@@ -667,24 +667,24 @@ update_audio()
     if ( volume < 0 ) {
 	volume = 0;
     }
-    if ( volume > 128 ) {
-	volume = 128;
+    if ( volume > 10 ) {
+	volume = 10;
     }
     setparam_sound_volume( volume );
 
-    Mix_Volume( -1, volume ); /* channel of -1 sets volume for all channels */
+    Mix_Volume( -1, 10 + volume * 11 ); /* channel of -1 sets volume for all channels */
 
     /* Set music volume level */
     volume = getparam_music_volume();
     if ( volume < 0 ) {
 	volume = 0;
     }
-    if ( volume > 128 ) {
-	volume = 128;
+    if ( volume > 10 ) {
+	volume = 10;
     }
     setparam_music_volume( volume );
  
-    Mix_VolumeMusic( volume );
+    Mix_VolumeMusic( 10 + volume * 11 );
 
     /* Update music status */
 

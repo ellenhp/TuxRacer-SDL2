@@ -210,13 +210,13 @@ set music_enabled True
 #
 # This controls the sound volume (valid range is 0-127).
 #
-set sound_volume 127
+set sound_volume 8
 
 # music_volume
 #
 # This controls the music volume (valid range is 0-127).
 #
-set music_volume 64
+set music_volume 5
 
 # audio_freq_mode
 #
