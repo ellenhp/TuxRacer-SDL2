@@ -3,6 +3,7 @@
 #include "fonts.h"
 #include "gui_abstraction.h"
 #include "winsys.h"
+#include "joystick.h"
 
 font_t* menu_font;
 
@@ -213,3 +214,38 @@ int TRGui_get_window_width()
 {
 	return getparam_x_resolution();
 }
+
+int TRGui_joystick_enabled()
+{
+	if (is_joystick_active()==True)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+double TRGui_get_joystick_x()
+{
+	return get_joystick_x_axis();
+}
+
+double TRGui_get_joystick_y()
+{
+	return get_joystick_y_axis();
+}
+
+int TRGui_joystick_button_down(int button)
+{
+	if (is_joystick_button_down(button)==True)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
