@@ -48,7 +48,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\Users\nolan\gamedev\Tux Racer\TuxRacer\src;$(SDL_HOME)\include;$(SDL_MIXER_HOME)\include;$(TCL_HOME)\generic;$(TRGUI_HOME)\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SDL_HOME)\include;$(SDL_MIXER_HOME)\include;$(TCL_HOME)\generic;$(TRGUI_HOME)\src</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>HAVE_SDL;HAVE_SDL_MIXER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -70,7 +70,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>C:\Users\nolan\gamedev\Tux Racer\TuxRacer\src;$(SDL_HOME)\include;$(SDL_MIXER_HOME)\include;$(TCL_HOME)\generic;$(TRGUI_HOME)\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SDL_HOME)\include;$(SDL_MIXER_HOME)\include;$(TCL_HOME)\generic;$(TRGUI_HOME)\src</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>HAVE_SDL;HAVE_SDL_MIXER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
