@@ -10,7 +10,7 @@ font_t* menu_font;
 /*
  * This is here to allow ui_mgr to know about the position of the cursor so it can render it on top of the menus
  */
-void TRGui_motion_func( int x, int y )
+void GameMenu_motion_func( int x, int y )
 {
 	ui_event_motion_func( x, y );
 	gui_mouse_motion_event( x, y );
@@ -19,19 +19,19 @@ void TRGui_motion_func( int x, int y )
 /*
  * This is here solely to hide the internals of the GUI library from tux racer
  */
-void TRGui_mouse_func( int button, int state, int x, int y )
+void GameMenu_mouse_func( int button, int state, int x, int y )
 {
 	gui_mouse_button_event( button, state, x, y );
 }
 
-void TRGui_simulate_click(widget_t* widget)
+void GameMenu_simulate_click(widget_t* widget)
 {
 	//call back is the same regardless of what the widget type is
 	widget_bounding_box_t bb={0, 0, 0, 0};
 	widget->callback1(1, 0, 0, bb);
 }
 
-void TRGui_init()
+void GameMenu_init()
 {
 
 }
@@ -41,8 +41,8 @@ coord_t get_absolute(coord_t coord, int asc, int desc)
 	int w, h, num_lines;
 	coord_t absolute;
 
-	w=TRGui_get_window_width();
-	h=TRGui_get_window_height();
+	w=GameMenu_get_window_width();
+	h=GameMenu_get_window_height();
 
 	absolute.x_coord_type=ABSOLUTE_COORD;
 	absolute.y_coord_type=ABSOLUTE_COORD;
@@ -81,7 +81,7 @@ coord_t get_absolute(coord_t coord, int asc, int desc)
 	return absolute;
 }
 
-widget_bounding_box_t TRGui_get_bb(widget_t* widget)
+widget_bounding_box_t GameMenu_get_bb(widget_t* widget)
 {
 	widget_bounding_box_t bb;
 
@@ -105,7 +105,7 @@ widget_bounding_box_t TRGui_get_bb(widget_t* widget)
 	absolute_coord=get_absolute(widget->layout_info, asc, desc);
 
 	bb.x=absolute_coord.x;
-	bb.y=TRGui_get_window_height()-absolute_coord.y;
+	bb.y=GameMenu_get_window_height()-absolute_coord.y;
 	bb.width=w;
 	bb.height=asc+desc;
 
@@ -140,7 +140,7 @@ widget_bounding_box_t TRGui_get_bb(widget_t* widget)
 	return bb;
 }
 
-void TRGui_draw_text(char* text, int active, coord_t coord)
+void GameMenu_draw_text(char* text, int active, coord_t coord)
 {
     font_t *font;
     int w, asc, desc;
@@ -205,17 +205,17 @@ void TRGui_draw_text(char* text, int active, coord_t coord)
     }
 }
 
-int TRGui_get_window_height()
+int GameMenu_get_window_height()
 {
 	return getparam_y_resolution();
 }
 
-int TRGui_get_window_width()
+int GameMenu_get_window_width()
 {
 	return getparam_x_resolution();
 }
 
-int TRGui_joystick_enabled()
+int GameMenu_joystick_enabled()
 {
 	if (is_joystick_active()==True)
 	{
@@ -227,17 +227,17 @@ int TRGui_joystick_enabled()
 	}
 }
 
-double TRGui_get_joystick_x()
+double GameMenu_get_joystick_x()
 {
 	return get_joystick_x_axis();
 }
 
-double TRGui_get_joystick_y()
+double GameMenu_get_joystick_y()
 {
 	return get_joystick_y_axis();
 }
 
-int TRGui_joystick_button_down(int button)
+int GameMenu_joystick_button_down(int button)
 {
 	if (is_joystick_button_down(button)==True)
 	{

@@ -107,11 +107,11 @@ static void prefs_init(void)
     winsys_set_display_func( main_loop );
     winsys_set_idle_func( main_loop );
     winsys_set_reshape_func( reshape );
-    winsys_set_mouse_func( TRGui_mouse_func );
-    winsys_set_motion_func( TRGui_motion_func );
-    winsys_set_passive_motion_func( TRGui_motion_func );
+    winsys_set_mouse_func( GameMenu_mouse_func );
+    winsys_set_motion_func( GameMenu_motion_func );
+    winsys_set_passive_motion_func( GameMenu_motion_func );
 
-	TRGui_init();
+	GameMenu_init();
 	setup_gui();
 
 	gui_add_widget(back_btn=create_button("Back", back_click), NULL);
