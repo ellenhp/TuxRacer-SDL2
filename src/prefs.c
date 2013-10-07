@@ -165,17 +165,7 @@ START_KEYBOARD_CB( prefs_key_cb )
 {
 	if (release) return;
 
-    if ( !special )
-	{
-		key = (int) tolower( (char) key );
-
-		switch( key )
-		{
-		case 'q':
-		case 27: /* Esc */
-			break;
-		}
-    }
+    GameMenu_keypress(key);
 }
 END_KEYBOARD_CB
 

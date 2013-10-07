@@ -1,5 +1,6 @@
 #include "ui_mgr.h"
 #include "gui_mgr.h"
+#include "gui_input.h"
 #include "fonts.h"
 #include "gui_abstraction.h"
 #include "winsys.h"
@@ -22,6 +23,11 @@ void GameMenu_motion_func( int x, int y )
 void GameMenu_mouse_func( int button, int state, int x, int y )
 {
 	gui_mouse_button_event( button, state, x, y );
+}
+
+void GameMenu_keypress(int key)
+{
+	gui_process_keypress(key);
 }
 
 void GameMenu_simulate_click(widget_t* widget)
@@ -214,38 +220,3 @@ int GameMenu_get_window_width()
 {
 	return getparam_x_resolution();
 }
-
-int GameMenu_joystick_enabled()
-{
-	if (is_joystick_active()==True)
-	{
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
-}
-
-double GameMenu_get_joystick_x()
-{
-	return get_joystick_x_axis();
-}
-
-double GameMenu_get_joystick_y()
-{
-	return get_joystick_y_axis();
-}
-
-int GameMenu_joystick_button_down(int button)
-{
-	if (is_joystick_button_down(button)==True)
-	{
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
-}
-
