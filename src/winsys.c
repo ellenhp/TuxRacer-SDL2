@@ -45,9 +45,14 @@ static winsys_keyboard_func_t keyboard_func = NULL;
 static winsys_mouse_func_t mouse_func = NULL;
 static winsys_motion_func_t motion_func = NULL;
 static winsys_motion_func_t passive_motion_func = NULL;
+static winsys_joystick_func_t joystick_func = NULL;
+static winsys_joystick_button_func_t joystick_button_func = NULL;
+
 static winsys_atexit_func_t atexit_func = NULL;
 
 static bool_t redisplay = False;
+
+double x_joystick=0, y_joystick=0;
 
 
 /*---------------------------------------------------------------------------*/
@@ -151,6 +156,30 @@ void winsys_set_motion_func( winsys_motion_func_t func )
 void winsys_set_passive_motion_func( winsys_motion_func_t func )
 {
     passive_motion_func = func;
+}
+
+/*---------------------------------------------------------------------------*/
+/*! 
+  Sets the joystick callback
+  \author  nopoe
+  \date    Created:  2013-10-06
+  \date    Modfiied: 2013-10-06
+*/
+void winsys_set_joystick_func( winsys_joystick_func_t func )
+{
+    joystick_func = func;
+}
+
+/*---------------------------------------------------------------------------*/
+/*! 
+  Sets the joystick button callback
+  \author  nopoe
+  \date    Created:  2013-10-06
+  \date    Modfiied: 2013-10-06
+*/
+void winsys_set_joystick_button_func( winsys_joystick_button_func_t func )
+{
+    joystick_button_func = func;
 }
 
 
@@ -324,6 +353,7 @@ void winsys_show_cursor( bool_t visible )
 */
 void winsys_process_events()
 {
+	int z;
     SDL_Event event; 
     unsigned int key;
     int x, y;
@@ -358,8 +388,30 @@ void winsys_process_events()
 		}
 		break;
 
+		case SDL_JOYAXISMOTION:
+			if (event.jaxis.axis == getparam_joystick_x_axis())
+			{
+				x_joystick=(double)event.jaxis.value/(SHRT_MAX+1);
+			}
+			if (event.jaxis.axis == getparam_joystick_y_axis())
+			{
+				y_joystick=(double)event.jaxis.value/(SHRT_MAX+1);
+			}
+			if (joystick_func)
+			{
+				joystick_func(x_joystick, y_joystick);
+			}
+			break;
+		case SDL_JOYBUTTONDOWN:
+			if (joystick_button_func)
+			{
+				joystick_button_func(event.jbutton.button);
+			}
+			break;
+
 	    case SDL_MOUSEBUTTONDOWN:
 	    case SDL_MOUSEBUTTONUP:
+
 		if ( mouse_func ) {
 		    (*mouse_func)( event.button.button,
 				   event.button.state,

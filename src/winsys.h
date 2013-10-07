@@ -312,6 +312,8 @@ typedef void (*winsys_keyboard_func_t)( unsigned int key, bool_t special,
 					bool_t release, int x, int y );
 typedef void (*winsys_mouse_func_t)( int button, int state, int x, int y );
 typedef void (*winsys_motion_func_t)( int x, int y );
+typedef void (*winsys_joystick_func_t)( double x, double y );
+typedef void (*winsys_joystick_button_func_t)( int button );
 
 typedef void (*winsys_atexit_func_t)( void );
 
@@ -323,6 +325,8 @@ void winsys_set_keyboard_func( winsys_keyboard_func_t func );
 void winsys_set_mouse_func( winsys_mouse_func_t func );
 void winsys_set_motion_func( winsys_motion_func_t func );
 void winsys_set_passive_motion_func( winsys_motion_func_t func );
+void winsys_set_joystick_func( winsys_joystick_func_t func );
+void winsys_set_joystick_button_func( winsys_joystick_button_func_t func );
 
 void winsys_set_high_framerate( bool_t highframerate );
 

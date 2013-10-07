@@ -25,6 +25,16 @@ void GameMenu_mouse_func( int button, int state, int x, int y )
 	gui_mouse_button_event( button, state, x, y );
 }
 
+void GameMenu_joystick_func( double x, double y )
+{
+	gui_process_axis(x, y);
+}
+
+void GameMenu_joystick_button_func( int button )
+{
+	gui_process_button_press(button);
+}
+
 void GameMenu_keypress(int key)
 {
 	gui_process_keypress(key);

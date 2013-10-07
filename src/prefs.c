@@ -110,6 +110,8 @@ static void prefs_init(void)
     winsys_set_mouse_func( GameMenu_mouse_func );
     winsys_set_motion_func( GameMenu_motion_func );
     winsys_set_passive_motion_func( GameMenu_motion_func );
+	winsys_set_joystick_func( GameMenu_joystick_func );
+	winsys_set_joystick_button_func( GameMenu_joystick_button_func );
 
 	GameMenu_init();
 	setup_gui();

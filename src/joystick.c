@@ -54,6 +54,8 @@ void init_joystick()
 
     joystick = SDL_JoystickOpen( 0 );
 
+	SDL_JoystickEventState(SDL_ENABLE);
+
     if ( joystick == NULL ) {
 	print_debug( DEBUG_JOYSTICK, "Cannot open joystick" );
 	return;
@@ -78,7 +80,7 @@ bool_t is_joystick_active()
 
 void update_joystick()
 {
-    SDL_JoystickUpdate();
+    //SDL_JoystickUpdate();
 }
 
 scalar_t get_joystick_x_axis()
