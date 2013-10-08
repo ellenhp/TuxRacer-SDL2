@@ -242,7 +242,7 @@ int GameMenu_resolve_bounds(int val, int min, int max, input_type_t input_type)
 		{
 			val=val%(max+1)+min;
 		}
-		if (val<max)
+		if (val<min)
 		{
 			val%=max+1;
 			val+=max+1;
