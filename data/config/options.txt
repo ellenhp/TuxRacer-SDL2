@@ -368,7 +368,7 @@ set draw_particles True
 #
 # If True, then the players will leave track marks in the snow.
 #
-set track_marks True
+set track_marks False
 
 # ui_snow
 #

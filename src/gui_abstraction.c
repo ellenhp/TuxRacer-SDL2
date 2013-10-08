@@ -261,5 +261,6 @@ int GameMenu_resolve_bounds(int val, int min, int max, input_type_t input_type)
 			val=min;
 		}
 	}
+	return val;
 }
 

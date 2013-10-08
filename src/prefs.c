@@ -51,7 +51,7 @@ typedef struct graphics_options_t
 graphics_options_t graphics_options[]={
 	{5, 30, 0, False, False, False, 3, False, False, "Low"},
 	{10, 70, 20, True, False, True, 16, True, False, "Medium"},
-	{20, 300, 300, True, True, True, 64, True, True, "High"},
+	{20, 300, 300, True, True, True, 64, True, False, "High"},
 };
 
 widget_t* back_btn=NULL;
