@@ -520,16 +520,11 @@ static void event_select_init(void)
     
     event_list = get_events_list();
     
-    if ( g_game.prev_mode != RACE_SELECT ) {
-        cur_event = get_list_head( event_list );
-        event_data = (event_data_t*)get_list_elem_data( cur_event );
-        cup_list = get_event_cup_list( event_data );
+    cur_event = get_list_head( event_list );
+    event_data = (event_data_t*)get_list_elem_data( cur_event );
+    cup_list = get_event_cup_list( event_data );
         
-        set_cur_cup_to_first_incomplete( event_data, cup_list );
-    } else {
-        event_data = (event_data_t*)get_list_elem_data( cur_event );
-        cup_list = get_event_cup_list( event_data );
-    }
+    set_cur_cup_to_first_incomplete( event_data, cup_list );
     
     
     
