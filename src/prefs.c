@@ -61,10 +61,14 @@ widget_t* sound_volume_slider=NULL;
 
 widget_t* graphics_slider=NULL;
 
+widget_t* fps_btn=NULL;
+
 int music_volume_ticks=0;
 int sound_volume_ticks=0;
 
 int graphics_ticks=0;
+
+bool_t display_fps;
 
 void update_volume()
 {
@@ -103,6 +107,24 @@ void update_graphics()
 	setparam_tux_sphere_divisions(options.tux_sphere_divisions);
 	setparam_draw_particles(options.draw_particles);
 	setparam_track_marks(options.track_marks);
+
+	write_config_file();
+}
+
+void update_fps()
+{
+	if (display_fps)
+	{
+		widget_set_text(fps_btn, "Show FPS: Yes");
+	}
+	else
+	{
+		widget_set_text(fps_btn, "Show FPS: No");
+	}
+
+	setparam_display_fps(display_fps);
+
+	write_config_file();
 }
 
 void music_volume_down(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
@@ -144,6 +166,15 @@ void graphics_down(int button, int mouse_x, int mouse_y, widget_bounding_box_t b
 	update_graphics();
 }
 
+void fps_click(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
+{
+	if (display_fps)
+		display_fps=False;
+	else
+		display_fps=True;
+	update_fps();
+}
+
 static void prefs_init(void) 
 {
     winsys_set_display_func( main_loop );
@@ -169,14 +200,17 @@ static void prefs_init(void)
 	graphics_slider=create_slider("", graphics_down, graphics_up);
 	gui_add_widget(graphics_slider, NULL);
 
-	//this is the result of some algebra. Initializes the volume slider values
+	gui_add_widget(fps_btn=create_button("", fps_click), NULL);
+	
 	music_volume_ticks=getparam_music_volume();
 	sound_volume_ticks=getparam_sound_volume();
 
 	graphics_ticks=getparam_graphics_slider_tick();
+	display_fps=getparam_display_fps();
 
 	update_volume();
 	update_graphics();
+	update_fps();
 
     play_music( "start_screen" );
 }
