@@ -182,25 +182,26 @@ START_KEYBOARD_CB( game_type_select_cb )
 	    winsys_exit(0);
 	    break;
 	case 'e':
-	case 13: /* Enter */
 	    if ( enter_event_btn ) {
-		button_simulate_mouse_click( enter_event_btn );
+		GameMenu_simulate_click( enter_event_btn );
 	    }
 	    break;
 	case 'p':
 	    if ( practice_btn ) {
-		button_simulate_mouse_click( practice_btn );
+		GameMenu_simulate_click( practice_btn );
 	    }
 	    break;
 	case 'c':
 	    if ( credits_btn ) {
-		button_simulate_mouse_click( credits_btn );
+		GameMenu_simulate_click( credits_btn );
 	    }
 	    break;
 	}
     }
+    
+	GameMenu_keypress(key);
 
-    winsys_post_redisplay();
+	winsys_post_redisplay();
 }
 END_KEYBOARD_CB
 
