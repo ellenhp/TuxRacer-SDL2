@@ -44,6 +44,11 @@
 #define CREDITS_MAX_Y -140
 #define CREDITS_MIN_Y 64
 
+#define CREDITS_SPEED 35
+#define CREDITS_JOYSTICK_SPEED 150
+
+double joystick_y;
+
 typedef struct {
     char *binding;
     char *text;
@@ -54,7 +59,7 @@ static credit_line_t credit_lines[] =
     { "credits_text", "" },
     { "credits_text", "" },
     { "credits_text", "" },
-    { "credits_h1", "Tux Racer 4iOS" },
+    { "credits_h1", "Tux Racer SDL2" }, //a real name will come later
     { "credits_text_small", "" },
     { "credits_text_small", "This program is free software;" },
     { "credits_text_small", "you can redistribute it and/or" },
@@ -63,26 +68,21 @@ static credit_line_t credit_lines[] =
     { "credits_text_small", "" },
     { "credits_text", "Ported from" },
     { "credits_text", "the open-source project" },
-    { "credits_text", "by Jasmin F. Patry" },
-    //{ "credits_text", "tuxracer.sourceforge.net" },
+    { "credits_text", "Tux Racer 4iOS" },
     { "credits_text", "" },
+    { "credits_h2", "Tux Racer SDL2" },
+    { "credits_h2", "Development Team:" },
+    { "credits_text", "Names will go here" },
+    { "credits_text", "Names will go here" },
     { "credits_text", "" },
-    { "credits_h2", "iPhone port:" },
+    { "credits_h2", "Tux Racer 4iOS" },
+    { "credits_h2", "Core Development Team:" },
     { "credits_text", "Emmanuel de Roux" },
     { "credits_text", "Felix Jankowski" },  
     { "credits_text", "Pedro de Barlow" },
     { "credits_text", "" },
-    { "credits_h2", "Currently maintained by:" },
-    { "credits_text", "Felix Jankowski" },
-    { "credits_text", "" },
-    { "credits_h2", "Launchscreen graphics:" },
-    { "credits_text", "Bodo Graumann" },  
-    { "credits_text", "" },
-    { "credits_h2", "Special Thanks to:" },
-    { "credits_text", "Lucas Clemente" },  
-    { "credits_text", "" },
-    { "credits_h2", "Tux Racer" },
-    { "credits_h2", "Core Development Team" },
+    { "credits_h2", "Original Tux Racer" },
+    { "credits_h2", "Core Development Team:" },
     { "credits_text_small", "(Alphabetical Order)" },
     { "credits_text", "Patrick \"Pog\" Gilhuly" },
     { "credits_text", "Eric \"Monster\" Hall" },
@@ -90,46 +90,6 @@ static credit_line_t credit_lines[] =
     { "credits_text", "Vincent Ma" },
     { "credits_text", "Jasmin Patry" },
     { "credits_text", "Mark Riddell" },
-    /*{ "credits_text", "" },
-    { "credits_h2", "Music" },
-    { "credits_text", "The Lames: She said no" },
-    { "credits_text_small", "http://myspace.com/whosthelames" },
-    { "credits_text", "EDY: Gotta work" },
-    { "credits_text_small", "http://myspace.com/edyrap" },
-    { "credits_text", "Cosy Palace: ode a un glacon" },
-    { "credits_text", "Allie Delfau" },
-    { "credits_text", "Raphael Lebas de Lacour" },
-    { "credits_text", "Joseph Toscano" },
-    { "credits_text", "" },
-    { "credits_text", "" },
-    { "credits_text_small", "Tux Racer is a trademark" },
-    { "credits_text_small", "of Jasmin F. Patry" },*/
-    { "credits_text", "" },
-    { "credits_text", "" },
-    { "credits_text", "" },
-    { "credits_text", "" },
-    { "credits_text", "" },
-    { "credits_text", "" },
-    { "credits_text", "" },
-    { "credits_text", "" },
-    { "credits_text", "" },
-    { "credits_h2", "~ For Lisa  ~" },
-    { "credits_text", "" },
-    { "credits_text", "" },
-    { "credits_text", "" },
-    { "credits_text", "" },
-    { "credits_text", "" },
-    { "credits_text", "" },
-    { "credits_text", "" },
-    { "credits_text", "" },
-    { "credits_text_small", "Version " VERSION "  ~  August 5th, 2011" },
-    { "credits_text_small", "Version 1.0  ~  August 5th, 2011" },
-    { "credits_text", "" },
-    { "credits_text", "" },
-    { "credits_text", "" },
-    { "credits_text", "" },
-    { "credits_text", "" },
-    { "credits_text", "" },
 };
 
 static scalar_t y_offset = 0;
@@ -163,6 +123,29 @@ void mouse_cb( int button, int state, int x, int y )
     }
 }
 
+/*---------------------------------------------------------------------------*/
+/*! 
+ Joystick axis event callback
+ \author  nopoe
+ \date    Created:  2013-10-08
+ \date    Modified: 2013-10-08
+ */
+void credits_joystick_func(double x, double y)
+{
+	joystick_y=y;
+}
+
+/*---------------------------------------------------------------------------*/
+/*! 
+ Joystick button event callback
+ \author  nopoe
+ \date    Created:  2013-10-08
+ \date    Modified: 2013-10-08
+ */
+void credits_joystick_button_func(int button)
+{
+	go_back();
+}
 
 /*---------------------------------------------------------------------------*/
 /*! 
@@ -180,7 +163,11 @@ static void draw_credits_text( scalar_t time_step )
     scalar_t y;
     int string_w, asc, desc;
     
-    y_offset += time_step * 30;
+    y_offset += time_step * CREDITS_SPEED + time_step*joystick_y*CREDITS_JOYSTICK_SPEED;
+	if (y_offset<0)
+	{
+		y_offset=0;
+	}
     y = CREDITS_MIN_Y+y_offset;
     
     glPushMatrix();
@@ -217,7 +204,7 @@ static void draw_credits_text( scalar_t time_step )
     glPopMatrix();
     
     if ( y > h+CREDITS_MAX_Y ) {
-        y_offset = 0;
+        go_back();
     }
     
     /* Draw strips at the top and bottom to clip out text */
@@ -351,6 +338,8 @@ static void credits_init(void)
     winsys_set_mouse_func( mouse_cb );
     winsys_set_motion_func( ui_event_motion_func );
     winsys_set_passive_motion_func( ui_event_motion_func );
+	winsys_set_joystick_func(credits_joystick_func);
+	winsys_set_joystick_button_func(credits_joystick_button_func);
     
     y_offset = 0;
     
