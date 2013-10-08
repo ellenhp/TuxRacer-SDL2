@@ -49,9 +49,9 @@ typedef struct graphics_options_t
 
 #define NUM_GRAPHICS_OPTIONS 3
 graphics_options_t graphics_options[]={
-	{5, 30, 0, False, False, False, 3, False, False, "Low"},
-	{10, 70, 20, True, False, True, 16, True, False, "Medium"},
-	{20, 300, 300, True, True, True, 64, True, False, "High"},
+	{5, 30, 0, False, False, False, 3, False, False, "Graphics Preset: Low"},
+	{10, 70, 20, True, False, True, 16, True, False, "Graphics Preset: Medium"},
+	{20, 300, 300, True, True, True, 64, True, False, "Graphics Preset: High"},
 };
 
 widget_t* back_btn=NULL;
@@ -61,12 +61,17 @@ widget_t* sound_volume_slider=NULL;
 
 widget_t* graphics_slider=NULL;
 
+#define NUM_VIEW_OPTIONS 4
+widget_t* view_slider=NULL;
+
 widget_t* fps_btn=NULL;
 
 int music_volume_ticks=0;
 int sound_volume_ticks=0;
 
 int graphics_ticks=0;
+
+int view_mode=0;
 
 bool_t display_fps;
 
@@ -107,6 +112,29 @@ void update_graphics()
 	setparam_tux_sphere_divisions(options.tux_sphere_divisions);
 	setparam_draw_particles(options.draw_particles);
 	setparam_track_marks(options.track_marks);
+
+	write_config_file();
+}
+
+void update_view_slider()
+{
+	switch (view_mode)
+	{
+	case 0:
+		widget_set_text(view_slider, "View Mode: Behind");
+		break;
+	case 1:
+		widget_set_text(view_slider, "View Mode: Follow");
+		break;
+	case 2:
+		widget_set_text(view_slider, "View Mode: Above");
+		break;
+	case 3:
+		widget_set_text(view_slider, "View Mode: Tux's Eyes");
+		break;
+	}
+
+	setparam_view_mode(view_mode);
 
 	write_config_file();
 }
@@ -166,6 +194,17 @@ void graphics_down(int button, int mouse_x, int mouse_y, widget_bounding_box_t b
 	update_graphics();
 }
 
+void view_up(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
+{
+	view_mode=GameMenu_resolve_bounds(view_mode+1, 1, NUM_VIEW_OPTIONS-1, input_type);
+	update_view_slider();
+}
+void view_down(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
+{
+	view_mode=GameMenu_resolve_bounds(view_mode-1, 1, NUM_VIEW_OPTIONS-1, input_type);
+	update_view_slider();
+}
+
 void fps_click(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
 {
 	if (display_fps)
@@ -200,17 +239,24 @@ static void prefs_init(void)
 	graphics_slider=create_slider("", graphics_down, graphics_up);
 	gui_add_widget(graphics_slider, NULL);
 
+	view_slider=create_slider("", view_down, view_up);
+	gui_add_widget(view_slider, NULL);
+
 	gui_add_widget(fps_btn=create_button("", fps_click), NULL);
 	
 	music_volume_ticks=getparam_music_volume();
 	sound_volume_ticks=getparam_sound_volume();
 
 	graphics_ticks=getparam_graphics_slider_tick();
+
+	view_mode=getparam_view_mode();
+
 	display_fps=getparam_display_fps();
 
 	update_volume();
 	update_graphics();
 	update_fps();
+	update_view_slider();
 
     play_music( "start_screen" );
 }
