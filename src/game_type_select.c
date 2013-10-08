@@ -155,7 +155,7 @@ static void game_type_select_loop( scalar_t time_step )
 
     ui_draw_menu_decorations();
 
-	gui_draw();
+	GameMenu_draw();
 
 	ui_draw_cursor();
 

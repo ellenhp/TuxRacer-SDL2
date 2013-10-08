@@ -142,8 +142,8 @@ static void prefs_loop( scalar_t time_step )
         draw_ui_snow();
     }
 
-	gui_draw();
-    
+	GameMenu_draw();
+
     ui_draw_cursor();
     
     reshape( width, height );

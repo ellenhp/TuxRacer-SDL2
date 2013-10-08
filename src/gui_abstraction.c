@@ -52,6 +52,12 @@ void GameMenu_init()
 
 }
 
+void GameMenu_draw()
+{
+	gui_update();
+	gui_draw();
+}
+
 coord_t get_absolute(coord_t coord, int asc, int desc)
 {
 	int w, h, num_lines;
@@ -150,9 +156,6 @@ widget_bounding_box_t GameMenu_get_bb(widget_t* widget)
         print_warning( IMPORTANT_WARNING,"Justification x/y mismatch\n" );
 		break;
 	}
-
-
-
 	return bb;
 }
 
