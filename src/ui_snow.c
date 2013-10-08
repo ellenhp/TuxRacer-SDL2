@@ -29,7 +29,7 @@
 #include "loop.h"
 
 #define MAX_NUM_PARTICLES 10000
-#define BASE_NUM_PARTICLES 400
+#define PARTICLE_DENSITY 0.0005
 #define GRAVITY_FACTOR 0.015
 #define BASE_VELOCITY 0.05
 #define VELOCITY_RANGE 0.02
@@ -54,7 +54,8 @@ typedef struct _particle_t {
 } particle_t;
 
 static particle_t particles[MAX_NUM_PARTICLES];
-static int num_particles = BASE_NUM_PARTICLES;
+static int orig_num_particles = 0;
+static int num_particles = 0;
 static GLfloat particle_colour[4] = { 1, 1, 1, 0.4 };
 static point2d_t push_position = {0, 0};
 static point2d_t last_push_position;
@@ -97,6 +98,8 @@ void init_ui_snow( void )
 {
     int i;
 
+	num_particles=orig_num_particles=PARTICLE_DENSITY*getparam_x_resolution()*getparam_y_resolution();
+
     for( i=0; i<num_particles; i++) {
 	make_particle( i, frand(), frand() );
     }
@@ -123,7 +126,8 @@ void update_ui_snow( scalar_t time_step, bool_t windy )
     winsys_get_gravity(&grav_x, &grav_y);
 #else
 	// No gravity (yet) on Windows/Android
-	grav_x = grav_y = 0.0;
+	grav_x = 0.0;
+	grav_y = -1.0;
 #endif
     if ( push_position_initialized ) {
 	push_vector.x = push_position.x - last_push_position.x;
@@ -184,7 +188,7 @@ void update_ui_snow( scalar_t time_step, bool_t windy )
 	if (p->pt.y < -0.05) {
 	    /* If we have an excess of particles, kill off with
 	       50% probability */
-	    if ( num_particles > BASE_NUM_PARTICLES && frand() > 0.5 ) {
+	    if ( num_particles > orig_num_particles && frand() > 0.5 ) {
 		/* Delete the particle */
 		*p = particles[num_particles-1];
 		num_particles -= 1;
@@ -316,6 +320,8 @@ push_ui_snow( point2d_t pos )
 {
     scalar_t xres, yres;
 
+	return;
+
     xres = getparam_x_resolution();
     yres = getparam_y_resolution();
     push_position = make_point2d( pos.x/(scalar_t)xres,
@@ -357,7 +363,7 @@ reset_ui_snow( void ) {
                 num_particles -= 1;
     }
     
-    num_particles = BASE_NUM_PARTICLES;
+    num_particles = orig_num_particles;
     
     init_ui_snow();
 }

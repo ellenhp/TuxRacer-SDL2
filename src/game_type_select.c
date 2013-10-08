@@ -45,6 +45,8 @@ widget_t* credits_btn = NULL;
 widget_t* pref_btn = NULL;
 widget_t* quit_btn = NULL;
 
+bool_t snow_initiated=False;
+
 //The training mode of Tux Racer World challenge has been binded to the event mode of tuxracer
 void enter_event_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb)
 {
@@ -109,8 +111,12 @@ void quit_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t b
 static void game_type_select_init(void)
 {
     point2d_t dummy_pos = {0, 0};
-
-	init_ui_snow();
+	
+	if (!snow_initiated)
+	{
+		init_ui_snow();
+		snow_initiated=True;
+	}
 
     winsys_set_display_func( main_loop );
     winsys_set_idle_func( main_loop );
