@@ -430,6 +430,8 @@ static void back_click_cb( button_t *button, void *userdata )
         set_game_mode( GAME_TYPE_SELECT );
     }
     
+	winsys_reset_js_bindings();
+
     ui_set_dirty();
 }
 
@@ -463,7 +465,10 @@ static void start_click_cb( button_t *button, void *userdata )
     if (!strcmp(g_game.race.name,"Basic tutorial")) init_starting_tutorial_step(0);
     if (!strcmp(g_game.race.name,"Jump tutorial")) init_starting_tutorial_step(10);
     
+	winsys_reset_js_bindings();
+
     set_game_mode( LOADING );
+
 }
 
 
@@ -791,6 +796,10 @@ static void race_select_init(void)
     winsys_set_motion_func( ui_event_motion_func );
     winsys_set_passive_motion_func( ui_event_motion_func );
     
+	winsys_add_js_axis_bindings();
+	winsys_add_js_button_binding(getparam_joystick_continue_button(), SDLK_RETURN);
+	winsys_add_js_button_binding(getparam_joystick_brake_button(), SDLK_ESCAPE);
+
     plyr = get_player_data( local_player() );
     
     /* Setup the race list */
@@ -1115,6 +1124,8 @@ static void race_select_loop( scalar_t time_step )
     
     set_widget_positions_and_draw_decorations();
     
+	winsys_update_joysticks();
+
     ui_draw();
     
     reshape( getparam_x_resolution(), getparam_y_resolution() );

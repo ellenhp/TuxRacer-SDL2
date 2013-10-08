@@ -125,6 +125,12 @@ typedef enum {
     WS_MOUSE_UP = SDL_RELEASED
 } winsys_button_state_t;
 
+typedef struct js_binding_t
+{
+	int js_button;
+	int sdl_key;
+} js_binding_t;
+
 #elif defined(HAVE_GLUT)
 /*---------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------*/
@@ -327,6 +333,12 @@ void winsys_set_motion_func( winsys_motion_func_t func );
 void winsys_set_passive_motion_func( winsys_motion_func_t func );
 void winsys_set_joystick_func( winsys_joystick_func_t func );
 void winsys_set_joystick_button_func( winsys_joystick_button_func_t func );
+
+void winsys_add_js_button_binding(int js_button, int sdl_key);
+void winsys_add_js_axis_bindings();
+void winsys_reset_js_bindings();
+
+void winsys_update_joysticks();
 
 void winsys_set_high_framerate( bool_t highframerate );
 

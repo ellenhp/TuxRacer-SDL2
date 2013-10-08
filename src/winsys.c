@@ -54,6 +54,22 @@ static bool_t redisplay = False;
 
 double x_joystick=0, y_joystick=0;
 
+#define JOYSTICK_TRIGGER 0.5
+#define JOYSTICK_RELAX 0.35
+
+#define JOYSTICK_REPEAT_DELAY 400
+#define JOYSTICK_REPEAT_RATE_INVERSE 200
+
+#define MAX_JS_BINDINGS 10
+
+int winsys_joystick_x_status=0, winsys_joystick_y_status=0;
+int winsys_joystick_x_trigger_time=INT_MAX, winsys_joystick_y_trigger_time=INT_MAX;
+int winsys_joystick_x_repeating=0, winsys_joystick_y_repeating=0;
+
+int num_js_bindings=0;
+js_binding_t js_bindings[MAX_JS_BINDINGS];
+
+bool_t bind_js_axes=False;
 
 /*---------------------------------------------------------------------------*/
 /*! 
@@ -274,7 +290,7 @@ void winsys_init( int *argc, char **argv, char *window_title,
 		  char *icon_title )
 {
     Uint32 sdl_flags = SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE;
-
+	int i;
     /*
      * Initialize SDL
      */
@@ -296,7 +312,6 @@ void winsys_init( int *argc, char **argv, char *window_title,
     setup_sdl_video_mode();
 
     SDL_WM_SetCaption( window_title, icon_title );
-
 }
 
 
@@ -357,6 +372,7 @@ void winsys_process_events()
     SDL_Event event; 
     unsigned int key;
     int x, y;
+	int i;
 
     while (True) {
 
@@ -403,6 +419,16 @@ void winsys_process_events()
 			}
 			break;
 		case SDL_JOYBUTTONDOWN:
+			for (i=0; i<num_js_bindings; i++)
+			{
+				if (event.jbutton.button==js_bindings[i].js_button)
+				{
+					if (keyboard_func)
+					{
+						keyboard_func(js_bindings[i].sdl_key, js_bindings[i].sdl_key>=256, False, 0, 0);
+					}
+				}
+			}
 			if (joystick_button_func)
 			{
 				joystick_button_func(event.jbutton.button);
@@ -465,6 +491,162 @@ void winsys_process_events()
 
     /* Never exits */
     code_not_reached();
+}
+
+
+/*---------------------------------------------------------------------------*/
+/*! 
+  Adds an assocation between a joystick button and an SDL Key.
+  \author  nopoe
+  \date    Created:  2013-10-08
+  \date    Modified: 2013-10-08 */
+void winsys_add_js_button_binding(int js_button, int sdl_key)
+{
+	if (num_js_bindings<MAX_JS_BINDINGS)
+	{
+		js_bindings[num_js_bindings].js_button=js_button;
+		js_bindings[num_js_bindings].sdl_key=sdl_key;
+		num_js_bindings++;
+	}
+}
+
+
+/*---------------------------------------------------------------------------*/
+/*! 
+  Binds the joystick axes to the arrow keys
+  \author  nopoe
+  \date    Created:  2013-10-08
+  \date    Modified: 2013-10-08 */
+void winsys_add_js_axis_bindings()
+{
+	bind_js_axes=True;
+}
+
+
+/*---------------------------------------------------------------------------*/
+/*! 
+  Resets all bindings of joystick axes or buttons to keys.
+  \author  nopoe
+  \date    Created:  2013-10-08
+  \date    Modified: 2013-10-08 */
+void winsys_reset_js_bindings()
+{
+	bind_js_axes=False;
+	num_js_bindings=0;
+}
+
+/*---------------------------------------------------------------------------*/
+/*! 
+  Updates the joysticks for the purposes of sending keyboard events bound
+  to the axes.
+  \author  nopoe
+  \date    Created:  2013-10-08
+  \date    Modified: 2013-10-08 */
+void winsys_update_joysticks()
+{
+	if (!keyboard_func)
+	{
+		return;
+	}
+	if (winsys_joystick_x_status!=0)
+	{
+		if (fabs(x_joystick)<JOYSTICK_RELAX)
+		{
+			winsys_joystick_x_status=0;
+			winsys_joystick_x_repeating=0;
+			winsys_joystick_x_trigger_time=INT_MAX;
+		}
+		else if (winsys_joystick_x_repeating && SDL_GetTicks()-winsys_joystick_x_trigger_time>JOYSTICK_REPEAT_RATE_INVERSE)
+		{
+			winsys_joystick_x_trigger_time=SDL_GetTicks();
+			if (winsys_joystick_x_status==-1)
+			{
+				(*keyboard_func)(SDLK_LEFT, True, False, 0, 0);
+			}
+			else if (winsys_joystick_x_status==1)
+			{
+				(*keyboard_func)(SDLK_RIGHT, True, False, 0, 0);
+			}
+		}
+		else if (SDL_GetTicks()-winsys_joystick_x_trigger_time>JOYSTICK_REPEAT_DELAY)
+		{
+			winsys_joystick_x_repeating=1;
+			winsys_joystick_x_trigger_time=SDL_GetTicks();
+			if (winsys_joystick_x_status==-1)
+			{
+				(*keyboard_func)(SDLK_LEFT, True, False, 0, 0);
+			}
+			else if (winsys_joystick_x_status==1)
+			{
+				(*keyboard_func)(SDLK_RIGHT, True, False, 0, 0);
+			}
+		}
+	}
+	else
+	{
+		if (x_joystick<-JOYSTICK_TRIGGER)
+		{
+			winsys_joystick_x_status=-1;
+			winsys_joystick_x_trigger_time=SDL_GetTicks();
+			(*keyboard_func)(SDLK_LEFT, True, False, 0, 0);
+		}
+		if (x_joystick>JOYSTICK_TRIGGER)
+		{
+			winsys_joystick_x_status=1;
+			winsys_joystick_x_trigger_time=SDL_GetTicks();
+			(*keyboard_func)(SDLK_RIGHT, True, False, 0, 0);
+		}
+	}
+
+	if (winsys_joystick_y_status!=0)
+	{
+		if (fabs(y_joystick)<JOYSTICK_RELAX)
+		{
+			winsys_joystick_y_status=0;
+			winsys_joystick_y_repeating=0;
+			winsys_joystick_y_trigger_time=INT_MAX;
+		}
+		else if (winsys_joystick_y_repeating && SDL_GetTicks()-winsys_joystick_y_trigger_time>JOYSTICK_REPEAT_RATE_INVERSE)
+		{
+			winsys_joystick_y_trigger_time=SDL_GetTicks();
+			if (winsys_joystick_y_status==-1)
+			{
+				(*keyboard_func)(SDLK_UP, True, False, 0, 0);
+			}
+			else if (winsys_joystick_y_status==1)
+			{
+				(*keyboard_func)(SDLK_DOWN, True, False, 0, 0);
+			}
+		}
+		else if (SDL_GetTicks()-winsys_joystick_y_trigger_time>JOYSTICK_REPEAT_DELAY)
+		{
+			winsys_joystick_y_repeating=1;
+			winsys_joystick_y_trigger_time=SDL_GetTicks();
+			if (winsys_joystick_y_status==-1)
+			{
+				(*keyboard_func)(SDLK_UP, True, False, 0, 0);
+			}
+			else if (winsys_joystick_y_status==1)
+			{
+				(*keyboard_func)(SDLK_DOWN, True, False, 0, 0);
+			}
+		}
+	}
+	else
+	{
+		if (y_joystick<-JOYSTICK_TRIGGER)
+		{
+			winsys_joystick_y_status=-1;
+			winsys_joystick_y_trigger_time=SDL_GetTicks();
+			(*keyboard_func)(SDLK_UP, True, False, 0, 0);
+		}
+		if (y_joystick>JOYSTICK_TRIGGER)
+		{
+			winsys_joystick_y_status=1;
+			winsys_joystick_y_trigger_time=SDL_GetTicks();
+			(*keyboard_func)(SDLK_DOWN, True, False, 0, 0);
+		}
+	}
 }
 
 
