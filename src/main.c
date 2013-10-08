@@ -269,7 +269,6 @@ int main( int argc, char **argv )
 
     init_preview();
 
-    splash_screen_register();
     intro_register();
     racing_register();
     game_over_register();
@@ -286,7 +285,7 @@ int main( int argc, char **argv )
     loading_register();
 
     g_game.mode = NO_MODE;
-    set_game_mode( SPLASH );
+    set_game_mode( GAME_TYPE_SELECT );
 
     g_game.difficulty = DIFFICULTY_LEVEL_NORMAL;
 

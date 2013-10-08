@@ -254,8 +254,7 @@ extern "C"
 typedef enum {
     ALL_MODES = -2,
     NO_MODE = -1,
-    SPLASH = 0,
-    GAME_TYPE_SELECT,
+    GAME_TYPE_SELECT = 0,
     EVENT_SELECT,
 #ifdef SPEED_MODE
     RACING_MODE_SELECT,
