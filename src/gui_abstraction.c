@@ -49,7 +49,7 @@ void GameMenu_simulate_click(widget_t* widget)
 
 void GameMenu_init()
 {
-
+	gui_set_select_button(getparam_joystick_continue_button());
 }
 
 void GameMenu_draw()
