@@ -32,43 +32,35 @@
 #include "joystick.h"
 #include "event_select.h"
 #include "winsys.h"
+#include "gui_abstraction.h"
+#include "gui_mgr.h"
+
 #ifdef __APPLE__
     #include "sharedGeneralFunctions.h"
 #endif
 
-#ifdef __APPLE__
-#define BOX_HEIGHT		240
-#define BOX_Y_OFFSET	90
-#else
-#define BOX_HEIGHT		210
-#define BOX_Y_OFFSET	128
-#endif
-
-static button_t *enter_event_btn = NULL;
-static button_t *practice_btn = NULL;
-static button_t *credits_btn = NULL;
-static button_t *pref_btn = NULL;
-static button_t *quit_btn = NULL;
+widget_t* enter_event_btn = NULL;
+widget_t* practice_btn = NULL;
+widget_t* credits_btn = NULL;
+widget_t* pref_btn = NULL;
+widget_t* quit_btn = NULL;
 
 //The training mode of Tux Racer World challenge has been binded to the event mode of tuxracer
-void enter_event_click_cb( button_t* button, void *userdata )
+void enter_event_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb)
 {
-    check_assertion( userdata == NULL, "userdata is not null" );
-
     g_game.current_event = NULL;
     g_game.current_cup = NULL;
     g_game.current_race = -1;
     g_game.practicing = False;
     
-    zappe_event_screen(NULL, userdata);
+    zappe_event_screen(NULL, NULL);
     
     ui_set_dirty();
 }
 
 //wich is in this version the "world challenge click callback
-void practice_click_cb( button_t *button, void *userdata )
+void practice_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb)
 {
-    check_assertion( userdata == NULL, "userdata is not null" );
 #ifdef __APPLE__
     //Only registered players can go in this mode
     /* if (playerRegistered()) { */
@@ -95,82 +87,23 @@ void practice_click_cb( button_t *button, void *userdata )
 #endif
 }
 
-void credits_click_cb( button_t *button, void *userdata )
+void credits_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb)
 {
-    check_assertion( userdata == NULL, "userdata is not null" );
-
     set_game_mode( CREDITS );
 
     ui_set_dirty();
 }
 
-void pref_click_cb( button_t *button, void *userdata )
+void pref_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb)
 {
-    check_assertion( userdata == NULL, "userdata is not null" );
-
     set_game_mode( PREFS );
 
     ui_set_dirty();
 }
 
-void quit_click_cb( button_t *button, void *userdata )
+void quit_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb)
 {
-    check_assertion( userdata == NULL, "userdata is not null" );
-
     winsys_exit( 0 );
-}
-
-static void set_widget_positions()
-{
-    button_t **button_list[] = { 
-		&enter_event_btn,
-		&practice_btn,
-		&pref_btn,
-		&credits_btn,
-		&quit_btn
-	};
-    int w = getparam_x_resolution();
-    int h = getparam_y_resolution();
-    int box_height;
-    int box_max_y;
-    int top_y;
-    int bottom_y;
-    int num_buttons = sizeof( button_list ) / sizeof( button_list[0] );
-    int i;
-    int tot_button_height = 0;
-    int button_sep =0;
-    int cur_y_pos;
-
-    box_height = BOX_HEIGHT;
-    box_max_y = h - BOX_Y_OFFSET;
-
-    bottom_y = 0.4*h - box_height/2;
-
-    if ( bottom_y + box_height > box_max_y ) {
-	bottom_y = box_max_y - box_height;
-    }
-
-    top_y = bottom_y + box_height;
-
-    for (i=0; i<num_buttons; i++) {
-	tot_button_height += button_get_height( *button_list[i] );
-    }
-
-    if ( num_buttons > 1 ) {
-	button_sep = ( top_y - bottom_y - tot_button_height ) / 
-	    ( num_buttons - 1 );
-	button_sep = max( 0, button_sep );
-    }
-
-    cur_y_pos = top_y;
-    for (i=0; i<num_buttons; i++) {
-	cur_y_pos -= button_get_height( *button_list[i] );
-	button_set_position( 
-	    *button_list[i],
-	    make_point2d( w/2.0 - button_get_width( *button_list[i] )/2.0,
-			  cur_y_pos ) );
-	cur_y_pos -= button_sep;
-    }
 }
 
 static void game_type_select_init(void)
@@ -182,59 +115,20 @@ static void game_type_select_init(void)
     winsys_set_display_func( main_loop );
     winsys_set_idle_func( main_loop );
     winsys_set_reshape_func( reshape );
-    winsys_set_mouse_func( ui_event_mouse_func );
-    winsys_set_motion_func( ui_event_motion_func );
-    winsys_set_passive_motion_func( ui_event_motion_func );
+    winsys_set_mouse_func( GameMenu_mouse_func );
+    winsys_set_motion_func( GameMenu_motion_func );
+    winsys_set_passive_motion_func( GameMenu_motion_func );
+	winsys_set_joystick_func( GameMenu_joystick_func );
+	winsys_set_joystick_button_func( GameMenu_joystick_button_func );
 
-    enter_event_btn = button_create( dummy_pos,
-				     300, 40, 
-				     "button_label", 
-				     "Tutorial" );
-    button_set_hilit_font_binding( enter_event_btn, "button_label_hilit" );
-    button_set_visible( enter_event_btn, True );
-    button_set_click_event_cb( enter_event_btn, enter_event_click_cb, NULL );
+	setup_gui();
 
-    practice_btn = button_create( dummy_pos,
-				  300, 40,
-				  "button_label",
-				  Localize("Play","") );
-    button_set_hilit_font_binding( practice_btn, "button_label_hilit" );
-    button_set_visible( practice_btn, True );
-    button_set_click_event_cb( practice_btn, practice_click_cb, NULL );
+	gui_add_widget(practice_btn=create_button("Play", practice_click_cb), NULL);
+	gui_add_widget(enter_event_btn=create_button("Tutorial", enter_event_click_cb), NULL);
+	gui_add_widget(pref_btn=create_button("Settings", pref_click_cb), NULL);
+	gui_add_widget(credits_btn=create_button("Credits", credits_click_cb), NULL);
+	gui_add_widget(quit_btn=create_button("Quit", quit_click_cb), NULL);
 
-    credits_btn = button_create( dummy_pos,
-				  300, 40,
-				  "button_label",
-				  "Credits");
-    button_set_hilit_font_binding( credits_btn, "button_label_hilit" );
-    button_set_visible( credits_btn, True );
-    button_set_click_event_cb( credits_btn, credits_click_cb, NULL );
-
-  /*
-    rankings_btn = button_create( dummy_pos,
-                             300, 40,
-                             "button_label",
-                             Localize("Rankings","") );
-    button_set_hilit_font_binding( rankings_btn, "button_label_hilit" );
-    button_set_visible( rankings_btn, True );
-    button_set_click_event_cb( rankings_btn, rankings_click_cb, NULL );
-    */
-
-	pref_btn = button_create( dummy_pos,
-                             300, 40,
-                             "button_label",
-                             Localize("Settings","") );
-    button_set_hilit_font_binding( pref_btn, "button_label_hilit" );
-    button_set_visible( pref_btn, True );
-    button_set_click_event_cb( pref_btn, pref_click_cb, NULL );
-
-    quit_btn = button_create( dummy_pos,
-                             300, 40,
-                             "button_label",
-                             Localize("Quit","") );
-    button_set_hilit_font_binding( quit_btn, "button_label_hilit" );
-    button_set_visible( quit_btn, True );
-    button_set_click_event_cb( quit_btn, quit_click_cb, NULL );
 
     play_music( "start_screen" );
 
@@ -252,8 +146,6 @@ static void game_type_select_loop( scalar_t time_step )
 
     clear_rendering_context();
 
-    set_widget_positions();
-
     ui_setup_display();
 
     if (getparam_ui_snow()) {
@@ -263,7 +155,9 @@ static void game_type_select_loop( scalar_t time_step )
 
     ui_draw_menu_decorations();
 
-    ui_draw();
+	gui_draw();
+
+	ui_draw_cursor();
 
     reshape( getparam_x_resolution(), getparam_y_resolution() );
 
@@ -272,23 +166,7 @@ static void game_type_select_loop( scalar_t time_step )
 
 static void game_type_select_term(void)
 {
-    button_delete( enter_event_btn );
-    enter_event_btn = NULL;
-
-    button_delete( practice_btn );
-    practice_btn = NULL;
-
-    button_delete( credits_btn );
-    credits_btn = NULL;
-
-    button_delete( pref_btn );
-    pref_btn = NULL;    
-    /*button_delete( rankings_btn );*/
-    /*rankings_btn = NULL;*/
-
-    button_delete( quit_btn );
-    quit_btn = NULL;
-
+    reset_gui();
 }
 
 START_KEYBOARD_CB( game_type_select_cb )
