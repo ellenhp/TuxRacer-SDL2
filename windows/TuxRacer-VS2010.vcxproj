@@ -150,7 +150,6 @@
     <ClCompile Include="..\src\reset.c" />
     <ClCompile Include="..\src\save.c" />
     <ClCompile Include="..\src\screenshot.c" />
-    <ClCompile Include="..\src\splash_screen.c" />
     <ClCompile Include="..\src\ssbutton.c" />
     <ClCompile Include="..\src\string_util.c" />
     <ClCompile Include="..\src\tcl_util.c" />
@@ -227,7 +226,6 @@
     <ClInclude Include="..\src\reset.h" />
     <ClInclude Include="..\src\save.h" />
     <ClInclude Include="..\src\screenshot.h" />
-    <ClInclude Include="..\src\splash_screen.h" />
     <ClInclude Include="..\src\ssbutton.h" />
     <ClInclude Include="..\src\string_util.h" />
     <ClInclude Include="..\src\tcl_util.h" />

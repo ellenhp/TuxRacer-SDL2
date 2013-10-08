@@ -32,7 +32,6 @@
 #include "game_config.h"
 #include "loop.h"
 #include "render_util.h"
-#include "splash_screen.h"
 #include "intro.h"
 #include "racing.h"
 #include "game_over.h"
@@ -269,7 +268,6 @@ int main( int argc, char **argv )
 
     init_preview();
 
-    splash_screen_register();
     intro_register();
     racing_register();
     game_over_register();
@@ -286,7 +284,7 @@ int main( int argc, char **argv )
     loading_register();
 
     g_game.mode = NO_MODE;
-    set_game_mode( SPLASH );
+    set_game_mode( GAME_TYPE_SELECT );
 
     g_game.difficulty = DIFFICULTY_LEVEL_NORMAL;
 

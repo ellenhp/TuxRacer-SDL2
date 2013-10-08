@@ -189,9 +189,6 @@
     <ClCompile Include="..\src\screenshot.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\splash_screen.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\ssbutton.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -417,9 +414,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\screenshot.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\splash_screen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\ssbutton.h">

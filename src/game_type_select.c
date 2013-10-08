@@ -177,6 +177,8 @@ static void game_type_select_init(void)
 {
     point2d_t dummy_pos = {0, 0};
 
+	init_ui_snow();
+
     winsys_set_display_func( main_loop );
     winsys_set_idle_func( main_loop );
     winsys_set_reshape_func( reshape );
@@ -235,6 +237,9 @@ static void game_type_select_init(void)
     button_set_click_event_cb( quit_btn, quit_click_cb, NULL );
 
     play_music( "start_screen" );
+
+	reshape( getparam_x_resolution(), getparam_y_resolution() );
+
 }
 
 static void game_type_select_loop( scalar_t time_step )
