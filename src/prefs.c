@@ -60,43 +60,31 @@ void update_volume()
 	write_config_file();
 }
 
-void music_volume_down(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb)
+void music_volume_down(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
 {
-	music_volume_ticks--;
-	music_volume_ticks+=VOLUME_TOTAL_TICKS+1;
-	music_volume_ticks%=VOLUME_TOTAL_TICKS+1;
-	//modulus of negative number returns negative and negative volume is bad. this is kind of a hack, but it works
-
+	music_volume_ticks=GameMenu_resolve_bounds(music_volume_ticks-1, 0, 10, input_type);
 	update_volume();
 }
 
-void music_volume_up(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb)
+void music_volume_up(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
 {
-	music_volume_ticks++;
-	music_volume_ticks%=VOLUME_TOTAL_TICKS+1;
-
+	music_volume_ticks=GameMenu_resolve_bounds(music_volume_ticks+1, 0, 10, input_type);
 	update_volume();
 }
 
-void sound_volume_down(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb)
+void sound_volume_down(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
 {
-	sound_volume_ticks--;
-	sound_volume_ticks+=VOLUME_TOTAL_TICKS+1;
-	sound_volume_ticks%=VOLUME_TOTAL_TICKS+1;
-	//modulus of negative number returns negative and negative volume is bad. this is kind of a hack, but it works
-
+	sound_volume_ticks=GameMenu_resolve_bounds(sound_volume_ticks-1, 0, 10, input_type);
 	update_volume();
 }
 
-void sound_volume_up(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb)
+void sound_volume_up(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
 {
-	sound_volume_ticks++;
-	sound_volume_ticks%=VOLUME_TOTAL_TICKS+1;
-
+	sound_volume_ticks=GameMenu_resolve_bounds(sound_volume_ticks+1, 0, 10, input_type);
 	update_volume();
 }
 
-void back_click(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb)
+void back_click(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
 {
 	set_game_mode( GAME_TYPE_SELECT );
 	reset_gui();
@@ -167,7 +155,16 @@ START_KEYBOARD_CB( prefs_key_cb )
 {
 	if (release) return;
 
-    GameMenu_keypress(key);
+	switch (key)
+	{
+	case SDLK_ESCAPE:
+	case SDLK_q:
+		GameMenu_simulate_click(back_btn);
+		break;
+	default:
+	    GameMenu_keypress(key);
+	}
+
 }
 END_KEYBOARD_CB
 

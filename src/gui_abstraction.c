@@ -44,7 +44,7 @@ void GameMenu_simulate_click(widget_t* widget)
 {
 	//call back is the same regardless of what the widget type is
 	widget_bounding_box_t bb={0, 0, 0, 0};
-	widget->callback1(1, 0, 0, bb);
+	widget->callback1(1, 0, 0, bb, CLICK_INPUT);
 }
 
 void GameMenu_init()
@@ -230,3 +230,33 @@ int GameMenu_get_window_width()
 {
 	return getparam_x_resolution();
 }
+
+int GameMenu_resolve_bounds(int val, int min, int max, input_type_t input_type)
+{
+	if (input_type==CLICK_INPUT)
+	{
+		if (val>max)
+		{
+			val=val%(max+1)+min;
+		}
+		if (val<max)
+		{
+			val%=max+1;
+			val+=max+1;
+			val%=max+1;
+			val+=min;
+		}
+	}
+	else //joystick or keyboard directional input
+	{
+		if (val>max)
+		{
+			val=max;
+		}
+		if (val<min)
+		{
+			val=min;
+		}
+	}
+}
+
