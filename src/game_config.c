@@ -338,6 +338,7 @@ void set_param_bool( struct param *p, bool_t new_val )
  */
 struct params {
     struct param data_dir;
+	struct param graphics_slider_tick;
     struct param fullscreen;
     struct param x_resolution;
     struct param y_resolution;
@@ -436,6 +437,12 @@ void init_game_configuration()
 					  "# The location of the Tux Racer data files" );
 
 #endif
+
+	INIT_PARAM_INT( 
+	graphics_slider_tick, 0,
+	"# [DO NOT MODIFY] This param is modified by the options menu inside \n"
+	"# Tux Racer." );
+
     INIT_PARAM_BOOL( 
 	draw_tux_shadow, False, 
 	"# Set this to true to display Tux's shadow.  Note that this is a \n"
@@ -741,6 +748,7 @@ void init_game_configuration()
  */
 
 FN_PARAM_STRING( data_dir )
+FN_PARAM_INT( graphics_slider_tick )
 FN_PARAM_BOOL( draw_tux_shadow )
 FN_PARAM_BOOL( draw_particles )
 FN_PARAM_INT( tux_sphere_divisions )

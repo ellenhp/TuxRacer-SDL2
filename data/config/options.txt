@@ -7,6 +7,13 @@
 #
 set data_dir "."
 
+# graphics_slider_tick
+#
+# [DO NOT MODIFY] This param is modified by the options menu inside 
+# Tux Racer.
+#
+set graphics_slider_tick 2
+
 # fullscreen
 #
 # If true then the game will run in full-screen mode.
@@ -267,7 +274,7 @@ set display_fps False
 # To better see the effect, activate wireframe mode using the F11 
 # key (this is a toggle).
 #
-set course_detail_level 10
+set course_detail_level 20
 
 # forward_clip_distance
 #
@@ -276,7 +283,7 @@ set course_detail_level 10
 # rendered, resulting in slower performance. Decreasing this 
 # value is an effective way to improve framerates.
 #
-set forward_clip_distance 150
+set forward_clip_distance 300
 
 # backward_clip_distance
 #
@@ -291,7 +298,7 @@ set backward_clip_distance 5
 # [EXPERT] Controls the distance at which trees are drawn with 
 # two rectangles instead of one.
 #
-set tree_detail_distance 20
+set tree_detail_distance 300
 
 # terrain_blending
 #
@@ -306,7 +313,7 @@ set terrain_blending True
 # terrain types at the vertices will be blended correctly
 # (instead of using a faster but imperfect approximation).
 #
-set perfect_terrain_blending False
+set perfect_terrain_blending True
 
 # terrain_envmap
 #
@@ -341,7 +348,7 @@ set draw_tux_shadow False
 # for Tux, and vice versa.  If you're experiencing low framerates,
 # try lowering this value.
 #
-set tux_sphere_divisions 16
+set tux_sphere_divisions 64
 
 # tux_shadow_sphere_divisions
 #
@@ -361,7 +368,7 @@ set draw_particles True
 #
 # If True, then the players will leave track marks in the snow.
 #
-set track_marks False
+set track_marks True
 
 # ui_snow
 #

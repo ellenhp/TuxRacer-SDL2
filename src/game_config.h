@@ -53,6 +53,8 @@ int get_config_dir_name( char *buff, int len );
 
 PROTO_PARAM_STRING( data_dir );
 
+PROTO_PARAM_INT( graphics_slider_tick );
+
 PROTO_PARAM_BOOL( draw_tux_shadow );
 
 PROTO_PARAM_BOOL( draw_particles );

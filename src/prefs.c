@@ -33,13 +33,38 @@
 #define MUSIC_VOLUME_STRING "Music Volume: %d"
 #define SOUND_VOLUME_STRING "Effects Volume: %d"
 
-widget_t* music_volume_slider=NULL;
-widget_t* sound_volume_slider=NULL;
+typedef struct graphics_options_t
+{
+	int course_detail_level;
+	int forward_clip_distance;
+	int tree_detail_distance;
+	bool_t terrain_blending;
+	bool_t perfect_terrain_blending;
+	bool_t terrain_envmap;
+	int tux_sphere_divisions;
+	bool_t draw_particles;
+	bool_t track_marks;
+	char* name;
+} graphics_options_t;
+
+#define NUM_GRAPHICS_OPTIONS 3
+graphics_options_t graphics_options[]={
+	{5, 30, 0, False, False, False, 3, False, False, "Low"},
+	{10, 70, 20, True, False, True, 16, True, False, "Medium"},
+	{20, 300, 300, True, True, True, 64, True, True, "High"},
+};
 
 widget_t* back_btn=NULL;
 
+widget_t* music_volume_slider=NULL;
+widget_t* sound_volume_slider=NULL;
+
+widget_t* graphics_slider=NULL;
+
 int music_volume_ticks=0;
 int sound_volume_ticks=0;
+
+int graphics_ticks=0;
 
 void update_volume()
 {
@@ -60,12 +85,31 @@ void update_volume()
 	write_config_file();
 }
 
+void update_graphics()
+{
+	graphics_options_t options=graphics_options[graphics_ticks];
+	widget_set_text(graphics_slider, options.name);
+	
+	//apply tick param to remember setting for next start
+	setparam_graphics_slider_tick(graphics_ticks);
+
+	//apply settings
+	setparam_course_detail_level(options.course_detail_level);
+	setparam_forward_clip_distance(options.forward_clip_distance);
+	setparam_tree_detail_distance(options.tree_detail_distance);
+	setparam_terrain_blending(options.terrain_blending);
+	setparam_perfect_terrain_blending(options.perfect_terrain_blending);
+	setparam_terrain_envmap(options.terrain_envmap);
+	setparam_tux_sphere_divisions(options.tux_sphere_divisions);
+	setparam_draw_particles(options.draw_particles);
+	setparam_track_marks(options.track_marks);
+}
+
 void music_volume_down(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
 {
 	music_volume_ticks=GameMenu_resolve_bounds(music_volume_ticks-1, 0, 10, input_type);
 	update_volume();
 }
-
 void music_volume_up(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
 {
 	music_volume_ticks=GameMenu_resolve_bounds(music_volume_ticks+1, 0, 10, input_type);
@@ -77,7 +121,6 @@ void sound_volume_down(int button, int mouse_x, int mouse_y, widget_bounding_box
 	sound_volume_ticks=GameMenu_resolve_bounds(sound_volume_ticks-1, 0, 10, input_type);
 	update_volume();
 }
-
 void sound_volume_up(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
 {
 	sound_volume_ticks=GameMenu_resolve_bounds(sound_volume_ticks+1, 0, 10, input_type);
@@ -88,6 +131,17 @@ void back_click(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, 
 {
 	set_game_mode( GAME_TYPE_SELECT );
 	reset_gui();
+}
+
+void graphics_up(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
+{
+	graphics_ticks=GameMenu_resolve_bounds(graphics_ticks+1, 0, NUM_GRAPHICS_OPTIONS-1, input_type);
+	update_graphics();
+}
+void graphics_down(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
+{
+	graphics_ticks=GameMenu_resolve_bounds(graphics_ticks-1, 0, NUM_GRAPHICS_OPTIONS-1, input_type);
+	update_graphics();
 }
 
 static void prefs_init(void) 
@@ -112,11 +166,17 @@ static void prefs_init(void)
 	sound_volume_slider=create_slider("", sound_volume_down, sound_volume_up);
 	gui_add_widget(sound_volume_slider, NULL);
 
+	graphics_slider=create_slider("", graphics_down, graphics_up);
+	gui_add_widget(graphics_slider, NULL);
+
 	//this is the result of some algebra. Initializes the volume slider values
 	music_volume_ticks=getparam_music_volume();
 	sound_volume_ticks=getparam_sound_volume();
 
+	graphics_ticks=getparam_graphics_slider_tick();
+
 	update_volume();
+	update_graphics();
 
     play_music( "start_screen" );
 }
