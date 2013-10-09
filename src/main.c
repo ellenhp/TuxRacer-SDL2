@@ -250,7 +250,6 @@ int main( int argc, char **argv )
     init_saved_games();
     chdir( curdir );
     load_tux();
-    return;
     init_textures();
     init_fonts();
     init_audio_data();
