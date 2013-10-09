@@ -240,6 +240,9 @@
     <ClCompile Include="..\src\gui_abstraction.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\splash_screen.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\alglib.h">
@@ -468,6 +471,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\prefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\splash_screen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
