@@ -36,7 +36,12 @@
 /*---------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------*/
 
+#if SDL_MAJOR_VERSION==2
+static SDL_Window *window = NULL;
+#else
 static SDL_Surface *screen = NULL;
+#endif
+
 
 static winsys_display_func_t display_func = NULL;
 static winsys_idle_func_t idle_func = NULL;
@@ -209,7 +214,11 @@ void winsys_set_joystick_button_func( winsys_joystick_button_func_t func )
 */
 void winsys_swap_buffers()
 {
+#if SDL_MAJOR_VERSION==2
+    SDL_GL_SwapWindow(window);
+#else
     SDL_GL_SwapBuffers();
+#endif
 }
 
 
@@ -222,7 +231,11 @@ void winsys_swap_buffers()
 */
 void winsys_warp_pointer( int x, int y )
 {
-    SDL_WarpMouse( x, y );
+#if SDL_MAJOR_VERSION==2
+    SDL_WarpMouseInWindow( window, x, y );
+#else
+	SDL_WarpMouse( x, y );
+#endif
 }
 
 
@@ -235,11 +248,24 @@ void winsys_warp_pointer( int x, int y )
 */
 static void setup_sdl_video_mode()
 {
-    Uint32 video_flags = SDL_OPENGL; 
+#if SDL_MAJOR_VERSION==2
+    Uint32 video_flags = SDL_WINDOW_OPENGL;
+#else
+    Uint32 video_flags = SDL_OPENGL;
+#endif
     int bpp = 0;
     int width, height;
 
+#if SDL_MAJOR_VERSION==2
+
     if ( getparam_fullscreen() ) {
+	video_flags |= SDL_WINDOW_FULLSCREEN;
+    } else {
+	video_flags |= SDL_WINDOW_RESIZABLE;
+    }
+
+#else
+	if ( getparam_fullscreen() ) {
 	video_flags |= SDL_FULLSCREEN;
     } else {
 	video_flags |= SDL_RESIZABLE;
@@ -265,16 +291,26 @@ static void setup_sdl_video_mode()
 	setparam_bpp_mode( 0 );
 	bpp = getparam_bpp_mode();
     }
+#endif
 
     width = getparam_x_resolution();
     height = getparam_y_resolution();
 
-    if ( ( screen = SDL_SetVideoMode( width, height, bpp, video_flags ) ) == 
-	 NULL ) 
+#if SDL_MAJOR_VERSION==2
+    if ( ( window = SDL_CreateWindow( "Tux Racer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, video_flags ) ) == NULL ) 
+#else
+	if ( ( screen = SDL_SetVideoMode( width, height, bpp, video_flags ) ) == NULL )
+#endif
     {
 	handle_system_error( 1, "Couldn't initialize video: %s", 
 			     SDL_GetError() );
     }
+#if SDL_MAJOR_VERSION==2
+	else
+	{
+		SDL_GL_CreateContext(window);
+	}
+#endif
 }
 
 
@@ -311,7 +347,11 @@ void winsys_init( int *argc, char **argv, char *window_title,
 
     setup_sdl_video_mode();
 
+#if SDL_MAJOR_VERSION==2
+	SDL_SetWindowTitle(window, window_title);
+#else
     SDL_WM_SetCaption( window_title, icon_title );
+#endif
 }
 
 
@@ -327,6 +367,7 @@ void winsys_shutdown()
     SDL_Quit();
 }
 
+
 /*---------------------------------------------------------------------------*/
 /*! 
   Enables/disables key repeat messages from being generated
@@ -335,6 +376,7 @@ void winsys_shutdown()
   \date    Created:  2000-10-19
   \date    Modified: 2000-10-19
 */
+#if SDL_MAJOR_VERSION==1
 void winsys_enable_key_repeat( bool_t enabled )
 {
     if ( enabled ) {
@@ -344,6 +386,7 @@ void winsys_enable_key_repeat( bool_t enabled )
 	SDL_EnableKeyRepeat( 0, 0 );
     }
 }
+#endif
 
 
 /*---------------------------------------------------------------------------*/
@@ -462,14 +505,15 @@ void winsys_process_events()
 		}
 		break;
 
+#if SDL_MAJOR_VERSION==1
 	    case SDL_VIDEORESIZE:
 		setup_sdl_video_mode();
 		if ( reshape_func ) {
 		    (*reshape_func)( event.resize.w,
 				     event.resize.h );
 		}
-		
 		break;
+#endif
 	    }
 
 	    SDL_LockAudio();

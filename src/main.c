@@ -196,10 +196,10 @@ int main( int argc, char **argv )
      */
     winsys_init( &argc, argv, WINDOW_TITLE, WINDOW_TITLE );
 
-
+#if SDL_MAJOR_VERSION==1
     /* Ingore key-repeat messages */
     winsys_enable_key_repeat(0);
-
+#endif
 
     /* Set up a function to clean up when program exits */
     winsys_atexit( cleanup );

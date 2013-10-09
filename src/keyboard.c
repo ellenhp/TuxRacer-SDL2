@@ -23,11 +23,20 @@
 #include "loop.h"
 
 #define KEYMAP_SIZE 1000
+#if SDL_MAJOR_VERSION==1
 #define KEYTABLE_SIZE WSK_LAST
-#define SPECIAL_KEYTABLE_SIZE WSK_LAST 
+#define SPECIAL_KEYTABLE_SIZE WSK_LAST
 
 static key_cb_t keytable[KEYTABLE_SIZE];
 static key_cb_t special_keytable[SPECIAL_KEYTABLE_SIZE];
+#else
+#define KEYTABLE_SIZE UCHAR_MAX*16
+
+static int keytableEntries=0;
+static key_desc_t keytable[KEYTABLE_SIZE]; //holds key codes
+static key_cb_t keyActionTable[KEYTABLE_SIZE]; //holds key_cb_t values associated with corresponding key code.
+static key_cb_t keytableDefault=0;
+#endif
 
 static keymap_t keymap[KEYMAP_SIZE];
 static int num_keymap_entries = 0;
@@ -55,36 +64,69 @@ static void fill_keytable( key_cb_t value  )
     int i;
 
     for (i=0; i<KEYTABLE_SIZE; i++) {
+#if SDL_MAJOR_VERSION==1
 	keytable[i] = value;
+#else
+		keytable[i].key=0;
+		keytable[i].special=False;
+#endif
     }
-
+#if SDL_MAJOR_VERSION==2
+	keytableDefault = value;
+	keytableEntries=0;
+#else
     for (i=0; i<SPECIAL_KEYTABLE_SIZE; i++) {
 	special_keytable[i] = value;
     }
+#endif
 }
 
 static int insert_keytable_entries( char *keys, key_cb_t callback )
 {
     key_desc_t *key_list;
     int num_keys;
-    int i;
+    int i, j;
 
     num_keys = translate_key_string( keys, &key_list );
 
-    if ( num_keys > 0 ) {
-	for ( i=0; i<num_keys; i++ ) {
-	    if ( key_list[i].special ) {
-		special_keytable[ key_list[i].key ] = callback;
-	    } else {
-		keytable[ key_list[i].key ] = callback;
-	    }
-	} 
-
-	free( key_list );
-	return 1;
-
-    } else {
-	return 0;
+    if ( num_keys > 0 )
+	{
+		for ( i=0; i<num_keys; i++ )
+		{
+#if SDL_MAJOR_VERSION==1
+			if ( key_list[i].special )
+			{
+				special_keytable[ key_list[i].key ] = callback;
+			}
+			else
+			{
+				keytable[ key_list[i].key ] = callback;
+			}
+#else
+			bool_t alreadyExists=False;
+			for (j=0; j<keytableEntries; j++)
+			{
+				if (keytable[keytableEntries].key==key_list[i].key)
+				{
+					keyActionTable[keytableEntries] = callback;
+					alreadyExists=True;
+					break;
+				}
+			}
+			if (alreadyExists==False)
+			{
+				keytable[keytableEntries]=key_list[i];
+				keyActionTable[keytableEntries] = callback;
+				keytableEntries++;
+			}
+#endif
+		}
+		free( key_list );
+		return 1;
+    }
+	else
+	{
+		return 0;
     }
 }
 
@@ -95,65 +137,62 @@ static void init_keytable( game_mode_t mode )
     fill_keytable( NULL );
 
     /* Handle default callbacks first */
-    for (i=0; i<num_keymap_entries; i++) {
-	if ( ( keymap[i].mode == mode || keymap[i].mode == ALL_MODES ) && 
-            keymap[i].keymap_class == DEFAULT_CALLBACK ) 
-        {
-	    fill_keytable( keymap[i].key_cb );
-	}
+    for (i=0; i<num_keymap_entries; i++)
+	{
+		if ((keymap[i].mode == mode || keymap[i].mode == ALL_MODES ) && keymap[i].keymap_class == DEFAULT_CALLBACK)
+		{
+			fill_keytable( keymap[i].key_cb );
+		}
     }
 
     /* Handle other classes */
-    for (i=0; i<num_keymap_entries; i++) {
-	if ( keymap[i].mode == mode || keymap[i].mode == ALL_MODES ) {
-	    switch ( keymap[i].keymap_class ) {
-	    case FIXED_KEY:
-		if ( ! insert_keytable_entries( keymap[i].keys, 
-						keymap[i].key_cb ) )
+    for (i=0; i<num_keymap_entries; i++)
+	{
+		if (keymap[i].mode == mode || keymap[i].mode == ALL_MODES)
 		{
-		    check_assertion( 0, "failed to insert keytable entries" );
+			switch (keymap[i].keymap_class)
+			{
+			case FIXED_KEY:
+				if (!insert_keytable_entries(keymap[i].keys, keymap[i].key_cb))
+				{
+					check_assertion( 0, "failed to insert keytable entries" );
+				}
+				break;
+
+			case CONFIGURABLE_KEY:
+				check_assertion( keymap[i].key_func != NULL, "No key_func for configurable key");
+
+				keys = keymap[i].key_func();
+
+				check_assertion(keys != NULL, "key_func returned NULL keys string");
+
+				if (!insert_keytable_entries( keys, keymap[i].key_cb))
+				{
+					fprintf(stderr,"Tux Racer warning: key specification "
+						 "'%s' is unrecognized; using '%s' instead.\n",
+						 keys, keymap[i].keys);
+					if (!insert_keytable_entries(keymap[i].keys, keymap[i].key_cb))
+					{
+					check_assertion( 0, "couldn't insert keytable entry" );
+					}
+				}
+				break;
+
+			case DEFAULT_CALLBACK:
+				/* handled above */
+				break;
+
+			default:
+				code_not_reached();
+			}
 		}
-
-		break;
-
-	    case CONFIGURABLE_KEY:
-		check_assertion( keymap[i].key_func != NULL,
-				 "No key_func for configurable key" );
-
-		keys = keymap[i].key_func();
-
-		check_assertion( keys != NULL,
-				 "key_func returned NULL keys string" );
-
-		if ( ! insert_keytable_entries( keys, keymap[i].key_cb ) )
-		{
-		    fprintf( stderr, "Tux Racer warning: key specification "
-			     "'%s' is unrecognized; using '%s' instead.\n",
-			     keys, keymap[i].keys );
-		    if ( ! insert_keytable_entries( keymap[i].keys, 
-						    keymap[i].key_cb ) )
-		    {
-			check_assertion( 0, "couldn't insert keytable entry" );
-		    }
-		}
-
-		break;
-
-	    case DEFAULT_CALLBACK:
-		/* handled above */
-		break;
-
-            default:
-		code_not_reached();
-	    }
-
-	}
     }
 }
 
 static void keyboard_handler( unsigned int key, bool_t special, 
 			      bool_t release, int x, int y )
 {
+#if SDL_MAJOR_VERSION==1
     static game_mode_t last_mode = NO_MODE;
     key_cb_t *table;
 #ifdef TR_DEBUG_MODE
@@ -182,6 +221,50 @@ static void keyboard_handler( unsigned int key, bool_t special,
     if ( table[key] != NULL ) {
 	(table[key])( key, special, release, x, y );
     }
+#else //SDL2
+    static game_mode_t last_mode = NO_MODE;
+	int i;
+	key_cb_t callback=0;
+
+    if ( is_mode_change_pending() )
+	{
+		/* Don't process keyboard events until the mode change happens */
+		return;
+    }
+
+    if ( last_mode != g_game.mode )
+	{
+		last_mode = g_game.mode;
+		init_keytable( last_mode );
+    }
+
+	for (i=0; i<keytableEntries; i++)
+	{
+		if (keytable[i].key==key)
+		{
+			callback=keyActionTable[i];
+		}
+	}
+
+	if (callback==0)
+	{
+		if (keytableDefault==0)
+		{
+			return;
+		}
+		else
+		{
+			callback=keytableDefault;
+		}
+	}
+
+    if (key<256 && isalpha(key))
+	{
+		key = tolower( key );
+    }
+
+	(callback)( key, special, release, x, y );
+#endif
 }
 
 void init_keyboard()
