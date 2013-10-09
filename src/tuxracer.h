@@ -79,6 +79,27 @@
 #   define VERSION "0.61pre"
 #   define TCL_HEADER <tcl.h>
 #   include <TargetConditionals.h>
+#elif defined(__ANDROID__)
+#   define HAVE_FINITE 1
+#   define HAVE_GETCWD 1
+#   define HAVE_GETTIMEOFDAY 1
+#   define HAVE_INTTYPES_H 1
+#   define HAVE_ISNAN 1
+#   define HAVE_MEMORY_H 1
+#   define HAVE_STDINT_H 1
+#   define HAVE_STDLIB_H 1
+#   define HAVE_STRDUP 1
+#   define HAVE_STRINGS_H 1
+#   define HAVE_STRING_H 1
+#   define HAVE_SYS_STAT_H 1
+#   define HAVE_SYS_TIME_H 1
+#   define HAVE_SYS_TYPES_H 1
+#   define HAVE_UNISTD_H 1
+#   define VERSION "0.61pre"
+#   define HAVE_SDL 1
+#   define HAVE_SDL_MIXER 1
+#   define HAVE_SDL_JOYSTICKOPEN 1
+#   define TCL_HEADER <tcl.h>
 #endif
 
 /* Include all (or most) system include files here.  This slows down
@@ -147,8 +168,9 @@ static inline uint64_t udate(void)
 #include "iphonegl.h"
 #elif defined(__ANDROID__)
 #define HAVE_OPENGLES
-#import <OpenGLES/ES1/gl.h>
-#import <OpenGLES/ES1/glext.h>
+#include <GLES/gl.h>
+#include <GLES/glext.h>
+#include "android/androidgl.h"
 #else
 #include <GL/gl.h>
 #include <GL/glu.h>

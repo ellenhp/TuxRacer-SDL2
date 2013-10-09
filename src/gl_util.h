@@ -51,15 +51,25 @@ extern "C"
 
 /* Shouldn't need to include glext.h if gl.h is recent, but alas we can't
  * count on that...  */
+#if defined(__APPLE__)
+#import <OpenGLES/ES1/glext.h>
+#elif defined(__ANDROID__)
+#include <GLES/glext.h>
+#else
 #include <GL/glext.h>
-
-#if !defined(GL_GLEXT_VERSION) || GL_GLEXT_VERSION < 6
+#endif
+    
+    
+#if (!defined(GL_GLEXT_VERSION) || GL_GLEXT_VERSION < 6) && !defined(HAVE_OPENGLES)
 #   error "*** You need a more recent copy of glext.h.  You can get one at http://oss.sgi.com/projects/ogl-sample/ABI/glext.h ; it goes in /usr/include/GL. ***"
 #endif
 
+    
+#if !defined(__APPLE__) && !defined(__ANDROID__)
 extern PFNGLLOCKARRAYSEXTPROC glLockArraysEXT_p;
 extern PFNGLUNLOCKARRAYSEXTPROC glUnlockArraysEXT_p;
-
+#endif
+    
 #endif
 
 typedef enum {

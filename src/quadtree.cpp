@@ -1113,7 +1113,7 @@ GLubyte *VNCArray;
 void quadsquare::DrawTris()
 {
 	//FIXME
-#ifndef __APPLE__
+#ifndef HAVE_OPENGLES
     int tmp_min_idx = VertexArrayMinIdx;
 
     if ( glLockArraysEXT_p && getparam_use_cva() ) {

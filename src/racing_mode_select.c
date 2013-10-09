@@ -70,7 +70,7 @@ void enter_speed_mode_click_cb( button_t* button, void *userdata )
     
     release_commentaires();
     
-    g_game.is_speed_only_mode = True;
+    //g_game.is_speed_only_mode = True;
     set_game_mode( RACE_SELECT );
     
     ui_set_dirty();
@@ -82,7 +82,7 @@ void enter_fish_mode_click_cb( button_t* button, void *userdata )
     
     release_commentaires();
     
-    g_game.is_speed_only_mode = False;
+    //g_game.is_speed_only_mode = False;
     set_game_mode( RACE_SELECT );
     
     ui_set_dirty();
@@ -291,13 +291,13 @@ void racing_mode_select_register()
 {
     int status = 0;
     
-    status |=
+    /*status |=
 	add_keymap_entry( RACING_MODE_SELECT,
                      DEFAULT_CALLBACK, NULL, NULL, racing_mode_select_cb );
     register_loop_funcs( RACING_MODE_SELECT, 
                         racing_mode_select_init,
                         racing_mode_select_loop,
-                        racing_mode_select_term );
+                        racing_mode_select_term );*/
     
 }
 

@@ -22,7 +22,7 @@
 #include "hier.h"
 #include "alglib.h"
 
-#define USE_GLUSPHERE 1
+#define USE_GLUSPHERE 0
 
 #if USE_GLUSPHERE
 
@@ -181,6 +181,9 @@ glutSolidSphere(GLfloat radius, GLint slices, GLint stacks)
 void draw_sphere( int num_divisions )
 {
     int div = num_divisions;
+#ifdef HAVE_OPENGLES
+    glutSolidSphere(1, num_divisions+1, num_divisions+1);
+#else
     if (firstDrawSphere==1)
     {
         firstDrawSphere=0;
@@ -349,12 +352,13 @@ void draw_sphere( int num_divisions )
             
             cas3.firstDraw=No;
         } 
-    } 
+    }
+#endif
 } 
 
 #endif /* USE_GLUSPHERE */
 
-#ifndef __APPLE__
+#ifndef HAVE_OPENGLES
 //FIXME
 static GLuint get_sphere_display_list( int divisions ) {
     static bool_t initialized = False;
@@ -429,12 +433,12 @@ void traverse_dag( scene_node_t *node, material_t *mat )
         set_material( mat->diffuse, mat->specular_colour, 
                      mat->specular_exp );
         
-#ifdef __APPLE__
+#ifdef HAVE_OPENGLES
         //FIXME
         draw_sphere(
         min(MAX_SPHERE_DIVISIONS, max( 
             MIN_SPHERE_DIVISIONS, 
-            ROUND_TO_NEAREST( getparam_tux_sphere_divisions() * node->param.sphere.resolution ) )));
+            ROUND_TO_NEAREST( getparam_tux_sphere_divisions() * node->param.sphere.divisions ) )));
 #else
         if ( getparam_use_sphere_display_list() ) {
             glCallList( get_sphere_display_list( 

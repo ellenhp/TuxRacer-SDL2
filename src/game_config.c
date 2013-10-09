@@ -78,6 +78,8 @@
 #ifndef DATA_DIR
 #  if defined( WIN32 )
 #    define DATA_DIR "."
+#  elif defined( __ANDROID__ )
+#    define DATA_DIR "."
 #  endif /* defined( WIN32 ) */
 #endif
 

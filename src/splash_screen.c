@@ -120,7 +120,7 @@ static void draw_logo()
 	for (i=0; i<NUM_LOGOS; i++) {
 		glBindTexture( GL_TEXTURE_2D, texid[i] );
 
-#ifdef __APPLE__
+#ifdef HAVE_OPENGLES
 		w = 512;
 		h = 512;
 #else

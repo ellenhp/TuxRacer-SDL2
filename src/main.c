@@ -67,6 +67,14 @@
 
 #define GAME_INIT_SCRIPT "tuxracer_init.tcl"
 
+#ifndef MAX_PATH
+#  ifdef PATH_MAX
+#    define MAX_PATH PATH_MAX
+#  else
+#    define MAX_PATH 8192 /* this ought to be more than enough */
+#  endif
+#endif
+
 /*
  * Globals 
  */
@@ -129,6 +137,8 @@ void read_game_init_script()
 
 #ifdef __APPLE__
 int libtuxracer_main( int argc, char **argv )
+#elif defined(__ANDROID__)
+int SDL_main( int argc, char **argv )
 #else
 int main( int argc, char **argv ) 
 #endif
@@ -165,6 +175,7 @@ int main( int argc, char **argv )
     g_game.num_players = 2;
 #endif
 
+    
     /* Create a Tcl interpreter */
     g_game.tcl_interp = Tcl_CreateInterp();
 
@@ -204,7 +215,7 @@ int main( int argc, char **argv )
     /* Set up a function to clean up when program exits */
     winsys_atexit( cleanup );
 
-    /* 
+    /*
      * Initial OpenGL settings 
      */
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
@@ -239,6 +250,7 @@ int main( int argc, char **argv )
     init_saved_games();
     chdir( curdir );
     load_tux();
+    return;
     init_textures();
     init_fonts();
     init_audio_data();
@@ -247,6 +259,8 @@ int main( int argc, char **argv )
     init_course_manager();
     init_joystick();
 
+
+    
     /* Read the tuxracer_init.tcl file */
     read_game_init_script();
 

@@ -35,7 +35,7 @@ void screenshot()
 } 
 
 char* take_screenshot ( char* filename ) {
-#ifdef __APPLE__
+#ifdef HAVE_OPENGLES
     // Not supported
 #else
     Pic *ppmFile;

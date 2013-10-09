@@ -28,6 +28,14 @@
 #include "hash.h"
 #include "list.h"
 
+#ifndef MAX_PATH
+#  ifdef PATH_MAX
+#    define MAX_PATH PATH_MAX
+#  else
+#    define MAX_PATH 8192 /* this ought to be more than enough */
+#  endif
+#endif
+
 #define SOUNDFILE_MISSING_WARNING_LEVEL 10
 #define SOUNDFILE_BUSY_WARNING_LEVEL 10
 

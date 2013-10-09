@@ -155,3 +155,9 @@ $RECYCLE.BIN/
 
 # DLL
 *.dll
+
+android/assets/*
+android/bin
+android/obj
+android/libs
+android/local.properties

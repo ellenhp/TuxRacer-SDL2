@@ -262,7 +262,7 @@ static void draw_herring_count( int herring_count )
 
     glPushMatrix();
 	{
-#if HAVE_OPENGLES
+#ifdef HAVE_OPENGLES
         static const GLfloat verticesItem []=
         {
             0, 0,
@@ -332,7 +332,9 @@ static void draw_herring_count( int herring_count )
 		      0 );
 
 	draw_string( font, string );
+#ifndef HAVE_OPENGLES //not sure what's up with these mismatching brackets.
     }
+#endif
     glPopMatrix();    
 }
 

@@ -42,7 +42,7 @@ const colour_t light_blue = { 0.5, 0.5, 0.8, 1.0 };
 const colour_t black = { 0., 0., 0., 1.0 };
 const colour_t sky   = { 0.82, 0.86, 0.88, 1.0 };
 
-#ifdef __APPLE__
+#ifdef HAVE_OPENGLES
 const unsigned int PRECISION = 16; 
 GLfixed ONE  = 1 << 16 /*PRECISION*/; 
 const GLfixed ZERO = 0;
@@ -78,7 +78,7 @@ void reshape( int w, int h )
 
     far_clip_dist = getparam_forward_clip_distance() + FAR_CLIP_FUDGE_AMOUNT;
 
-#ifdef __APPLE__
+#ifdef HAVE_OPENGLES
     glesPerspective( getparam_fov(), (scalar_t)w/h, NEAR_CLIP_DIST, 
 		    far_clip_dist );
 #else

@@ -35,6 +35,8 @@ typedef struct {
 
 void init_textures();
 
+void load_texture_main_thread( void * texArg, void *texImageArg );
+
 bool_t load_and_bind_texture( const char *binding, const char *filename );
 
 bool_t load_texture( const char *texname, const char *filename, int repeatable );
