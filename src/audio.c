@@ -672,7 +672,7 @@ update_audio()
     }
     setparam_sound_volume( volume );
 
-    Mix_Volume( -1, 10 + volume * 11 ); /* channel of -1 sets volume for all channels */
+    Mix_Volume( -1, volume * 12 ); /* channel of -1 sets volume for all channels */
 
     /* Set music volume level */
     volume = getparam_music_volume();
@@ -684,7 +684,7 @@ update_audio()
     }
     setparam_music_volume( volume );
  
-    Mix_VolumeMusic( 10 + volume * 11 );
+    Mix_VolumeMusic( volume * 8 );
 
     /* Update music status */
 
