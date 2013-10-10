@@ -40,7 +40,7 @@
        unsigned long wasteBytes;
        char name[80];
        unsigned long colorMap;
-       FILE *file;
+       SDL_RWops *file;
        unsigned char *tmp[5];
        unsigned long rleEnd;
        unsigned int *rowStart;
@@ -59,7 +59,7 @@ static Image *ImageOpen(const char *fileName)
       fprintf(stderr, "Out of memory!\n");
       winsys_exit(-1);
     }
-  if ((image->file = fopen(fileName, "rb")) == NULL) 
+  if ((image->file = SDL_RWFromFile(fileName, "rb")) == NULL) 
     {
       free( image );
       return NULL;
@@ -67,7 +67,8 @@ static Image *ImageOpen(const char *fileName)
   /*
    *	Read the image header
    */
-  fread(image, 1, 12, image->file);
+  SDL_RWread(image->file, image, 1, 12);
+  //fread(image, 1, 12, image->file);
   /*
    *	Check byte order
    */
@@ -90,42 +91,46 @@ static Image *ImageOpen(const char *fileName)
 	}
     }
 
-  if ((image->type & 0xFF00) == 0x0100) /* RLE image */
+	if ((image->type & 0xFF00) == 0x0100) /* RLE image */
     {
-      x = image->sizeY * image->sizeZ * sizeof(int);
-      image->rowStart = (unsigned int *)malloc(x);
-      image->rowSize = (unsigned int *)malloc(x);
-      if (image->rowStart == NULL || image->rowSize == NULL) 
-	{
-	  fprintf(stderr, "Out of memory!\n");
-	  winsys_exit(-1);
+		x = image->sizeY * image->sizeZ * sizeof(int);
+		image->rowStart = (unsigned int *)malloc(x);
+		image->rowSize = (unsigned int *)malloc(x);
+		if (image->rowStart == NULL || image->rowSize == NULL) 
+		{
+			fprintf(stderr, "Out of memory!\n");
+			winsys_exit(-1);
+		}
+		image->rleEnd = 512 + (2 * x);
+		//fseek(image->file, 512, SEEK_SET);
+		SDL_RWseek(image->file, 512, RW_SEEK_SET);
+		//fread(image->rowStart, 1, x, image->file);
+		SDL_RWread(image->file, image->rowStart, 1, x);
+		//fread(image->rowSize, 1, x, image->file);
+		SDL_RWread(image->file, image->rowSize, 1, x);
+		if (image->imagic == IMAGIC_SWAP) 
+		{
+			x /= sizeof(int);
+			rowStart = image->rowStart;
+			rowSize = image->rowSize;
+			while (x--) 
+			{
+				ulTmp = *rowStart;
+				*rowStart++ = SWAP_LONG_BYTES(ulTmp);
+				ulTmp = *rowSize;
+				*rowSize++ = SWAP_LONG_BYTES(ulTmp);
+			}
+		}
 	}
-      image->rleEnd = 512 + (2 * x);
-      fseek(image->file, 512, SEEK_SET);
-      fread(image->rowStart, 1, x, image->file);
-      fread(image->rowSize, 1, x, image->file);
-      if (image->imagic == IMAGIC_SWAP) 
-	{
-	  x /= sizeof(int);
-	  rowStart = image->rowStart;
-	  rowSize = image->rowSize;
-	  while (x--) 
-	    {
-	      ulTmp = *rowStart;
-	      *rowStart++ = SWAP_LONG_BYTES(ulTmp);
-	      ulTmp = *rowSize;
-	      *rowSize++ = SWAP_LONG_BYTES(ulTmp);
-	    }
-	}
-    }
-  return image;
+	return image;
 }
 
 static void ImageClose( Image *image)
 {
   int i;
 
-  fclose(image->file);
+  //fclose(image->file);
+  SDL_RWclose(image->file);
   free(image->rowSize);
   free(image->rowStart);
   for ( i = 0 ; i <= image->sizeZ ; i++ )
@@ -140,9 +145,10 @@ static void ImageGetRow( Image *image, unsigned char *buf, int y, int z)
 
   if ((image->type & 0xFF00) == 0x0100)  /* RLE image */
     {
-      fseek(image->file, image->rowStart[y+z*image->sizeY], SEEK_SET);
-      fread(image->tmp[0], 1, (unsigned int)image->rowSize[y+z*image->sizeY],
-	    image->file);
+      //fseek(image->file, image->rowStart[y+z*image->sizeY], SEEK_SET);
+	  SDL_RWseek(image->file, image->rowStart[y+z*image->sizeY], RW_SEEK_SET);
+      //fread(image->tmp[0], 1, (unsigned int)image->rowSize[y+z*image->sizeY], image->file);
+	  SDL_RWread(image->file, image->tmp[0], 1, (unsigned int)image->rowSize[y+z*image->sizeY]);
 
       iPtr = image->tmp[0];
       oPtr = buf;
@@ -171,9 +177,10 @@ static void ImageGetRow( Image *image, unsigned char *buf, int y, int z)
     }
   else /* verbatim image */
     {
-      fseek(image->file, 512+(y*image->sizeX)+(z*image->sizeX*image->sizeY),
-	    SEEK_SET);
-      fread(buf, 1, image->sizeX, image->file);
+      //fseek(image->file, 512+(y*image->sizeX)+(z*image->sizeX*image->sizeY), SEEK_SET);
+      SDL_RWseek(image->file, 512+(y*image->sizeX)+(z*image->sizeX*image->sizeY), RW_SEEK_SET);
+      //fread(buf, 1, image->sizeX, image->file);
+	  SDL_RWread(image->file, buf, 1, image->sizeX);
     }
 }
 

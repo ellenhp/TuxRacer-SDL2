@@ -48,7 +48,7 @@ struct char_dims {
 
 
 #define READ_BYTES( file, addr, bytes, swap ) \
-if ( fread( (addr), (bytes), 1, (file) ) != 1 ) { \
+if ( SDL_RWread( file, addr, 1, bytes ) == 0 ) { \
     err_msg = "Unexpected end of file"; \
     goto bail; \
 } else { \
@@ -68,7 +68,7 @@ if ( fread( (addr), (bytes), 1, (file) ) != 1 ) { \
 tex_font_metrics_t* load_tex_font_metrics( const char *filename )
 {
     tex_font_metrics_t *tfm = NULL;
-    FILE *tfm_file = NULL;
+    SDL_RWops *tfm_file = NULL;
     int i;
     char magic[4];
     char *err_msg;
@@ -87,7 +87,7 @@ tex_font_metrics_t* load_tex_font_metrics( const char *filename )
 		     "This architecture's char size is != 1" );
 
     /* Open file */
-    tfm_file = fopen( filename, "rb" );
+    tfm_file = SDL_RWFromFile( filename, "rb" );
     if ( tfm_file == NULL ) {
 	print_warning( MISSING_FILE_WARNING,
 		       "Couldn't open font metrics file %s", filename );
@@ -178,7 +178,7 @@ tex_font_metrics_t* load_tex_font_metrics( const char *filename )
 	tfm->char_data[ch_dims.ch] = cd;
     }
 
-    fclose( tfm_file );
+    SDL_RWclose( tfm_file );
 
     return tfm;
 
@@ -193,7 +193,7 @@ bail:
     }
 
     if ( tfm_file != NULL ) {
-	fclose( tfm_file );
+	SDL_RWclose( tfm_file );
     }
 
     print_warning( IMPORTANT_WARNING, 

@@ -47,13 +47,13 @@ bool_t file_exists( char *filename )
 
     /* Test existence by opening file -- I'm not a Win32 programmer,
        so if there's a better way let me know */
-    FILE *file;
-    file = fopen( filename, "r" );
+    SDL_RWops *file;
+    file = SDL_RWFromFile( filename, "r" );
 
     if ( file == NULL ) {
 	return False;
     } else {
-	if ( fclose( file ) != 0 ) {
+	if ( SDL_RWclose( file ) != 0 ) {
 	    handle_error( 1, "error closing file %s", filename );
 	}
 	return True;

@@ -20,7 +20,6 @@
 
 #include "tuxracer.h"
 #include "screenshot.h"
-#include "pic.h"
 
 static int screenshot_num = 0;
 
@@ -35,33 +34,5 @@ void screenshot()
 } 
 
 char* take_screenshot ( char* filename ) {
-#ifdef HAVE_OPENGLES
-    // Not supported
-#else
-    Pic *ppmFile;
-    Pic_Pixel *scanline;
-    int i, viewport[4];
-
-    glGetIntegerv( GL_VIEWPORT, viewport );
-    scanline = PixelAlloc(viewport[2]);
-
-    ppmFile = PicOpen( filename, viewport[2], viewport[3] );
-    glReadBuffer( GL_FRONT );
-
-    for (i=viewport[3]-1; i>=0; i--) {
-        glReadPixels(viewport[0], viewport[1]+i, viewport[2], 1, GL_RGB, 
-		     GL_UNSIGNED_BYTE, scanline);
-
-	/* Make sure write was successful */
-        if (!PicWriteLine(ppmFile, scanline)) {
-            PixelFree(scanline);
-            return "Error writing ppm file.";
-        } 
-    } 
-
-    PicClose( ppmFile );
-
-    PixelFree(scanline);
-#endif
     return (char *)0;
 }

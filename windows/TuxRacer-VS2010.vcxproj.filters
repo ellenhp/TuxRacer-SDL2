@@ -159,9 +159,6 @@
     <ClCompile Include="..\src\phys_sim.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\pic.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\preview.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -384,9 +381,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\phys_sim.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\pic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\preview.h">
