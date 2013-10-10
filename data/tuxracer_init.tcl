@@ -115,12 +115,12 @@ if { [tux_load_sound ice_sound sounds/tux_on_ice1.wav] } {
 
 # Track marks
 # Disabled because not used
-# tux_load_texture track_head courses/textures/terrain/buttstart.rgb 1
-# tux_load_texture track_mark courses/textures/terrain/buttprint.rgb 1
-# tux_load_texture track_tail courses/textures/terrain/buttstop.rgb 1
-# tux_bind_texture track_head track_head
-# tux_bind_texture track_mark track_mark
-# tux_bind_texture track_tail track_tail
+tux_load_texture track_head courses/textures/terrain/buttstart.rgb 1
+tux_load_texture track_mark courses/textures/terrain/buttprint.rgb 1
+tux_load_texture track_tail courses/textures/terrain/buttstop.rgb 1
+tux_bind_texture track_head track_head
+tux_bind_texture track_mark track_mark
+tux_bind_texture track_tail track_tail
 
 # Splash screen
 # tux_load_texture splash_screen textures/splash_bl.rgb 0
