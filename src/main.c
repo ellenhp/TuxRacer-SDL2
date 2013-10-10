@@ -146,7 +146,7 @@ int main( int argc, char **argv )
     char curdir[MAX_PATH];
     /* Print copyright notice */
 
-    fprintf( stderr, 
+    print_debug(DEBUG_OTHER, 
          "Tux Racer " VERSION " -- a Sunspire Studios Production "
 	     "(http://www.sunspirestudios.com)\n"
 	     "(c) 1999-2000 Jasmin F. Patry "

@@ -29,7 +29,7 @@ void screenshot()
     sprintf( buff, "tux_sshot_%d.ppm", screenshot_num++ );
     p = take_screenshot( buff );
     if ( p != NULL ) {
-        fprintf( stderr, "Couldn't save %s: %s\n", buff, p );
+        print_debug(DEBUG_OTHER, "Couldn't save %s: %s\n", buff, p );
     } 
 } 
 

@@ -495,66 +495,66 @@ void print_gl_info()
     GLfloat float_val;
     GLboolean boolean_val;
 
-    fprintf( stderr,
+    print_debug(DEBUG_OTHER,
 	     "  vendor: %s\n", 
 	     glGetString( GL_VENDOR ) );
 
-    fprintf( stderr,
+    print_debug(DEBUG_OTHER,
 	     "  renderer: %s\n", 
 	     glGetString( GL_RENDERER ) );
 
-    fprintf( stderr,
+    print_debug(DEBUG_OTHER,
 	     "  version: %s\n", 
 	     glGetString( GL_VERSION ) );
 
     extensions = string_copy( (char*) glGetString( GL_EXTENSIONS ) );
 
-    fprintf( stderr, "  extensions:\n" );
+    print_debug(DEBUG_OTHER, "  extensions:\n" );
 
     oldp = extensions;
     while ( (p=strchr(oldp,' ')) ) {
 	*p='\0';
-	fprintf( stderr, "    %s\n", oldp );
+	print_debug(DEBUG_OTHER, "    %s\n", oldp );
 	oldp = p+1;
     }
     if ( *oldp ) {
-	fprintf( stderr, "    %s\n", oldp );
+	print_debug(DEBUG_OTHER, "    %s\n", oldp );
     }
 
     free( extensions );
 
     for ( i=0; i<sizeof(gl_values)/sizeof(gl_values[0]); i++) {
-	fprintf( stderr, "  %s: ", gl_values[i].name );
+	print_debug(DEBUG_OTHER, "  %s: ", gl_values[i].name );
 
 	switch( gl_values[i].type ) {
 #ifndef __APPLE__
 	case GL_INT:
 	    glGetIntegerv( gl_values[i].value, &int_val );
-	    fprintf( stderr, "%d", int_val );
+	    print_debug(DEBUG_OTHER, "%d", int_val );
 	    break;
 #else
 	case GL_FIXED:
 	    glGetIntegerv( gl_values[i].value, &int_val );
-	    fprintf( stderr, "%d", int_val );
+	    print_debug(DEBUG_OTHER, "%d", int_val );
 	    break;
 #endif
 	case GL_FLOAT:
 	    glGetFloatv( gl_values[i].value, &float_val );
-	    fprintf( stderr, "%f", float_val );
+	    print_debug(DEBUG_OTHER, "%f", float_val );
 	    break;
 
 	case GL_UNSIGNED_BYTE:
 	    glGetBooleanv( gl_values[i].value, &boolean_val );
-	    fprintf( stderr, "%d", boolean_val );
+	    print_debug(DEBUG_OTHER, "%d", boolean_val );
 	    break;
 
 	default:
 	    code_not_reached();
 	}
 
-	fprintf( stderr, "\n" );
+	print_debug(DEBUG_OTHER, "\n" );
     }
 
 
-    fprintf( stderr, "\n" );
+    print_debug(DEBUG_OTHER, "\n" );
 }

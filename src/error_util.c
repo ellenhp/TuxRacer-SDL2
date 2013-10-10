@@ -31,6 +31,7 @@
 void print_warning( int warning_level, char *fmt, ... )
 {
     va_list args;
+	char strbuf[1000]; //should be enough
 
     /* We enforce the fact that warning level 0 prints no warnings */
     check_assertion( warning_level > 0, "warning levels must be > 0" );
@@ -42,9 +43,11 @@ void print_warning( int warning_level, char *fmt, ... )
 
     va_start( args, fmt );
 
-    fprintf( stderr, "%%%%%% " PROG_NAME " warning: " );
-    vfprintf( stderr, fmt, args );
-    fprintf( stderr, "\n" );
+    print_debug(DEBUG_OTHER, "%%%%%% " PROG_NAME " warning: " );
+	
+    vsprintf( strbuf, fmt, args );
+	print_debug(DEBUG_OTHER, strbuf);
+    print_debug(DEBUG_OTHER, "\n" );
 
     va_end( args );
 }
@@ -52,12 +55,14 @@ void print_warning( int warning_level, char *fmt, ... )
 void handle_error( int exit_code, char *fmt, ... )
 {
     va_list args;
+	char strbuf[1000]; //should be enough
 
     va_start( args, fmt );
 
-    fprintf( stdout, "*** " PROG_NAME " error: " );
-    vfprintf( stdout, fmt, args );
-    fprintf( stdout, "\n" );
+    print_debug(DEBUG_OTHER, "*** " PROG_NAME " error: " );
+    vsprintf( strbuf, fmt, args );
+    print_debug(DEBUG_OTHER, strbuf );
+    print_debug(DEBUG_OTHER, "\n" );
 
     va_end( args );
 
@@ -67,12 +72,14 @@ void handle_error( int exit_code, char *fmt, ... )
 void handle_system_error( int exit_code, char *fmt, ... )
 {
     va_list args;
+	char strbuf[1000]; //should be enough
 
     va_start( args, fmt );
 
-    fprintf( stdout, "*** " PROG_NAME " error: " );
-    vfprintf( stdout, fmt, args );
-    fprintf( stdout, " (%s)\n", strerror( errno ) );
+    print_debug(DEBUG_OTHER, "*** " PROG_NAME " error: " );
+    vsprintf( strbuf, fmt, args );
+    print_debug(DEBUG_OTHER, strbuf );
+    print_debug(DEBUG_OTHER, " (%s)\n", strerror( errno ) );
 
     va_end( args );
 

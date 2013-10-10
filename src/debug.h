@@ -42,6 +42,7 @@ typedef enum {
     DEBUG_SAVE,
     DEBUG_JOYSTICK,
     DEBUG_GL_INFO,
+	DEBUG_OTHER,
     NUM_DEBUG_MODES
 } debug_mode_t;
 

@@ -948,7 +948,7 @@ static int trees_cb ( ClientData cd, Tcl_Interp *ip, int argc, const char *argv[
 
 	    if ( best_tree_dist < best_item_dist && which_tree != NULL ) {
                 if (num_trees+1 == MAX_TREES ) {
-                    fprintf( stderr, "%s: maximum number of trees reached.\n", 
+                    print_debug(DEBUG_OTHER, "%s: maximum number of trees reached.\n", 
 			     argv[0] );
                     break;
                 }
@@ -962,7 +962,7 @@ static int trees_cb ( ClientData cd, Tcl_Interp *ip, int argc, const char *argv[
 
             } else if ( which_item != NULL ) {
                 if (num_items+1 == MAX_ITEMS ) {
-                    fprintf( stderr, "%s: maximum number of items reached.\n", 
+                    print_debug(DEBUG_OTHER, "%s: maximum number of items reached.\n", 
 			     argv[0] );
                     break;
                 }
@@ -1251,7 +1251,7 @@ static int friction_cb ( ClientData cd, Tcl_Interp *ip,
     int i;
 
     if ( argc != 4 ) {
-        fprintf( stderr, "Usage: %s <ice> <rock> <snow>", argv[0] );
+        print_debug(DEBUG_OTHER, "Usage: %s <ice> <rock> <snow>", argv[0] );
         Tcl_AppendResult(ip, argv[0], ": invalid number of arguments\n", 
 			 "Usage: ", argv[0], " <ice coeff.> <rock coeff.> "
 			 "<snow coeff.>",

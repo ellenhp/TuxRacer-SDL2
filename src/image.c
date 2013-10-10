@@ -56,7 +56,7 @@ static Image *ImageOpen(const char *fileName)
   image = (Image *)calloc(1, sizeof(Image));
   if (image == NULL) 
     {
-      fprintf(stderr, "Out of memory!\n");
+      print_debug(DEBUG_OTHER, "Out of memory!\n");
       winsys_exit(-1);
     }
   if ((image->file = SDL_RWFromFile(fileName, "rb")) == NULL) 
@@ -86,7 +86,7 @@ static Image *ImageOpen(const char *fileName)
       image->tmp[i] = (unsigned char *)malloc(image->sizeX*256);
       if (image->tmp[i] == NULL ) 
 	{
-	  fprintf(stderr, "Out of memory!\n");
+	  print_debug(DEBUG_OTHER, "Out of memory!\n");
 	  winsys_exit(-1);
 	}
     }
@@ -98,7 +98,7 @@ static Image *ImageOpen(const char *fileName)
 		image->rowSize = (unsigned int *)malloc(x);
 		if (image->rowStart == NULL || image->rowSize == NULL) 
 		{
-			fprintf(stderr, "Out of memory!\n");
+			print_debug(DEBUG_OTHER, "Out of memory!\n");
 			winsys_exit(-1);
 		}
 		image->rleEnd = 512 + (2 * x);
@@ -233,7 +233,7 @@ IMAGE *ImageLoad(const char *fileName)
   final = (IMAGE *)malloc(sizeof(IMAGE));
   if (final == NULL) 
     {
-      fprintf(stderr, "Out of memory!\n");
+      print_debug(DEBUG_OTHER, "Out of memory!\n");
       winsys_exit(-1);
     }
   final->imagic = image->imagic;
@@ -253,7 +253,7 @@ IMAGE *ImageLoad(const char *fileName)
 
   if (final->data == NULL) 
     {
-      fprintf(stderr, "Out of memory!\n");
+      print_debug(DEBUG_OTHER, "Out of memory!\n");
       winsys_exit(-1);
     }
 

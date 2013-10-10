@@ -114,7 +114,7 @@ int translate_key_string( char *keys, key_desc_t **key_list )
 	    if ( translate_key( key_ptr, &(*key_list)[num_keys] ) ) {
 		num_keys++;
 	    } else {
-		fprintf( stderr, "Tux Racer warning: Unrecognized key '%s'\n",
+		print_debug(DEBUG_OTHER, "Tux Racer warning: Unrecognized key '%s'\n",
 			 key_ptr );
 	    }
 	}

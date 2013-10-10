@@ -468,4 +468,4 @@ set warning_level 100
 # To generate the file, set this variable to "true", and
 # then run the game so that you reproduce the bug, if possible.
 #
-set write_diagnostic_log False
+set write_diagnostic_log True

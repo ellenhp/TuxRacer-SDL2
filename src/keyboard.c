@@ -168,7 +168,7 @@ static void init_keytable( game_mode_t mode )
 
 				if (!insert_keytable_entries( keys, keymap[i].key_cb))
 				{
-					fprintf(stderr,"Tux Racer warning: key specification "
+					print_debug(DEBUG_OTHER,"Tux Racer warning: key specification "
 						 "'%s' is unrecognized; using '%s' instead.\n",
 						 keys, keymap[i].keys);
 					if (!insert_keytable_entries(keymap[i].keys, keymap[i].key_cb))

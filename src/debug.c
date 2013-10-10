@@ -114,6 +114,7 @@ void debug_mode_set_active( debug_mode_t mode, bool_t active )
 void print_debug( debug_mode_t mode, char *fmt, ... )
 {
     va_list args;
+	char strbuf[1000];
 
     check_assertion( 0 <= mode && mode < NUM_DEBUG_MODES,
 		     "invalid debugging mode" );
@@ -124,9 +125,9 @@ void print_debug( debug_mode_t mode, char *fmt, ... )
 
     va_start( args, fmt );
 
-    fprintf( stderr, PROG_NAME " debug (%s): ", debug_desc[ mode ] );
-    vfprintf( stderr, fmt, args );
-    fprintf( stderr, "\n" );
+    SDL_Log( PROG_NAME " debug (%s): ", debug_desc[ mode ] );
+    vsprintf( strbuf, fmt, args );
+    SDL_Log( "%s\n", strbuf );
 	
 	printf( PROG_NAME " debug (%s): ", debug_desc[ mode ] );
     vprintf( fmt, args );
@@ -166,37 +167,23 @@ void setup_diagnostic_log()
     debug_mode_set_active( DEBUG_JOYSTICK, True );
     debug_mode_set_active( DEBUG_GL_INFO, True );
 
-    /* Redirect stderr to file; taken from SDL_main.c, which is in the 
-       public domain */
-    newfp = freopen(BUGREPORT_FILE, "w", stderr);
-    if ( newfp == NULL ) {	/* This happens on NT */
-#if !defined(stderr)
-	stderr = fopen(BUGREPORT_FILE, "w");
-#else
-	newfp = fopen(BUGREPORT_FILE, "w");
-	if ( newfp ) {
-	    *stderr = *newfp;
-	}
-#endif
-    }
-
     /* Write bug report header */
-    fprintf( stderr, "Tux Racer Diagnostic Log\n\n" );
+    SDL_Log( "Tux Racer Diagnostic Log\n\n" );
 
     /* Generate time string */
     t = time( NULL );
     sprintf( time_buff, "%s", asctime( gmtime( &t ) ) );
     time_buff[ strlen(time_buff)-1 ] = (char)0; /* remove trailing newline */
 
-    fprintf( stderr, "Generated:       %s GMT\n", time_buff );
-    fprintf( stderr, "TR Version:      %s\n", VERSION );
-    fprintf( stderr, "OS:              " );
+    SDL_Log( "Generated:       %s GMT\n", time_buff );
+    SDL_Log( "TR Version:      %s\n", VERSION );
+    SDL_Log( "OS:              " );
 
     if ( get_os_version( os_buff, sizeof( os_buff ) ) == 0 ) {
-	fprintf( stderr, "%s\n", os_buff );
+	SDL_Log( "%s\n", os_buff );
     } else {
-	fprintf( stderr, "Could not determine!\n" );
+	SDL_Log( "Could not determine!\n" );
     }
 
-    fprintf( stderr, "\n" );
+    SDL_Log( "\n" );
 }
