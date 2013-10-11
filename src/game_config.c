@@ -737,7 +737,7 @@ void init_game_configuration()
 	"# If true, then the ui screens will have falling snow." );
 
     INIT_PARAM_BOOL( 
-	write_diagnostic_log, False,
+	write_diagnostic_log, True,
 	"# If true, then a file called diagnostic_log.txt will be generated\n" 
 	"# which you should attach to any bug reports you make.\n"
 	"# To generate the file, set this variable to \"true\", and\n"
