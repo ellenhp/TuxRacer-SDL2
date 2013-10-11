@@ -166,7 +166,11 @@ void setup_diagnostic_log()
     debug_mode_set_active( DEBUG_SAVE, True );
     debug_mode_set_active( DEBUG_JOYSTICK, True );
     debug_mode_set_active( DEBUG_GL_INFO, False );
+#ifdef __ANDROID__ //gets rid of some really weird runtime errors on windows
     debug_mode_set_active( DEBUG_OTHER, True );
+#else
+    debug_mode_set_active( DEBUG_OTHER, False );
+#endif
 
     /* Write bug report header */
     SDL_Log( "Tux Racer Diagnostic Log\n\n" );

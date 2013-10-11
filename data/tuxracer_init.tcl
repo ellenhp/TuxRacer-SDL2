@@ -15,13 +15,13 @@ proc tux_goto_data_dir {} {
 
 proc tux_course_init {} {
     global tux_data_dir
-    tux_eval "$tux_data_dir/courses/common/courseinit.tcl"
+    source "$tux_data_dir/courses/common/courseinit.tcl"
 } 
 
 #
 # Read course index
 #
-tux_eval courses/course_idx.tcl
+source courses/course_idx.tcl
 
 #
 # Set Up Music
