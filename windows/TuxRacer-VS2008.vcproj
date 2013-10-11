@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(SDL_HOME)\include;$(SDL_MIXER_HOME)\include;$(GAMEMENU_HOME)/src;..\..\TCL-8.3\include"
+				AdditionalIncludeDirectories="$(SDL2_HOME)\include;$(SDL2_MIXER_HOME);$(GAMEMENU_HOME)/src;..\..\TCL-8.3\include"
 				PreprocessorDefinitions="HAVE_SDL,HAVE_SDL_MIXER"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -61,9 +61,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="SDL.lib SDLmain.lib SDL_mixer.lib GameMenu.lib TCL83.lib opengl32.lib glu32.lib"
+				AdditionalDependencies="SDL2.lib SDL2main.lib SDL2_mixer.lib GameMenu.lib TCL83.lib opengl32.lib glu32.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="$(SDL_HOME)\lib\x86;$(SDL_MIXER_HOME)\lib\x86;$(GAMEMENU_HOME)\lib;$(TCL_HOME)\lib"
+				AdditionalLibraryDirectories="$(SDL2_HOME)\lib\x86;$(SDL2_MIXER_HOME)\lib\x86;$(GAMEMENU_HOME)\lib;$(TCL_HOME)\lib"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -117,7 +117,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="$(SDL_HOME)\include;$(SDL_MIXER_HOME)\include;$(GAMEMENU_HOME)/src;..\..\TCL-8.3\include"
+				AdditionalIncludeDirectories="$(SDL2_HOME)\include;$(SDL2_MIXER_HOME);$(GAMEMENU_HOME)/src;..\..\TCL-8.3\include"
 				PreprocessorDefinitions="HAVE_SDL,HAVE_SDL_MIXER"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -136,9 +136,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="SDL.lib SDLmain.lib SDL_mixer.lib GameMenu.lib TCL83.lib opengl32.lib glu32.lib"
+				AdditionalDependencies="SDL2.lib SDL2main.lib SDL2_mixer.lib GameMenu.lib TCL83.lib opengl32.lib glu32.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="$(SDL_HOME)\lib\x86;$(SDL_MIXER_HOME)\lib\x86;$(GAMEMENU_HOME)\lib;$(TCL_HOME)\lib"
+				AdditionalLibraryDirectories="$(SDL2_HOME)\lib\x86;$(SDL2_MIXER_HOME)\lib\x86;$(GAMEMENU_HOME)\lib;$(TCL_HOME)\lib"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -370,10 +370,6 @@
 			</File>
 			<File
 				RelativePath="..\src\phys_sim.c"
-				>
-			</File>
-			<File
-				RelativePath="..\src\pic.c"
 				>
 			</File>
 			<File
