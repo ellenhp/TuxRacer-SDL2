@@ -9,8 +9,8 @@ tux_angle  37.5                 ;# angle of course
 tux_elev_scale 15.0             ;# amount by which to scale elevation data
 tux_base_height_value 255     ;# greyscale value corresponding to height
                                ;#     offset of 0 (integer from 0 - 255)
-tux_elev elev.rgb              ;# bitmap specifying course elevations
-tux_terrain terrain.rgb        ;# bitmap specifying terrains type
+tux_elev $::course_dir/elev.rgb              ;# bitmap specifying course elevations
+tux_terrain $::course_dir/terrain.rgb        ;# bitmap specifying terrains type
 tux_calculation_mode Half_Pipe      ;# optional : this indicates if the calculation mode
 
 

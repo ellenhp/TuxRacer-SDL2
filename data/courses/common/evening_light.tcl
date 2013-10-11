@@ -13,17 +13,17 @@ tux_particle_color { 0.9 0.7 0.35 1.0 }
 #
 # Environmental sphere map
     
-tux_load_texture alpine1-sphere ../textures/conditions/eveningenv.rgb 0
+tux_load_texture alpine1-sphere courses/textures/conditions/eveningenv.rgb 0
 tux_bind_texture terrain_envmap alpine1-sphere
 
 tux_particle_colour { 0.51 0.30 0.30 1.0 }
 
-tux_load_texture alpine1-front ../textures/conditions/eveningfront.rgb 0
-tux_load_texture alpine1-right ../textures/conditions/eveningright.rgb 0
-tux_load_texture alpine1-left ../textures/conditions/eveningleft.rgb 0
-tux_load_texture alpine1-back ../textures/conditions/eveningback.rgb 0
-tux_load_texture alpine1-top ../textures/conditions/eveningtop.rgb 0
-tux_load_texture alpine1-bottom ../textures/conditions/eveningbottom.rgb 0
+tux_load_texture alpine1-front courses/textures/conditions/eveningfront.rgb 0
+tux_load_texture alpine1-right courses/textures/conditions/eveningright.rgb 0
+tux_load_texture alpine1-left courses/textures/conditions/eveningleft.rgb 0
+tux_load_texture alpine1-back courses/textures/conditions/eveningback.rgb 0
+tux_load_texture alpine1-top courses/textures/conditions/eveningtop.rgb 0
+tux_load_texture alpine1-bottom courses/textures/conditions/eveningbottom.rgb 0
 
 tux_bind_texture sky_front alpine1-front
 tux_bind_texture sky_right alpine1-right

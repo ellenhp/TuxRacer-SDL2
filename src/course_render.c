@@ -100,7 +100,7 @@ void calc_normals(const char *course)
     struct stat buf;
     int exists;
 
-    sprintf( buff, "%s/courses/%s/normal.data", getparam_data_dir(), course );
+    //sprintf( buff, "%s/courses/%s/normal.data", getparam_data_dir(), course );
 
     get_course_dimensions( &courseWidth, &courseLength );
     get_course_divisions( &nx, &ny );

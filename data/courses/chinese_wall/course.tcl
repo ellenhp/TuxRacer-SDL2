@@ -5,6 +5,6 @@ tux_start_pt 50 3.0
 tux_angle 30
 tux_elev_scale 12
 tux_base_height_value 255
-tux_elev elev.rgb
-tux_terrain terrain.rgb
+tux_elev $::course_dir/elev.rgb
+tux_terrain $::course_dir/terrain.rgb
 tux_course_init
