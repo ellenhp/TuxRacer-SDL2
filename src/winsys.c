@@ -458,6 +458,10 @@ void winsys_process_events()
 		break;
 
 		case SDL_JOYAXISMOTION:
+			if (SDL_GetNumTouchDevices()>0)
+			{
+				break;
+			}
 			if (event.jaxis.axis == getparam_joystick_x_axis())
 			{
 				x_joystick=(double)event.jaxis.value/(SHRT_MAX+1);
@@ -472,6 +476,10 @@ void winsys_process_events()
 			}
 			break;
 		case SDL_JOYBUTTONDOWN:
+			if (SDL_GetNumTouchDevices()>0)
+			{
+				break;
+			}
 			for (i=0; i<num_js_bindings; i++)
 			{
 				if (event.jbutton.button==js_bindings[i].js_button)
@@ -491,6 +499,11 @@ void winsys_process_events()
 	    case SDL_MOUSEBUTTONDOWN:
 	    case SDL_MOUSEBUTTONUP:
 
+		if (SDL_GetNumTouchDevices()>0)
+		{
+			break;
+		}
+
 		if ( mouse_func ) {
 		    (*mouse_func)( event.button.button,
 				   event.button.state,
@@ -499,7 +512,28 @@ void winsys_process_events()
 		}
 		break;
 
+	    case SDL_FINGERDOWN:
+	    
+	    print_debug(DEBUG_OTHER, "finger click: %d, %d", (int)(event.tfinger.x*getparam_x_resolution()), (int)(event.tfinger.y*getparam_y_resolution()));
+
+		if ( mouse_func ) {
+		    (*mouse_func)( SDL_BUTTON_LEFT,
+				   SDL_PRESSED,
+				   (int)(event.tfinger.x*getparam_x_resolution()),
+				   (int)(event.tfinger.y*getparam_y_resolution()) );
+		    (*mouse_func)( SDL_BUTTON_LEFT,
+				   SDL_RELEASED,
+				   (int)(event.tfinger.x*getparam_x_resolution()),
+				   (int)(event.tfinger.y*getparam_y_resolution()) );
+		}
+		break;
+
 	    case SDL_MOUSEMOTION:
+		if (SDL_GetNumTouchDevices()>0)
+		{
+			break;
+		}
+
 		if ( event.motion.state ) {
 		    /* buttons are down */
 		    if ( motion_func ) {
