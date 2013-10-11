@@ -129,23 +129,19 @@ extern "C" void init_course_quadtree( const char * course, scalar_t *elevation, 
     
     // Debug info.
     print_debug( DEBUG_QUADTREE, "nodes = %d\n", root->CountNodes());
-    print_debug( DEBUG_QUADTREE, "max error = %g\n", 
-                root->RecomputeError(root_corner_data));
+    print_debug( DEBUG_QUADTREE, "max error = %g\n", root->RecomputeError(root_corner_data));
     
 #ifdef TR_DEBUG_MODE
     uint64_t start_time = udate();
 #endif
     
     // Get rid of unnecessary nodes in flat-ish areas.
-    print_debug( DEBUG_QUADTREE, 
-                "Culling unnecessary nodes (detail factor = %d)...\n",
-                CULL_DETAIL_FACTOR);
+    print_debug( DEBUG_QUADTREE, "Culling unnecessary nodes (detail factor = %d)...\n", CULL_DETAIL_FACTOR);
     root->StaticCullData(root_corner_data, CULL_DETAIL_FACTOR);
     
     // Post-cull debug info.
     print_debug( DEBUG_QUADTREE, "nodes = %d\n", root->CountNodes());
-    print_debug( DEBUG_QUADTREE, "max error = %g\n", 
-                root->RecomputeError(root_corner_data));
+    print_debug( DEBUG_QUADTREE, "max error = %g\n", root->RecomputeError(root_corner_data));
     
     // Run the update function a few times before we start rendering
     // to disable unnecessary quadsquares, so the first frame won't

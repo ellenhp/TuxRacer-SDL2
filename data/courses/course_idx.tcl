@@ -50,6 +50,9 @@ tux_load_texture noicon textures/noicon.rgb
 tux_load_texture no_preview courses/textures/hud/nopreview.rgb
 tux_bind_texture no_preview no_preview
 
+
+global ::course_dir
+
 #
 # Bind preview textures if they exist
 #
@@ -57,6 +60,7 @@ foreach course_path [glob -nocomplain courses/*] {
     if { $course_path == "courses/common" || $course_path == "courses/textures" || $course_path == "courses/course_idx.tcl" } {
 	continue;
     }
+	set ::course_dir $course_path
 	set course_name [lindex [split $course_path "/"] 1 ]
 	tux_load_texture $course_name "$course_path/preview.rgb"
 	tux_bind_texture $course_name $course_name

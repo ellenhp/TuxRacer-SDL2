@@ -54,6 +54,8 @@
 #define DEP_TREE_GREEN 0
 #define DEP_TREE_BLUE 0
 
+#define SCRIPT_MAXSIZE 10000
+
 static bool_t        course_loaded = False;
 
 /* This array stores the heightmap.  It is stored as follows: suppose
@@ -366,25 +368,33 @@ void load_course_core( char *course )
 #ifdef TR_DEBUG_MODE
     uint64_t start_time = udate();
 #endif
-    char buff[BUFF_LEN];
-    char cwd[BUFF_LEN];
-    if ( getcwd( cwd, BUFF_LEN ) == NULL ) {
-	handle_system_error( 1, "getcwd failed" );
+    char buf[BUFF_LEN];
+    char pre_script[BUFF_LEN];
+    char script_buf[SCRIPT_MAXSIZE];
+	SDL_RWops* file;
+	int bytes_read=0;
+	const char* error;
+
+    sprintf( buf, "%s/courses/%s/course.tcl", getparam_data_dir(), course );
+
+    sprintf( pre_script, "set cwd %s/courses/%s\n", getparam_data_dir(), course );
+
+	file=SDL_RWFromFile(buf, "r");
+	if (!file)
+	{
+		handle_error( 1, "Error evaluating %s: couldn't open file", buf);
+		return;
+	}
+	bytes_read=SDL_RWread(file, script_buf, 1, SCRIPT_MAXSIZE-1);
+	script_buf[bytes_read]=0; //null terminate script
+	SDL_RWclose(file);
+
+    if ( Tcl_Eval( g_game.tcl_interp, pre_script) == TCL_ERROR ) {
+		handle_error( 1, "Error evaluating %s pre_script: %s", buf, Tcl_GetStringResult( g_game.tcl_interp ) );
     }
-
-    sprintf( buff, "%s/courses/%s", getparam_data_dir(), course );
-    if ( chdir( buff ) != 0 ) {
-	handle_system_error( 1, "Couldn't chdir to %s", buff );
-    } 
-
-    if ( Tcl_EvalFile( g_game.tcl_interp, "./course.tcl") == TCL_ERROR ) {
-	handle_error( 1, "Error evaluating %s/course.tcl: %s",  
-		      buff, Tcl_GetStringResult( g_game.tcl_interp ) );
-    } 
-
-    if ( chdir( cwd ) != 0 ) {
-	handle_system_error( 1, "Couldn't chdir to %s", cwd );
-    } 
+    if ( Tcl_Eval( g_game.tcl_interp, script_buf) == TCL_ERROR ) {
+		handle_error( 1, "Error evaluating %s: %s", buf, Tcl_GetStringResult( g_game.tcl_interp ) );
+    }
 
     check_assertion( !Tcl_InterpDeleted( g_game.tcl_interp ),
 		     "Tcl interpreter deleted" );
@@ -1651,6 +1661,10 @@ static int item_spec_cb( ClientData cd, Tcl_Interp *ip,
 	    item_types[num_item_types].use_normal = True;
 
 	} else {
+		if (strlen(*argv)==0)
+		{
+			continue;
+		}
 	    sprintf( buff, "Unrecognized option `%s'", *argv );
 	    goto item_spec_bail;
 	}

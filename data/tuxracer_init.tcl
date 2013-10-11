@@ -10,7 +10,6 @@ set tux_data_dir [pwd]
 #
 proc tux_goto_data_dir {} {
     global tux_data_dir
-    cd $tux_data_dir
 }
 
 proc tux_course_init {} {

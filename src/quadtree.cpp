@@ -16,6 +16,7 @@
 #include "fog.h"
 #include "gl_util.h"
 #include "course_render.h"
+#include "debug.h"
 
 #include "quadtree.hpp"
 #include "quadgeom.hpp"

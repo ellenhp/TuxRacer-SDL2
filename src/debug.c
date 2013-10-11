@@ -111,6 +111,8 @@ void debug_mode_set_active( debug_mode_t mode, bool_t active )
     debug_setting[ mode ] = active;
 }
 
+#ifndef WIN32
+
 void print_debug( debug_mode_t mode, char *fmt, ... )
 {
     va_list args;
@@ -135,6 +137,8 @@ void print_debug( debug_mode_t mode, char *fmt, ... )
 
     va_end( args );
 }
+
+#endif
 
 
 
@@ -166,11 +170,7 @@ void setup_diagnostic_log()
     debug_mode_set_active( DEBUG_SAVE, True );
     debug_mode_set_active( DEBUG_JOYSTICK, True );
     debug_mode_set_active( DEBUG_GL_INFO, False );
-#ifdef __ANDROID__ //gets rid of some really weird runtime errors on windows
     debug_mode_set_active( DEBUG_OTHER, True );
-#else
-    debug_mode_set_active( DEBUG_OTHER, False );
-#endif
 
     /* Write bug report header */
     SDL_Log( "Tux Racer Diagnostic Log\n\n" );

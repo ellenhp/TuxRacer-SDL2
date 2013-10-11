@@ -49,7 +49,13 @@ typedef enum {
 void init_debug();
 bool_t debug_mode_is_active( debug_mode_t mode );
 void debug_mode_set_active( debug_mode_t mode, bool_t active );
+
+#ifndef WIN32
 void print_debug( debug_mode_t mode, char *fmt, ... );
+#else
+#define print_debug( mode, ... ) printf(__VA_ARGS__); printf("\n")
+#endif
+
 void setup_diagnostic_log();
 
 /* Define assertion macros (these do nothing if TUXRACER_NO_ASSERT
