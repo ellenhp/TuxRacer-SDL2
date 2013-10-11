@@ -375,10 +375,17 @@ void load_course_core( char *course )
 	int bytes_read=0;
 	const char* error;
 
+#ifdef __ANDROID__
+    sprintf( buf, "courses/%s/course.tcl", course );
+    sprintf( pre_script, "set ::course_dir courses/%s\n", course );
+#else
     sprintf( buf, "%s/courses/%s/course.tcl", getparam_data_dir(), course );
+    sprintf( pre_script, "set ::course_dir %s/courses/%s\n", getparam_data_dir(), course );
+#endif
+    
 
-    sprintf( pre_script, "set cwd %s/courses/%s\n", getparam_data_dir(), course );
-
+    print_debug(DEBUG_OTHER, pre_script);
+    
 	file=SDL_RWFromFile(buf, "r");
 	if (!file)
 	{

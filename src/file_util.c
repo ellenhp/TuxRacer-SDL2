@@ -106,6 +106,10 @@ bool_t dir_exists( char *dirname )
     }
     return True;
 
+#elif defined(__ANDROID__)
+    
+    return True;
+    
 #else
 
     /* Unix/Linux/Cygwin */
