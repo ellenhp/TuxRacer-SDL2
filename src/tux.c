@@ -28,6 +28,7 @@
 #define MAX_PADDLING_ANGLE 35.0
 #define MAX_EXT_PADDLING_ANGLE 30.0
 #define MAX_KICK_PADDLING_ANGLE 20.0
+#define SCRIPT_MAX_SIZE 20000
 
 static void register_tux_callbacks( Tcl_Interp *ip );
 
@@ -154,6 +155,10 @@ void draw_tux()
 void load_tux()
 {
     char cwd[BUFF_LEN];
+    
+    char tcl_script_buf[SCRIPT_MAX_SIZE];
+    int bytes_read=0;
+    SDL_RWops* file=0;
 
     if ( tuxLoaded == True ) 
         return;
@@ -165,28 +170,18 @@ void load_tux()
 
     initialize_scene_graph();
 
-    if ( getcwd( cwd, BUFF_LEN ) == NULL ) {
-	handle_system_error( 1, "getcwd failed" );
+    file=SDL_RWFromFile("tux.tcl", "r");
+    if (!file)
+    {
+        handle_error( 1, "error opening tux.tcl\n");
+        return;
     }
+    bytes_read=SDL_RWread(file, tcl_script_buf, 1, SCRIPT_MAX_SIZE-1);
+    tcl_script_buf[bytes_read]=0;
+    SDL_RWclose(file);
 
-    if ( chdir( getparam_data_dir() ) != 0 ) {
-	/* Print a more informative warning since this is a common error */
-	handle_system_error( 
-	    1, "Can't find the tuxracer data "
-	    "directory.  Please check the\nvalue of `data_dir' in "
-	    "~/.tuxracer/options and set it to the location where you\n"
-	    "installed the TRWC-data files.\n\n"
-	    "Couldn't chdir to %s", getparam_data_dir() );
-	/*
-        handle_system_error( 1, "couldn't chdir to %s", getparam_data_dir() );
-	*/
-    } 
-
-    if ( Tcl_EvalFile( g_game.tcl_interp, "tux.tcl") == TCL_ERROR ) {
-        handle_error( 1, "error evalating %s/tux.tcl: %s\n"
-		      "Please check the value of `data_dir' in ~/.tuxracer/options "
-		      "and make sure it\npoints to the location of the "
-		      "latest version of the TRWC-data files.", 
+    if ( Tcl_Eval( g_game.tcl_interp, tcl_script_buf) == TCL_ERROR ) {
+        handle_error( 1, "error evalating %s/tux.tcl: %s\n",
 		      getparam_data_dir(), 
 		      Tcl_GetStringResult( g_game.tcl_interp ) );
     } 
@@ -194,9 +189,6 @@ void load_tux()
     check_assertion( !Tcl_InterpDeleted( g_game.tcl_interp ),
 		     "Tcl interpreter deleted" );
 
-    if ( chdir( cwd ) != 0 ) {
-	handle_system_error( 1, "couldn't chdir to %s", cwd );
-    } 
 } 
 
 char* get_tux_root_node() { return tuxRootNode; } 

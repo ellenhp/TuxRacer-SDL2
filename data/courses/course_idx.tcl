@@ -45,107 +45,103 @@ proc get_course_info { } {
 set cwd [pwd]
 tux_goto_data_dir
 
-tux_load_texture noicon textures/noicon.rgb
+#tux_load_texture noicon courses/textures/noicon.rgb
 
-cd courses
-
-tux_load_texture no_preview textures/hud/nopreview.rgb
+tux_load_texture no_preview courses/textures/hud/nopreview.rgb
 tux_bind_texture no_preview no_preview
 
 #
 # Bind preview textures if they exist
 #
-foreach course [glob -nocomplain *] {
+foreach course [glob -nocomplain courses/*] {
     if { $course == "common" || $course == "textures" } {
 	continue;
     }
-    if [file exists "$course/preview.rgb"] {
-	tux_load_texture $course "$course/preview.rgb"
+	tux_load_texture $course "courses/$course/preview.rgb"
 	tux_bind_texture $course $course
-    }
 }
 
 tux_open_courses [concat \
-    { \
-    { \
-        -course bunny_hill -name "Bunny Hill" \
-            -description "Use clever turning to conquer the Bunny Hill." \
-                    -par_time 40.0 \
-                    -conditions sunny -no_speed \
-    } \
-    { \
-        -course frozen_river -name "Frozen River" \
-            -description "Don't get stuck in the Frozen River !" \
-                    -par_time 80.0 \
-                    -conditions sunny \
-    } \
-    { \
-        -course twisty_slope -name "Twisty Slope" \
-            -description "Tight twists make grabbing herring difficult.  Hard turns will lead you to victory." \
-                    -par_time 40.0  -no_speed \
-    } \
-    { \
-        -course bumpy_ride -name "Bumpy Ride" \
-            -description "This hill has a series of ramps tackle.  Make sure to line yourself up before getting airborne." \
-                    -par_time 40.0 \
-                    -conditions sunny -no_speed \
-    } \
-    { \
-        -course penguins_cant_fly -name "Flying Penguins" \
-            -description "Go fast, and try to keep a bit of control to catch herrings !" \
-                    -par_time 120.0 \
-    } \
-    { \
-        -course slippy_slidey -name "Slippy Slidey" \
-            -description "Choose your way to be the best !" \
-                    -par_time 120.0 \
-                    -conditions sunny -no_score \
-    } \
-    { \
-        -course chinese_wall -name "Chinese Wall" \
-            -description "Choose your way to be the best !" \
-                    -par_time 120.0 \
-                    -conditions sunny -no_score \
-    } \
-    { \
-        -course bobsled_ride -name "Bobsled Ride" \
-            -description "Just like a real bobsled ride, only more dangerous !" \
-                    -par_time 80.0 -conditions sunny -no_score \
-    } \
-    { \
-        -course deadman -name "Dead Mans Drop" \
-            -description "Pretty tough hill. It's fast, steep, lumpy, twisty, and full of trees. Don't forget the drop." \
-                    -par_time 60.0 -conditions sunny -no_score \
-    } \
-    { \
-        -course ski_jump -name "Ski-Jump" \
-            -description "Try to get the longest flying time, make tricks, and to catch as many fishes as possible..." \
-                    -par_time 40.0 \
-                    -conditions evening -no_speed \
-    } \
-    { \
-        -course Half_Pipe -name "Half-Pipe" \
-            -description "Make tricks shaking the iPhone while jumping to earn points. Be carefull of the time remaining..." \
-                    -par_time 80.0 \
-                    -conditions sunny -no_speed \
-    } \
-    { \
-        -course Off_Piste_Skiing -name "Off piste skiing" \
-            -description "Free-ride in the mountain ! Be careful to trees and use jumps to take shorters ways... Don't forget that stop paddling when speedometers becomes yellow if you want to increase your speed." \
-                    -par_time 120.0 \
-                    -conditions evening \
-    } \
-    { \
-        -course in_search_of_vodka -name "In search of vodka" \
-            -description "Tux needs some vodka to warm up is cold belly. Alas, his liquor cabinet has been pillaged. Join Tux on the quest for vodka. Pick up herring for dinner along the way !" \
-                    -par_time 120.0 \
-                    -conditions night \
-    } \
-    } \
+     { \
+     { \
+-        -course bunny_hill -name "Bunny Hill" \
+-            -description "Use clever turning to conquer the Bunny Hill." \
+-                    -par_time 40.0 \
+-                    -conditions sunny -no_speed \
+-    } \
+-    { \
+-        -course frozen_river -name "Frozen River" \
+-            -description "Don't get stuck in the Frozen River !" \
+-                    -par_time 80.0 \
+-                    -conditions sunny \
+-    } \
+-    { \
+         -course twisty_slope -name "Twisty Slope" \
+             -description "Tight twists make grabbing herring difficult.  Hard turns will lead you to victory." \
+                     -par_time 40.0  -no_speed \
+     } \
+-    { \
+-        -course bumpy_ride -name "Bumpy Ride" \
+-            -description "This hill has a series of ramps tackle.  Make sure to line yourself up before getting airborne." \
+-                    -par_time 40.0 \
+-                    -conditions sunny -no_speed \
+-    } \
+-    { \
+-        -course penguins_cant_fly -name "Flying Penguins" \
+-            -description "Go fast, and try to keep a bit of control to catch herrings !" \
+-                    -par_time 120.0 \
+-    } \
+-    { \
+-        -course slippy_slidey -name "Slippy Slidey" \
+-            -description "Choose your way to be the best !" \
+-                    -par_time 120.0 \
+-                    -conditions sunny -no_score \
+-    } \
+-    { \
+-        -course chinese_wall -name "Chinese Wall" \
+-            -description "Choose your way to be the best !" \
+-                    -par_time 120.0 \
+-                    -conditions sunny -no_score \
+-    } \
+-    { \
+-        -course bobsled_ride -name "Bobsled Ride" \
+-            -description "Just like a real bobsled ride, only more dangerous !" \
+-                    -par_time 80.0 -conditions sunny -no_score \
+-    } \
+-    { \
+-        -course deadman -name "Dead Mans Drop" \
+-            -description "Pretty tough hill. It's fast, steep, lumpy, twisty, and full of trees. Don't forget the drop." \
+-                    -par_time 60.0 -conditions sunny -no_score \
+-    } \
+-    { \
+-        -course ski_jump -name "Ski-Jump" \
+-            -description "Try to get the longest flying time, make tricks, and to catch as many fishes as possible..." \
+-                    -par_time 40.0 \
+-                    -conditions evening -no_speed \
+-    } \
+-    { \
+-        -course Half_Pipe -name "Half-Pipe" \
+-            -description "Make tricks shaking the iPhone while jumping to earn points. Be carefull of the time remaining..." \
+-                    -par_time 80.0 \
+-                    -conditions sunny -no_speed \
+-    } \
+-    { \
+-        -course Off_Piste_Skiing -name "Off piste skiing" \
+-            -description "Free-ride in the mountain ! Be careful to trees and use jumps to take shorters ways... Don't forget that stop paddling when speedometers becomes yellow if you want to increase your speed." \
+-                    -par_time 120.0 \
+-                    -conditions evening \
+-    } \
+-    { \
+-        -course in_search_of_vodka -name "In search of vodka" \
+-            -description "Tux needs some vodka to warm up is cold belly. Alas, his liquor cabinet has been pillaged. Join Tux on the quest for vodka. Pick up herring for dinner along the way !" \
+-                    -par_time 120.0 \
+-                    -conditions night \
+-    } \
+     } \
 ]
 
-tux_load_texture herring_run_icon textures/hud/herringrunicon.rgb 0
-tux_load_texture cup_icon textures/hud/cupicon.rgb 0
+tux_load_texture herring_run_icon courses/textures/hud/herringrunicon.rgb 0
+tux_load_texture cup_icon courses/textures/hud/cupicon.rgb 0
 
 tux_events {
     {
@@ -179,7 +175,5 @@ tux_events {
 		}
 	}	
 }
-    
 
-cd $cwd
 

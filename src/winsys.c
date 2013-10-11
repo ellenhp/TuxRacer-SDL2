@@ -258,10 +258,17 @@ static void setup_sdl_video_mode()
 
 #if SDL_MAJOR_VERSION==2
 
-    if ( getparam_fullscreen() ) {
-	video_flags |= SDL_WINDOW_FULLSCREEN;
-    } else {
-	video_flags |= SDL_WINDOW_RESIZABLE;
+    if ( getparam_fullscreen() )
+    {
+        video_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+        width = 0;
+        height = 0;
+    }
+    else
+    {
+        video_flags |= SDL_WINDOW_RESIZABLE;
+        width = getparam_x_resolution();
+        height = getparam_y_resolution();
     }
 
 #else
@@ -270,6 +277,9 @@ static void setup_sdl_video_mode()
     } else {
 	video_flags |= SDL_RESIZABLE;
     }
+    
+    width = getparam_x_resolution();
+    height = getparam_y_resolution();
 
     switch ( getparam_bpp_mode() ) {
     case 0:
@@ -293,11 +303,8 @@ static void setup_sdl_video_mode()
     }
 #endif
 
-    width = getparam_x_resolution();
-    height = getparam_y_resolution();
-
 #if SDL_MAJOR_VERSION==2
-    if ( ( window = SDL_CreateWindow( "Tux Racer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, video_flags ) ) == NULL ) 
+    if ( ( window = SDL_CreateWindow( "Tux Racer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, video_flags ) ) == NULL )
 #else
 	if ( ( screen = SDL_SetVideoMode( width, height, bpp, video_flags ) ) == NULL )
 #endif
@@ -308,6 +315,9 @@ static void setup_sdl_video_mode()
 #if SDL_MAJOR_VERSION==2
 	else
 	{
+        SDL_GetWindowSize(window, &width, &height);
+        setparam_x_resolution(width);
+        setparam_y_resolution(height);
 		SDL_GL_CreateContext(window);
 	}
 #endif
@@ -692,7 +702,6 @@ void winsys_update_joysticks()
 		}
 	}
 }
-
 
 /*---------------------------------------------------------------------------*/
 /*! 

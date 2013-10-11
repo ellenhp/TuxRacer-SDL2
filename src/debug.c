@@ -159,13 +159,14 @@ void setup_diagnostic_log()
     debug_mode_set_active( DEBUG_SOUND, True );
     debug_mode_set_active( DEBUG_TEXTURE, True );
     debug_mode_set_active( DEBUG_VIEW, True );
-    debug_mode_set_active( DEBUG_GL_EXT, True );
+    debug_mode_set_active( DEBUG_GL_EXT, False );
     debug_mode_set_active( DEBUG_FONT, True );
     debug_mode_set_active( DEBUG_UI, True );
     debug_mode_set_active( DEBUG_GAME_LOGIC, True );
     debug_mode_set_active( DEBUG_SAVE, True );
     debug_mode_set_active( DEBUG_JOYSTICK, True );
-    debug_mode_set_active( DEBUG_GL_INFO, True );
+    debug_mode_set_active( DEBUG_GL_INFO, False );
+    debug_mode_set_active( DEBUG_OTHER, True );
 
     /* Write bug report header */
     SDL_Log( "Tux Racer Diagnostic Log\n\n" );

@@ -59,6 +59,7 @@
 #include "os_util.h"
 #include "loading.h"
 #include "tcl_util.h"
+#include "tcl.h"
 #ifdef __APPLE__
     #include "sharedGeneralFunctions.h"
 #endif
@@ -66,6 +67,9 @@
 #define WINDOW_TITLE "Tux Racer " VERSION
 
 #define GAME_INIT_SCRIPT "tuxracer_init.tcl"
+#define COURSE_INDEX_SCRIPT "courses/course_idx.tcl"
+
+#define SCRIPT_MAX_SIZE 20000
 
 #ifndef MAX_PATH
 #  ifdef PATH_MAX
@@ -98,39 +102,67 @@ void cleanup(void)
     winsys_shutdown();
 }
 
+int tux_eval(Tcl_Interp *interp, char* filename)
+{
+    char tcl_script_buf[SCRIPT_MAX_SIZE];
+    int bytes_read=0;
+    SDL_RWops* file=0;
+    
+    file=SDL_RWFromFile(filename, "r");
+    if (!file)
+    {
+        handle_error( 1, "error opening script %s", filename);
+        return;
+    }
+    bytes_read=SDL_RWread(file, tcl_script_buf, 1, SCRIPT_MAX_SIZE-1);
+    tcl_script_buf[bytes_read]=0; //null terminate it!
+    SDL_RWclose(file);
+    if ( Tcl_Eval( interp, tcl_script_buf) == TCL_ERROR )
+    {
+        handle_error(1, "error evalating %s: %s", filename, Tcl_GetStringResult( g_game.tcl_interp));
+        return 0;
+    }
+    return 1;
+}
+
+int tcl_tux_eval(ClientData clientData, Tcl_Interp *interp, int argc, char *argv[])
+{
+    if (argc!=2)
+    {
+        Tcl_SetResult(interp, "Inappropriate arguments for tux_eval", 0);
+        return TCL_ERROR;
+    }
+    if (tux_eval(interp, argv[1]))
+    {
+        Tcl_SetResult(interp, "tux_eval evaluated file", 0);
+        return TCL_OK;
+    }
+    Tcl_SetResult(interp, "Error evaluating script", 0);
+    return TCL_ERROR;
+}
+
 void read_game_init_script()
 {
     char cwd[BUFF_LEN];
+    
+    char tcl_script_buf[SCRIPT_MAX_SIZE];
+    int bytes_read=0;
+    SDL_RWops* file=0;
 
-    if ( getcwd( cwd, BUFF_LEN ) == NULL ) {
-	handle_system_error( 1, "getcwd failed" );
-    }
-
-    if ( chdir( getparam_data_dir() ) != 0 ) {
-	/* Print a more informative warning since this is a common error */
-	handle_system_error( 
-	    1, "Can't find the tuxracer data "
-	    "directory.  Please check the\nvalue of `data_dir' in "
-	    "~/.tuxracer/options and set it to the location where you\n"
-	    "installed the TRWC-data files.\n\n"
-	    "Couldn't chdir to %s", getparam_data_dir() );
-    } 
-
-    if ( Tcl_EvalFile( g_game.tcl_interp, GAME_INIT_SCRIPT) == TCL_ERROR ) {
-        handle_error( 1, "error evalating %s/%s: %s\n"
-		      "Please check the value of `data_dir' in ~/.tuxracer/options "
-		      "and make sure it\npoints to the location of the "
-		      "latest version of the TRWC-data files.", 
-		      getparam_data_dir(), GAME_INIT_SCRIPT, 
-		      Tcl_GetStringResult( g_game.tcl_interp ) );
-    } 
+    Tcl_CreateCommand(g_game.tcl_interp, "tux_eval", (Tcl_CmdProc*)tcl_tux_eval, 0, NULL);
+    
+    tux_eval(g_game.tcl_interp, GAME_INIT_SCRIPT);
+    
+    print_debug(DEBUG_OTHER, "Read game init script");
 
     check_assertion( !Tcl_InterpDeleted( g_game.tcl_interp ),
 		     "Tcl interpreter deleted" );
-
+    
+    /*
     if ( chdir( cwd ) != 0 ) {
 	handle_system_error( 1, "couldn't chdir to %s", cwd );
-    } 
+    }
+    */
 }
 
     
@@ -229,7 +261,6 @@ int main( int argc, char **argv )
 	print_gl_info();
     }
 
-
     /* 
      * Load the game data and initialize game state
      */
@@ -257,8 +288,6 @@ int main( int argc, char **argv )
     init_ui_manager();
     init_course_manager();
     init_joystick();
-
-
     
     /* Read the tuxracer_init.tcl file */
     read_game_init_script();
