@@ -98,7 +98,7 @@ void draw_shadow_sphere( matrixgl_t model_matrix )
 
     d_theta = d_phi = M_PI / div;
 
-#ifndef __APPLE__DISABLED__
+#ifndef HAVE_OPENGLES
 // FIXME
     for ( phi = 0.0; phi + eps < M_PI; phi += d_phi ) {
 	scalar_t cos_theta, sin_theta;
@@ -204,7 +204,7 @@ void draw_shadow_vertex( scalar_t x, scalar_t y, scalar_t z,
     if ( pt.y > old_y ) 
 	pt.y = old_y;
 
-#ifndef __APPLE__DISABLED__
+#ifndef HAVE_OPENGLES
 //FIXME
     glNormal3f( nml.x, nml.y, nml.z );
     glVertex3f( pt.x, pt.y, pt.z );

@@ -522,8 +522,24 @@ void ui_draw_cursor( void )
 {
     GLuint texobj;
     char *binding;
-#ifndef __APPLE__
-    binding = "mouse_cursor";
+
+	const GLfloat vertices []=
+	{
+	    cursor_pos.x, cursor_pos.y - CURSOR_TEX_SIZE,
+	    cursor_pos.x, cursor_pos.y,
+	    cursor_pos.x + CURSOR_TEX_SIZE, cursor_pos.y,
+	    cursor_pos.x + CURSOR_TEX_SIZE, cursor_pos.y - CURSOR_TEX_SIZE
+	};
+
+	const GLfloat texCoords []=
+	{
+	    0,0,
+	    0,1,
+	    1,1,
+	    1,0
+	};
+
+	binding = "mouse_cursor";
     if ( !get_texture_binding( binding, &texobj ) ) {
 	texobj = 0;
     }
@@ -531,55 +547,16 @@ void ui_draw_cursor( void )
     ui_setup_display();
 
     glBindTexture( GL_TEXTURE_2D, texobj );
-    
-	#ifdef __APPLE__DISABLED__
 	
-	   const GLfloat vertices []=
-	   {
-	       cursor_pos.x, cursor_pos.y,
-	       cursor_pos.x, cursor_pos.y - CURSOR_TEX_SIZE,
-	       cursor_pos.x + CURSOR_TEX_SIZE, cursor_pos.y - CURSOR_TEX_SIZE,
-	       cursor_pos.x + CURSOR_TEX_SIZE, cursor_pos.y
-	   };
+	glEnableClientState (GL_VERTEX_ARRAY);
+	glEnableClientState (GL_TEXTURE_COORD_ARRAY);
 
-		const GLfloat texCoords []=
-	   {
-	       0,1,
-	       0,0,
-	       1,0,
-	       1,1
-	   };
+	glVertexPointer (2, GL_FLOAT , 0, vertices);	
+	glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-	   glEnableClientState (GL_VERTEX_ARRAY);
-	   glVertexPointer (2, GL_FLOAT , 0, vertices);	
-	   glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
-	   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-	#else
-	
-    glBegin( GL_QUADS );
-    {
-	glTexCoord2f( 0, 1 );
-	glVertex2f( cursor_pos.x, 
-		    cursor_pos.y );
-
-	glTexCoord2f( 0, 0 );
-	glVertex2f( cursor_pos.x, 
-		    cursor_pos.y - CURSOR_TEX_SIZE );
-
-	glTexCoord2f( 1, 0 );
-	glVertex2f( cursor_pos.x + CURSOR_TEX_SIZE, 
-		    cursor_pos.y - CURSOR_TEX_SIZE );
-
-	glTexCoord2f( 1, 1 );
-	glVertex2f( cursor_pos.x + CURSOR_TEX_SIZE, 
-		    cursor_pos.y );
-
-    }
-    glEnd();
-    
-    #endif
-#endif
+	glEnableClientState (GL_VERTEX_ARRAY);
+	glEnableClientState (GL_TEXTURE_COORD_ARRAY);
 }
 
 

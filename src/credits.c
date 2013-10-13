@@ -162,8 +162,56 @@ static void draw_credits_text( scalar_t time_step )
     int i;
     scalar_t y;
     int string_w, asc, desc;
+
+    const GLfloat vertices []=
+    {
+        0, 0,
+        w, 0 ,
+        w , CREDITS_MIN_Y,
+        0, CREDITS_MIN_Y
+    };
+
+    const GLfloat vertices1 []=
+    {
+        0, CREDITS_MIN_Y,
+        w, CREDITS_MIN_Y,
+        w, CREDITS_MIN_Y + 30,
+        0, CREDITS_MIN_Y + 30
+    };
     
-    y_offset += time_step * CREDITS_SPEED + time_step*joystick_y*CREDITS_JOYSTICK_SPEED;
+    const GLfloat colors1 []=
+    {
+        ui_background_colour.r, ui_background_colour.g, ui_background_colour.b, ui_background_colour.a,
+        ui_background_colour.r, ui_background_colour.g, ui_background_colour.b, ui_background_colour.a,
+        ui_background_colour.r, ui_background_colour.g, ui_background_colour.b, 0.0,
+        ui_background_colour.r, ui_background_colour.g, ui_background_colour.b, 0.0,
+    };
+    
+    const GLfloat vertices2 []=
+    {
+        0, h+CREDITS_MAX_Y,
+        w, h+CREDITS_MAX_Y ,
+        w , h,
+        0, h
+    };
+
+	const GLfloat vertices3 []=
+    {
+        w, h+CREDITS_MAX_Y,
+        0, h+CREDITS_MAX_Y,
+        0, h+CREDITS_MAX_Y - 30,
+        w, h+CREDITS_MAX_Y - 30
+    };
+    
+    const GLfloat colors3 []=
+    {
+        ui_background_colour.r, ui_background_colour.g, ui_background_colour.b, ui_background_colour.a,
+        ui_background_colour.r, ui_background_colour.g, ui_background_colour.b, ui_background_colour.a,
+        ui_background_colour.r, ui_background_colour.g, ui_background_colour.b, 0.0,
+        ui_background_colour.r, ui_background_colour.g, ui_background_colour.b, 0.0,
+    };
+
+	y_offset += time_step * CREDITS_SPEED + time_step*joystick_y*CREDITS_JOYSTICK_SPEED;
 	if (y_offset<0)
 	{
 		y_offset=0;
@@ -210,39 +258,14 @@ static void draw_credits_text( scalar_t time_step )
     /* Draw strips at the top and bottom to clip out text */
     //glDisable( GL_TEXTURE_2D );
     
-    
-#ifdef HAVE_OPENGLES
 	glColor4f( ui_background_colour.r, ui_background_colour.g, ui_background_colour.b, ui_background_colour.a );
     
     //draws rect a la place de glRectf
-    const GLfloat vertices []=
-    {
-        0, 0,
-        w, 0 ,
-        w , CREDITS_MIN_Y,
-        0, CREDITS_MIN_Y
-    };
     
     glEnableClientState (GL_VERTEX_ARRAY);
     glVertexPointer (2, GL_FLOAT , 0, vertices);	
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	
-    const GLfloat vertices1 []=
-    {
-        0, CREDITS_MIN_Y,
-        w, CREDITS_MIN_Y,
-        w, CREDITS_MIN_Y + 30,
-        0, CREDITS_MIN_Y + 30
-    };
-    
-    const GLfloat colors1 []=
-    {
-        ui_background_colour.r, ui_background_colour.g, ui_background_colour.b, ui_background_colour.a,
-        ui_background_colour.r, ui_background_colour.g, ui_background_colour.b, ui_background_colour.a,
-        ui_background_colour.r, ui_background_colour.g, ui_background_colour.b, 0.0,
-        ui_background_colour.r, ui_background_colour.g, ui_background_colour.b, 0.0,
-    };
-    
+	    
     glEnableClientState (GL_VERTEX_ARRAY);
     glVertexPointer (2, GL_FLOAT , 0, vertices);	
     glColorPointer(4, GL_FLOAT, 0, colors1);
@@ -251,79 +274,15 @@ static void draw_credits_text( scalar_t time_step )
     glColor4f( ui_background_colour.r,  ui_background_colour.g, ui_background_colour.b, ui_background_colour.a );
     
     //draws rect a la place de glRectf( 0, h+CREDITS_MAX_Y, w, h );
-    const GLfloat vertices2 []=
-    {
-        0, h+CREDITS_MAX_Y,
-        w, h+CREDITS_MAX_Y ,
-        w , h,
-        0, h
-    };
     
     glEnableClientState (GL_VERTEX_ARRAY);
     glVertexPointer (2, GL_FLOAT , 0, vertices2);	
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     
-    
-    const GLfloat vertices3 []=
-    {
-        w, h+CREDITS_MAX_Y,
-        0, h+CREDITS_MAX_Y,
-        0, h+CREDITS_MAX_Y - 30,
-        w, h+CREDITS_MAX_Y - 30
-    };
-    
-    const GLfloat colors3 []=
-    {
-        ui_background_colour.r, ui_background_colour.g, ui_background_colour.b, ui_background_colour.a,
-        ui_background_colour.r, ui_background_colour.g, ui_background_colour.b, ui_background_colour.a,
-        ui_background_colour.r, ui_background_colour.g, ui_background_colour.b, 0.0,
-        ui_background_colour.r, ui_background_colour.g, ui_background_colour.b, 0.0,
-    };
-    
     glEnableClientState (GL_VERTEX_ARRAY);
     glVertexPointer (2, GL_FLOAT , 0, vertices3);	
     glColorPointer(4, GL_FLOAT, 0, colors3);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    
-    
-    
-#else
-    
-    glColor4dv( (scalar_t*)&ui_background_colour );
-    
-    glRectf( 0, 0, w, CREDITS_MIN_Y );
-    
-    glBegin( GL_QUADS );
-    {
-        glVertex2f( 0, CREDITS_MIN_Y );
-        glVertex2f( w, CREDITS_MIN_Y );
-        glColor4f( ui_background_colour.r, 
-                  ui_background_colour.g,
-                  ui_background_colour.b,
-                  0 );
-        glVertex2f( w, CREDITS_MIN_Y + 30 );
-        glVertex2f( 0, CREDITS_MIN_Y + 30 );
-    }
-    glEnd();
-    
-    glColor4dv( (scalar_t*)&ui_background_colour );
-    
-    glRectf( 0, h+CREDITS_MAX_Y, w, h );
-    
-    glBegin( GL_QUADS );
-    {
-        glVertex2f( w, h+CREDITS_MAX_Y );
-        glVertex2f( 0, h+CREDITS_MAX_Y );
-        glColor4f( ui_background_colour.r, 
-                  ui_background_colour.g,
-                  ui_background_colour.b,
-                  0 );
-        glVertex2f( 0, h+CREDITS_MAX_Y - 30 );
-        glVertex2f( w, h+CREDITS_MAX_Y - 30 );
-    }
-    glEnd();
-    
-#endif
     
     glColor4f( 1, 1, 1, 1 );
     

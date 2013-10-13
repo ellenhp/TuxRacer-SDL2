@@ -195,3 +195,4 @@ extern "C" void render_course_quadtree()
     
     root->Render( root_corner_data, vnc_array );
 }
+

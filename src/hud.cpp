@@ -30,6 +30,9 @@
 #include "course_load.h"
 #include "bonus.h"
 
+extern "C"
+{
+
 #define SECONDS_IN_MINUTE 60
 
 #define TIME_LABEL_X_OFFSET 12.0
@@ -55,6 +58,9 @@
 #define ENERGY_GAUGE_CENTER_X 71.0
 #define ENERGY_GAUGE_CENTER_Y 55.0
 
+#define ENERGY_GAUGE_TEX_CENTER_X 71.0
+#define ENERGY_GAUGE_TEX_CENTER_Y 40.0
+
 #define GAUGE_WIDTH 127.0
 #define SPEED_UNITS_Y_OFFSET 4.0
 
@@ -70,7 +76,6 @@
 
 #define FPS_X_OFFSET 12
 #define FPS_Y_OFFSET 12
-
 
 static GLfloat energy_background_color[] = { 0.2, 0.2, 0.2, 0.5 };
 static GLfloat energy_foreground_color[] = { 0.54, 0.59, 1.00, 0.5 };
@@ -156,7 +161,8 @@ static void draw_time(player_data_t* plyr)
 
     bind_font_texture( font );
     set_gl_options( TEXFONT );
-    glColor3f( 1, 1, 1 );
+
+    glColor4f( 1, 1, 1, 1 );
 
     string = "Time";
 
@@ -233,6 +239,28 @@ static void draw_herring_count( int herring_count )
     char *binding;
     int w, asc, desc;
 
+	GLfloat verticesItem []=
+    {
+        0, 0, 0,
+        HERRING_ICON_WIDTH, 0, 0,
+        HERRING_ICON_WIDTH, HERRING_ICON_HEIGHT, 0,
+        0, HERRING_ICON_HEIGHT, 0,
+        0, 0, 0,
+        HERRING_ICON_WIDTH, HERRING_ICON_HEIGHT, 0
+    };
+        
+    GLfloat texCoordsItem []=
+    {
+        0.0, 0.0 ,
+        (GLfloat) HERRING_ICON_WIDTH / HERRING_ICON_IMG_SIZE, 0,
+        (GLfloat)HERRING_ICON_WIDTH / HERRING_ICON_IMG_SIZE, (GLfloat)HERRING_ICON_HEIGHT / HERRING_ICON_IMG_SIZE ,
+        0, (GLfloat)HERRING_ICON_HEIGHT / HERRING_ICON_IMG_SIZE,
+        0.0, 0.0,
+        (GLfloat)HERRING_ICON_WIDTH / HERRING_ICON_IMG_SIZE, (GLfloat)HERRING_ICON_HEIGHT / HERRING_ICON_IMG_SIZE ,
+    };
+
+	GLubyte indices[]={0, 1, 2, 2, 3, 0};
+
     set_gl_options( TEXFONT );
     glColor4f( 1.0, 1.0, 1.0, 1.0);
 
@@ -261,80 +289,29 @@ static void draw_herring_count( int herring_count )
     glBindTexture( GL_TEXTURE_2D, texobj );
 
     glPushMatrix();
-	{
-#ifdef HAVE_OPENGLES
-        static const GLfloat verticesItem []=
-        {
-            0, 0,
-            HERRING_ICON_WIDTH, 0,
-            HERRING_ICON_WIDTH, HERRING_ICON_HEIGHT,
-            0, HERRING_ICON_HEIGHT,
-            0, 0,
-            HERRING_ICON_WIDTH, HERRING_ICON_HEIGHT
-        };
-        
-        static const GLfloat texCoordsItem []=
-        {
-            0.0, 0.0 ,
-            (GLfloat) HERRING_ICON_WIDTH / HERRING_ICON_IMG_SIZE, 0,
-            (GLfloat)HERRING_ICON_WIDTH / HERRING_ICON_IMG_SIZE, (GLfloat)HERRING_ICON_HEIGHT / HERRING_ICON_IMG_SIZE ,
-            0, (GLfloat)HERRING_ICON_HEIGHT / HERRING_ICON_IMG_SIZE,
-            0.0, 0.0,
-            (GLfloat)HERRING_ICON_WIDTH / HERRING_ICON_IMG_SIZE, (GLfloat)HERRING_ICON_HEIGHT / HERRING_ICON_IMG_SIZE ,
-        };
-        
+	{        
         glTranslatef( getparam_x_resolution() - HERRING_ICON_X_OFFSET,
                      getparam_y_resolution() - HERRING_ICON_Y_OFFSET - asc, 
                      0 );
         
-        
-#undef    glEnableClientState
-#undef    glVertexPointer
-#undef    glTexCoordPointer
-#undef    glDrawArrays
-        
         glEnableClientState (GL_VERTEX_ARRAY);
         glEnableClientState (GL_TEXTURE_COORD_ARRAY);
-        glVertexPointer (2, GL_FLOAT , 0, verticesItem);	
+
+        glVertexPointer(3, GL_FLOAT , 0, verticesItem);	
         glTexCoordPointer(2, GL_FLOAT, 0, texCoordsItem);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
-    }
-#else
-	glTranslatef( getparam_x_resolution() - HERRING_ICON_X_OFFSET,
-		      getparam_y_resolution() - HERRING_ICON_Y_OFFSET - asc, 
-		      0 );
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
+		
+		glDisableClientState (GL_VERTEX_ARRAY);
+        glDisableClientState (GL_TEXTURE_COORD_ARRAY);
 
-	glBegin( GL_QUADS );
-	{
-	    glTexCoord2f( 0, 0 );
-	    glVertex2f( 0, 0 );
+		bind_font_texture( font );
 
-	    glTexCoord2f( (GLfloat) HERRING_ICON_WIDTH / HERRING_ICON_IMG_SIZE,
-			  0 );
-	    glVertex2f( HERRING_ICON_WIDTH, 0 );
+		glTranslatef( HERRING_ICON_WIDTH, HERRING_ICON_Y_OFFSET -  HERRING_COUNT_Y_OFFSET, 0 );
 
-	    glTexCoord2f( 
-		(GLfloat)HERRING_ICON_WIDTH / HERRING_ICON_IMG_SIZE,
-		(GLfloat)HERRING_ICON_HEIGHT / HERRING_ICON_IMG_SIZE );
-	    glVertex2f( HERRING_ICON_WIDTH, HERRING_ICON_HEIGHT );
+		draw_string( font, string );
 
-	    glTexCoord2f( 
-		0,
-		(GLfloat)HERRING_ICON_HEIGHT / HERRING_ICON_IMG_SIZE );
-	    glVertex2f( 0, HERRING_ICON_HEIGHT );
 	}
-	glEnd();
-#endif
-	bind_font_texture( font );
 
-	glTranslatef( HERRING_ICON_WIDTH, 
-		      HERRING_ICON_Y_OFFSET -  HERRING_COUNT_Y_OFFSET,
-		      0 );
-
-	draw_string( font, string );
-#ifndef HAVE_OPENGLES //not sure what's up with these mismatching brackets.
-    }
-#endif
     glPopMatrix();    
 }
 
@@ -374,7 +351,7 @@ static void draw_score( player_data_t *plyr )
     glPopMatrix();
 }
 
-#define CIRCLE_DIVISIONS 10
+#define CIRCLE_DIVISIONS 30
 
 point2d_t calc_new_fan_pt( scalar_t angle )
 {
@@ -387,72 +364,80 @@ point2d_t calc_new_fan_pt( scalar_t angle )
     return pt;
 }
 
-void start_tri_fan()
+point2d_t calc_new_fan_tex_pt( scalar_t angle )
 {
-#ifdef HAVE_OPENGLES
-	// TODO: convert this code
-#else
     point2d_t pt;
+    pt.x = (cos(ANGLES_TO_RADIANS(angle)) + 1)/2;
+    pt.y = (sin( ANGLES_TO_RADIANS(angle)) + 1)/2;
     
-    glBegin( GL_TRIANGLE_FAN );
-    glVertex2f( ENERGY_GAUGE_CENTER_X, 
-               ENERGY_GAUGE_CENTER_Y );
-    
-    pt = calc_new_fan_pt( SPEEDBAR_BASE_ANGLE ); 
-    
-    glVertex2f( pt.x, pt.y );
-#endif
+    return pt;
 }
 
 void draw_partial_tri_fan( scalar_t fraction )
 {
-#ifdef HAVE_OPENGLES
-#else
-    int divs;
+    const int divs=CIRCLE_DIVISIONS+2;
     scalar_t angle, angle_incr, cur_angle;
     int i;
-    bool_t trifan = False;
     point2d_t pt;
-    
-    angle = SPEEDBAR_BASE_ANGLE + 
-	( SPEEDBAR_MAX_ANGLE - SPEEDBAR_BASE_ANGLE ) * fraction;
-    
-    divs = (int) ( SPEEDBAR_BASE_ANGLE - angle ) * CIRCLE_DIVISIONS / 360.0;
+	GLfloat vertices[divs*3];
+	GLfloat texcoords[divs*2];
+	
+    angle = SPEEDBAR_BASE_ANGLE + ( SPEEDBAR_MAX_ANGLE - SPEEDBAR_BASE_ANGLE ) * fraction;
     
     cur_angle = SPEEDBAR_BASE_ANGLE;
     
-    angle_incr = 360.0 / CIRCLE_DIVISIONS;
+    angle_incr = fraction * ( SPEEDBAR_BASE_ANGLE - SPEEDBAR_MAX_ANGLE ) / CIRCLE_DIVISIONS;
     
-    for (i=0; i<divs; i++) {
-        if ( !trifan ) {
-            start_tri_fan();
-            trifan = True;
-        }
-        
+    vertices[0]=ENERGY_GAUGE_CENTER_X;
+    vertices[1]=ENERGY_GAUGE_CENTER_Y;
+    vertices[2]=0;
+
+	texcoords[0]=ENERGY_GAUGE_TEX_CENTER_X/128;
+	texcoords[1]=ENERGY_GAUGE_TEX_CENTER_Y/128;
+    
+    pt = calc_new_fan_pt( cur_angle );
+    vertices[3]=pt.x;
+    vertices[4]=pt.y;
+    vertices[5]=0;
+
+    pt = calc_new_fan_tex_pt( cur_angle );    
+    texcoords[3]=pt.x;
+	texcoords[4]=pt.y;
+	texcoords[5]=0;
+
+    for (i=1; i<divs-1; i++) {
         cur_angle -= angle_incr;
         
         pt = calc_new_fan_pt( cur_angle );
         
-        glVertex2f( pt.x, pt.y );
-    }
-    
-    if ( cur_angle > angle + EPS ) {
-        cur_angle = angle;
-        if ( !trifan ) {
-            start_tri_fan();
-            trifan = True;
-        }
+        vertices[i*3]=pt.x;
+		vertices[i*3+1]=pt.y;
+		vertices[i*3+2]=0;
+
+        pt = calc_new_fan_tex_pt( cur_angle );
         
-        pt = calc_new_fan_pt( cur_angle );
+        texcoords[i*2]=pt.x;
+		texcoords[i*2+1]=pt.y;
+    }
+    cur_angle = angle;
         
-        glVertex2f( pt.x, pt.y );
-    }
-    
-    if ( trifan ) {
-        glEnd();
-        trifan = False;
-    }
-#endif
+    pt = calc_new_fan_pt( cur_angle );
+        
+    vertices[sizeof(vertices)/sizeof(GLfloat)-3]=pt.x;
+	vertices[sizeof(vertices)/sizeof(GLfloat)-2]=pt.y;
+	vertices[sizeof(vertices)/sizeof(GLfloat)-1]=0;
+
+
+    pt = calc_new_fan_tex_pt( cur_angle );
+        
+    texcoords[sizeof(texcoords)/sizeof(GLfloat)-2]=pt.x;
+	texcoords[sizeof(texcoords)/sizeof(GLfloat)-1]=pt.y;
+        
+    glVertexPointer(3, GL_FLOAT , 0, vertices);
+    glTexCoordPointer(2, GL_FLOAT , 0, texcoords);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, CIRCLE_DIVISIONS);
+
+	return;
 }
 
 void draw_gauge( scalar_t speed, scalar_t energy )
@@ -505,8 +490,8 @@ void draw_gauge( scalar_t speed, scalar_t energy )
     }
     
     
-    glTexGenfv( GL_S, GL_OBJECT_PLANE, xplane );
-    glTexGenfv( GL_T, GL_OBJECT_PLANE, yplane );
+    //glTexGenfv( GL_S, GL_OBJECT_PLANE, xplane );
+    //glTexGenfv( GL_T, GL_OBJECT_PLANE, yplane );
     
     glPushMatrix();
     {
@@ -514,76 +499,58 @@ void draw_gauge( scalar_t speed, scalar_t energy )
                      0,
                      0 );
         
-        glColor4fv( energy_background_color );
-        
-        glBindTexture( GL_TEXTURE_2D, energymask_texobj );
-        
+        glColor4f(energy_background_color[0], energy_background_color[1], energy_background_color[2], energy_background_color[3]);
+
         y = ENERGY_GAUGE_BOTTOM + energy * ENERGY_GAUGE_HEIGHT;
-        
-#ifdef HAVE_OPENGLES
-#undef glDrawArrays
-#undef glVertexPointer
-#undef glEnableClientState
+
         const GLfloat verticesItem []=
         {
-            0.0, y,
-            GAUGE_IMG_SIZE, y,
-            GAUGE_IMG_SIZE, GAUGE_IMG_SIZE,
-            0.0, GAUGE_IMG_SIZE,
-            0.0, y,
-            GAUGE_IMG_SIZE, GAUGE_IMG_SIZE,
+            0.0, y, 0,
+            0.0, GAUGE_IMG_SIZE, 0,
+            GAUGE_IMG_SIZE, GAUGE_IMG_SIZE, 0,
+            GAUGE_IMG_SIZE, GAUGE_IMG_SIZE, 0,
+            GAUGE_IMG_SIZE, y, 0,
+            0.0, y, 0,
             
-            0.0, 0.0,
-            GAUGE_IMG_SIZE, 0.0,
-            GAUGE_IMG_SIZE, y,
-            0.0, y,
-            0.0, 0.0,
-            GAUGE_IMG_SIZE, y,
+            0.0, 0.0, 0,
+            0.0, y, 0,
+            GAUGE_IMG_SIZE, y, 0,
+            GAUGE_IMG_SIZE, y, 0,
+            GAUGE_IMG_SIZE, 0.0, 0,
+            0.0, 0.0, 0,
             
-            0.0, 0.0,
-            GAUGE_IMG_SIZE, 0.0,
-            GAUGE_IMG_SIZE, GAUGE_IMG_SIZE,
-            0.0, GAUGE_IMG_SIZE,
-            0.0, 0.0,
-            GAUGE_IMG_SIZE, GAUGE_IMG_SIZE,
+            0.0, 0.0, 0,
+            0.0, GAUGE_IMG_SIZE, 0,
+            GAUGE_IMG_SIZE, GAUGE_IMG_SIZE, 0,
+            GAUGE_IMG_SIZE, GAUGE_IMG_SIZE, 0,
+            GAUGE_IMG_SIZE, 0.0, 0,
+            0.0, 0.0, 0,
         };
+
+        const GLfloat texcoordItem []=
+        {
+            0, 0,
+            0, 1,
+			1, 1,
+			1, 1,
+			1, 0,
+			0, 0,
+        };
+
+		glEnableClientState (GL_VERTEX_ARRAY);
+        glEnableClientState (GL_TEXTURE_COORD_ARRAY);
         
-        glEnableClientState (GL_VERTEX_ARRAY);
-        glVertexPointer (2, GL_FLOAT , 0, verticesItem);
-        
+        glBindTexture( GL_TEXTURE_2D, energymask_texobj );
+
+        glVertexPointer (3, GL_FLOAT , 0, verticesItem);
+        glTexCoordPointer (2, GL_FLOAT , 0, texcoordItem);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         
-        glColor4fv( energy_foreground_color );
+        glColor4f(energy_foreground_color[0], energy_foreground_color[1], energy_foreground_color[2], energy_foreground_color[3]);
         
-        glDrawArrays(GL_TRIANGLES, 6, 6);
-        
-#else
-        
-        if(energy > 0) {
-            glBegin( GL_QUADS );
-            {
-                glVertex2f( 0.0, 0.0 );
-                glVertex2f( GAUGE_IMG_SIZE, 0.0 );
-                glVertex2f( GAUGE_IMG_SIZE, y );
-                glVertex2f( 0.0, y );
-            }
-            glEnd();
-        }
-        
-#ifndef __APPLE__
-        glColor4fv( energy_foreground_color );
-        
-        glBegin( GL_QUADS );
-        {
-            glVertex2f( 0.0, 0.0 );
-            glVertex2f( GAUGE_IMG_SIZE, 0.0 );
-            glVertex2f( GAUGE_IMG_SIZE, GAUGE_IMG_SIZE );
-            glVertex2f( 0.0, GAUGE_IMG_SIZE );
-        }
-        glEnd();
-#endif
-        
-#endif
+        glVertexPointer (3, GL_FLOAT , 0, verticesItem+3*6);
+        glTexCoordPointer (2, GL_FLOAT , 0, texcoordItem);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
         
         /* Calculate the fraction of the speed bar to fill */
         speedbar_frac = 0.0;
@@ -615,33 +582,24 @@ void draw_gauge( scalar_t speed, scalar_t energy )
             SPEEDBAR_GREEN_FRACTION;
         }
         
-        glColor4fv( speedbar_background_color );
         
         glBindTexture( GL_TEXTURE_2D, speedmask_texobj );
-        
+
+		glTexCoordPointer(2, GL_FLOAT , 0, NULL);
+		glVertexPointer(3, GL_FLOAT , 0, NULL);
+
+		glColor4f(speedbar_background_color[0], speedbar_background_color[1], speedbar_background_color[2], speedbar_background_color[3]);
         draw_partial_tri_fan( 1.0 );
-        
-        glColor4fv( white );
-        
+        glColor4f(white[0], white[1], white[2], white[3]);
         draw_partial_tri_fan( min( 1.0, speedbar_frac ) );
         
-        glColor4fv( white );
-        
         glBindTexture( GL_TEXTURE_2D, outline_texobj );
-        
-#ifdef HAVE_OPENGLES
-        glVertexPointer (2, GL_FLOAT , 0, verticesItem);
-        glDrawArrays(GL_TRIANGLES, 2*6, 6);
-#else
-        glBegin( GL_QUADS );
-        {
-            glVertex2f( 0.0, 0.0 );
-            glVertex2f( GAUGE_IMG_SIZE, 0.0 );
-            glVertex2f( GAUGE_IMG_SIZE, GAUGE_IMG_SIZE );
-            glVertex2f( 0.0, GAUGE_IMG_SIZE );
-        }
-        glEnd();
-#endif
+        glVertexPointer(3, GL_FLOAT , 0, verticesItem);
+        glTexCoordPointer(2, GL_FLOAT , 0, texcoordItem);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glVertexPointer(3, GL_FLOAT , 0, verticesItem+9);
+        glTexCoordPointer(2, GL_FLOAT , 0, texcoordItem+6);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
         
         sprintf( buff, "%d", (int)speed );
         string = buff;
@@ -681,9 +639,10 @@ void draw_gauge( scalar_t speed, scalar_t energy )
         
     }
     glPopMatrix();
-	
-}
 
+	glDisableClientState (GL_VERTEX_ARRAY);
+    glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+}
 void print_fps()
 {
     char buff[BUFF_LEN];
@@ -707,7 +666,8 @@ void print_fps()
 
     bind_font_texture( font );
     set_gl_options( TEXFONT );
-    glColor3f( 1, 1, 1 );
+
+    glColor4f( 1, 1, 1, 1 );
 
     sprintf( buff, "FPS: %.1f", get_fps() );
     string = buff;
@@ -740,7 +700,8 @@ void draw_hud( player_data_t *plyr )
 
     draw_gauge( speed * M_PER_SEC_TO_KM_PER_H, plyr->control.jump_amt );
     draw_time(plyr);
-    draw_herring_count( plyr->herring );
 
     print_fps();
+}
+
 }

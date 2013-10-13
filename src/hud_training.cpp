@@ -35,6 +35,8 @@
     #include "sharedGeneralFunctions.h"
 #endif
 
+extern "C"
+{
 
 static int step = -1;
 static  uint32_t first_time_true = 0;
@@ -45,7 +47,7 @@ static bool_t resume_from_tutorial_explanation = False;
 
 
 static void print_instruction(const char* string, int line) {
-    
+
     char* binding = "instructions";
     font_t *font;
     int w, asc, desc;
@@ -62,14 +64,21 @@ static void print_instruction(const char* string, int line) {
     glDisable(GL_TEXTURE_2D);
     glColor4f(1.0,1.0,1.0,0.4);
     
-    glBegin( GL_QUADS );
-    {
-        glVertex2f( 0.0, (float)(200-(line-2)*(asc+desc)) -5.0);
-        glVertex2f( 0.0, (float)(200-(line-1)*(asc+desc)) -5.0);
-        glVertex2f( 480.0, (float)(200-(line-1)*(asc+desc)) -5.0);
-        glVertex2f( 480.0, (float)(200-(line-2)*(asc+desc)) -5.0);
-    }
-    glEnd();
+    GLfloat vertices[]={
+		0.0, (float)(200-(line-2)*(asc+desc)) -5.0, 0,
+		0.0, (float)(200-(line-1)*(asc+desc)) -5.0, 0,
+		480.0, (float)(200-(line-1)*(asc+desc)) -5.0, 0,
+		480.0, (float)(200-(line-2)*(asc+desc)) -5.0, 0};
+
+	GLubyte indices[] = {0, 1, 2, 2, 3, 0};
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+
+	glVertexPointer(3, GL_FLOAT, 0, vertices);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
+		
+	glDisableClientState(GL_VERTEX_ARRAY);
+
     glEnable(GL_TEXTURE_2D);
     glPushMatrix();
     {
@@ -91,31 +100,41 @@ static void drawRedCircle(GLint x, GLint y) {
     glColor4f(1.0,0.0,0.0,0.5);
     
     glBindTexture( GL_TEXTURE_2D, texobj );
-    
-    glBegin( GL_QUADS );
-    {
-        point2d_t tll, tur;
-        point2d_t ll, ur;
+
+    point2d_t tll, tur;
+    point2d_t ll, ur;
         
-        ll = make_point2d( x_org, y_org);
-        ur = make_point2d( x_org + 110, y_org + 110 );
-        tll = make_point2d( 0, 0 );
-        tur = make_point2d(1, 1 );
+    ll = make_point2d( x_org, y_org);
+    ur = make_point2d( x_org + 110, y_org + 110 );
+    tll = make_point2d( 0, 0 );
+    tur = make_point2d(1, 1 );
         
-        
-        glTexCoord2f( tll.x, tll.y );
-        glVertex2f( ll.x, ll.y );
-        
-        glTexCoord2f( tur.x, tll.y );
-        glVertex2f( ur.x, ll.y );
-        
-        glTexCoord2f( tur.x, tur.y );
-        glVertex2f( ur.x, ur.y );
-        
-        glTexCoord2f( tll.x, tur.y );
-        glVertex2f( ll.x, ur.y );
-    }
-    glEnd();
+ 	GLfloat texcoords[]={
+		tll.x, tll.y,
+		tll.x, tur.y,
+		tur.x, tur.y,
+		tur.x, tll.y};
+
+	GLfloat vertices[]={
+		ll.x, ll.y, 0,
+		ll.x, ur.y, 0,
+		ur.x, ur.y, 0,
+		ur.x, ll.y, 0};
+
+	GLubyte indices[] = {0, 1, 2, 2, 3, 0};
+
+    glEnable(GL_TEXTURE_2D);
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+	glTexCoordPointer(2, GL_FLOAT, 0, texcoords);
+	glVertexPointer(3, GL_FLOAT, 0, vertices);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
+		
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
     
 }  
 
@@ -223,7 +242,7 @@ static void draw_instructions(player_data_t *plyr)
             break;
         case 6:
             print_instruction(Localize("Now let's learn how to Pause and to Abort.", ""),1);
-            if(check_condition_for_time(1,2)) step = 7;
+            if(check_condition_for_time(True,2)) step = 7;
             break;
         case 7:
             print_instruction(Localize("Double tap in the middle of the screen", ""),1);
@@ -261,7 +280,7 @@ static void draw_instructions(player_data_t *plyr)
             break;
         case 11:
              print_instruction(Localize("Let's learn how to jump !", ""),1);
-             if (check_condition_for_time( 1,1)) step = 12;
+             if (check_condition_for_time( True,1)) step = 12;
             break;
         case 12:
             print_instruction(Localize("Push the red area to accumulate enough ", ""),2);
@@ -273,11 +292,11 @@ static void draw_instructions(player_data_t *plyr)
             print_instruction(Localize("You can see the energy gauge filling.", ""),1);
             print_instruction(Localize("When you release the finger, all the energy", ""),2);
             print_instruction(Localize("accumulated is released and used to jump.", ""),3);
-            if (check_condition_for_time( 1,6)) step = 14;
+            if (check_condition_for_time( True,6)) step = 14;
             break;
         case 14:
             print_instruction(Localize("Now try to do a jump.", ""),1);
-            if (check_condition_for_time( 1,1)) step = 15;
+            if (check_condition_for_time( True,1)) step = 15;
             break;
         case 15:
             print_instruction(Localize("Try to do a jump.", ""),-3);
@@ -287,7 +306,7 @@ static void draw_instructions(player_data_t *plyr)
             print_instruction(Localize("Ok, now try to do a longer jump.", ""),1);
             print_instruction(Localize("(At least 1 second in the air.)", ""),2);
             print_instruction(Localize("Go fast and jump on a bump.", ""),3);
-            if (check_condition_for_time( 1,5)) step = 17;
+            if (check_condition_for_time( True,5)) step = 17;
             break;
         case 17:
             print_instruction(Localize("Try to do a longer jump (>1sec) on a bump.", ""),-3);
@@ -295,10 +314,10 @@ static void draw_instructions(player_data_t *plyr)
             break;
         case 18:
             print_instruction(Localize("Great !.", ""),1);
-            if (check_condition_for_time( 1,1)) step = 19;
+            if (check_condition_for_time( True,1)) step = 19;
             break;
         case 19:
-            if (check_condition_for_time( 1,1)) step = 20;
+            if (check_condition_for_time( True,1)) step = 20;
             break;
         case 20:
             training_pause_for_tutorial_explanation();
@@ -324,7 +343,7 @@ static void draw_instructions(player_data_t *plyr)
             break;
         case 23:
             print_instruction(Localize("Great !.", ""),1);
-            if (check_condition_for_time( 1,2)) step = 24;
+            if (check_condition_for_time( True,2)) step = 24;
             break;
         case 24:
             training_pause_for_tutorial_explanation();
@@ -342,7 +361,7 @@ static void draw_instructions(player_data_t *plyr)
             break;
         case 25:
             print_instruction(Localize("Try to do a long jump flying (>1sec).", ""),-3);
-            if (check_condition_for_time( plyr->control.is_flying && plyr->control.is_accelerating,1)) step = -2;
+            if (check_condition_for_time( (bool_t)(plyr->control.is_flying && plyr->control.is_accelerating),1)) step = -2;
             break;
         case -2:
             print_instruction(Localize("Congratulation, you finished this tutorial.", ""),1);
@@ -398,5 +417,5 @@ void init_starting_tutorial_step(int i){
     step = i;
 }
 
-
+}
 

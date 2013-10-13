@@ -26,11 +26,13 @@ extern "C"
 #define _HUD_TRAINING_H_
 
 #include "tuxracer.h"
-    void draw_hud_training( player_data_t *plyr);
-    void init_starting_tutorial_step(int i);
-    bool_t game_abort_is_for_tutorial(void);
-    bool_t pause_is_for_long_tutorial_explanation(void);
-    void training_resume_from_tutorial_explanation(void);
+
+void draw_hud_training( player_data_t *plyr);
+void init_starting_tutorial_step(int i);
+bool_t game_abort_is_for_tutorial(void);
+bool_t pause_is_for_long_tutorial_explanation(void);
+void training_resume_from_tutorial_explanation(void);
+
 #endif /* _HUD_H_ */
 
 #ifdef __cplusplus

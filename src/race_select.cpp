@@ -44,6 +44,9 @@
 	#import "sharedGeneralFunctions.h"
 #endif
 
+extern "C"
+{
+
 #ifdef __APPLE__
 	#define SCREEN_WIDTH	320
 	#define RACE_DESC_X		170
@@ -706,27 +709,22 @@ static void set_widget_positions_and_draw_decorations()
     
     glColor4f( 0.0, 0.0, 0.0, 0.3 );
     
-#ifdef __APPLE__
-    float margin = 4.f;
-    float yoffset = TEXT_LINE_Y + 30;
-    glBegin( GL_QUADS );
-    {
-        glVertex2f( x_org, y_org + yoffset );
-        glVertex2f( x_org + 140, y_org + yoffset );
-        glVertex2f( x_org + 140, y_org + yoffset+107 );
-        glVertex2f( x_org, y_org + yoffset+107 );
-    }
-    glEnd();
-#else
-    glBegin( GL_QUADS );
-    {
-        glVertex2f( x_org+box_width-140, y_org+66 );
-        glVertex2f( x_org+box_width, y_org+66 );
-        glVertex2f( x_org+box_width, y_org+66+107 );
-        glVertex2f( x_org+box_width-140, y_org+66+107 );
-    }
-    glEnd();
-#endif
+    GLfloat vertices[]={
+		x_org+box_width-140, y_org+66, 0,
+		x_org+box_width, y_org+66, 0,
+		x_org+box_width, y_org+66+107, 0,
+		x_org+box_width-140, y_org+66+107, 0};
+
+	GLubyte indices[] = {0, 1, 2, 2, 3, 0};
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+
+	glVertexPointer(3, GL_FLOAT, 0, vertices);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
+		
+	glDisableClientState(GL_VERTEX_ARRAY);
+
+
     
     glColor4f( 1.0, 1.0, 1.0, 1.0 );
     glEnable( GL_TEXTURE_2D );
@@ -738,41 +736,32 @@ static void set_widget_positions_and_draw_decorations()
     }
     
     glBindTexture( GL_TEXTURE_2D, texobj );
+
+	GLfloat texcoords2[]={
+		0, 0,
+		1, 0,
+		1, 1,
+		0, 1};
+
+	GLfloat vertices2[]={
+		x_org+box_width-136, y_org+70, 0,
+		x_org+box_width-4, y_org+70, 0,
+		x_org+box_width-4, y_org+70+99, 0,
+		x_org+box_width-136, y_org+70+99, 0};
     
-#ifdef __APPLE__
-    glBegin( GL_QUADS );
-    {
-        glTexCoord2d( 0, 0);
-        glVertex2f( x_org + margin, y_org + yoffset+margin );
-        
-        glTexCoord2d( 1, 0);
-        glVertex2f( x_org + 140 - margin, y_org + yoffset+margin );
-        
-        glTexCoord2d( 1, 1);
-        glVertex2f( x_org + 140 - margin, y_org + yoffset+margin+99 );
-        
-        glTexCoord2d( 0, 1);
-        glVertex2f( x_org + margin, y_org + yoffset+margin+99 );
-    }
-    glEnd();
-    
-#else
-    glBegin( GL_QUADS );
-    {
-        glTexCoord2d( 0, 0);
-        glVertex2f( x_org+box_width-136, y_org+70 );
-        
-        glTexCoord2d( 1, 0);
-        glVertex2f( x_org+box_width-4, y_org+70 );
-        
-        glTexCoord2d( 1, 1);
-        glVertex2f( x_org+box_width-4, y_org+70+99 );
-        
-        glTexCoord2d( 0, 1);
-        glVertex2f( x_org+box_width-136, y_org+70+99 );
-    }
-    glEnd();
-#endif
+	GLubyte indices2[] = {0, 1, 2, 2, 3, 0};
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+	glTexCoordPointer(2, GL_FLOAT, 0, texcoords2);
+	glVertexPointer(3, GL_FLOAT, 0, vertices2);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices2);
+		
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
+
 }
 
 
@@ -1309,5 +1298,6 @@ void race_select_register()
                         race_select_term );
 }
 
+}
 
 /* EOF */

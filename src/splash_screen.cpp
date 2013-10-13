@@ -39,6 +39,10 @@ static const colour_t background_colour = { 0.48, 0.63, 0.90, 1.0 };
 static char *logo_bindings = "splash_screen";
 #else
 #define NUM_LOGOS	4
+
+extern "C"
+{
+
 static char *logo_bindings[NUM_LOGOS] =
 {
 	"splash_screen_tl",
@@ -128,24 +132,30 @@ static void draw_logo()
 		glGetTexLevelParameteriv( GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h );
 #endif
 
-		ll.x = getparam_x_resolution()/2 + xoffsets[i]*w;
-		ll.y = getparam_y_resolution()/2 + yoffsets[i]*h;
-		ur.x = ll.x + w;
-		ur.y = ll.y + h;
+		GLfloat texcoords[]={
+			0, 0,
+			0, 1,
+			1, 1,
+			1, 0};
 
+		GLfloat vertices[]={
+			ll.x, ll.y,
+			ll.x, ur.y,
+			ur.x, ur.y,
+			ur.x, ll.y};
 
-		glBegin( GL_QUADS );
-		{
-			glTexCoord2f( 0.0, 0.0 );
-			glVertex2f( ll.x, ll.y );
-			glTexCoord2f( 1.0, 0.0 );
-			glVertex2f( ur.x, ll.y );
-			glTexCoord2f( 1.0, 1.0 );
-			glVertex2f( ur.x, ur.y );
-			glTexCoord2f( 0.0, 1.0 );
-			glVertex2f( ll.x, ur.y );
-		}
-		glEnd();
+		GLubyte indices[] = {0, 1, 2, 2, 3, 0};
+
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+		glTexCoordPointer(2, GL_FLOAT, 0, texcoords);
+		glVertexPointer(3, GL_FLOAT, 0, vertices);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
+		
+		glDisableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
 	}
 }
 
@@ -206,5 +216,7 @@ void splash_screen_register()
 
     register_loop_funcs( SPLASH, splash_screen_init, splash_screen_loop, 
 			 NULL );
+
+}
 
 }

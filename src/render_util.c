@@ -102,7 +102,7 @@ void flat_mode()
 
 void draw_overlay() {
     glColor4f( 0.0, 0.0, 1.0, 0.1 );
-#ifdef __APPLE__DISABLED__
+#ifdef HAVE_OPENGLES
     const GLfloat vertices []=
     {
        0, 0,
@@ -190,7 +190,7 @@ void draw_billboard( player_data_t *plyr,
 	z_vec.z = plyr->view.inv_view_mat[2][2];
     }
 
-#ifdef __APPLE__DISABLED__
+#ifdef HAVE_OPENGLES
     glNormal3f( z_vec.x, z_vec.y, z_vec.z );
 
     pt = move_point( center_pt, scale_vector( -width/2.0, x_vec ) );

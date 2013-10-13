@@ -272,24 +272,39 @@ void textarea_draw( textarea_t *ta )
 {
     font_t *font;
 
+	GLfloat border_vertices[]={
+		ta->pos.x, ta->pos.y, 0,
+		ta->pos.x, ta->pos.y + ta->h, 0,
+		ta->pos.x + ta->w, ta->pos.y + ta->h, 0,
+		ta->pos.x + ta->w, ta->pos.y, 0 };
+
+	GLfloat background_vertices[]={
+		ta->pos.x + ta->border_width, ta->pos.y + ta->border_width,
+		ta->pos.x + ta->border_width, ta->pos.y + ta->h - ta->border_width,
+        ta->pos.x + ta->w - ta->border_width, ta->pos.y + ta->h - ta->border_width,
+		ta->pos.x + ta->border_width, ta->pos.y + ta->h - ta->border_width };
+
+	
+	GLubyte indices[]={0, 1, 2, 2, 3, 0};
+
     check_assertion( ta != NULL, "ta is NULL" );
 
     glDisable( GL_TEXTURE_2D );
 
     if(ta->background_colour.a != 0.) {
-        glColor3dv( (scalar_t*)&ta->border_colour );
+        glColor4f( ta->border_colour.r, ta->border_colour.g, ta->border_colour.b, 1 );
 
-        glRectf( ta->pos.x, 
-             ta->pos.y,
-             ta->pos.x + ta->w,
-             ta->pos.y + ta->h );
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer (3, GL_FLOAT , 0, border_vertices);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
 
-        glColor3dv( (scalar_t*)&ta->background_colour );
+		glColor4f( ta->background_colour.r, ta->background_colour.g, ta->background_colour.b, 1 );
 
-        glRectf( ta->pos.x + ta->border_width, 
-             ta->pos.y + ta->border_width,
-             ta->pos.x + ta->w - ta->border_width,
-             ta->pos.y + ta->h - ta->border_width );
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer (3, GL_FLOAT , 0, background_vertices);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
+
+		glDisableClientState(GL_VERTEX_ARRAY);
     }
 
     glEnable( GL_TEXTURE_2D );

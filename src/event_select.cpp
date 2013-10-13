@@ -37,6 +37,9 @@
 #include "ui_snow.h"
 #include "joystick.h"
 
+extern "C"
+{
+
 #ifdef ___APPLE__
 #define BOX_WIDTH		300
 #define BOX_HEIGHT		310
@@ -275,41 +278,42 @@ static void set_widget_positions_and_draw_decorations()
         texobj = 0;
     }
     
-    glBindTexture( GL_TEXTURE_2D, texobj );
+
+    point2d_t tll, tur;
+    point2d_t ll, ur;
+
+	glBindTexture( GL_TEXTURE_2D, texobj );
+
+    ll = make_point2d( x_org, y_org + 193 );
+    ur = make_point2d( x_org + 44, y_org + 193 + 44 );
+    tll = make_point2d( 0, 0 );
+    tur = make_point2d( 44.0/64.0, 44.0/64.0 );
+
+	GLfloat texcoords[]={
+		tll.x, tll.y,
+		tll.x, tur.y,
+		tur.x, tur.y,
+		tur.x, tll.y};
+
+	GLfloat vertices[]={
+		tll.x, tll.y, 0,
+		tll.x, tur.y, 0,
+		tur.x, tur.y, 0,
+		tur.x, tll.y, 0};
     
-    glBegin( GL_QUADS );
-    {
-        point2d_t tll, tur;
-        point2d_t ll, ur;
-        
-#ifdef __APPLE__
-        //out of the field of view
-        ll = make_point2d( x_org, y_org + 500 );
-        ur = make_point2d( x_org + 44, y_org + 500 + 44 );
-        tll = make_point2d( 0, 0 );
-        tur = make_point2d( 44.0/64.0, 44.0/64.0 );
-#else
-        ll = make_point2d( x_org, y_org + 193 );
-        ur = make_point2d( x_org + 44, y_org + 193 + 44 );
-        tll = make_point2d( 0, 0 );
-        tur = make_point2d( 44.0/64.0, 44.0/64.0 );
-#endif
-        
-        glTexCoord2f( tll.x, tll.y );
-        glVertex2f( ll.x, ll.y );
-        
-        glTexCoord2f( tur.x, tll.y );
-        glVertex2f( ur.x, ll.y );
-        
-        glTexCoord2f( tur.x, tur.y );
-        glVertex2f( ur.x, ur.y );
-        
-        glTexCoord2f( tll.x, tur.y );
-        glVertex2f( ll.x, ur.y );
-    }
-    glEnd();
-    
-    
+	GLubyte indices[] = {0, 1, 2, 2, 3, 0};
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+	glTexCoordPointer(2, GL_FLOAT, 0, texcoords);
+	glVertexPointer(3, GL_FLOAT, 0, vertices);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
+		
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
+
     if ( !get_texture_binding(get_cup_icon_texture_binding((cup_data_t*) get_list_elem_data( cur_cup ) ), &texobj ) ) 
     {
         texobj = 0;
@@ -317,7 +321,6 @@ static void set_widget_positions_and_draw_decorations()
     
     glBindTexture( GL_TEXTURE_2D, texobj );
     
-#ifdef __APPLE__DISABLED__
     {
         point2d_t tll, tur;
         point2d_t ll, ur;
@@ -348,38 +351,6 @@ static void set_widget_positions_and_draw_decorations()
         glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
-#else
-    glBegin( GL_QUADS );
-    {
-        point2d_t tll, tur;
-        point2d_t ll, ur;
-        
-#ifdef __APPLE__
-        ll = make_point2d( x_org, y_org + 193 );
-        ur = make_point2d( x_org + 44, y_org + 193 + 44 );
-        tll = make_point2d( 0, 0 );
-        tur = make_point2d( 44.0/64.0, 44.0/64.0 );
-#else
-        ll = make_point2d( x_org, y_org + 103 );
-        ur = make_point2d( x_org + 44, y_org + 103 + 44 );
-        tll = make_point2d( 0, 0 );
-        tur = make_point2d( 44.0/64.0, 44.0/64.0 );
-#endif
-        
-        glTexCoord2f( tll.x, tll.y );
-        glVertex2f( ll.x, ll.y );
-        
-        glTexCoord2f( tur.x, tll.y );
-        glVertex2f( ur.x, ll.y );
-        
-        glTexCoord2f( tur.x, tur.y );
-        glVertex2f( ur.x, ur.y );
-        
-        glTexCoord2f( tll.x, tur.y );
-        glVertex2f( ll.x, ur.y );
-    }
-    glEnd();
-#endif
     
     if ( !get_font_binding( "menu_label", &font ) ) {
         print_warning( IMPORTANT_WARNING,
@@ -708,8 +679,10 @@ void event_select_register()
 void zappe_event_screen(void* button, void* userdata)
 {
     event_select_init();
-    continue_click_cb(button, userdata);
+    continue_click_cb((button_t*)button, userdata);
     event_select_term();
+}
+
 }
 
 /* EOF */

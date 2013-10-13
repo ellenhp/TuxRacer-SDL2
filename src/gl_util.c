@@ -41,8 +41,6 @@ void set_gl_options( RenderMode mode )
 	   GL_ALPHA_TEST
 	   GL_BLEND
 	   GL_STENCIL_TEST
-	   GL_TEXTURE_GEN_S
-	   GL_TEXTURE_GEN_T
 	   GL_COLOR_MATERIAL
            
 	 Other Functions:
@@ -67,8 +65,6 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-	glDisable( GL_TEXTURE_GEN_S );
-	glDisable( GL_TEXTURE_GEN_T );
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -84,15 +80,11 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-	glEnable( GL_TEXTURE_GEN_S );
-	glEnable( GL_TEXTURE_GEN_T );
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
 	glDepthFunc( GL_LESS );
 
-	glTexGeni( GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
-	glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
         break;
 
     case TEXFONT:
@@ -104,8 +96,6 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-	glDisable( GL_TEXTURE_GEN_S );
-	glDisable( GL_TEXTURE_GEN_T );
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -121,8 +111,6 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-	glDisable( GL_TEXTURE_GEN_S );
-	glDisable( GL_TEXTURE_GEN_T );
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -138,8 +126,6 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-	glDisable( GL_TEXTURE_GEN_S );
-	glDisable( GL_TEXTURE_GEN_T );
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -155,15 +141,11 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
 	glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-	glEnable( GL_TEXTURE_GEN_S );
-	glEnable( GL_TEXTURE_GEN_T );
 	glEnable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
 	glDepthFunc( GL_LEQUAL );
 
-	glTexGeni( GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
-	glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
 	break;
 
     case TREES:
@@ -175,8 +157,6 @@ void set_gl_options( RenderMode mode )
         glEnable( GL_ALPHA_TEST );
 	glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-	glDisable( GL_TEXTURE_GEN_S );
-	glDisable( GL_TEXTURE_GEN_T );
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -194,8 +174,6 @@ void set_gl_options( RenderMode mode )
 	glEnable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-	glDisable( GL_TEXTURE_GEN_S );
-	glDisable( GL_TEXTURE_GEN_T );
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -213,8 +191,6 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-	glDisable( GL_TEXTURE_GEN_S );
-	glDisable( GL_TEXTURE_GEN_T );
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -231,8 +207,6 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
 	glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-	glDisable( GL_TEXTURE_GEN_S );
-	glDisable( GL_TEXTURE_GEN_T );
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_FALSE );
 	glShadeModel( GL_SMOOTH );
@@ -248,8 +222,6 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
 	glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-	glDisable( GL_TEXTURE_GEN_S );
-	glDisable( GL_TEXTURE_GEN_T );
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -265,8 +237,6 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_ALPHA_TEST );
 	glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-	glDisable( GL_TEXTURE_GEN_S );
-	glDisable( GL_TEXTURE_GEN_T );
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -317,8 +287,6 @@ void set_gl_options( RenderMode mode )
 	glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
 	glDisable( GL_COLOR_MATERIAL );
-	glDisable( GL_TEXTURE_GEN_S );
-	glDisable( GL_TEXTURE_GEN_T );
 	glDepthMask( GL_FALSE );
 	glShadeModel( GL_SMOOTH );
 	glDepthFunc( GL_LEQUAL );
@@ -333,8 +301,6 @@ void set_gl_options( RenderMode mode )
 	glEnable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-	glDisable( GL_TEXTURE_GEN_S );
-	glDisable( GL_TEXTURE_GEN_T );
 	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
 	glShadeModel( GL_SMOOTH );
@@ -457,7 +423,7 @@ typedef struct {
     GLenum type;
 } gl_value_t;
 
-#ifdef __APPLE__
+#ifdef HAVE_OPENGLES
 // FIXME
 #ifdef GL_INT
 #undef GL_INT
@@ -527,7 +493,7 @@ void print_gl_info()
 	print_debug(DEBUG_OTHER, "  %s: ", gl_values[i].name );
 
 	switch( gl_values[i].type ) {
-#ifndef __APPLE__
+#ifndef HAVE_OPENGLES
 	case GL_INT:
 	    glGetIntegerv( gl_values[i].value, &int_val );
 	    print_debug(DEBUG_OTHER, "%d", int_val );

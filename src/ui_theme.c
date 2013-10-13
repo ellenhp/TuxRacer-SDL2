@@ -31,52 +31,33 @@ colour_t ui_enabled_but_disabled_colour = { 1.0, 1.0, 1.0, 1.0 };
 
 static void draw_quad(int x, int y, int w, int h)
 {
-    glPushMatrix();
-    {
-	glTranslatef( x, y, 0 );
-	
-		#ifdef __APPLE__DISABLED__
-    	
-    	   const GLfloat vertices []=
-    	   {
-    	       0, 0,
-    	       w, 0,
-    	       w, h,
-    	       0, h
-    	   };
-
-    		const GLfloat texCoords []=
-    	   {
-    	       0,0,
-    	       1,0,
-    	       1,1,
-    	       0,1
-    	   };
-
-    	   glEnableClientState (GL_VERTEX_ARRAY);
-    	   glVertexPointer (2, GL_FLOAT , 0, vertices);	
-    	   glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
-    	   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-    	#else
-	
-	glBegin( GL_QUADS );
+	GLfloat vertices []=
 	{
-	    glTexCoord2f( 0, 0 );
-	    glVertex2f( 0, 0 );
-	    
-	    glTexCoord2f( 1, 0 );
-	    glVertex2f( w, 0 );
-	    
-	    glTexCoord2f( 1, 1 );
-	    glVertex2f( w, h );
-	    
-	    glTexCoord2f( 0, 1 );
-	    glVertex2f( 0, h );
-	}
-	glEnd();
-	
-	#endif
+    	0, 0, 0,
+    	0, h, 0,
+    	w, h, 0,
+    	w, 0, 0
+	};
+    GLfloat texCoords []=
+	{
+    	0,0,
+    	0,1,
+    	1,1,
+    	1,0
+	};
+	GLubyte indices[]={0, 1, 2, 0, 2, 3};
+
+	glPushMatrix();
+    {
+		glTranslatef( x, y, 0 );
+    	
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glVertexPointer(3, GL_FLOAT , 0, vertices);	
+		glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
+		glDisableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     }
     glPopMatrix();
 }
