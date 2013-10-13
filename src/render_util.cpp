@@ -61,7 +61,11 @@ void glesPerspective(GLfloat fovy, GLfloat aspect, GLfloat zNear, GLfloat zFar)
 	xmin = ymin * aspect;
 	xmax = ymax * aspect;
 	
+#ifdef HAVE_OPENGLES
+	glFrustumf(xmin, xmax, ymin, ymax, zNear, zFar);
+#else
 	glFrustum(xmin, xmax, ymin, ymax, zNear, zFar);
+#endif
 }
 
 void reshape( int w, int h )

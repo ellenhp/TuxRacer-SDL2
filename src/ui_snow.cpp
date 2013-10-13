@@ -254,46 +254,28 @@ void draw_ui_snow( void )
 	    glPushMatrix();
 	    {
 		glTranslatef( pt->x*xres, pt->y*yres, 0 );
-		
-		#ifdef HAVE_OPENGLES
     	
-    	   const GLfloat vertices []=
-    	   {
-    	       0, 0,
-    	       size, 0,
-    	       size, size,
-    	       0, size
-    	   };
+    	const GLfloat vertices []=
+    	{
+    	    0, 0,
+    	    size, 0,
+    	    size, size,
+    	    0, size
+    	};
 
-    		const GLfloat texCoords []=
-    	   {
-    	       tex_min->x, tex_min->y,
-    	       tex_max->x, tex_min->y,
-    	       tex_max->x, tex_max->y,
-    	       tex_min->x, tex_max->y
-    	   };
+    	const GLfloat texCoords []=
+    	{
+    	    tex_min->x, tex_min->y,
+    	    tex_max->x, tex_min->y,
+    	    tex_max->x, tex_max->y,
+    	    tex_min->x, tex_max->y
+    	};
 
-    	   glEnableClientState (GL_VERTEX_ARRAY);
-    	   glVertexPointer (2, GL_FLOAT , 0, vertices);	
-    	   glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
-    	   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    	glEnableClientState (GL_VERTEX_ARRAY);
+    	glVertexPointer (2, GL_FLOAT , 0, vertices);	
+    	glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
+    	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-    	#else
-		
-		glBegin( GL_QUADS );
-		{
-		    glTexCoord2f( tex_min->x, tex_min->y );
-		    glVertex2f( 0, 0 );
-		    glTexCoord2f( tex_max->x, tex_min->y );
-		    glVertex2f( size, 0 );
-		    glTexCoord2f( tex_max->x, tex_max->y );
-		    glVertex2f( size, size );
-		    glTexCoord2f( tex_min->x, tex_max->y );
-		    glVertex2f( 0, size );
-		}
-		glEnd();
-		
-		#endif
 	    }
 	    glPopMatrix();
 	} 

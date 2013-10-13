@@ -274,6 +274,8 @@ void interpolate_view_frame( vector_t up1, vector_t dir1,
 
 void setup_view_matrix( player_data_t *plyr ) 
 {
+    GLfloat matrix[4][4];
+    int i,j;
     vector_t view_x, view_y, view_z;
     matrixgl_t view_mat;
     point_t viewpt_in_view_frame;
@@ -317,18 +319,13 @@ void setup_view_matrix( player_data_t *plyr )
     view_mat[3][2] = -viewpt_in_view_frame.z;
     
     glLoadIdentity();
-#ifdef HAVE_OPENGLES
-    GLfloat matrix[3][3];
-    int i,j;
-    for( i = 0; i < 3; i++ )
+
+	for( i = 0; i < 4; i++ )
     {
-        for( j = 0; j < 3; j++ )
+        for( j = 0; j < 4; j++ )
             matrix[i][j] = view_mat[i][j];
     }
     glMultMatrixf( (GLfloat *) matrix );
-#else
-    glMultMatrixd( (scalar_t *) view_mat );
-#endif
 
 }
 

@@ -28,27 +28,6 @@
 #define USE_GLUSPHERE 1
 #endif
 
-#if USE_GLUSPHERE
-
-/* Draws a sphere using gluSphere
- */
-void draw_sphere( int num_divisions )
-{
-    GLUquadricObj *qobj;
-    
-    qobj = gluNewQuadric();
-    gluQuadricDrawStyle( qobj, GLU_FILL );
-    gluQuadricOrientation( qobj, GLU_OUTSIDE );
-    gluQuadricNormals( qobj, GLU_SMOOTH );
-    
-    gluSphere( qobj, 1.0, 2.0 * num_divisions, num_divisions );
-    
-    gluDeleteQuadric( qobj );
-    
-}
-
-#else 
-
 enum firstDraw {
     Yes,
     No
@@ -135,10 +114,6 @@ glutSolidSphere(GLfloat radius, GLint slices, GLint stacks)
 	GLint i, triangles; 
 	static GLfloat* v, *n;
 	static GLfloat parms[3];
-#undef glVertexPointer
-#undef glNormalPointer
-#undef glDrawArrays
-#undef glEnableClientState
 	if (v) 
 	{
 		if (parms[0] != radius || parms[1] != slices || parms[2] != stacks) 
@@ -185,224 +160,9 @@ glutSolidSphere(GLfloat radius, GLint slices, GLint stacks)
 void draw_sphere( int num_divisions )
 {
     int div = num_divisions;
-#ifdef HAVE_OPENGLES
     glutSolidSphere(1, num_divisions+1, num_divisions+1);
-#else
-    if (firstDrawSphere==1)
-    {
-        firstDrawSphere=0;
-        cas1.firstDraw=Yes;
-        cas2.firstDraw=Yes;
-        cas3.firstDraw=Yes;
-        
-        //div+2 car les boucles suivantes tournent 2*div fois ou (2*div+1) fois selon l'arrondi, et qu'en sortant de la boucle il reste encore un calcul de x, y ou z
-        cas1.x = (scalar_t *)calloc(1,sizeof(scalar_t)*(2*div+2));
-        cas1.y = (scalar_t *)calloc(1,sizeof(scalar_t)*(2*div+2));
-        cas1.z = (scalar_t *)calloc(1,sizeof(scalar_t)*(2*div+2));
-        cas2.x = (scalar_t *)calloc(1,sizeof(scalar_t)*(2*div+2));
-        cas2.y = (scalar_t *)calloc(1,sizeof(scalar_t)*(2*div+2));
-        cas2.z = (scalar_t *)calloc(1,sizeof(scalar_t)*(2*div+2));
-        //l'espace pour le cas 3 dois etre 2 fois plus grand car il y a deux fois plus de calculs
-        cas3.x = (scalar_t *)calloc(1,2*sizeof(scalar_t)*(2*div+2));
-        cas3.y = (scalar_t *)calloc(1,2*sizeof(scalar_t)*(2*div+2));
-        cas3.z = (scalar_t *)calloc(1,2*sizeof(scalar_t)*(2*div+2));
-    }
-
-    scalar_t theta, phi, d_theta, d_phi, eps, twopi;
-    int i;
-    
-    eps = 1e-15;
-    twopi = M_PI * 2.0;
-    
-    d_theta = d_phi = M_PI / div;
-    
-    for ( phi = 0.0; phi + eps < M_PI; phi += d_phi ) {
-    
-        scalar_t cos_theta, sin_theta;
-        scalar_t sin_phi, cos_phi;
-        scalar_t sin_phi_d_phi, cos_phi_d_phi;
-        
-        if (cas1.firstDraw ==Yes || cas2.firstDraw ==Yes || cas3.firstDraw ==Yes)
-        {
-            
-            sin_phi = sin( phi );
-            cos_phi = cos( phi );
-            sin_phi_d_phi = sin( phi + d_phi );
-            cos_phi_d_phi = cos( phi + d_phi );
-        }
-        
-        if ( phi <= eps ) {
-            
-            glBegin( GL_TRIANGLE_FAN );
-            glNormal3f( 0.0, 0.0, 1.0 );
-            glVertex3f( 0.0, 0.0, 1.0 );
-            i=0;
-            for ( theta = 0.0; theta + eps < twopi; theta += d_theta ) {
-                if (cas1.firstDraw ==Yes)
-                {
-                    sin_theta = sin( theta );
-                    cos_theta = cos( theta );
-                    
-                    cas1.x[i] = cos_theta * sin_phi_d_phi;
-                    cas1.y[i] = sin_theta * sin_phi_d_phi;
-                    cas1.z[i] = cos_phi_d_phi;
-                }
-                
-                glNormal3f( cas1.x[i], cas1.y[i], cas1.z[i] );
-                glVertex3f( cas1.x[i], cas1.y[i], cas1.z[i] );
-                i++;
-            } 
-            
-            if (cas1.firstDraw ==Yes)
-            {
-                cas1.x[i] = sin_phi_d_phi;
-                cas1.y[i] = 0.0;
-                cas1.z[i] = cos_phi_d_phi;
-            }
-            
-            glNormal3f( cas1.x[i], cas1.y[i], cas1.z[i] );
-            glVertex3f( cas1.x[i], cas1.y[i], cas1.z[i] );
-            
-            glEnd();
-            
-            cas1.firstDraw=No;
-            
-        } else if ( phi + d_phi + eps >= M_PI ) {
-            
-            glBegin( GL_TRIANGLE_FAN );
-            glNormal3f( 0.0, 0.0, -1.0 );
-            glVertex3f( 0.0, 0.0, -1.0 );
-            
-            i=0;
-            for ( theta = twopi; theta - eps > 0; theta -= d_theta ) {
-                if (cas2.firstDraw ==Yes)
-                {
-                    sin_theta = sin( theta );
-                    cos_theta = cos( theta );
-                    
-                    cas2.x[i] = cos_theta * sin_phi;
-                    cas2.y[i] = sin_theta * sin_phi;
-                    cas2.z[i] = cos_phi;
-                }
-                
-                glNormal3f( cas2.x[i], cas2.y[i], cas2.z[i] );
-                glVertex3f( cas2.x[i], cas2.y[i], cas2.z[i] );
-                i++;
-            } 
-            if (cas1.firstDraw == Yes)
-            {
-                cas2.x[i] = sin_phi;
-                cas2.y[i] = 0.0;
-                cas2.z[i] = cos_phi;
-            }
-            
-            glNormal3f( cas2.x[i], cas2.y[i], cas2.z[i] );
-            glVertex3f( cas2.x[i], cas2.y[i], cas2.z[i] );
-            
-            glEnd();
-            
-            cas2.firstDraw=No;
-            
-        } else {
-            
-            glBegin( GL_TRIANGLE_STRIP );
-            
-            i=0;
-            for ( theta = 0.0; theta + eps < twopi; theta += d_theta ) {
-                if (cas3.firstDraw ==Yes)
-                {
-                    sin_theta = sin( theta );
-                    cos_theta = cos( theta );
-                    
-                    cas3.x[i] = cos_theta * sin_phi;
-                    cas3.y[i] = sin_theta * sin_phi;
-                    cas3.z[i] = cos_phi;
-                    
-                    cas3.x[i+1] = cos_theta * sin_phi_d_phi;
-                    cas3.y[i+1] = sin_theta * sin_phi_d_phi;
-                    cas3.z[i+1] = cos_phi_d_phi;
-                }
-                
-                glNormal3f( cas3.x[i], cas3.y[i], cas3.z[i] );
-                glVertex3f( cas3.x[i], cas3.y[i], cas3.z[i] );
-                i++;
-                
-                glNormal3f( cas3.x[i], cas3.y[i], cas3.z[i] );
-                glVertex3f( cas3.x[i], cas3.y[i], cas3.z[i] );
-                i++;
-            } 
-            
-            if (cas3.firstDraw ==Yes)
-            {
-                cas3.x[i] = sin_phi;
-                cas3.y[i] = 0.0;
-                cas3.z[i] = cos_phi;
-            }
-            
-            glNormal3f( cas3.x[i], cas3.y[i], cas3.z[i] );
-            glVertex3f( cas3.x[i], cas3.y[i], cas3.z[i] );
-            i++;
-            
-            if (cas3.firstDraw ==Yes)
-            {
-                cas3.x[i] = sin_phi_d_phi;
-                cas3.y[i] = 0.0;
-                cas3.z[i] = cos_phi_d_phi;
-            }
-            glNormal3f( cas3.x[i], cas3.y[i], cas3.z[i] );
-            glVertex3f( cas3.x[i], cas3.y[i], cas3.z[i] );
-            
-            glEnd();
-            
-            cas3.firstDraw=No;
-        } 
-    }
-#endif
-} 
-
-#endif /* USE_GLUSPHERE */
-
-#ifndef HAVE_OPENGLES
-//FIXME
-static GLuint get_sphere_display_list( int divisions ) {
-    static bool_t initialized = False;
-    static int num_display_lists;
-    static GLuint *display_lists = NULL;
-    int base_divisions;
-    int i, idx;
-    
-    if ( !initialized ) {
-        initialized = True;
-        base_divisions = getparam_tux_sphere_divisions();
-        
-        num_display_lists = MAX_SPHERE_DIVISIONS - MIN_SPHERE_DIVISIONS + 1;
-        
-        check_assertion( display_lists == NULL, "display_lists not NULL" );
-        display_lists = (GLuint*) malloc( sizeof(GLuint) * num_display_lists );
-        
-        for (i=0; i<num_display_lists; i++) {
-            display_lists[i] = 0;
-        }
-    }
-    
-    
-    idx = divisions - MIN_SPHERE_DIVISIONS;
-    
-    check_assertion( idx >= 0 &&
-                    idx < num_display_lists, 
-                    "invalid number of sphere subdivisions" );
-    
-    if ( display_lists[idx] == 0 ) {
-        /* Initialize the sphere display list */
-        display_lists[idx] = glGenLists(1);
-        glNewList( display_lists[idx], GL_COMPILE );
-        draw_sphere( divisions );
-        glEndList();
-    }
-    
-    return display_lists[idx];
 }
-#endif
+
 
 
 /*--------------------------------------------------------------------------*/
@@ -412,22 +172,18 @@ static GLuint get_sphere_display_list( int divisions ) {
 void traverse_dag( scene_node_t *node, material_t *mat )
 {
     scene_node_t *child;
+    GLfloat matrix[4][4];
+    int i,j;
     
     check_assertion( node != NULL, "node is NULL" );
     glPushMatrix();
     
-#ifdef HAVE_OPENGLES
-    GLfloat matrix[3][3];
-    int i,j;
-    for( i = 0; i < 3; i++ )
+    for( i = 0; i < 4; i++ )
     {
-        for( j = 0; j < 3; j++ )
+        for( j = 0; j < 4; j++ )
             matrix[i][j] = node->trans[i][j];
     }
     glMultMatrixf( (GLfloat *) matrix );
-#else
-    glMultMatrixd( (double *) node->trans );
-#endif
     
     if ( node->mat != NULL ) {
         mat = node->mat;
@@ -437,20 +193,11 @@ void traverse_dag( scene_node_t *node, material_t *mat )
         set_material( mat->diffuse, mat->specular_colour, 
                      mat->specular_exp );
         
-#ifdef HAVE_OPENGLES
         //FIXME
         draw_sphere(
         min(MAX_SPHERE_DIVISIONS, max( 
             MIN_SPHERE_DIVISIONS, 
             ROUND_TO_NEAREST( getparam_tux_sphere_divisions() * node->param.sphere.divisions ) )));
-#else
-        if ( getparam_use_sphere_display_list() ) {
-            glCallList( get_sphere_display_list( 
-                                                node->param.sphere.divisions ) );
-        } else {
-            draw_sphere( node->param.sphere.divisions );
-        }
-#endif
     } 
     
     child = node->child;

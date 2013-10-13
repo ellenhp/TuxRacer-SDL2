@@ -159,7 +159,7 @@
     <ClCompile Include="..\src\track_marks.c" />
     <ClCompile Include="..\src\tux.c" />
     <ClCompile Include="..\src\ui_mgr.c" />
-    <ClCompile Include="..\src\ui_snow.c" />
+    <ClCompile Include="..\src\ui_snow.cpp" />
     <ClCompile Include="..\src\ui_theme.c" />
     <ClCompile Include="..\src\view.c" />
     <ClCompile Include="..\src\viewfrustum.c" />
