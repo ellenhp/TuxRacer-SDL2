@@ -42,7 +42,7 @@ void bind_music_to_context( char *music_context, char *name, int loop );
 bool_t play_music( char *music_context );
 bool_t is_music_playing();
 
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
 bool_t mustLoopFromContext(char *context);
 char* uniqueContextFromContext (char* context);
 bool_t isSSFromContext(char *context);

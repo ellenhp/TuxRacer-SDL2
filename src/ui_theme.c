@@ -25,7 +25,7 @@ colour_t ui_background_colour = { 0.48, 0.63, 0.90, 0. };
 colour_t ui_foreground_colour = { 1.0, 1.0, 1.0, 1.0 }; 
 colour_t ui_highlight_colour = { 1.0, 0.89, 0.01, 1.0 };
 colour_t ui_disabled_colour = { 1.0, 1.0, 1.0, 0.6 };
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
 colour_t ui_enabled_but_disabled_colour = { 1.0, 1.0, 1.0, 1.0 };
 #endif
 

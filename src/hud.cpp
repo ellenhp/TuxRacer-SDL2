@@ -116,7 +116,7 @@ static void draw_time(player_data_t* plyr)
 #ifdef USE_TIME_ICON
     /* display Time logo */
     x_org = TIME_LOGO_X_OFFSET;
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     y_org = TIME_LOGO_Y_OFFSET;    
 #else
     y_org = getparam_y_resolution() - TIME_LOGO_Y_OFFSET;

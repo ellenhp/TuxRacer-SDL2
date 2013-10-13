@@ -29,7 +29,7 @@
 #include "course_quad.h"
 #include "viewfrustum.h"
 #include "track_marks.h"
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     #include "sharedGeneralFunctions.h"
     #include <sys/mman.h>
     #include <fcntl.h>
@@ -81,7 +81,7 @@ void set_course_eye_point( point_t pt ) { eye_pt = pt; }
 
 vector_t* get_course_normals() { return nmls; } 
 
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
 
 static size_t nmls_len = 0;
 static int nmls_fd = -1;
@@ -104,7 +104,7 @@ void calc_normals(const char *course)
 
     get_course_dimensions( &courseWidth, &courseLength );
     get_course_divisions( &nx, &ny );
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     if(nmls != (void*)-1 && nmls_fd != -1) 
     {
         munmap(nmls, nmls_len);
@@ -182,7 +182,7 @@ void calc_normals(const char *course)
     }
 
  
-#endif // __APPLE__
+#endif // TARGET_OS_IPHONE
 
                 
         for ( y=0; y<ny; y++) {

@@ -418,7 +418,7 @@ void load_texture_main_thread( void * texArg, void *texImageArg )
 #endif
     }
 
-#ifndef __APPLE__
+#ifndef TARGET_OS_IPHONE
     gluBuild2DMipmaps( GL_TEXTURE_2D, texImage->sizeZ, texImage->sizeX,
 		       texImage->sizeY, texImage->sizeZ == 3 ? GL_RGB : GL_RGBA, 
 		       GL_UNSIGNED_BYTE, texImage->data );

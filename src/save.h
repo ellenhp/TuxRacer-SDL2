@@ -61,7 +61,7 @@ bool_t get_high_score( char* event, char* cup, char** player, int *score );
 bool_t set_high_score( char* event, char* cup, char* player, int score );
 void write_high_scores( void );
 
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     char* editSynchronizeScoresRequest();
 #endif
 

@@ -21,7 +21,7 @@
 #include "loop.h"
 #include "ui_mgr.h"
 
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     #include "sharedGeneralFunctions.h"
 #endif
 
@@ -78,7 +78,7 @@ void register_loop_funcs( game_mode_t mode,
 
 scalar_t get_clock_time()
 {
-#if defined( __APPLE__ )
+#if defined( TARGET_OS_IPHONE )
     uint64_t nanosec = udate();
 
     return (scalar_t) nanosec * 1.e-9;

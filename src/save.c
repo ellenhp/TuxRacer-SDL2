@@ -527,7 +527,7 @@ bool_t set_saved_race_results( char *player,
     this_save->data.results.herring = herring;
     this_save->data.results.score = score;
     
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     // Write as soon as possible
     write_saved_games();
 #endif

@@ -29,7 +29,7 @@ void game_over_init();
 void game_over_loop( scalar_t time_step );
 void game_over_register();
 
-#ifdef __APPLE__  
+#ifdef TARGET_OS_IPHONE  
     void displaySavedAndRankings(const char* msg, const char* friends, const char* country, const char* world, scalar_t friendsPercentage, scalar_t countryPercentage , scalar_t worldPercentage);
     void saveAndDisplayRankings();
 #endif

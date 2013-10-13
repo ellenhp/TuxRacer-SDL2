@@ -73,7 +73,7 @@ void ssbutton_draw( ssbutton_t *ssbutton )
 		      ssbutton->regions[i].binding,
 		      ssbutton->regions[i].ll, 
 		      ssbutton->regions[i].ur, 
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
 		      ui_enabled_but_disabled_colour );
 #else
               ui_disabled_colour );

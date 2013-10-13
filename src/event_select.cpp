@@ -40,7 +40,7 @@
 extern "C"
 {
 
-#ifdef ___APPLE__
+#ifdef _TARGET_OS_IPHONE
 #define BOX_WIDTH		300
 #define BOX_HEIGHT		310
 #else
@@ -52,7 +52,7 @@ static listbox_t *event_listbox = NULL;
 static listbox_t *cup_listbox = NULL;
 static button_t *back_btn = NULL;
 static button_t *continue_btn = NULL;
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
 static button_t *howToPlay_btn = NULL;
 #endif
 static list_elem_t cur_event = NULL;
@@ -170,7 +170,7 @@ static void continue_click_cb( button_t *button, void *userdata )
     ui_set_dirty();
 }
 
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
 #import "sharedGeneralFunctions.h"
 static void howToPlay_click_cb( button_t *button, void *userdata )
 {
@@ -192,7 +192,7 @@ static void set_widget_positions_and_draw_decorations()
     list_t cup_list;
     GLuint texobj;
     
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     /* set the dimensions of the box in which all widgets should fit */
     box_width = BOX_WIDTH;
     box_height = BOX_HEIGHT;
@@ -357,7 +357,7 @@ static void set_widget_positions_and_draw_decorations()
                       "Couldn't get font for binding menu_label" );
     } else {
         bind_font_texture( font );
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
         string = "Select a training";
 #else
         string = "Select event and cup";
@@ -379,7 +379,7 @@ static void set_widget_positions_and_draw_decorations()
         print_warning( IMPORTANT_WARNING,
                       "Couldn't get font for binding menu_label" );
     } 
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     
     cur_event = listbox_get_current_item( event_listbox );
     event_data = (event_data_t*) get_list_elem_data( cur_event );
@@ -522,7 +522,7 @@ static void event_select_init(void)
     button_set_visible( continue_btn, True );
     button_set_click_event_cb( continue_btn, continue_click_cb, NULL );
     
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     /* How to play button */
     howToPlay_btn = button_create( dummy_pos,
                                   150, 40, 
@@ -604,7 +604,7 @@ static void event_select_term(void)
     
     button_delete( continue_btn );
     continue_btn = NULL;
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     button_delete( howToPlay_btn );
     continue_btn = NULL;
 #endif

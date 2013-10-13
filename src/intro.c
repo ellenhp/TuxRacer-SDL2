@@ -82,7 +82,7 @@ void intro_init(void)
     plyr->herring = 0;
     plyr->score = 0;
     
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     plyr->tricks = 0;
     plyr->control.is_flying=False;
     plyr->control.fly_total_time=0;
@@ -137,7 +137,7 @@ void intro_loop( scalar_t time_step )
 	}
     }
 
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     int saved_tux_sphere_divisions = getparam_tux_sphere_divisions();
     setparam_tux_sphere_divisions(10);
 #endif
@@ -175,7 +175,7 @@ void intro_loop( scalar_t time_step )
     
     reshape( width, height );
     winsys_swap_buffers();
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     setparam_tux_sphere_divisions(saved_tux_sphere_divisions);
 #endif
 } 

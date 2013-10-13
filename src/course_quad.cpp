@@ -3,7 +3,7 @@
 #include "course_load.h"
 #include "quadtree.hpp"
 
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     #include <fcntl.h>
     #include <sys/mman.h>
 #endif
@@ -82,7 +82,7 @@ extern "C" void init_course_quadtree( const char * course, scalar_t *elevation, 
         root_corner_data.Verts[i].Y = 0;
     }
 
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     char buff[BUFF_LEN];
     
     if(course) {
@@ -119,7 +119,7 @@ extern "C" void init_course_quadtree( const char * course, scalar_t *elevation, 
     abort(); // This shouldn't be reached on simulator. Crash to indicate.
 #endif
 
-#endif // __APPLE__
+#endif // TARGET_OS_IPHONE
 
     root = new quadsquare( &root_corner_data );
     

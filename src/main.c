@@ -60,7 +60,7 @@
 #include "loading.h"
 #include "tcl_util.h"
 #include "tcl.h"
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     #include "sharedGeneralFunctions.h"
 #endif
 
@@ -167,7 +167,7 @@ void read_game_init_script()
 
     
 
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
 int libtuxracer_main( int argc, char **argv )
 #elif defined(__ANDROID__)
 int SDL_main( int argc, char **argv )

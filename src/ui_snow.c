@@ -122,7 +122,7 @@ void update_ui_snow( scalar_t time_step, bool_t windy )
     push_vector.x = 0;
     push_vector.y = 0;
     push_timestep = 0;
-#ifdef __APPLE___
+#ifdef TARGET_OS_IPHONE_
     winsys_get_gravity(&grav_x, &grav_y);
 #else
 	// No gravity (yet) on Windows/Android

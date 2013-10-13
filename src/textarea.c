@@ -26,7 +26,7 @@
 #include "fonts.h"
 #include "render_util.h"
 
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
 #define DEFAULT_ARROW_BUTTON_HEIGHT 15 * 2
 #define DEFAULT_ARROW_BUTTON_WIDTH  27
 #define DEFAULT_ARROW_REGION_WIDTH  36

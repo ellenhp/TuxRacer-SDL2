@@ -1102,7 +1102,7 @@ void winsys_show_preferences( void )
 {
 }
 
-#elif defined(__APPLE__)
+#elif defined(TARGET_OS_IPHONE)
 
 //defined in touchwinsys.m
 

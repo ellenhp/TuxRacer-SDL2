@@ -41,7 +41,7 @@
 #include "hud_training.h"
 #include "joystick.h"
 #include "bonus.h"
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     #import "sharedGeneralFunctions.h"
 #endif
 
@@ -200,7 +200,7 @@ void racing_loop( scalar_t time_step )
     
     setup_fog();
     
-#ifndef __APPLE__
+#ifndef TARGET_OS_IPHONE
     /*
      * Joystick
      */
@@ -280,7 +280,7 @@ void racing_loop( scalar_t time_step )
             {
                 plyr->control.back_flip = True;
             }
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
             TRDebugLog("tricks : %d",plyr->tricks);
 #endif
         }
@@ -318,7 +318,7 @@ void racing_loop( scalar_t time_step )
         plyr->control.begin_jump = True;
     }
     
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     /* 
      * Turning 
      */

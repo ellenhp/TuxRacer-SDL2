@@ -40,14 +40,14 @@
 #include "ui_snow.h"
 #include "joystick.h"
 #include "hud_training.h"
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
 	#import "sharedGeneralFunctions.h"
 #endif
 
 extern "C"
 {
 
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
 	#define SCREEN_WIDTH	320
 	#define RACE_DESC_X		170
 	#define SCREEN_HEIGHT	480
@@ -455,7 +455,7 @@ static void start_click_cb( button_t *button, void *userdata )
     
     update_race_data();
     
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     //set landscape resolution
     setparam_x_resolution(480);
     setparam_y_resolution(320);
@@ -514,7 +514,7 @@ void draw_status_msg( int x_org, int y_org, int box_width, int box_height )
         }
         
         
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
 #define yTranslation -10
 #else
 #define yTranslation 0
@@ -602,7 +602,7 @@ static void set_widget_positions_and_draw_decorations()
     box_height = 310;
     box_max_y = h - 128;
 
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     x_org = 10;
     y_org = h/2 - box_height/2;
 
@@ -889,7 +889,7 @@ static void race_select_init(void)
     button_set_visible( start_btn, True );
     button_set_click_event_cb( start_btn, start_click_cb, NULL );
     
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     race_listbox = listbox_create( dummy_pos,
                                   300, 44,
                                   "course_name_label",
@@ -961,7 +961,7 @@ static void race_select_init(void)
                                  white );
         
         ssbutton_set_state( mirror_ssbtn, (int)g_game.race.mirrored );
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
         ssbutton_set_visible( mirror_ssbtn, False );
 #else
         ssbutton_set_visible( mirror_ssbtn, True );
@@ -1003,7 +1003,7 @@ static void race_select_init(void)
         ssbutton_set_state( conditions_ssbtn, (int)g_game.race.conditions );
         ssbutton_set_visible( conditions_ssbtn, True );
         
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
         ssbutton_set_visible( conditions_ssbtn, False );
 #else
         ssbutton_set_visible( conditions_ssbtn, True );
@@ -1028,7 +1028,7 @@ static void race_select_init(void)
                                  white );
         
         ssbutton_set_state( wind_ssbtn, (int)g_game.race.windy );
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
         ssbutton_set_visible( wind_ssbtn, False );
 #else
         ssbutton_set_visible( wind_ssbtn, True );
@@ -1053,7 +1053,7 @@ static void race_select_init(void)
                                  white );
         
         ssbutton_set_state( snow_ssbtn, (int)g_game.race.snowing );
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
         ssbutton_set_visible( snow_ssbtn, False );
 #else
         ssbutton_set_visible( snow_ssbtn, True );

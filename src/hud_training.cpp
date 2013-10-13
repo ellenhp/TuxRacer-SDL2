@@ -31,7 +31,7 @@
 #include "loop.h"
 #include "racing.h"
 #include "paused.h"
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     #include "sharedGeneralFunctions.h"
 #endif
 

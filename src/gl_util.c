@@ -327,7 +327,7 @@ void check_gl_error()
     error = glGetError();
     if ( error != GL_NO_ERROR ) {
 	print_warning( CRITICAL_WARNING, 
-# ifdef __APPLE__
+# ifdef TARGET_OS_IPHONE
 		       "OpenGL Error: %d", error
 # else
 		       "OpenGL Error: %s", gluErrorString( error )
@@ -361,7 +361,7 @@ void init_glfloat_array( int num, GLfloat arr[], ... )
 }
 
 /* Extension func ptrs *must* be initialized to NULL */
-#if !defined(__APPLE__) && !defined(__ANDROID__)
+#if !defined(TARGET_OS_IPHONE) && !defined(__ANDROID__)
 PFNGLLOCKARRAYSEXTPROC glLockArraysEXT_p = NULL;
 PFNGLUNLOCKARRAYSEXTPROC glUnlockArraysEXT_p = NULL;
 #endif
@@ -382,7 +382,7 @@ void init_opengl_extensions()
     get_gl_proc = NULL;
 #endif
 
-#if !defined(__APPLE__) && !defined(__ANDROID__)
+#if !defined(TARGET_OS_IPHONE) && !defined(__ANDROID__)
     if ( get_gl_proc ) {
 	glLockArraysEXT_p = (PFNGLLOCKARRAYSEXTPROC) 
 	    (*get_gl_proc)( (GLubyte*) "glLockArraysEXT" );
@@ -437,7 +437,7 @@ gl_value_t gl_values[] = {
     { "modelview stack depth", GL_MAX_MODELVIEW_STACK_DEPTH, GL_INT },
     { "projection stack depth", GL_MAX_PROJECTION_STACK_DEPTH, GL_INT },
     { "max texture size", GL_MAX_TEXTURE_SIZE, GL_INT },
-#if !defined(__APPLE__) && !defined(__ANDROID__)
+#if !defined(TARGET_OS_IPHONE) && !defined(__ANDROID__)
     { "double buffering", GL_DOUBLEBUFFER, GL_UNSIGNED_BYTE },
 #endif
     { "red bits", GL_RED_BITS, GL_INT },
@@ -447,7 +447,7 @@ gl_value_t gl_values[] = {
     { "depth bits", GL_DEPTH_BITS, GL_INT },
     { "stencil bits", GL_STENCIL_BITS, GL_INT } };
 
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
 // FIXME
 # undef GL_INT
 #endif

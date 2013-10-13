@@ -362,7 +362,7 @@ create_sphere_node(const char *parent_name, const char *child_name, scalar_t res
     node->geom = Sphere;
     node->param.sphere.radius = 1.0;
 
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     node->param.sphere.resolution = resolution;
 #else
     node->param.sphere.divisions = min( 

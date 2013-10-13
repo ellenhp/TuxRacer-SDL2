@@ -28,7 +28,7 @@
 #include "audio.h"
 #include "audio_data.h"
 #include "hash.h"
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     #include "sharedAudioFunctions.h"
 #endif
 

@@ -30,7 +30,7 @@
 #include "audio.h"
 #include "bonus.h"
 #include "loop.h"
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     #include "sharedGeneralFunctions.h"
 #endif
 #include <stdio.h>
@@ -257,7 +257,7 @@ static double ode_time_step = -1;
 
 bool_t collision_cooldown_active = False;
 
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
 typedef struct {
     int first_index;
     int second_index;
@@ -621,7 +621,7 @@ void set_tux_pos( player_data_t *plyr, point_t new_pos )
                          make_vector( new_pos.x, disp_y, new_pos.z ) );
 } 
 
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
 
 #pragma mark trees collision
 
@@ -818,7 +818,7 @@ bool_t check_tree_collisions( player_data_t *plyr, point_t pos,
     
     trees = get_tree_locs();
     
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     range_t range = potential_trees_in_collision(pos);
     /*if (range.second_index-range.first_index>0) {
      printf("first : %d ; second : %d\n",range.first_index,range.second_index);
@@ -928,7 +928,7 @@ void check_item_collection( player_data_t *plyr, point_t pos )
     
     items = get_item_locs();
     
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     range_t range = potential_items_in_collision(pos);
     /*
      if (range.second_index-range.first_index>0) {
@@ -2015,7 +2015,7 @@ void init_physical_simulation_at_point(player_data_t *plyr, point_t point)
     plyr->control.barrel_roll_factor = 0;
     plyr->control.front_flip = False;
     plyr->control.back_flip = False;
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     order_trees();
     order_items();
 #endif

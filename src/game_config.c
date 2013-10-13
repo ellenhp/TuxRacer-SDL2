@@ -83,7 +83,7 @@
 #  endif /* defined( WIN32 ) */
 #endif
 
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
 #import "sharedGeneralFunctions.h"
 #endif
 
@@ -429,7 +429,7 @@ static struct params Params;
 
 void init_game_configuration()
 {
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     INIT_PARAM_STRING( 
 	data_dir, strdup(getRessourcePath()), 
 	"# The location of the Tux Racer data files" );
@@ -855,7 +855,7 @@ int get_config_dir_name( char *buff, int len )
     }
     strcpy( buff, CONFIG_DIR );
     return 0;
-#elif defined(__APPLE__)
+#elif defined(TARGET_OS_IPHONE)
     const char * configDir = getConfigPath();
     assert(configDir);
 
@@ -965,7 +965,7 @@ void write_config_file()
     struct param *parm;
     int i;
 
-#ifdef  __APPLE__
+#ifdef  TARGET_OS_IPHONE
     // Don't save the config file on iphone, no use for it.
     return;
 #endif
@@ -1007,7 +1007,7 @@ void write_config_file()
 
     for (i=0; i<sizeof(Params)/sizeof(struct param); i++) {
 	parm = (struct param*)&Params + i;
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
 	//FIXME : dans la version simulateur, on ne veut as qu'il enregistre le data_dir car il change à chaque fois et sinon c'est la merde
 	if (!strcmp(parm->name,"data_dir")) continue;
 

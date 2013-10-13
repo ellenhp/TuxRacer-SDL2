@@ -60,7 +60,7 @@
         /* Codewarrior 4 seems to need this... */
         int _isnan( double x );
 #   endif /* __MWERKS__ */
-#elif defined(__APPLE__)
+#elif defined(TARGET_OS_IPHONE)
 #   define HAVE_FINITE 1
 #   define HAVE_GETCWD 1
 #   define HAVE_GETTIMEOFDAY 1
@@ -138,7 +138,7 @@
 #   include <dirent.h>
 #endif
 
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
 #include <mach/mach.h>
 #include <mach/mach_time.h>
 
@@ -161,7 +161,7 @@ static inline uint64_t udate(void)
 #endif
 
 /* OpenGL */
-#if defined(__APPLE__)
+#if defined(TARGET_OS_IPHONE)
 #define HAVE_OPENGLES
 #import <OpenGLES/ES1/gl.h>
 #import <OpenGLES/ES1/glext.h>

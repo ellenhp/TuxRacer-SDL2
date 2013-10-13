@@ -40,7 +40,7 @@
 #include "ui_mgr.h"
 #include "joystick.h"
 #include "part_sys.h"
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     #import "sharedGeneralFunctions.h"
 #endif
 #include "game_over.h"
@@ -57,7 +57,7 @@ static scalar_t friendsPercent,countryPercent,worldPercent;
 
 static void mouse_cb( int button, int state, int x, int y )
 {
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     if (g_game.practicing && !g_game.race_aborted && g_game.race.name!=NULL && did_player_beat_best_results()  && g_game.rankings_displayed==False) {
         //Notify that a new best result is for the moment unsaved
         //dirtyScores();
@@ -236,7 +236,7 @@ void draw_game_over_text( void )
                 glPopMatrix();
             }
         } 
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     //display rankings if needed
         else if ( !g_game.race_aborted && g_game.practicing && g_game.needs_save_or_display_rankings) 
         {
@@ -347,7 +347,7 @@ void draw_game_over_text( void )
         }
         glPopMatrix();
     }
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     //Draws "touch screen to contin"ue
     string = Localize("Touch screen to continue","");
     
@@ -370,7 +370,7 @@ void draw_game_over_text( void )
     
 }
 
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
 
 //this function is called from scoreController.m in the function treatError
 void displaySavedAndRankings(const char* msg, const char* friends, const char* country, const char* world, scalar_t friendsPercentage, scalar_t countryPercentage , scalar_t worldPercentage) {
@@ -498,7 +498,7 @@ void game_over_loop( scalar_t time_step )
     
     draw_game_over_text();
     
-#ifndef __APPLE__
+#ifndef TARGET_OS_IPHONE
     draw_hud( plyr );
 #endif
     draw_hud_training(plyr);
@@ -510,7 +510,7 @@ void game_over_loop( scalar_t time_step )
 START_KEYBOARD_CB( game_over_cb )
 {
     if ( release ) return;
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     
     if (g_game.practicing && !g_game.race_aborted && g_game.race.name!=NULL && did_player_beat_best_results()  && g_game.rankings_displayed==False) {
         //Notify that a new best result is for the moment unsaved

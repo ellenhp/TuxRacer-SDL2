@@ -35,7 +35,7 @@
 #include "gui_abstraction.h"
 #include "gui_mgr.h"
 
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     #include "sharedGeneralFunctions.h"
 #endif
 
@@ -61,7 +61,7 @@ void enter_event_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_
 //wich is in this version the "world challenge click callback
 void practice_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb)
 {
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     //Only registered players can go in this mode
     /* if (playerRegistered()) { */
 #endif
@@ -69,7 +69,7 @@ void practice_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box
         g_game.current_cup = NULL;
         g_game.current_race = -1;
         g_game.practicing = True;
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
         //usefull for score saving
         g_game.race.name=NULL;
 #endif
@@ -80,7 +80,7 @@ void practice_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box
 #endif
         
         ui_set_dirty();
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     /* } else {
         alertRegisterNeeded();
     } */

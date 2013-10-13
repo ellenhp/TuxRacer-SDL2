@@ -27,7 +27,7 @@ extern "C"
 
 #include "tuxracer.h"
 
-#ifndef __APPLE__
+#ifndef TARGET_OS_IPHONE
 
 /* Hack to fix compiling problem with old gl.h's, reported by Steve
    Baker <sjbaker1@airmail.net>.  Some old gl.h's don't include glext.h, but
@@ -51,7 +51,7 @@ extern "C"
 
 /* Shouldn't need to include glext.h if gl.h is recent, but alas we can't
  * count on that...  */
-#if defined(__APPLE__)
+#if defined(TARGET_OS_IPHONE)
 #import <OpenGLES/ES1/glext.h>
 #elif defined(__ANDROID__)
 #include <GLES/glext.h>
@@ -65,7 +65,7 @@ extern "C"
 #endif
 
     
-#if !defined(__APPLE__) && !defined(__ANDROID__)
+#if !defined(TARGET_OS_IPHONE) && !defined(__ANDROID__)
 extern PFNGLLOCKARRAYSEXTPROC glLockArraysEXT_p;
 extern PFNGLUNLOCKARRAYSEXTPROC glUnlockArraysEXT_p;
 #endif

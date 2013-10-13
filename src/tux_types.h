@@ -166,7 +166,7 @@ typedef enum {
 typedef struct {
     double radius;
 
-#ifndef __APPLE__
+#ifndef TARGET_OS_IPHONE
     /* How many divisions do we use to draw a sphere? */
     int divisions;
 #else

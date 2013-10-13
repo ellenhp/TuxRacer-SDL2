@@ -136,7 +136,7 @@ bool_t did_player_beat_best_results( void )
                                  &herring,
                                  &score ) )
     {
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
         /* No previous result, so we didn't "beat" anything : OK BUT WE STILL WANT TO SAVE THE SCORE ONLINE !!!!! */
         return True;
 #else

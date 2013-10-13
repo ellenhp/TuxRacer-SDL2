@@ -28,13 +28,13 @@
 #include "multiplayer.h"
 #include "ui_mgr.h"
 #include "ui_snow.h"
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     #include "sharedGeneralFunctions.h"
 #endif
 
 #define COORD_OFFSET_AMT -0.5
 static const colour_t background_colour = { 0.48, 0.63, 0.90, 1.0 };
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
 #define NUM_LOGOS	1
 static char *logo_bindings = "splash_screen";
 #else
@@ -69,11 +69,11 @@ static void goto_next_mode()
 
 static void splash_screen_mouse_func( int button, int state, int x, int y )
 {
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     if (state==WS_MOUSE_DOWN) {
 #endif
         goto_next_mode();
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     }
 #endif
 }
@@ -89,13 +89,13 @@ void splash_screen_init(void)
     winsys_set_motion_func( ui_event_motion_func );
     winsys_set_passive_motion_func( ui_event_motion_func );
 
-#ifndef __APPLE__
+#ifndef TARGET_OS_IPHONE
     play_music( "splash_screen" );
 #endif
 
     reshape( getparam_x_resolution(), getparam_y_resolution() );
     
-#ifdef __APPLE__
+#ifdef TARGET_OS_IPHONE
     // Skip the splash screen directly
     goto_next_mode();
 #endif
@@ -188,7 +188,7 @@ void splash_screen_loop( scalar_t time_step )
 
 START_KEYBOARD_CB( splash_screen_cb )
 {
-#ifndef __APPLE__
+#ifndef TARGET_OS_IPHONE
     goto_next_mode();
 #endif
 }

@@ -26,7 +26,7 @@
 #   include "SDL.h"
 #elif defined( HAVE_GLUT )
 #   include "GL/glut.h"
-#elif defined( __APPLE__ )
+#elif defined( TARGET_OS_IPHONE )
 
 #else
 #   error "Neither SDL nor GLUT are present."
@@ -238,7 +238,7 @@ typedef enum {
     WS_MOUSE_UP = GLUT_UP
 } winsys_button_state_t;
 
-#elif defined(__APPLE__)
+#elif defined(TARGET_OS_IPHONE)
 
 /*---------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------*/
