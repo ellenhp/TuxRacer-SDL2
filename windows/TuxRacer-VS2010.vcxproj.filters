@@ -27,9 +27,6 @@
     <ClCompile Include="..\src\bonus.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\button.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\course_load.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -49,9 +46,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\error_util.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\event_select.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\file_util.c">
@@ -94,12 +88,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\hier_util.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\hud.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\hud_training.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\image.c">
@@ -168,9 +156,6 @@
     <ClCompile Include="..\src\quadtree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\race_select.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\racing.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -237,7 +222,22 @@
     <ClCompile Include="..\src\gui_abstraction.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\splash_screen.c">
+    <ClCompile Include="..\src\button.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\event_select.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hud_training.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\race_select.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\splash_screen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hud.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

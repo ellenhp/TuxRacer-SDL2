@@ -255,7 +255,7 @@ void draw_ui_snow( void )
 	    {
 		glTranslatef( pt->x*xres, pt->y*yres, 0 );
 		
-		#ifdef __APPLE__DISABLED__
+		#ifdef HAVE_OPENGLES
     	
     	   const GLfloat vertices []=
     	   {

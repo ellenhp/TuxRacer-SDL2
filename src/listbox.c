@@ -234,26 +234,44 @@ bool_t listbox_goto_prev_item( listbox_t *listbox )
 void listbox_draw( listbox_t *listbox )
 {
     font_t *font;
+	GLfloat vertices_box[]={
+		listbox->pos.x, 
+        listbox->pos.y,
+        listbox->pos.x + listbox->w - listbox->arrow_width,
+		listbox->pos.y + listbox->h };
 
-    check_assertion( listbox != NULL, "listbox is NULL" );
+	GLfloat vertices_background[]={
+		listbox->pos.x + listbox->border_width, 
+        listbox->pos.y + listbox->border_width,
+        listbox->pos.x + listbox->w - listbox->border_width - listbox->arrow_width,
+		listbox->pos.y + listbox->h - listbox->border_width };
+
+		
+	check_assertion( listbox != NULL, "listbox is NULL" );
 
     glDisable( GL_TEXTURE_2D );
     
     if(listbox->background_colour.a != 0.0) {
-        glColor4dv( (scalar_t*)&listbox->border_colour );
-        
-        glRectf( listbox->pos.x, 
-             listbox->pos.y,
-             listbox->pos.x + listbox->w - listbox->arrow_width,
-             listbox->pos.y + listbox->h );
+#ifdef HAVE_OPENGLES
+		glColor4x( listbox->border_colour.r, listbox->border_colour.g, listbox->border_colour.b, listbox->border_colour.a );
+#else
+		glColor4d( listbox->border_colour.r, listbox->border_colour.g, listbox->border_colour.b, listbox->border_colour.a );
+#endif
+		glEnableClientState (GL_VERTEX_ARRAY);
+    	glVertexPointer (2, GL_FLOAT , 0, vertices_box);
+    	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-        glColor4dv( (scalar_t*)&listbox->background_colour );
+#ifdef HAVE_OPENGLES
+		glColor4x( listbox->background_colour.r, listbox->background_colour.g, listbox->background_colour.b, listbox->background_colour.a );
+#else
+		glColor4d( listbox->background_colour.r, listbox->background_colour.g, listbox->background_colour.b, listbox->background_colour.a );
+#endif
 
-        glRectf( listbox->pos.x + listbox->border_width, 
-             listbox->pos.y + listbox->border_width,
-             listbox->pos.x + listbox->w - listbox->border_width -
-             listbox->arrow_width,
-             listbox->pos.y + listbox->h - listbox->border_width );
+		glEnableClientState (GL_VERTEX_ARRAY);
+    	glVertexPointer (2, GL_FLOAT , 0, vertices_background);
+    	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+		glDisableClientState (GL_VERTEX_ARRAY);
     }
     
     glEnable( GL_TEXTURE_2D );

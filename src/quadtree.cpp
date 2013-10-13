@@ -1113,50 +1113,22 @@ GLubyte *VNCArray;
 
 void quadsquare::DrawTris()
 {
-	//FIXME
-#ifndef HAVE_OPENGLES
-    int tmp_min_idx = VertexArrayMinIdx;
-
-    if ( glLockArraysEXT_p && getparam_use_cva() ) {
-		
-		if ( getparam_cva_hack() ) {
-			/* This is a hack that seems to fix the "psychedelic colours" on 
-			 some drivers (TNT/TNT2, for example)
-			 */
-			if ( tmp_min_idx == 0 ) {
-				tmp_min_idx = 1;
-			}
-		} 
-		
-		glLockArraysEXT_p( tmp_min_idx, 
-						  VertexArrayMaxIdx - tmp_min_idx + 1 ); 
-    }
-
-    glDrawElements( GL_TRIANGLES, VertexArrayCounter,
-				   GL_UNSIGNED_INT, VertexArrayIndices );
-	
-    if ( glUnlockArraysEXT_p && getparam_use_cva() ) {
-		glUnlockArraysEXT_p();
-    }
-#else
-	glDrawElements( GL_TRIANGLES, VertexArrayCounter,
-				   GL_UNSIGNED_INT, VertexArrayIndices );
-#endif
+	glDrawElements( GL_TRIANGLES, VertexArrayCounter, GL_UNSIGNED_INT, VertexArrayIndices );
 }
 
 void quadsquare::DrawEnvmapTris() 
 {
     if ( VertexArrayCounter > 0 && EnvmapTexId != 0 ) {
 		
-		glTexGeni( GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP );
-		glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP );
+		//glTexGeni( GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP );
+		//glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP );
 		
 		glBindTexture( GL_TEXTURE_2D, EnvmapTexId );
 		
 		DrawTris();
 		
-		glTexGeni( GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
-		glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );		
+		//glTexGeni( GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
+		//glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );		
 
     } 
 }
@@ -1179,9 +1151,19 @@ void	quadsquare::Render(const quadcornerdata& cd, GLubyte *vnc_array)
     get_course_divisions( &nx, &ny );
 	
 	
-    /* Save fog state */
-    fog_on = is_fog_on();
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glVertexPointer( 3, GL_FLOAT, STRIDE_GL_ARRAY, VNCArray );
+
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glNormalPointer( GL_FLOAT, STRIDE_GL_ARRAY, 
+				VNCArray + 3*sizeof(GLfloat) );
+
+	glEnableClientState(GL_COLOR_ARRAY);
+	glColorPointer( 4, GL_UNSIGNED_BYTE, STRIDE_GL_ARRAY, VNCArray + 8*sizeof(GLfloat) );
+
 	
+	/* Save fog state */
+    fog_on = is_fog_on();
 
     /*
      * Draw the "normal" blended triangles ( <= 2 terrains textures )
@@ -1283,6 +1265,7 @@ void	quadsquare::Render(const quadcornerdata& cd, GLubyte *vnc_array)
 		}
     }
     glDisableClientState( GL_COLOR_ARRAY );
+	glDisableClientState(GL_VERTEX_ARRAY);
 
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 }

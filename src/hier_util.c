@@ -416,7 +416,7 @@ void traverse_dag( scene_node_t *node, material_t *mat )
     check_assertion( node != NULL, "node is NULL" );
     glPushMatrix();
     
-#ifdef __APPLE__DISABLED__
+#ifdef HAVE_OPENGLES
     GLfloat matrix[3][3];
     int i,j;
     for( i = 0; i < 3; i++ )

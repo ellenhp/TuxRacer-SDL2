@@ -45,9 +45,11 @@ void setup_fog()
 
     glEnable( GL_FOG );
     enabled = True;
-
+#ifdef HAVE_OPENGLES
+    glFogx( GL_FOG_MODE, fog_settings.mode );
+#else
     glFogi( GL_FOG_MODE, fog_settings.mode );
-
+#endif
     glFogf( GL_FOG_DENSITY, fog_settings.density );
     glFogf( GL_FOG_START, fog_settings.start );
     glFogf( GL_FOG_END, fog_settings.end );

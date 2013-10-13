@@ -36,9 +36,8 @@ bool_t is_current_cup_complete( void );
 void update_player_score( player_data_t *plyr );
 void get_time_components( scalar_t time, int *minutes, int *seconds,
 			  int *hundredths );
-#ifdef __APPLE__
-    int calculate_player_score(player_data_t *plyr);
-#endif
+
+int calculate_player_score(player_data_t *plyr);
 
 #endif /* GAME_LOGIC_UTIL_H */
 

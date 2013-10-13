@@ -381,8 +381,9 @@ void setup_course_tex_gen()
 {
     static GLfloat xplane[4] = { 1.0 / TEX_SCALE, 0.0, 0.0, 0.0 };
     static GLfloat zplane[4] = { 0.0, 0.0, 1.0 / TEX_SCALE, 0.0 };
-    glTexGenfv( GL_S, GL_OBJECT_PLANE, xplane );
-    glTexGenfv( GL_T, GL_OBJECT_PLANE, zplane );
+    //glTexGenfv( GL_S, GL_OBJECT_PLANE, xplane );
+    //glTexGenfv( GL_T, GL_OBJECT_PLANE, zplane );
+	//TODO do something here
 }
 
 #define DRAW_POINT \
@@ -1046,7 +1047,7 @@ void draw_fog_plane()
     
     fog_colour = get_fog_colour();
     
-    glColor4fv( fog_colour );
+    glColor4f( fog_colour[0], fog_colour[1], fog_colour[2], fog_colour[3] );
     
 #ifdef HAVE_OPENGLES
 #undef glEnableClientState

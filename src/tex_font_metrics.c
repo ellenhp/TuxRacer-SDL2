@@ -267,7 +267,7 @@ void get_tex_font_string_bbox( tex_font_metrics_t *tfm,
     *max_descent = tfm->max_descent;
 }
 
-#ifdef __APPLE__
+#ifdef HAVE_OPENGLES
     #undef glEnableClientState    
     #undef glVertexPointer    
     #undef glTexCoordPointer    

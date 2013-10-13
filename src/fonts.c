@@ -236,11 +236,7 @@ static void start_font_draw( font_t *font )
 	      scale_fact,
 	      scale_fact );
 
-#ifdef __APPLE__DISABLED__
 	glColor4f( (float)font->colour.r, (float)font->colour.g, (float)font->colour.b, (float)font->colour.a );
-#else
-    glColor4dv( (scalar_t*) &font->colour );
-#endif
 }
 
 static void end_font_draw( font_t *font )

@@ -317,7 +317,7 @@ void setup_view_matrix( player_data_t *plyr )
     view_mat[3][2] = -viewpt_in_view_frame.z;
     
     glLoadIdentity();
-#ifdef __APPLE__DISABLED__
+#ifdef HAVE_OPENGLES
     GLfloat matrix[3][3];
     int i,j;
     for( i = 0; i < 3; i++ )

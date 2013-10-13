@@ -170,7 +170,6 @@ static inline uint64_t udate(void)
 #define HAVE_OPENGLES
 #include <GLES/gl.h>
 #include <GLES/glext.h>
-#include "android/androidgl.h"
 #else
 #include <GL/gl.h>
 #include <GL/glu.h>

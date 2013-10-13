@@ -94,7 +94,7 @@
     <ClCompile Include="..\src\audio.c" />
     <ClCompile Include="..\src\audio_data.c" />
     <ClCompile Include="..\src\bonus.c" />
-    <ClCompile Include="..\src\button.c" />
+    <ClCompile Include="..\src\button.cpp" />
     <ClCompile Include="..\src\course_load.c" />
     <ClCompile Include="..\src\course_mgr.c" />
     <ClCompile Include="..\src\course_quad.cpp" />
@@ -102,7 +102,7 @@
     <ClCompile Include="..\src\credits.c" />
     <ClCompile Include="..\src\debug.c" />
     <ClCompile Include="..\src\error_util.c" />
-    <ClCompile Include="..\src\event_select.c" />
+    <ClCompile Include="..\src\event_select.cpp" />
     <ClCompile Include="..\src\file_util.c" />
     <ClCompile Include="..\src\fog.c" />
     <ClCompile Include="..\src\fonts.c" />
@@ -118,8 +118,8 @@
     <ClCompile Include="..\src\hier.c" />
     <ClCompile Include="..\src\hier_cb.c" />
     <ClCompile Include="..\src\hier_util.c" />
-    <ClCompile Include="..\src\hud.c" />
-    <ClCompile Include="..\src\hud_training.c" />
+    <ClCompile Include="..\src\hud.cpp" />
+    <ClCompile Include="..\src\hud_training.cpp" />
     <ClCompile Include="..\src\image.c" />
     <ClCompile Include="..\src\intro.c" />
     <ClCompile Include="..\src\joystick.c" />
@@ -143,13 +143,13 @@
     <ClCompile Include="..\src\preview.c" />
     <ClCompile Include="..\src\quadgeom.cpp" />
     <ClCompile Include="..\src\quadtree.cpp" />
-    <ClCompile Include="..\src\race_select.c" />
+    <ClCompile Include="..\src\race_select.cpp" />
     <ClCompile Include="..\src\racing.c" />
     <ClCompile Include="..\src\render_util.c" />
     <ClCompile Include="..\src\reset.c" />
     <ClCompile Include="..\src\save.c" />
     <ClCompile Include="..\src\screenshot.c" />
-    <ClCompile Include="..\src\splash_screen.c" />
+    <ClCompile Include="..\src\splash_screen.cpp" />
     <ClCompile Include="..\src\ssbutton.c" />
     <ClCompile Include="..\src\string_util.c" />
     <ClCompile Include="..\src\tcl_util.c" />

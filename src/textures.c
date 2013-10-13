@@ -119,7 +119,7 @@ bool_t load_texture( const char *texname, const char *filename, int repeatable )
         glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
         glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
     } else {
-#ifndef __APPLE__DISABLED__
+#ifndef HAVE_OPENGLES
         glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
         glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
 #endif
@@ -133,7 +133,7 @@ bool_t load_texture( const char *texname, const char *filename, int repeatable )
     if ( texImage->sizeX > max_texture_size ||
         texImage->sizeY > max_texture_size )
     {
-#ifdef __APPLE__DISABLED__
+#ifdef HAVE_OPENGLES
         abort(); //We don't support that yet
 #else
         char *newdata = (char*)malloc( texImage->sizeZ *
@@ -374,7 +374,7 @@ void load_texture_main_thread( void * texArg, void *texImageArg )
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
     } else {
-#ifndef __APPLE__DISABLED__
+#ifndef HAVE_OPENGLES
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
 #endif
@@ -388,7 +388,7 @@ void load_texture_main_thread( void * texArg, void *texImageArg )
     if ( texImage->sizeX > max_texture_size ||
 	 texImage->sizeY > max_texture_size ) 
     {
-#ifdef __APPLE__DISABLED__
+#ifdef HAVE_OPENGLES
         abort(); //We don't support that yet
 #else
 	char *newdata = (char*)malloc( texImage->sizeZ *
