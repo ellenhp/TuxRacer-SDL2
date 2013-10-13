@@ -324,10 +324,12 @@ void fill_gl_arrays()
 	    floatval(5) = nml.y;
 	    floatval(6) = nml.z;
 	    floatval(7) = 1.0f;
-	   
+
+	    floatval(8) = (GLfloat)x / (nx-1.) * course_width/10;
+	    floatval(9) = (GLfloat)y / (ny-1.) * course_length/10;
+
 #undef floatval
-#define byteval(i) (*(GLubyte*)(vnc_array+idx+8*sizeof(GLfloat) +\
-    i*sizeof(GLubyte)))
+#define byteval(i) (*(GLubyte*)(vnc_array+idx+10*sizeof(GLfloat) + i*sizeof(GLubyte)))
 
 	    byteval(0) = 255;
 	    byteval(1) = 255;
@@ -338,17 +340,6 @@ void fill_gl_arrays()
 
 	}
     }
-
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer( 3, GL_FLOAT, STRIDE_GL_ARRAY, vnc_array );
-
-    glEnableClientState(GL_NORMAL_ARRAY);
-    glNormalPointer( GL_FLOAT, STRIDE_GL_ARRAY, 
-		     vnc_array + 3*sizeof(GLfloat) );
-
-    glEnableClientState(GL_COLOR_ARRAY);
-    glColorPointer( 4, GL_UNSIGNED_BYTE, STRIDE_GL_ARRAY, 
-		    vnc_array + 8*sizeof(GLfloat) );
 }
 
 void preload_course( char *course )

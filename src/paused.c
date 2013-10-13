@@ -176,7 +176,6 @@ void paused_loop( scalar_t time_step )
     }
 
     draw_tux();
-    draw_tux_shadow();
 
     set_gl_options( GUI );
 

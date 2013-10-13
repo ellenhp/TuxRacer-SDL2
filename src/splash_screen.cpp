@@ -124,13 +124,8 @@ static void draw_logo()
 	for (i=0; i<NUM_LOGOS; i++) {
 		glBindTexture( GL_TEXTURE_2D, texid[i] );
 
-#ifdef HAVE_OPENGLES
 		w = 512;
 		h = 512;
-#else
-		glGetTexLevelParameteriv( GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &w );
-		glGetTexLevelParameteriv( GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &h );
-#endif
 
 		GLfloat texcoords[]={
 			0, 0,

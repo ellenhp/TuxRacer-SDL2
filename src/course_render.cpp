@@ -413,32 +413,6 @@ void draw_sky(point_t pos)
 {
     GLuint texture_id[6];
     
-    set_gl_options( SKY );
-    
-    if (!(get_texture_binding( "sky_front", &texture_id[0] ) && 
-          get_texture_binding( "sky_top", &texture_id[1] ) && 
-          get_texture_binding( "sky_bottom", &texture_id[2] ) && 
-          get_texture_binding( "sky_left", &texture_id[3] ) && 
-          get_texture_binding( "sky_right", &texture_id[4] ) && 
-          get_texture_binding( "sky_back", &texture_id[5] ) ) ) {
-        return;
-    } 
-    
-    glColor4f( 1.0, 1.0, 1.0, 1.0 );
-    
-    glPushMatrix();
-    
-    glTranslatef(pos.x, pos.y, pos.z);
-    
-#ifdef HAVE_OPENGLES
-
-#undef glEnableClientState
-#undef glDisableClientState
-#undef glVertexPointer
-#undef glTexCoordPointer
-#undef glDrawArrays
-#undef glDrawElements
-    
     static const GLfloat vertices []=
     {
         -1, -1, -1, //0
@@ -489,8 +463,11 @@ void draw_sky(point_t pos)
         // Work around an iphone FPU/GL? bug
         // that makes the plane and texture non contiguous.
         // this removes an artifacts visible in the sky
-#define ZERO 0.01
-#define ONE 0.99
+
+		// nopoe 10/13/2013: necessary even on windows when using OpenGL ES rendering code
+
+#define ZERO 0.005
+#define ONE 0.995
         ZERO, ZERO ,
         ONE, ZERO ,
         ONE, ONE ,
@@ -533,108 +510,41 @@ void draw_sky(point_t pos)
         ZERO, ZERO ,
         ONE, ONE ,
     };
+
+    int i = 0;
+
+	set_gl_options( SKY );
     
+    if (!(get_texture_binding( "sky_front", &texture_id[0] ) && 
+          get_texture_binding( "sky_top", &texture_id[1] ) && 
+          get_texture_binding( "sky_bottom", &texture_id[2] ) && 
+          get_texture_binding( "sky_left", &texture_id[3] ) && 
+          get_texture_binding( "sky_right", &texture_id[4] ) && 
+          get_texture_binding( "sky_back", &texture_id[5] ) ) ) {
+        return;
+    } 
+    
+    glColor4f( 1.0, 1.0, 1.0, 1.0 );
+    
+    glPushMatrix();
+    
+    glTranslatef(pos.x, pos.y, pos.z);
     
     glEnableClientState (GL_VERTEX_ARRAY);
     glEnableClientState (GL_TEXTURE_COORD_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);
     glVertexPointer (3, GL_FLOAT , 0, vertices);	
     glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
-    
-    int i = 0;
-    
+        
     for(i =0; i < 6; i++) {
         glBindTexture( GL_TEXTURE_2D, texture_id[i] );
         glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL );
         glDrawArrays(GL_TRIANGLES, i*6, 6);
     }
-    
-#else
-    
-    glBindTexture( GL_TEXTURE_2D, texture_id[0] );
-    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL );
-    
-    glBegin(GL_QUADS);
-    glTexCoord2f( 0.0, 0.0 );
-    glVertex3f( -1, -1, -1);
-    glTexCoord2f( 1.0, 0.0 );
-    glVertex3f(  1, -1, -1);
-    glTexCoord2f( 1.0, 1.0 );
-    glVertex3f(  1,  1, -1);
-    glTexCoord2f( 0.0, 1.0 );
-    glVertex3f( -1,  1, -1);
-    glEnd();
-    
-    glBindTexture( GL_TEXTURE_2D, texture_id[1] );
-    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL );
-    
-    glBegin(GL_QUADS);
-    glTexCoord2f( 0.0, 0.0 );
-    glVertex3f( -1,  1, -1);
-    glTexCoord2f( 1.0, 0.0 );
-    glVertex3f(  1,  1, -1);
-    glTexCoord2f( 1.0, 1.0 );
-    glVertex3f(  1,  1,  1);
-    glTexCoord2f( 0.0, 1.0 );
-    glVertex3f( -1,  1,  1);
-    glEnd();
-    
-    glBindTexture( GL_TEXTURE_2D, texture_id[2] );
-    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL );
-    
-    glBegin(GL_QUADS);
-    glTexCoord2f( 0.0, 0.0 );
-    glVertex3f( -1, -1,  1);
-    glTexCoord2f( 1.0, 0.0 );
-    glVertex3f(  1, -1,  1);
-    glTexCoord2f( 1.0, 1.0 );
-    glVertex3f(  1, -1, -1);
-    glTexCoord2f( 0.0, 1.0 );
-    glVertex3f( -1, -1, -1);
-    glEnd();
-    
-    glBindTexture( GL_TEXTURE_2D, texture_id[3] );
-    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL );
-    
-    glBegin(GL_QUADS);
-    glTexCoord2f( 0.0, 0.0 );
-    glVertex3f( -1, -1,  1);
-    glTexCoord2f( 1.0, 0.0 );
-    glVertex3f( -1, -1, -1);
-    glTexCoord2f( 1.0, 1.0 );
-    glVertex3f( -1,  1, -1);
-    glTexCoord2f( 0.0, 1.0 );
-    glVertex3f( -1,  1,  1);
-    glEnd();
-    
-    glBindTexture( GL_TEXTURE_2D, texture_id[4] );
-    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL );
-    
-    glBegin(GL_QUADS);
-    glTexCoord2f( 0.0, 0.0 );
-    glVertex3f(  1, -1, -1);
-    glTexCoord2f( 1.0, 0.0 );
-    glVertex3f(  1, -1,  1);
-    glTexCoord2f( 1.0, 1.0 );
-    glVertex3f(  1,  1,  1);
-    glTexCoord2f( 0.0, 1.0 );
-    glVertex3f(  1,  1, -1);
-    glEnd();
-    
-    glBindTexture( GL_TEXTURE_2D, texture_id[5] );
-    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL );
-    
-    glBegin(GL_QUADS);
-    glTexCoord2f( 0.0, 0.0 );
-    glVertex3f(  1, -1,  1);
-    glTexCoord2f( 1.0, 0.0 );
-    glVertex3f( -1, -1,  1);
-    glTexCoord2f( 1.0, 1.0 );
-    glVertex3f( -1,  1,  1);
-    glTexCoord2f( 0.0, 1.0 );
-    glVertex3f(  1,  1,  1);
-    glEnd();
-#endif
+
+    glDisableClientState (GL_VERTEX_ARRAY);
+    glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+
     glPopMatrix();
     
 }
@@ -642,8 +552,8 @@ void draw_sky(point_t pos)
 /* fonction utilisateur de comparaison fournie a qsort() */
 static int compare_func (void const *a, void const *b)
 {
-    tree_t const *treeA = a;
-    tree_t const *treeB = b;
+    tree_t const *treeA = (tree_t*)a;
+    tree_t const *treeB = (tree_t*)b;
 	scalar_t diff;
     
     point_t locA,locB;
@@ -693,6 +603,41 @@ void draw_trees()
     int       item_type = -1;
     char *    item_name = 0;
     item_type_t *item_types;
+
+    static const GLfloat verticesTree []=
+    {
+        -1, 0, 0,
+        -1, 1, 0,
+        1, 1, 0,
+        1, 1, 0,
+        1, 0, 0,
+        -1, 0, 0,
+        
+        0, 0, -1,
+        0, 1, -1,
+        0, 1, 1,
+        0, 1, 1,
+        0, 0, 1,
+        0, 0, -1,
+        
+    };
+    static const GLfloat texCoordsTree []=
+    {
+        0, 0,
+		0, 1,
+		1, 1,
+		1, 1,
+		1, 0,
+		0, 0,
+        
+        0, 0,
+		0, 1,
+		1, 1,
+		1, 1,
+		1, 0,
+		0, 0,
+        
+    };
     
     treeLocs = treeLocsOrderedByZ;
     numTrees = get_num_trees();
@@ -707,50 +652,10 @@ void draw_trees()
     glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
     set_material( white, black, 1.0 );
     
-#ifdef HAVE_OPENGLES
-#undef glVertexPointer
-#undef glTexCoordPointer
-#undef glEnableClientState
-#undef glDisableClientState
-#undef glDrawArrays
-    static const GLfloat verticesTree []=
-    {
-        -1.0, 0.0, 0.0,
-        1.0, 0.0, 0.0,
-        1.0, 1.0, 0.0,
-        -1.0, 1.0, 0.0,
-        -1.0, 0.0, 0.0,
-        1.0, 1.0, 0.0,
-        
-        0.0, 0.0, -1.0,
-        0.0, 0.0,  1.0,
-        0.0, 1.0,  1.0,
-        0.0, 1.0, -1.0,
-        0.0, 0.0, -1.0,
-        0.0, 1.0,  1.0,
-        
-    };
-    static const GLfloat texCoordsTree []=
-    {
-        0.0, 0.0 ,
-        1.0, 0.0 ,
-        1.0, 1.0 ,
-        0.0, 1.0 ,
-        0.0, 0.0 ,
-        1.0, 1.0 ,
-        
-        0.0, 0.0 ,
-        1.0, 0.0 ,
-        1.0, 1.0 ,
-        0.0, 1.0 ,
-        0.0, 0.0 ,
-        1.0, 1.0 ,
-        
-    };
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer (3, GL_FLOAT , 0, verticesTree);
     glTexCoordPointer(2, GL_FLOAT, 0, texCoordsTree);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-#endif
     
     for (i = first_tree_to_check; i< numTrees; i++ ) {
         if ( clip_course ) {
@@ -787,7 +692,6 @@ void draw_trees()
         
         glNormal3f( normal.x, normal.y, normal.z );
         
-#ifdef HAVE_OPENGLES
         glScalef(treeRadius, treeHeight, treeRadius);
         
         bool_t drawTwoPlanes = False;
@@ -795,155 +699,100 @@ void draw_trees()
             eye_pt.z - treeLocs[i].ray.pt.z < fwd_tree_detail_limit )
             drawTwoPlanes = True;
         
-        glDrawArrays(GL_TRIANGLES, 0, 6 + drawTwoPlanes ? 6 : 0);
-        
-#else
-        glBegin( GL_QUADS );
-        glTexCoord2f( 0., 0. );
-        glVertex3f( -treeRadius, 0.0, 0.0 );
-        glTexCoord2f( 1., 0. );
-        glVertex3f( treeRadius, 0.0, 0.0 );
-        glTexCoord2f( 1., 1. );
-        glVertex3f( treeRadius, treeHeight, 0.0 );
-        glTexCoord2f( 0., 1. );
-        glVertex3f( -treeRadius, treeHeight, 0.0 );
-        
-        if ( !clip_course ||
-            eye_pt.z - treeLocs[i].ray.pt.z < fwd_tree_detail_limit )
-        {
-            glTexCoord2f( 0., 0. );
-            glVertex3f( 0.0, 0.0, -treeRadius );
-            glTexCoord2f( 1., 0. );
-            glVertex3f( 0.0, 0.0, treeRadius );
-            glTexCoord2f( 1., 1. );
-            glVertex3f( 0.0, treeHeight, treeRadius );
-            glTexCoord2f( 0., 1. );
-            glVertex3f( 0.0, treeHeight, -treeRadius );
-        }
-        
-        glEnd();
-        
-#endif
+        glDrawArrays(GL_TRIANGLES, 0, 6 + (drawTwoPlanes ? 6 : 0));
         
         glPopMatrix();
     } 
     
     
         
-        itemLocs = get_item_locs();
-        numItems = get_num_items();
+    itemLocs = get_item_locs();
+    numItems = get_num_items();
         
+    static const GLfloat verticesItem []=
+    {
+        -1.0, 0.0,  1.0,
+        1.0, 0.0, -1.0,
+        1.0, 1.0, -1.0,
+        -1.0, 1.0,  1.0,
+        -1.0, 0.0,  1.0,
+        1.0, 1.0, -1.0,
+    };
         
-#ifdef HAVE_OPENGLES
-        static const GLfloat verticesItem []=
-        {
-            -1.0, 0.0,  1.0,
-            1.0, 0.0, -1.0,
-            1.0, 1.0, -1.0,
-            -1.0, 1.0,  1.0,
-            -1.0, 0.0,  1.0,
-            1.0, 1.0, -1.0,
-        };
-        
-        static const GLfloat texCoordsItem []=
-        {
-            0.0, 0.0 ,
-            1.0, 0.0 ,
-            1.0, 1.0 ,
-            0.0, 1.0 ,
-            0.0, 0.0 ,
-            1.0, 1.0 ,
-        };
-        glVertexPointer (3, GL_FLOAT , 0, verticesItem);
-        glTexCoordPointer(2, GL_FLOAT, 0, texCoordsItem);
-#endif
-        for (i = 0; i< numItems; i++ ) {
-            if (!game_has_herring()) {
-                if ( itemLocs[i].collectable == 1) {
-                    /* In speed mode or in tutorial we don't want to draw fishes*/
-                    continue;
-                }
-            }
-            if ( itemLocs[i].collectable == 0 || itemLocs[i].drawable == False) {
-                /* already collected or not to be drawn*/
+    static const GLfloat texCoordsItem []=
+    {
+        0.0, 0.0 ,
+        1.0, 0.0 ,
+        1.0, 1.0 ,
+        0.0, 1.0 ,
+        0.0, 0.0 ,
+        1.0, 1.0 ,
+    };
+    glVertexPointer (3, GL_FLOAT , 0, verticesItem);
+    glTexCoordPointer(2, GL_FLOAT, 0, texCoordsItem);
+
+    for (i = 0; i< numItems; i++ ) {
+        if (!game_has_herring()) {
+            if ( itemLocs[i].collectable == 1) {
+                /* In speed mode or in tutorial we don't want to draw fishes*/
                 continue;
             }
+        }
+        if ( itemLocs[i].collectable == 0 || itemLocs[i].drawable == False) {
+            /* already collected or not to be drawn*/
+            continue;
+        }
             
-            if ( clip_course ) {
-                if ( eye_pt.z - itemLocs[i].ray.pt.z > fwd_clip_limit ) 
-                    continue;
+        if ( clip_course ) {
+            if ( eye_pt.z - itemLocs[i].ray.pt.z > fwd_clip_limit ) 
+                continue;
                 
-                if ( itemLocs[i].ray.pt.z - eye_pt.z > bwd_clip_limit )
-                    continue;
+            if ( itemLocs[i].ray.pt.z - eye_pt.z > bwd_clip_limit )
+                continue;
+        }
+            
+        /* verify that the correct texture is bound */
+        if (itemLocs[i].item_type != item_type) {
+            item_type = itemLocs[i].item_type;
+            item_name = get_item_name(item_type);
+            if (!get_texture_binding( item_name, &texture_id ) ) {
+                texture_id = 0;
             }
+            glBindTexture( GL_TEXTURE_2D, texture_id );
+        }
             
-            /* verify that the correct texture is bound */
-            if (itemLocs[i].item_type != item_type) {
-                item_type = itemLocs[i].item_type;
-                item_name = get_item_name(item_type);
-                if (!get_texture_binding( item_name, &texture_id ) ) {
-                    texture_id = 0;
-                }
-                glBindTexture( GL_TEXTURE_2D, texture_id );
-            }
-            
-            glPushMatrix();
-            {
-                glTranslatef( itemLocs[i].ray.pt.x, itemLocs[i].ray.pt.y, 
-                             itemLocs[i].ray.pt.z );
+        glPushMatrix();
+        {
+            glTranslatef( itemLocs[i].ray.pt.x, itemLocs[i].ray.pt.y, 
+                            itemLocs[i].ray.pt.z );
                 
-                itemRadius = itemLocs[i].diam/2.;
-                itemHeight = itemLocs[i].height;
+            itemRadius = itemLocs[i].diam/2.;
+            itemHeight = itemLocs[i].height;
                 
-                if ( item_types[item_type].use_normal ) {
-                    normal = item_types[item_type].normal;
-                } else {
-                    normal = subtract_points( eye_pt, itemLocs[i].ray.pt );
-                    normalize_vector( &normal );
-                }
-                
-                if (normal.y == 1.0) {
-                    continue;
-                }
-                
-                glNormal3f( normal.x, normal.y, normal.z );
-                
-                normal.y = 0.0;
+            if ( item_types[item_type].use_normal ) {
+                normal = item_types[item_type].normal;
+            } else {
+                normal = subtract_points( eye_pt, itemLocs[i].ray.pt );
                 normalize_vector( &normal );
-                
-#ifdef HAVE_OPENGLES
-                glScalef(itemRadius*normal.z, itemHeight, itemRadius*normal.x);
-                glDrawArrays(GL_TRIANGLES, 0, 6);
-#else
-                
-                glBegin( GL_QUADS );
-                {
-                    glTexCoord2f( 0., 0. );
-                    glVertex3f( -itemRadius*normal.z, 
-                               0.0, 
-                               itemRadius*normal.x );
-                    glTexCoord2f( 1., 0. );
-                    glVertex3f( itemRadius*normal.z, 
-                               0.0, 
-                               -itemRadius*normal.x );
-                    glTexCoord2f( 1., 1. );
-                    glVertex3f( itemRadius*normal.z, 
-                               itemHeight, 
-                               -itemRadius*normal.x );
-                    glTexCoord2f( 0., 1. );
-                    glVertex3f( -itemRadius*normal.z, 
-                               itemHeight, 
-                               itemRadius*normal.x );
-                }
-                glEnd();
-#endif
             }
-            glPopMatrix();
-        } 
+                
+            if (normal.y == 1.0) {
+                continue;
+            }
+                
+            glNormal3f( normal.x, normal.y, normal.z );
+                
+            normal.y = 0.0;
+            normalize_vector( &normal );
+                
+            glScalef(itemRadius*normal.z, itemHeight, itemRadius*normal.x);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+        }
+        glPopMatrix();
+    } 
 
-#ifdef HAVE_OPENGLES
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-#endif
+    glDisableClientState(GL_VERTEX_ARRAY);
 } 
 
 /*! 
@@ -1049,13 +898,6 @@ void draw_fog_plane()
     
     glColor4f( fog_colour[0], fog_colour[1], fog_colour[2], fog_colour[3] );
     
-#ifdef HAVE_OPENGLES
-#undef glEnableClientState
-#undef glDisableClientState
-#undef glVertexPointer
-#undef glColorPointer
-#undef glDrawArrays
-    
     point_t pt1,pt2,pt3,pt4;
     
     pt1 = move_point( top_left_pt, left_vec );
@@ -1094,40 +936,14 @@ void draw_fog_plane()
     };
     
     glEnableClientState (GL_VERTEX_ARRAY);
-    //   glEnableClientState (GL_COLOR_ARRAY);
+    glEnableClientState (GL_COLOR_ARRAY);
     //  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     glVertexPointer (3, GL_FLOAT , 0, verticesFog);	
     glColorPointer(4, GL_FLOAT, 0, colorsFog);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
-    //glDisableClientState(GL_COLOR_ARRAY_POINTER);
-    
-#else
-    glBegin( GL_QUAD_STRIP );
-    
-    glVertex3f( bottom_left_pt.x, bottom_left_pt.y, bottom_left_pt.z );
-    glVertex3f( bottom_right_pt.x, bottom_right_pt.y, bottom_right_pt.z );
-    glVertex3f( left_pt.x, left_pt.y, left_pt.z );
-    glVertex3f( right_pt.x, right_pt.y, right_pt.z );
-    
-    glColor4f( fog_colour[0], fog_colour[1], fog_colour[2], 0.9 );
-    glVertex3f( top_left_pt.x, top_left_pt.y, top_left_pt.z );
-    glVertex3f( top_right_pt.x, top_right_pt.y, top_right_pt.z );
-    
-    glColor4f( fog_colour[0], fog_colour[1], fog_colour[2], 0.3 );
-    pt = move_point( top_left_pt, left_vec );
-    glVertex3f( pt.x, pt.y, pt.z );
-    pt = move_point( top_right_pt, right_vec );
-    glVertex3f( pt.x, pt.y, pt.z );
-    
-    glColor4f( fog_colour[0], fog_colour[1], fog_colour[2], 0.0 );
-    pt = move_point( top_left_pt, scale_vector( 3.0, left_vec ) );
-    glVertex3f( pt.x, pt.y, pt.z );
-    pt = move_point( top_right_pt, scale_vector( 3.0, right_vec ) );
-    glVertex3f( pt.x, pt.y, pt.z );
-    
-    glEnd();
-    
-#endif
+
+    glDisableClientState(GL_COLOR_ARRAY_POINTER);
+    glDisableClientState (GL_VERTEX_ARRAY);
 }
 
 void course_render_init() {

@@ -118,11 +118,6 @@ bool_t load_texture( const char *texname, const char *filename, int repeatable )
     if ( repeatable ) {
         glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
         glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-    } else {
-#ifndef HAVE_OPENGLES
-        glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
-        glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
-#endif
     }
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
@@ -133,42 +128,8 @@ bool_t load_texture( const char *texname, const char *filename, int repeatable )
     if ( texImage->sizeX > max_texture_size ||
         texImage->sizeY > max_texture_size )
     {
-#ifdef HAVE_OPENGLES
         abort(); //We don't support that yet
-#else
-        char *newdata = (char*)malloc( texImage->sizeZ *
-                                      max_texture_size *
-                                      max_texture_size );
-        
-        check_assertion( newdata != NULL, "out of memory" );
-        
-        print_debug( DEBUG_TEXTURE, "Texture `%s' too large -- scaling to "
-                    "maximum allowed size",
-                    filename );
-        
-        
-        /* In the case of large- or small-aspect ratio textures, this
-         could end up using *more* space... oh well. */
-        gluScaleImage( texImage->sizeZ == 3 ? GL_RGB : GL_RGBA,
-                      texImage->sizeX, texImage->sizeY,
-                      GL_UNSIGNED_BYTE,
-                      texImage->data,
-                      max_texture_size, max_texture_size,
-                      GL_UNSIGNED_BYTE,
-                      newdata );
-        
-        free( texImage->data );
-        texImage->data = (unsigned char*) newdata;
-        texImage->sizeX = max_texture_size;
-        texImage->sizeY = max_texture_size;
-#endif
     }
-    
-#ifndef HAVE_OPENGLES
-    gluBuild2DMipmaps( GL_TEXTURE_2D, texImage->sizeZ, texImage->sizeX,
-                      texImage->sizeY, texImage->sizeZ == 3 ? GL_RGB : GL_RGBA,
-                      GL_UNSIGNED_BYTE, texImage->data );
-#else
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -178,7 +139,7 @@ bool_t load_texture( const char *texname, const char *filename, int repeatable )
                  texImage->sizeY == 255 ? 256 : texImage->sizeY /* Work around for tree.png */,
                  0, texImage->sizeZ == 3 ? GL_RGB : GL_RGBA,
                  GL_UNSIGNED_BYTE, texImage->data );
-#endif
+
     free( texImage->data );
     free( texImage );
     return True;
@@ -254,12 +215,7 @@ bool_t unbind_texture( const char *binding )
 
 void get_current_texture_dimensions( int *width, int *height )
 {
-#ifdef HAVE_OPENGLES
     abort();
-#else
-    glGetTexLevelParameteriv( GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, width );
-    glGetTexLevelParameteriv( GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, height );
-#endif
 }
 
 bool_t flush_textures(void)
@@ -349,92 +305,3 @@ void register_texture_callbacks( Tcl_Interp *ip )
     Tcl_CreateCommand (ip, "tux_load_texture",   load_texture_cb,   0,0);
     Tcl_CreateCommand (ip, "tux_bind_texture",   bind_texture_cb,   0,0);
 }
-
-
-#ifdef _APPLE
-
-void delete_texture_main_thread( void * texture_id )
-{
-    glDeleteTextures( 1, texture_id );
-}
-
-void load_texture_main_thread( void * texArg, void *texImageArg )
-{
-    IMAGE *texImage = texImageArg;
-    texture_node_t *tex = texArg;
-    int max_texture_size;
-
-    glGenTextures( 1, &(tex->texture_id) );
-    glBindTexture( GL_TEXTURE_2D, tex->texture_id );
-
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-
-
-    if ( tex->repeatable ) {
-	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-    } else {
-#ifndef HAVE_OPENGLES
-	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
-	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
-#endif
-    }
-    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
-                     get_min_filter() );
-
-    /* Check if we need to scale image */
-    glGetIntegerv( GL_MAX_TEXTURE_SIZE, &max_texture_size );
-    if ( texImage->sizeX > max_texture_size ||
-	 texImage->sizeY > max_texture_size ) 
-    {
-#ifdef HAVE_OPENGLES
-        abort(); //We don't support that yet
-#else
-	char *newdata = (char*)malloc( texImage->sizeZ *
-				       max_texture_size *
-				       max_texture_size );
-
-	check_assertion( newdata != NULL, "out of memory" );
-
-	print_debug( DEBUG_TEXTURE, "Texture too large -- scaling to "
-		     "maximum allowed size" );
-
-
-	/* In the case of large- or small-aspect ratio textures, this
-           could end up using *more* space... oh well. */
-	gluScaleImage( texImage->sizeZ == 3 ? GL_RGB : GL_RGBA,
-		       texImage->sizeX, texImage->sizeY, 
-		       GL_UNSIGNED_BYTE,
-		       texImage->data,
-		       max_texture_size, max_texture_size, 
-		       GL_UNSIGNED_BYTE,
-		       newdata );
-
-	free( texImage->data );
-	texImage->data = (unsigned char*) newdata;
-	texImage->sizeX = max_texture_size;
-	texImage->sizeY = max_texture_size;
-#endif
-    }
-
-#ifndef TARGET_OS_IPHONE
-    gluBuild2DMipmaps( GL_TEXTURE_2D, texImage->sizeZ, texImage->sizeX,
-		       texImage->sizeY, texImage->sizeZ == 3 ? GL_RGB : GL_RGBA, 
-		       GL_UNSIGNED_BYTE, texImage->data );
-#else
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    
-    glTexImage2D( GL_TEXTURE_2D, 0, texImage->sizeZ == 3 ? GL_RGB : GL_RGBA, texImage->sizeX,
-		       texImage->sizeY == 255 ? 256 : texImage->sizeY /* Work around for tree.png */,
-               0, texImage->sizeZ == 3 ? GL_RGB : GL_RGBA,
-		       GL_UNSIGNED_BYTE, texImage->data );
-#endif
-    free( texImage->data );
-    free( texImage );
-}
-
-#endif

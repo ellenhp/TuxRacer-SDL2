@@ -42,7 +42,6 @@ const colour_t light_blue = { 0.5, 0.5, 0.8, 1.0 };
 const colour_t black = { 0., 0., 0., 1.0 };
 const colour_t sky   = { 0.82, 0.86, 0.88, 1.0 };
 
-#ifdef HAVE_OPENGLES
 const unsigned int PRECISION = 16; 
 GLfixed ONE  = 1 << 16 /*PRECISION*/; 
 const GLfixed ZERO = 0;
@@ -62,9 +61,8 @@ void glesPerspective(GLfloat fovy, GLfloat aspect, GLfloat zNear, GLfloat zFar)
 	xmin = ymin * aspect;
 	xmax = ymax * aspect;
 	
-	glFrustumf(xmin, xmax, ymin, ymax, zNear, zFar);
+	glFrustum(xmin, xmax, ymin, ymax, zNear, zFar);
 }
-#endif
 
 void reshape( int w, int h )
 {
@@ -78,13 +76,8 @@ void reshape( int w, int h )
 
     far_clip_dist = getparam_forward_clip_distance() + FAR_CLIP_FUDGE_AMOUNT;
 
-#ifdef HAVE_OPENGLES
     glesPerspective( getparam_fov(), (scalar_t)w/h, NEAR_CLIP_DIST, 
 		    far_clip_dist );
-#else
-    gluPerspective( getparam_fov(), (scalar_t)w/h, NEAR_CLIP_DIST, 
-		    far_clip_dist );
-#endif
 
     glMatrixMode( GL_MODELVIEW );
 } 
@@ -101,8 +94,6 @@ void flat_mode()
 }
 
 void draw_overlay() {
-    glColor4f( 0.0, 0.0, 1.0, 0.1 );
-#ifdef HAVE_OPENGLES
     const GLfloat vertices []=
     {
        0, 0,
@@ -111,12 +102,10 @@ void draw_overlay() {
        0, 480
     };
 
+    glColor4f( 0.0, 0.0, 1.0, 0.1 );
     glEnableClientState (GL_VERTEX_ARRAY);
     glVertexPointer (2, GL_FLOAT , 0, vertices);	
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-#else
-    glRecti( 0, 0, 640, 480 );
-#endif
 } 
 
 void clear_rendering_context()
@@ -190,7 +179,6 @@ void draw_billboard( player_data_t *plyr,
 	z_vec.z = plyr->view.inv_view_mat[2][2];
     }
 
-#ifdef HAVE_OPENGLES
     glNormal3f( z_vec.x, z_vec.y, z_vec.z );
 
     pt = move_point( center_pt, scale_vector( -width/2.0, x_vec ) );
@@ -216,30 +204,12 @@ void draw_billboard( player_data_t *plyr,
     };
 
     glEnableClientState (GL_VERTEX_ARRAY);
+    glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+
     glVertexPointer (3, GL_FLOAT , 0, vertices2);	
     glTexCoordPointer(2, GL_SHORT, 0, texCoords2);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-#else
-    glBegin( GL_QUADS );
-    {
-	pt = move_point( center_pt, scale_vector( -width/2.0, x_vec ) );
-	pt = move_point( pt, scale_vector( -height/2.0, y_vec ) );
-	glNormal3f( z_vec.x, z_vec.y, z_vec.z );
-	glTexCoord2f( min_tex_coord.x, min_tex_coord.y );
-	glVertex3f( pt.x, pt.y, pt.z );
 
-	pt = move_point( pt, scale_vector( width, x_vec ) );
-	glTexCoord2f( max_tex_coord.x, min_tex_coord.y );
-	glVertex3f( pt.x, pt.y, pt.z );
-
-	pt = move_point( pt, scale_vector( height, y_vec ) );
-	glTexCoord2f( max_tex_coord.x, max_tex_coord.y );
-	glVertex3f( pt.x, pt.y, pt.z );
-
-	pt = move_point( pt, scale_vector( -width, x_vec ) );
-	glTexCoord2f( min_tex_coord.x, max_tex_coord.y );
-	glVertex3f( pt.x, pt.y, pt.z );
-    }
-    glEnd();
-#endif
+    glDisableClientState (GL_VERTEX_ARRAY);
+    glDisableClientState (GL_TEXTURE_COORD_ARRAY);
 }

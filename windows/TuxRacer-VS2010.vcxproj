@@ -98,7 +98,7 @@
     <ClCompile Include="..\src\course_load.c" />
     <ClCompile Include="..\src\course_mgr.c" />
     <ClCompile Include="..\src\course_quad.cpp" />
-    <ClCompile Include="..\src\course_render.c" />
+    <ClCompile Include="..\src\course_render.cpp" />
     <ClCompile Include="..\src\credits.c" />
     <ClCompile Include="..\src\debug.c" />
     <ClCompile Include="..\src\error_util.c" />
@@ -145,7 +145,7 @@
     <ClCompile Include="..\src\quadtree.cpp" />
     <ClCompile Include="..\src\race_select.cpp" />
     <ClCompile Include="..\src\racing.c" />
-    <ClCompile Include="..\src\render_util.c" />
+    <ClCompile Include="..\src\render_util.cpp" />
     <ClCompile Include="..\src\reset.c" />
     <ClCompile Include="..\src\save.c" />
     <ClCompile Include="..\src\screenshot.c" />
@@ -158,7 +158,6 @@
     <ClCompile Include="..\src\textures.c" />
     <ClCompile Include="..\src\track_marks.c" />
     <ClCompile Include="..\src\tux.c" />
-    <ClCompile Include="..\src\tux_shadow.c" />
     <ClCompile Include="..\src\ui_mgr.c" />
     <ClCompile Include="..\src\ui_snow.c" />
     <ClCompile Include="..\src\ui_theme.c" />
@@ -234,7 +233,6 @@
     <ClInclude Include="..\src\textures.h" />
     <ClInclude Include="..\src\track_marks.h" />
     <ClInclude Include="..\src\tux.h" />
-    <ClInclude Include="..\src\tux_shadow.h" />
     <ClInclude Include="..\src\tux_types.h" />
     <ClInclude Include="..\src\tuxracer.h" />
     <ClInclude Include="..\src\ui_mgr.h" />

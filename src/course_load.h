@@ -28,7 +28,7 @@ extern "C"
 #ifndef _COURSE_LOAD_H_
 #define _COURSE_LOAD_H_
 
-#define STRIDE_GL_ARRAY ( 8 * sizeof(GLfloat) + 4 * sizeof(GLubyte) )
+#define STRIDE_GL_ARRAY ( 10 * sizeof(GLfloat) + 4 * sizeof(GLubyte) )
 
 /* Convenience macro for accessing terrain elevations */
 #define ELEV(x,y) ( elevation[(x) + nx*(y)] )

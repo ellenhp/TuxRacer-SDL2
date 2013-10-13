@@ -538,7 +538,6 @@ void racing_loop( scalar_t time_step )
     }
     
     draw_tux();
-    draw_tux_shadow();
     
     draw_hud( plyr );
     

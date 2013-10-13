@@ -1159,8 +1159,10 @@ void	quadsquare::Render(const quadcornerdata& cd, GLubyte *vnc_array)
 				VNCArray + 3*sizeof(GLfloat) );
 
 	glEnableClientState(GL_COLOR_ARRAY);
-	glColorPointer( 4, GL_UNSIGNED_BYTE, STRIDE_GL_ARRAY, VNCArray + 8*sizeof(GLfloat) );
+	glColorPointer( 4, GL_UNSIGNED_BYTE, STRIDE_GL_ARRAY, VNCArray + 10*sizeof(GLfloat) );
 
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glTexCoordPointer( 2, GL_FLOAT, STRIDE_GL_ARRAY, VNCArray + 8*sizeof(GLfloat));
 	
 	/* Save fog state */
     fog_on = is_fog_on();

@@ -157,7 +157,6 @@ void reset_loop( scalar_t time_step )
 
     if (tux_visible) { 
 	draw_tux();
-	draw_tux_shadow();
     } 
     if (++tux_visible_count > 3) {
 	tux_visible = (bool_t) !tux_visible;

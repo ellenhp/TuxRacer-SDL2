@@ -168,7 +168,6 @@ void intro_loop( scalar_t time_step )
     draw_trees();
 
     draw_tux();
-    draw_tux_shadow();
 
     draw_hud( plyr );
     draw_hud_training(plyr);

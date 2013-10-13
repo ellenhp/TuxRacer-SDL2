@@ -36,9 +36,6 @@
     <ClCompile Include="..\src\course_quad.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\course_render.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\credits.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -159,9 +156,6 @@
     <ClCompile Include="..\src\racing.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\render_util.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\reset.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -193,9 +187,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\tux.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\tux_shadow.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\ui_mgr.c">
@@ -238,6 +229,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\hud.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\course_render.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\render_util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -435,9 +432,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\tux.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\tux_shadow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\tux_types.h">
