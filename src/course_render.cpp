@@ -942,7 +942,7 @@ void draw_fog_plane()
     glColorPointer(4, GL_FLOAT, 0, colorsFog);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 10);
 
-    glDisableClientState(GL_COLOR_ARRAY_POINTER);
+    glDisableClientState(GL_COLOR_ARRAY);
     glDisableClientState (GL_VERTEX_ARRAY);
 }
 

@@ -472,6 +472,7 @@ void draw_track_marks(void)
 
             glEnableClientState (GL_VERTEX_ARRAY);
             glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+            glDisableClientState (GL_NORMAL_ARRAY);
 
             glVertexPointer (3, GL_FLOAT , 0, vertices2);	
             glTexCoordPointer(2, GL_SHORT, 0, texCoords2);

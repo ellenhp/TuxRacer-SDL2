@@ -1150,7 +1150,7 @@ void	quadsquare::Render(const quadcornerdata& cd, GLubyte *vnc_array)
     int nx, ny;
     get_course_divisions( &nx, &ny );
 	
-	print_debug(DEBUG_RENDER, "Drawing triangles");
+	print_debug(DEBUG_QUADTREE, "Drawing triangles");
 	
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer( 3, GL_FLOAT, STRIDE_GL_ARRAY, VNCArray );

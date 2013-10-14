@@ -302,11 +302,7 @@ void fill_gl_arrays()
     vector_t nml;
     int idx;
 
-    glDisableClientState(GL_VERTEX_ARRAY);
-    glDisableClientState(GL_NORMAL_ARRAY);
-    glDisableClientState(GL_COLOR_ARRAY);
-
-    /* Align vertices and normals on 16-byte intervals (Q3A does this) */
+	/* Align vertices and normals on 16-byte intervals (Q3A does this) */
     vnc_array = (GLubyte*) malloc( STRIDE_GL_ARRAY * nx * ny );
 
     for (x=0; x<nx; x++) {
