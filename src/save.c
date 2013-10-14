@@ -153,19 +153,19 @@ int get_save_game_file_name( char *buff, char *player, int len )
 
 void init_high_scores( void ) 
 {
-    FILE *score_stream;
+    SDL_RWops *score_stream;
     char score_file[BUFF_LEN];
     score_info_t this_score;
     
     score_table = create_hash_table();
     if ( get_high_score_file_name( score_file, sizeof(score_file) ) == 0 ) {
-        score_stream = fopen( score_file, "r" );
+        score_stream = SDL_RWFromFile( score_file, "r" );
         if (score_stream != NULL) {
-            while (fread( &this_score, sizeof(this_score), 1, score_stream)) {
+            while (SDL_RWread( score_stream, &this_score, sizeof(this_score), 1)) {
                 set_high_score( this_score.event.event, this_score.event.cup,
                                this_score.player_name, this_score.score );
             }
-            if ( fclose( score_stream ) != 0 ) {
+            if ( SDL_RWclose( score_stream ) != 0 ) {
                 perror( "fclose" );
             }
         }
@@ -221,21 +221,21 @@ void write_high_scores( void )
     char *event_name;
     char *cup_name;
     score_info_t *this_score;
-    FILE *score_stream;
+    SDL_RWops *score_stream;
     char score_file[BUFF_LEN];
     
     if ( get_high_score_file_name( score_file, sizeof(score_file) ) == 0 ) {
-        score_stream = fopen( score_file, "w" );
+        score_stream = SDL_RWFromFile( score_file, "w" );
         begin_hash_scan( score_table, &score_scan_ptr );
         while ( next_hash_entry( score_scan_ptr, &event_name, (hash_entry_t*)&cup_table ) ) {
             begin_hash_scan( *cup_table, &cup_scan_ptr );
             while ( next_hash_entry( cup_scan_ptr, &cup_name, (hash_entry_t*)&this_score ) ) {
-                fwrite( this_score, sizeof(this_score), 1, score_stream );
+                SDL_RWwrite( score_stream, this_score, sizeof(this_score), 1 );
             }
             end_hash_scan( cup_scan_ptr );
         }
         end_hash_scan( score_scan_ptr );
-        if ( fclose( score_stream ) != 0 ) {
+        if ( SDL_RWclose( score_stream ) != 0 ) {
             perror( "fclose" );
         }
     }
@@ -267,7 +267,7 @@ bool_t get_sav_index( char* str, int *index )
 void init_saved_games( void ) 
 {
     char dir_name[BUFF_LEN];
-    FILE* save_stream;
+    SDL_RWops* save_stream;
     save_info_t this_save;
     char player_name[BUFF_LEN];
     int sav_index;
@@ -311,21 +311,21 @@ void init_saved_games( void )
                     dir_name,
                     cur_dir_filename );
             
-            save_stream = fopen( file_name, "r" );
+            save_stream = SDL_RWFromFile( file_name, "r" );
             
-            if ( fread( magic, sizeof(magic), 1, save_stream ) != 1 ||
+            if ( SDL_RWread( save_stream, magic, sizeof(magic), 1 ) != 1 ||
                 strncmp( magic, SAVE_MAGIC_V1, sizeof(magic) ) != 0 ) 
             {
                 print_warning( IMPORTANT_WARNING,
                               "`%s' is not a valid saved game file",
                               file_name );
-                fclose( save_stream);
+                SDL_RWclose( save_stream);
                 continue;
             }
             
             
             if (save_stream != NULL) {
-                while (fread( &this_save, sizeof(this_save), 1, save_stream)) {
+                while (SDL_RWread( save_stream, &this_save, sizeof(this_save), 1)) {
                     switch ( this_save.data_type ) {
                         case EVENT_INFO:
                             set_last_completed_cup( player_name, 
@@ -375,7 +375,7 @@ void init_saved_games( void )
                 }
                 
                 
-                if ( fclose( save_stream ) != 0 ) {
+                if ( SDL_RWclose( save_stream ) != 0 ) {
                     perror( "fclose" );
                 }
             } else {
@@ -546,12 +546,12 @@ bool_t set_saved_race_results( char *player,
 static void truncate_and_init_save_file( char *player_name )
 {
     char save_file[BUFF_LEN];
-    FILE* save_stream;
+    SDL_RWops* save_stream;
     
     if ( get_save_game_file_name( save_file, player_name, 
                                  sizeof(save_file) ) == 0 ) 
     {
-        save_stream = fopen( save_file, "w" );
+        save_stream = SDL_RWFromFile( save_file, "w" );
         if ( save_stream == NULL ) {
             print_warning( IMPORTANT_WARNING,
                           "Couldn't open `%s' for writing: %s",
@@ -561,9 +561,9 @@ static void truncate_and_init_save_file( char *player_name )
             
             check_assertion( strlen( SAVE_MAGIC_V1 ) == 4,
                             "Magic number has wrong size" );
-            fwrite( SAVE_MAGIC_V1, 4, 1, save_stream );
+            SDL_RWwrite( save_stream, SAVE_MAGIC_V1, 4, 1  );
             
-            if ( fclose( save_stream ) != 0 ) {
+            if ( SDL_RWclose( save_stream ) != 0 ) {
                 print_warning( IMPORTANT_WARNING,
                               "Couldn't close `%s': %s",
                               save_file, 
@@ -590,13 +590,13 @@ void write_saved_games( void )
     hash_search_t save_scan_ptr;
     char *player_name;
     char *event_name;
-    FILE* save_stream;
+    SDL_RWops* save_stream;
     char save_file[BUFF_LEN];
     save_info_t *this_save;
     difficulty_level_t level;
     int i;
     hash_table_t player_table;
-    
+
     /* Create list of players */
     player_table = create_hash_table();
     
@@ -642,7 +642,7 @@ void write_saved_games( void )
         if ( get_save_game_file_name( save_file, player_name, 
                                      sizeof(save_file) ) == 0 ) 
         {
-            save_stream = fopen( save_file, "ab" );
+            save_stream = SDL_RWFromFile( save_file, "ab" );
             
             if ( save_stream == NULL ) {
                 print_warning( IMPORTANT_WARNING,
@@ -658,16 +658,14 @@ void write_saved_games( void )
                     for( i=0; i<DIFFICULTY_NUM_LEVELS; i++ ) {
                         level = (difficulty_level_t)i;
                         if ( this_save[level].data_type >= 0 ) {
-                            fwrite( &(this_save[level]), 
-                                   sizeof(this_save[level]), 
-                                   1, 
-                                   save_stream );
+                            SDL_RWwrite(save_stream, &(this_save[level]),
+								   1, sizeof(this_save[level]));
                         }
                     }
                 }
                 end_hash_scan( save_scan_ptr );
                 
-                if ( fclose( save_stream ) != 0 ) {
+                if ( SDL_RWclose( save_stream ) != 0 ) {
                     perror( "fclose" );
                 }
                 save_stream = NULL;
@@ -684,7 +682,7 @@ void write_saved_games( void )
             if ( get_save_game_file_name( save_file, player_name, 
                                          sizeof(save_file) ) == 0 ) 
             {
-                save_stream = fopen( save_file, "ab" );
+                save_stream = SDL_RWFromFile( save_file, "ab" );
                 
                 if ( save_stream == NULL ) {
                     print_warning( IMPORTANT_WARNING,
@@ -704,10 +702,7 @@ void write_saved_games( void )
                             while ( next_hash_entry( race_scan_ptr, NULL,
                                                     (hash_entry_t*)&this_save ) )
                             {
-                                fwrite( this_save, 
-                                       sizeof(save_info_t), 
-                                       1, 
-                                       save_stream );
+                                SDL_RWwrite(save_stream, this_save, 1, sizeof(save_info_t));
                                 
                             }
                             end_hash_scan( race_scan_ptr );
@@ -716,7 +711,7 @@ void write_saved_games( void )
                     }
                     end_hash_scan( event_scan_ptr );
                     
-                    if ( fclose( save_stream ) != 0 ) {
+                    if ( SDL_RWclose( save_stream ) != 0 ) {
                         perror( "fclose" );
                     }
                     save_stream = NULL;

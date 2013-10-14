@@ -71,7 +71,7 @@
 #  define CONFIG_DIR "config"
 #  define CONFIG_FILE "options.txt"
 #else
-#  define CONFIG_DIR ".tuxracer"
+#  define CONFIG_DIR SDL_AndroidGetInternalStoragePath()
 #  define CONFIG_FILE "tuxracerConfig"
 #endif /* defined( WIN32 ) */
 
@@ -849,38 +849,11 @@ int get_old_config_file_name( char *buff, int len )
 
 int get_config_dir_name( char *buff, int len )
 {
-#if defined( WIN32 ) 
     if ( strlen( CONFIG_DIR ) +1 > len ) {
 	return 1;
     }
     strcpy( buff, CONFIG_DIR );
     return 0;
-#elif defined(TARGET_OS_IPHONE)
-    const char * configDir = getConfigPath();
-    assert(configDir);
-
-    if ( strlen( configDir ) + 1 > len ) {
-    assert(0);
-	return 1;
-    }
-    strcpy( buff, configDir );
-    return 0;
-#else
-    struct passwd *pwent;
-
-    pwent = getpwuid( getuid() );
-    if ( pwent == NULL ) {
-	perror( "getpwuid" );
-	return 1;
-    }
-
-    if ( strlen( pwent->pw_dir ) + strlen( CONFIG_DIR) + 2 > len ) {
-	return 1;
-    }
-
-    sprintf( buff, "%s/%s", pwent->pw_dir, CONFIG_DIR );
-    return 0;
-#endif /* defined( WIN32 ) */
 }
 
 int get_config_file_name( char *buff, int len )
@@ -959,11 +932,13 @@ void read_config_file()
 
 void write_config_file()
 {
-    FILE *config_stream;
+    SDL_RWops *config_stream;
     char config_file[BUFF_LEN];
     char config_dir[BUFF_LEN];
     struct param *parm;
     int i;
+	char buf[500];
+
 
 #ifdef  TARGET_OS_IPHONE
     // Don't save the config file on iphone, no use for it.
@@ -977,7 +952,9 @@ void write_config_file()
 	return;
     }
 
+
     if ( !dir_exists( config_dir ) ) {
+
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 	if (mkdir( config_dir ) != 0) {
@@ -991,7 +968,7 @@ void write_config_file()
 
     }
 
-    config_stream = fopen( config_file, "w" );
+    config_stream = SDL_RWFromFile( config_file, "w" );
 
     if ( config_stream == NULL ) {
 	print_warning( CRITICAL_WARNING, 
@@ -1000,10 +977,10 @@ void write_config_file()
 	return;
     }
 
-    fprintf( config_stream, 
+    sprintf( buf, 
 	     "# Tux Racer " VERSION " configuration file\n"
-	     "#\n"
-	);
+	     "#\n");
+	SDL_RWwrite(config_stream, buf, 1, strlen(buf));
 
     for (i=0; i<sizeof(Params)/sizeof(struct param); i++) {
 	parm = (struct param*)&Params + i;
@@ -1016,36 +993,37 @@ void write_config_file()
 	if (!strcmp(parm->name,"y_resolution")) continue;
 #endif	
 	if ( parm->comment != NULL ) {
-	    fprintf( config_stream, "\n# %s\n#\n%s\n#\n", 
+	    sprintf( buf, "\n# %s\n#\n%s\n#\n", 
 		     parm->name, parm->comment );
 	}
 	switch ( parm->type ) {
 	case PARAM_STRING:
 	    fetch_param_string( parm );
-	    fprintf( config_stream, "set %s \"%s\"\n",
+	    sprintf( buf, "set %s \"%s\"\n",
 		     parm->name, parm->val.string_val );
 	    break;
 	case PARAM_CHAR:
 	    fetch_param_char( parm );
-	    fprintf( config_stream, "set %s %c\n",
+	    sprintf( buf, "set %s %c\n",
 		     parm->name, parm->val.char_val );
 	    break;
 	case PARAM_INT:
 	    fetch_param_int( parm );
-	    fprintf( config_stream, "set %s %d\n",
+	    sprintf( buf, "set %s %d\n",
 		     parm->name, parm->val.int_val );
 	    break;
 	case PARAM_BOOL:
 	    fetch_param_bool( parm );
-	    fprintf( config_stream, "set %s %s\n",
+	    sprintf( buf, "set %s %s\n",
 		     parm->name, parm->val.bool_val ? "True" : "False" );
 	    break;
 	default:
 	    code_not_reached();
 	}
+	SDL_RWwrite(config_stream, buf, 1, strlen(buf));
     }
 
-    if ( fclose( config_stream ) != 0 ) {
+    if ( SDL_RWclose( config_stream ) != 0 ) {
 	perror( "fclose" );
     }
 }
