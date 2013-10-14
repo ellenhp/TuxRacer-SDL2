@@ -22,12 +22,6 @@
 #include "hier.h"
 #include "alglib.h"
 
-#ifdef HAVE_OPENGLES
-#define USE_GLUSPHERE 0
-#else
-#define USE_GLUSPHERE 1
-#endif
-
 enum firstDraw {
     Yes,
     No

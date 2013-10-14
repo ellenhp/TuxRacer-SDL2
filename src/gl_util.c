@@ -423,13 +423,10 @@ typedef struct {
     GLenum type;
 } gl_value_t;
 
-#ifdef HAVE_OPENGLES
-// FIXME
 #ifdef GL_INT
 #undef GL_INT
 #endif
-# define GL_INT GL_FIXED
-#endif
+#define GL_INT GL_FIXED
 
 /* Add more things here as needed */
 gl_value_t gl_values[] = {
@@ -493,17 +490,13 @@ void print_gl_info()
 	print_debug(DEBUG_OTHER, "  %s: ", gl_values[i].name );
 
 	switch( gl_values[i].type ) {
-#ifndef HAVE_OPENGLES
-	case GL_INT:
-	    glGetIntegerv( gl_values[i].value, &int_val );
-	    print_debug(DEBUG_OTHER, "%d", int_val );
-	    break;
-#else
 	case GL_FIXED:
 	    glGetIntegerv( gl_values[i].value, &int_val );
 	    print_debug(DEBUG_OTHER, "%d", int_val );
 	    break;
-#endif
+	    glGetIntegerv( gl_values[i].value, &int_val );
+	    print_debug(DEBUG_OTHER, "%d", int_val );
+	    break;
 	case GL_FLOAT:
 	    glGetFloatv( gl_values[i].value, &float_val );
 	    print_debug(DEBUG_OTHER, "%f", float_val );
