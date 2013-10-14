@@ -114,23 +114,23 @@ if { [tux_load_sound ice_sound sounds/tux_on_ice1.wav] } {
 
 # Track marks
 # Disabled because not used
-tux_load_texture track_head courses/textures/terrain/buttstart.rgb 1
-tux_load_texture track_mark courses/textures/terrain/buttprint.rgb 1
-tux_load_texture track_tail courses/textures/terrain/buttstop.rgb 1
+tux_load_texture track_head courses/textures/terrain/buttstart.png 1
+tux_load_texture track_mark courses/textures/terrain/buttprint.png 1
+tux_load_texture track_tail courses/textures/terrain/buttstop.png 1
 tux_bind_texture track_head track_head
 tux_bind_texture track_mark track_mark
 tux_bind_texture track_tail track_tail
 
 # Splash screen
-# tux_load_texture splash_screen textures/splash_bl.rgb 0
+# tux_load_texture splash_screen textures/splash_bl.png 0
 # tux_bind_texture splash_screen splash_screen
 
 # Snow Particle
-tux_load_texture snow_particle courses/textures/terrain/snowparticles.rgb 0
+tux_load_texture snow_particle courses/textures/terrain/snowparticles.png 0
 tux_bind_texture snow_particle snow_particle
 
 # Fonts
-tux_load_texture trebuchet_yel_blk fonts/trebuchet_yel_blk.rgb 0
+tux_load_texture trebuchet_yel_blk fonts/trebuchet_yel_blk.png 0
 tux_load_font -name trebuchet_yel_blk -file fonts/trebuchet.tfm \
               -texture trebuchet_yel_blk
 tux_bind_font -binding time_label -font trebuchet_yel_blk -size 20
@@ -142,7 +142,7 @@ tux_bind_font -binding speed_units -font trebuchet_yel_blk -size 20
 tux_bind_font -binding fps -font trebuchet_yel_blk -size 20 
 
 
-tux_load_texture trebuchet_white fonts/trebuchet_white.rgb 0
+tux_load_texture trebuchet_white fonts/trebuchet_white.png 0
 tux_load_font -name trebuchet_white -file fonts/trebuchet.tfm \
               -texture trebuchet_white
 tux_bind_font -binding bonus -font trebuchet_yel_blk -size 15 \
@@ -185,65 +185,65 @@ tux_bind_font -binding credits_text_small -font trebuchet_white -size 14
 tux_bind_font -binding loading -font trebuchet_yel_blk -size 30
 
 # HUD
-tux_load_texture herring_icon textures/herringicon.rgb 0
+tux_load_texture herring_icon textures/herringicon.png 0
 tux_bind_texture herring_icon herring_icon
 
-tux_load_texture gauge_outline textures/gaugeoutline.rgb 0
+tux_load_texture gauge_outline textures/gaugeoutline.png 0
 tux_bind_texture gauge_outline gauge_outline
 
-tux_load_texture gauge_energy_mask textures/gaugeenergymask.rgb 0
+tux_load_texture gauge_energy_mask textures/gaugeenergymask.png 0
 tux_bind_texture gauge_energy_mask gauge_energy_mask
 
-tux_load_texture gauge_speed_mask textures/gaugespeedmask.rgb 0
+tux_load_texture gauge_speed_mask textures/gaugespeedmask.png 0
 tux_bind_texture gauge_speed_mask gauge_speed_mask
 
 #HUD Training
-tux_load_texture red_circle textures/redCircle.rgb 0
+tux_load_texture red_circle textures/redCircle.png 0
 tux_bind_texture red_circle red_circle
 
 # UI widgets
-tux_load_texture listbox_arrows textures/listbox_arrows.rgb 0
+tux_load_texture listbox_arrows textures/listbox_arrows.png 0
 tux_bind_texture listbox_arrows listbox_arrows
-tux_load_texture textarea_arrows textures/textarea_arrows.rgb 0
+tux_load_texture textarea_arrows textures/textarea_arrows.png 0
 tux_bind_texture textarea_arrows textarea_arrows
 
 # Racing menu icons
-tux_load_texture time_icon textures/timeicon.rgb 0
+tux_load_texture time_icon textures/timeicon.png 0
 tux_bind_texture time_icon time_icon
 
-tux_load_texture mirror_button textures/mirror_button.rgb 0
+tux_load_texture mirror_button textures/mirror_button.png 0
 tux_bind_texture mirror_button mirror_button
 
-tux_load_texture conditions_button textures/conditions_button.rgb 0
+tux_load_texture conditions_button textures/conditions_button.png 0
 tux_bind_texture conditions_button conditions_button
 
-tux_load_texture snow_button textures/snow_button.rgb 0
+tux_load_texture snow_button textures/snow_button.png 0
 tux_bind_texture snow_button snow_button
 
-tux_load_texture wind_button textures/wind_button.rgb 0
+tux_load_texture wind_button textures/wind_button.png 0
 tux_bind_texture wind_button wind_button
 
 
 # Menu decorations
-# Not Used: tux_load_texture menu_bottom_left textures/menu_bottom_left.rgb 0
+# Not Used: tux_load_texture menu_bottom_left textures/menu_bottom_left.png 0
 # Not Used: tux_bind_texture menu_bottom_left menu_bottom_left
 
-# Not Used: tux_load_texture menu_bottom_right textures/menu_bottom_right.rgb 0
+# Not Used: tux_load_texture menu_bottom_right textures/menu_bottom_right.png 0
 # Not Used: tux_bind_texture menu_bottom_right menu_bottom_right
 
-# Not Used: tux_load_texture menu_top_left textures/menu_top_left.rgb 0
+# Not Used: tux_load_texture menu_top_left textures/menu_top_left.png 0
 # Not Used: tux_bind_texture menu_top_left menu_top_left
 
-# Not Used: tux_load_texture menu_top_right textures/menu_top_right.rgb 0
+# Not Used: tux_load_texture menu_top_right textures/menu_top_right.png 0
 # Not Used: tux_bind_texture menu_top_right menu_top_right
 
-tux_load_texture menu_title textures/menu_title.rgb 0
+tux_load_texture menu_title textures/menu_title.png 0
 tux_bind_texture menu_title menu_title
 
 # Tux life icon
-tux_load_texture tux_life textures/tuxlife.rgb 0
+tux_load_texture tux_life textures/tuxlife.png 0
 tux_bind_texture tux_life tux_life
 
 # Mouse cursor
-tux_load_texture mouse_cursor textures/mouse_cursor.rgb 0
+tux_load_texture mouse_cursor textures/mouse_cursor.png 0
 tux_bind_texture mouse_cursor mouse_cursor

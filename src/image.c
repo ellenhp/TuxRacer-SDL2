@@ -22,6 +22,34 @@
 
 #include "tuxracer.h"
 #include "image.h"
+#include "SDL_image.h"
+
+void flipSurface(SDL_Surface* surface)
+{
+	char* tmp;
+	int i;
+	int pitch=surface->pitch;
+	tmp=(char*)malloc(surface->pitch);
+	SDL_LockSurface(surface);
+	for (i=0; i<surface->h/2; i++)
+	{
+		memcpy(tmp, (char*)surface->pixels+i*pitch, pitch);
+		memcpy((char*)surface->pixels+i*pitch, (char*)surface->pixels+pitch*(surface->h-1)-i*pitch, pitch);
+		memcpy((char*)surface->pixels+pitch*(surface->h-1)-i*pitch, tmp, pitch);
+	}
+	SDL_UnlockSurface(surface);
+	free(tmp);
+}
+
+SDL_Surface* ImageLoad(const char *filename)
+{
+	SDL_Surface *image = IMG_Load(filename);
+	if (!image) {
+		handle_error(1, "Error loading image: %s", filename);
+	}
+	flipSurface(image);
+	return image;
+}
 
 #define IMAGIC      0x01da
 #define IMAGIC_SWAP 0xda01
@@ -218,7 +246,7 @@ static void ImageGetRawData( Image *image, unsigned char *data)
     }
 }
 
-IMAGE *ImageLoad(const char *fileName)
+IMAGE *LegacyImageLoad(const char *fileName)
 {
   Image *image;
   IMAGE *final;

@@ -38,8 +38,10 @@ typedef struct
     unsigned char *data;
 } IMAGE;
 
-	IMAGE *ImageLoad(const char *fileName);
+IMAGE *LegacyImageLoad(const char *fileName);
 
+
+SDL_Surface* ImageLoad(const char *filename);
 
 #endif /* !__IMAGE_H__! */
 

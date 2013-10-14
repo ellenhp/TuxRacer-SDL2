@@ -562,7 +562,7 @@ static int elev_cb ( ClientData cd, Tcl_Interp *ip, int argc, const char *argv[]
 	return TCL_OK;
     }
 
-    elev_img = ImageLoad( argv[1] );
+    elev_img = LegacyImageLoad( argv[1] );
     if ( elev_img == NULL ) {
 	print_warning( TCL_WARNING, "%s: couldn't load %s", argv[0], argv[1] );
 	return TCL_ERROR;
@@ -610,7 +610,7 @@ static int terrain_cb ( ClientData cd, Tcl_Interp *ip, int argc, const char *arg
         return TCL_ERROR;
     } 
 
-    terrain_img = ImageLoad( argv[1] );
+    terrain_img = LegacyImageLoad( argv[1] );
 
     if ( terrain_img == NULL ) {
 	print_warning( TCL_WARNING, "%s: couldn't load %s", argv[0], argv[1] );
@@ -909,7 +909,7 @@ static int trees_cb ( ClientData cd, Tcl_Interp *ip, int argc, const char *argv[
         return TCL_ERROR;
     } 
 
-    treeImg = ImageLoad( argv[1] );
+    treeImg = LegacyImageLoad( argv[1] );
     if ( treeImg == NULL ) {
 	print_warning( TCL_WARNING, "%s: couldn't load %s", 
 		       argv[0], argv[1] );

@@ -45,9 +45,9 @@ proc get_course_info { } {
 set cwd [pwd]
 tux_goto_data_dir
 
-tux_load_texture noicon textures/noicon.rgb
+tux_load_texture noicon textures/noicon.png
 
-tux_load_texture no_preview courses/textures/hud/nopreview.rgb
+tux_load_texture no_preview courses/textures/hud/nopreview.png
 tux_bind_texture no_preview no_preview
 
 
@@ -62,7 +62,7 @@ foreach course_path [glob -nocomplain courses/*] {
     }
 	set ::course_dir $course_path
 	set course_name [lindex [split $course_path "/"] 1 ]
-	tux_load_texture $course_name "$course_path/preview.rgb"
+	tux_load_texture $course_name "$course_path/preview.png"
 	tux_bind_texture $course_name $course_name
 }
 
@@ -147,8 +147,8 @@ tux_open_courses [concat \
 
 #cd courses
 
-tux_load_texture herring_run_icon courses/textures/hud/herringrunicon.rgb 0
-tux_load_texture cup_icon courses/textures/hud/cupicon.rgb 0
+tux_load_texture herring_run_icon courses/textures/hud/herringrunicon.png 0
+tux_load_texture cup_icon courses/textures/hud/cupicon.png 0
 
 tux_events {
     {

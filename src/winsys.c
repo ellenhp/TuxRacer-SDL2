@@ -20,6 +20,7 @@
 #include "tuxracer.h"
 #include "winsys.h"
 #include "audio.h"
+#include "SDL_image.h"
 
 /* Windowing System Abstraction Layer */
 /* Abstracts creation of windows, handling of events, etc. */
@@ -337,11 +338,17 @@ void winsys_init( int *argc, char **argv, char *window_title,
 {
     Uint32 sdl_flags = SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE;
 	int i;
+	int initResult;
     /*
      * Initialize SDL
      */
     if ( SDL_Init( sdl_flags ) < 0 ) {
 	handle_error( 1, "Couldn't initialize SDL: %s", SDL_GetError() );
+    }
+
+	initResult=IMG_Init( IMG_INIT_PNG ) & IMG_INIT_PNG;
+    if (initResult != IMG_INIT_PNG) {
+	handle_error( 1, "Couldn't initialize SDL_image: %s", IMG_GetError() );
     }
 
 

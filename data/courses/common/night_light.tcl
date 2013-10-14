@@ -10,17 +10,17 @@ tux_fog -on -mode linear -density 0.005 -colour { 0.0 0.09 0.34 1 } -start 0 \
 #
 # Environmental sphere map
     
-tux_load_texture alpine1-sphere courses/textures/conditions/nightenv.rgb 0
+tux_load_texture alpine1-sphere courses/textures/conditions/nightenv.png 0
 tux_bind_texture terrain_envmap alpine1-sphere
 
 tux_particle_colour { 0.39 0.51 0.88 1.0 }
 
-tux_load_texture alpine1-front courses/textures/conditions/nightfront.rgb 0
-tux_load_texture alpine1-right courses/textures/conditions/nightright.rgb 0
-tux_load_texture alpine1-left courses/textures/conditions/nightleft.rgb 0
-tux_load_texture alpine1-back courses/textures/conditions/nightback.rgb 0
-tux_load_texture alpine1-top courses/textures/conditions/nighttop.rgb 0
-tux_load_texture alpine1-bottom courses/textures/conditions/nightbottom.rgb 0
+tux_load_texture alpine1-front courses/textures/conditions/nightfront.png 0
+tux_load_texture alpine1-right courses/textures/conditions/nightright.png 0
+tux_load_texture alpine1-left courses/textures/conditions/nightleft.png 0
+tux_load_texture alpine1-back courses/textures/conditions/nightback.png 0
+tux_load_texture alpine1-top courses/textures/conditions/nighttop.png 0
+tux_load_texture alpine1-bottom courses/textures/conditions/nightbottom.png 0
 
 tux_bind_texture sky_front alpine1-front
 tux_bind_texture sky_right alpine1-right

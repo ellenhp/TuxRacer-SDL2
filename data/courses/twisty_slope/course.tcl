@@ -10,3 +10,4 @@ tux_elev $::course_dir/elev.rgb              ;# bitmap specifying course elevati
 tux_terrain $::course_dir/terrain.rgb        ;# bitmap specifying terrains type
 
 tux_course_init
+S

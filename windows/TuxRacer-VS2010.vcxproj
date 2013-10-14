@@ -48,7 +48,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SDL2_HOME)\include;$(SDL2_MIXER_HOME)\include;$(TCL_HOME)\generic;$(GAMEMENU_HOME)\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SDL2_HOME)\include;$(SDL2_IMAGE_HOME)\include;$(SDL2_MIXER_HOME)\include;$(TCL_HOME)\generic;$(GAMEMENU_HOME)\src</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>HAVE_SDL;HAVE_SDL_MIXER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -59,8 +59,8 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>SDL2.lib;SDL2_mixer.lib;SDL2main.lib;tcl86t.lib;opengl32.lib;glu32.lib;GameMenu.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SDL2_HOME)\lib\x86;$(SDL2_MIXER_HOME)\lib\x86;$(TCL_HOME)\win\Release_VC10;$(GAMEMENU_HOME)\win\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2_mixer.lib;SDL2_image.lib;SDL2main.lib;tcl86t.lib;opengl32.lib;glu32.lib;GameMenu.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SDL2_HOME)\lib\x86;$(SDL2_IMAGE_HOME)\lib\x86;$(SDL2_MIXER_HOME)\lib\x86;$(TCL_HOME)\win\Release_VC10;$(GAMEMENU_HOME)\win\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
@@ -70,7 +70,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(SDL2_HOME)\include;$(SDL2_MIXER_HOME)\include;$(TCL_HOME)\generic;$(TRGUI_HOME)\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SDL2_HOME)\include;$(SDL2_IMAGE_HOME)\include;$(SDL2_MIXER_HOME)\include;$(TCL_HOME)\generic;$(TRGUI_HOME)\src</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>HAVE_SDL;HAVE_SDL_MIXER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -80,8 +80,8 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_mixer.lib;TCL.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SDL2_HOME)\lib\x86;$(SDL2_MIXER_HOME)\lib\x86;..\..\TCL-8.3\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2_mixer.lib;SDL2_image.lib;SDL2main.lib;tcl86t.lib;opengl32.lib;glu32.lib;GameMenu.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SDL2_HOME)\lib\x86;$(SDL2_IMAGE_HOME)\lib\x86;$(SDL2_MIXER_HOME)\lib\x86;..\..\TCL-8.3\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>

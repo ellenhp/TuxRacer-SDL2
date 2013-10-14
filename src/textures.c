@@ -76,10 +76,10 @@ int get_min_filter()
 
 bool_t load_texture( const char *texname, const char *filename, int repeatable )
 {
-    IMAGE *texImage;
+    SDL_Surface* texImage;
     texture_node_t *tex;
     int max_texture_size;
-    
+    int format=0;
     
     print_debug(DEBUG_TEXTURE, "Loading texture %s from file: %s",
                 texname, filename);
@@ -125,8 +125,8 @@ bool_t load_texture( const char *texname, const char *filename, int repeatable )
     
     /* Check if we need to scale image */
     glGetIntegerv( GL_MAX_TEXTURE_SIZE, &max_texture_size );
-    if ( texImage->sizeX > max_texture_size ||
-        texImage->sizeY > max_texture_size )
+	if ( texImage->w > max_texture_size ||
+        texImage->h > max_texture_size )
     {
         abort(); //We don't support that yet
     }
@@ -135,13 +135,29 @@ bool_t load_texture( const char *texname, const char *filename, int repeatable )
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     
-    glTexImage2D( GL_TEXTURE_2D, 0, texImage->sizeZ == 3 ? GL_RGB : GL_RGBA, texImage->sizeX,
-                 texImage->sizeY == 255 ? 256 : texImage->sizeY /* Work around for tree.png */,
-                 0, texImage->sizeZ == 3 ? GL_RGB : GL_RGBA,
-                 GL_UNSIGNED_BYTE, texImage->data );
+	switch (texImage->format->BytesPerPixel)
+	{
+	case 1:
+		format=GL_COLOR_INDEX;
+		break;
+	case 3:
+		format=GL_RGB;
+		break;
+	case 4:
+		format=GL_RGBA;
+		break;
+	default:
+		handle_error(1, "unsupported number of bytes per pixel");
+		break;
+	}
 
-    free( texImage->data );
-    free( texImage );
+	SDL_LockSurface(texImage);
+
+	glTexImage2D( GL_TEXTURE_2D, 0, format, texImage->w,texImage->h,
+                 0, format, GL_UNSIGNED_BYTE, texImage->pixels );
+
+	SDL_UnlockSurface(texImage);
+	SDL_FreeSurface(texImage);
     return True;
 }
 
