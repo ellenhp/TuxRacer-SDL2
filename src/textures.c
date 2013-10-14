@@ -137,9 +137,6 @@ bool_t load_texture( const char *texname, const char *filename, int repeatable )
     
 	switch (texImage->format->BytesPerPixel)
 	{
-	case 1:
-		format=GL_COLOR_INDEX;
-		break;
 	case 3:
 		format=GL_RGB;
 		break;
@@ -147,7 +144,7 @@ bool_t load_texture( const char *texname, const char *filename, int repeatable )
 		format=GL_RGBA;
 		break;
 	default:
-		handle_error(1, "unsupported number of bytes per pixel");
+		handle_error(1, "unsupported number of bytes per pixel in texture %s", filename);
 		break;
 	}
 
