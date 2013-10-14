@@ -67,7 +67,7 @@ static credit_line_t credit_lines[] =
     { "credits_text_small", "GNU General Public License" },
     { "credits_text_small", "" },
     { "credits_text", "Ported from" },
-    { "credits_text", "the open-source project" },
+    { "credits_text", "the open source project" },
     { "credits_text", "Tux Racer 4iOS" },
     { "credits_text", "" },
     { "credits_h2", "Tux Racer SDL2" },
@@ -77,6 +77,7 @@ static credit_line_t credit_lines[] =
     { "credits_text", "" },
     { "credits_h2", "Tux Racer 4iOS" },
     { "credits_h2", "Core Development Team:" },
+    { "credits_text_small", "(Alphabetical Order)" },
     { "credits_text", "Emmanuel de Roux" },
     { "credits_text", "Felix Jankowski" },  
     { "credits_text", "Pedro de Barlow" },
@@ -327,8 +328,6 @@ static void credits_loop( scalar_t time_step )
         update_ui_snow( time_step, False );
         draw_ui_snow();
     }
-    
-    ui_draw_menu_decorations();
     
     ui_draw();
     
