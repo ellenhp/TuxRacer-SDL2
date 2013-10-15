@@ -360,48 +360,13 @@ void init_glfloat_array( int num, GLfloat arr[], ... )
     va_end( args );
 }
 
-/* Extension func ptrs *must* be initialized to NULL */
-#if !defined(TARGET_OS_IPHONE) && !defined(__ANDROID__)
-PFNGLLOCKARRAYSEXTPROC glLockArraysEXT_p = NULL;
-PFNGLUNLOCKARRAYSEXTPROC glUnlockArraysEXT_p = NULL;
-#endif
-
 typedef void (*(*get_gl_proc_fptr_t)(const GLubyte *))(); 
 
 void init_opengl_extensions()
 {
     get_gl_proc_fptr_t get_gl_proc;
 
-#if defined( HAVE_SDL )
-    get_gl_proc = (get_gl_proc_fptr_t) SDL_GL_GetProcAddress;
-#elif defined( WIN32 )
-    get_gl_proc = (get_gl_proc_fptr_t) wglGetProcAddress;
-#elif defined( HAVE_GLXGETPROCADDRESSARB )
-    get_gl_proc = (get_gl_proc_fptr_t) glXGetProcAddressARB;
-#else
     get_gl_proc = NULL;
-#endif
-
-#if !defined(TARGET_OS_IPHONE) && !defined(__ANDROID__)
-    if ( get_gl_proc ) {
-	glLockArraysEXT_p = (PFNGLLOCKARRAYSEXTPROC) 
-	    (*get_gl_proc)( (GLubyte*) "glLockArraysEXT" );
-	glUnlockArraysEXT_p = (PFNGLUNLOCKARRAYSEXTPROC) 
-	    (*get_gl_proc)( (GLubyte*) "glUnlockArraysEXT" );
-	
-	if ( glLockArraysEXT_p != NULL && glUnlockArraysEXT_p != NULL ) {
-	    print_debug( DEBUG_GL_EXT, 
-			 "GL_EXT_compiled_vertex_array extension "
-			 "supported" );
-	} else {
-	    print_debug( DEBUG_GL_EXT, 
-			 "GL_EXT_compiled_vertex_array extension "
-			 "NOT supported" );
-	    glLockArraysEXT_p = NULL;
-	    glUnlockArraysEXT_p = NULL;
-	}
-    } else
-#endif
     {
 	print_debug( DEBUG_GL_EXT, 
 		     "No function available for obtaining GL proc addresses" );
@@ -434,9 +399,6 @@ gl_value_t gl_values[] = {
     { "modelview stack depth", GL_MAX_MODELVIEW_STACK_DEPTH, GL_INT },
     { "projection stack depth", GL_MAX_PROJECTION_STACK_DEPTH, GL_INT },
     { "max texture size", GL_MAX_TEXTURE_SIZE, GL_INT },
-#if !defined(TARGET_OS_IPHONE) && !defined(__ANDROID__)
-    { "double buffering", GL_DOUBLEBUFFER, GL_UNSIGNED_BYTE },
-#endif
     { "red bits", GL_RED_BITS, GL_INT },
     { "green bits", GL_GREEN_BITS, GL_INT },
     { "blue bits", GL_BLUE_BITS, GL_INT },

@@ -65,11 +65,6 @@ extern "C"
 #endif
 
     
-#if !defined(TARGET_OS_IPHONE) && !defined(__ANDROID__)
-extern PFNGLLOCKARRAYSEXTPROC glLockArraysEXT_p;
-extern PFNGLUNLOCKARRAYSEXTPROC glUnlockArraysEXT_p;
-#endif
-    
 #endif
 
 typedef enum {

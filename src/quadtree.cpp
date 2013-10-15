@@ -1267,8 +1267,10 @@ void	quadsquare::Render(const quadcornerdata& cd, GLubyte *vnc_array)
 			}
 		}
     }
-    glDisableClientState( GL_COLOR_ARRAY );
+    glDisableClientState(GL_COLOR_ARRAY );
 	glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY );
+	glDisableClientState(GL_NORMAL_ARRAY);
 
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 }
