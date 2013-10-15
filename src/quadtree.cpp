@@ -53,13 +53,9 @@ int quadsquare::NumRows;
 
 GLuint quadsquare::TexId[NumTerrains];
 GLuint quadsquare::EnvmapTexId;
-<<<<<<< HEAD
 GLuint *quadsquare::VertexArrayIndices = (GLuint*) NULL;
 GLushort quadsquare::VertexArrayIndicesShort[USHRT_MAX];
 GLuint quadsquare::VertexArrayIndexOffset=0;
-=======
-GLushort *quadsquare::VertexArrayIndices = (GLushort*) NULL;
->>>>>>> 7bd1a266dccbb1afcb12b621040a8b79193e7065
 GLuint quadsquare::VertexArrayCounter;
 GLuint quadsquare::VertexArrayMinIdx;
 GLuint quadsquare::VertexArrayMaxIdx;
@@ -1117,11 +1113,7 @@ GLubyte *VNCArray;
 
 void quadsquare::DrawTris()
 {
-<<<<<<< HEAD
 	glDrawElements( GL_TRIANGLES, VertexArrayCounter, GL_UNSIGNED_SHORT, VertexArrayIndicesShort );
-=======
-	glDrawElements( GL_TRIANGLES, VertexArrayCounter, GL_UNSIGNED_SHORT, VertexArrayIndices );
->>>>>>> 7bd1a266dccbb1afcb12b621040a8b79193e7065
 }
 
 void quadsquare::DrawEnvmapTris() 
@@ -1158,11 +1150,7 @@ void	quadsquare::Render(const quadcornerdata& cd, GLubyte *vnc_array)
     int nx, ny;
 	int minVert=INT_MAX, maxVert=INT_MIN, vert=0;
     get_course_divisions( &nx, &ny );
-<<<<<<< HEAD
 		
-=======
-	
->>>>>>> 7bd1a266dccbb1afcb12b621040a8b79193e7065
 	glEnableClientState(GL_VERTEX_ARRAY);
 
 	glEnableClientState(GL_NORMAL_ARRAY);
@@ -1636,7 +1624,7 @@ void	quadsquare::AddHeightMap(const quadcornerdata& cd, const HeightMapInfo& hm,
 		/* Maximum number of triangles is 2 * RowSize * NumRows 
 		 This uses up a lot of space but it is a *big* performance gain.
 		 */
-		VertexArrayIndices = new GLushort[6 * RowSize * NumRows];
+		VertexArrayIndices = new GLuint[6 * RowSize * NumRows];
     }
 	
     if ( serialized ) {
