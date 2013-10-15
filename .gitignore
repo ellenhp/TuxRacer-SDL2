@@ -153,6 +153,9 @@ $RECYCLE.BIN/
 # Save game
 *.sav
 
+# Options
+data/config/options.txt
+
 # DLL
 *.dll
 
