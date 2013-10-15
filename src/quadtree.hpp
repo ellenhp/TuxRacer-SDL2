@@ -82,7 +82,7 @@ struct quadsquare {
     static GLuint TexId[NumTerrains];
     static GLuint EnvmapTexId;
 
-    static GLuint *VertexArrayIndices;
+    static GLushort *VertexArrayIndices;
     static GLuint VertexArrayCounter;
     static GLuint VertexArrayMinIdx;
     static GLuint VertexArrayMaxIdx;
