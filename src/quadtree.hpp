@@ -82,9 +82,13 @@ struct quadsquare {
     static GLuint TexId[NumTerrains];
     static GLuint EnvmapTexId;
 
+<<<<<<< HEAD
     static GLuint *VertexArrayIndices;
     static GLushort VertexArrayIndicesShort[USHRT_MAX];
 	static GLuint VertexArrayIndexOffset;
+=======
+    static GLushort *VertexArrayIndices;
+>>>>>>> 7bd1a266dccbb1afcb12b621040a8b79193e7065
     static GLuint VertexArrayCounter;
     static GLuint VertexArrayMinIdx;
     static GLuint VertexArrayMaxIdx;
