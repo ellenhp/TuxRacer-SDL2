@@ -54,6 +54,8 @@ int quadsquare::NumRows;
 GLuint quadsquare::TexId[NumTerrains];
 GLuint quadsquare::EnvmapTexId;
 GLuint *quadsquare::VertexArrayIndices = (GLuint*) NULL;
+GLushort quadsquare::VertexArrayIndicesShort[USHRT_MAX];
+GLuint quadsquare::VertexArrayIndexOffset=0;
 GLuint quadsquare::VertexArrayCounter;
 GLuint quadsquare::VertexArrayMinIdx;
 GLuint quadsquare::VertexArrayMaxIdx;
@@ -132,8 +134,6 @@ quadsquare::quadsquare(quadcornerdata* pcd, void * serialized_rep, size_t size)
         else
             Child[i] = NULL;
     }
-
-
 }
 
 quadsquare::quadsquare(quadcornerdata* pcd)
@@ -1113,7 +1113,7 @@ GLubyte *VNCArray;
 
 void quadsquare::DrawTris()
 {
-	glDrawElements( GL_TRIANGLES, VertexArrayCounter, GL_UNSIGNED_INT, VertexArrayIndices );
+	glDrawElements( GL_TRIANGLES, VertexArrayCounter, GL_UNSIGNED_SHORT, VertexArrayIndicesShort );
 }
 
 void quadsquare::DrawEnvmapTris() 
@@ -1146,24 +1146,18 @@ void	quadsquare::Render(const quadcornerdata& cd, GLubyte *vnc_array)
 {
     VNCArray = vnc_array;
     bool_t fog_on;
-    unsigned int i, j;
+    unsigned int j;
     int nx, ny;
+	int minVert=INT_MAX, maxVert=INT_MIN, vert=0;
     get_course_divisions( &nx, &ny );
-	
-	print_debug(DEBUG_QUADTREE, "Drawing triangles");
-	
+		
 	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer( 3, GL_FLOAT, STRIDE_GL_ARRAY, VNCArray );
 
 	glEnableClientState(GL_NORMAL_ARRAY);
-	glNormalPointer( GL_FLOAT, STRIDE_GL_ARRAY, 
-				VNCArray + 3*sizeof(GLfloat) );
 
 	glEnableClientState(GL_COLOR_ARRAY);
-	glColorPointer( 4, GL_UNSIGNED_BYTE, STRIDE_GL_ARRAY, VNCArray + 10*sizeof(GLfloat) );
 
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glTexCoordPointer( 2, GL_FLOAT, STRIDE_GL_ARRAY, VNCArray + 8*sizeof(GLfloat));
 	
 	/* Save fog state */
     fog_on = is_fog_on();
@@ -1180,6 +1174,30 @@ void	quadsquare::Render(const quadcornerdata& cd, GLubyte *vnc_array)
             continue;
         } 
 		
+		for (GLuint i=0; i<VertexArrayCounter; i++)
+		{
+			vert=VertexArrayIndices[i];
+			if (vert<minVert)
+			{
+				minVert=VertexArrayIndices[i];
+			}
+			if (vert>maxVert)
+			{
+				maxVert=VertexArrayIndices[i];
+			}
+		}
+
+		VertexArrayIndexOffset=minVert;
+		for (GLuint i=0; i<VertexArrayCounter; i++)
+		{
+			VertexArrayIndicesShort[i]=(GLushort)(VertexArrayIndices[i]-VertexArrayIndexOffset);
+		}
+		glVertexPointer( 3, GL_FLOAT, STRIDE_GL_ARRAY, VNCArray + STRIDE_GL_ARRAY*VertexArrayIndexOffset);
+		glNormalPointer( GL_FLOAT, STRIDE_GL_ARRAY, VNCArray + 3*sizeof(GLfloat) + STRIDE_GL_ARRAY*VertexArrayIndexOffset );
+		glTexCoordPointer( 2, GL_FLOAT, STRIDE_GL_ARRAY, VNCArray + 8*sizeof(GLfloat) + STRIDE_GL_ARRAY*VertexArrayIndexOffset );
+		glColorPointer( 4, GL_UNSIGNED_BYTE, STRIDE_GL_ARRAY, VNCArray + 10*sizeof(GLfloat) + STRIDE_GL_ARRAY*VertexArrayIndexOffset );
+
+
 		glBindTexture( GL_TEXTURE_2D, TexId[j] );
 		DrawTris();
 		
@@ -1207,13 +1225,23 @@ void	quadsquare::Render(const quadcornerdata& cd, GLubyte *vnc_array)
 		 */
 		InitArrayCounters();
 		RenderAux( cd, SomeClip, -1 );
+
+		VertexArrayIndexOffset=minVert;
+		for (GLuint i=0; i<VertexArrayCounter; i++)
+		{
+			VertexArrayIndicesShort[i]=(GLushort)(VertexArrayIndices[i]-VertexArrayIndexOffset);
+		}
+		glVertexPointer( 3, GL_FLOAT, STRIDE_GL_ARRAY, VNCArray + STRIDE_GL_ARRAY*VertexArrayIndexOffset);
+		glNormalPointer( GL_FLOAT, STRIDE_GL_ARRAY, VNCArray + 3*sizeof(GLfloat) + STRIDE_GL_ARRAY*VertexArrayIndexOffset );
+		glTexCoordPointer( 2, GL_FLOAT, STRIDE_GL_ARRAY, VNCArray + 8*sizeof(GLfloat) + STRIDE_GL_ARRAY*VertexArrayIndexOffset );
+		glColorPointer( 4, GL_UNSIGNED_BYTE, STRIDE_GL_ARRAY, VNCArray + 10*sizeof(GLfloat) + STRIDE_GL_ARRAY*VertexArrayIndexOffset );
 		
 		if ( VertexArrayCounter != 0 ) {
 			/* Render black triangles */
 			glDisable( GL_FOG );
 			
 			/* Set triangle vertices to black */
-			for (i=0; i<VertexArrayCounter; i++) {
+			for (unsigned int i=0; i<VertexArrayCounter; i++) {
 				colorval( VertexArrayIndices[i], 0 ) = 0;
 				colorval( VertexArrayIndices[i], 1 ) = 0;
 				colorval( VertexArrayIndices[i], 2 ) = 0;
@@ -1233,7 +1261,7 @@ void	quadsquare::Render(const quadcornerdata& cd, GLubyte *vnc_array)
 			glBlendFunc( GL_SRC_ALPHA, GL_ONE );
 			
 			/* First set triangle colours to white */
-			for (i=0; i<VertexArrayCounter; i++) {
+			for (unsigned int i=0; i<VertexArrayCounter; i++) {
 				colorval( VertexArrayIndices[i], 0 ) = 255;
 				colorval( VertexArrayIndices[i], 1 ) = 255;
 				colorval( VertexArrayIndices[i], 2 ) = 255;
@@ -1243,7 +1271,7 @@ void	quadsquare::Render(const quadcornerdata& cd, GLubyte *vnc_array)
 				glBindTexture( GL_TEXTURE_2D, TexId[j] );
 				
 				/* Set alpha values */
-				for (i=0; i<VertexArrayCounter; i++) {
+				for (unsigned int i=0; i<VertexArrayCounter; i++) {
 					colorval( VertexArrayIndices[i], 3 ) = 
 					(Terrain[VertexArrayIndices[i]] == (terrain_t)j ) ? 
 					255 : 0;
@@ -1258,7 +1286,8 @@ void	quadsquare::Render(const quadcornerdata& cd, GLubyte *vnc_array)
 				glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 				
 				/* Need to set alpha values for ice */
-				for (i=0; i<VertexArrayCounter; i++) {
+
+				for (unsigned int i=0; i<VertexArrayCounter; i++) {
 					colorval( VertexArrayIndices[i], 3 ) = 
 					(Terrain[VertexArrayIndices[i]] == Ice) ? 
 					ENV_MAP_ALPHA : 0;

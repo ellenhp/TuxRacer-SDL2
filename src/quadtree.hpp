@@ -83,9 +83,12 @@ struct quadsquare {
     static GLuint EnvmapTexId;
 
     static GLuint *VertexArrayIndices;
+    static GLushort VertexArrayIndicesShort[USHRT_MAX];
+	static GLuint VertexArrayIndexOffset;
     static GLuint VertexArrayCounter;
     static GLuint VertexArrayMinIdx;
     static GLuint VertexArrayMaxIdx;
+
 
     static void MakeTri( int a, int b, int c, int terrain );
     static void MakeSpecialTri( int a, int b, int c, int terrain );
