@@ -58,13 +58,10 @@ extern "C"
 #define ENERGY_GAUGE_CENTER_X 71.0
 #define ENERGY_GAUGE_CENTER_Y 55.0
 
-#define ENERGY_GAUGE_TEX_CENTER_X 71.0
-#define ENERGY_GAUGE_TEX_CENTER_Y 40.0
-
 #define GAUGE_WIDTH 127.0
 #define SPEED_UNITS_Y_OFFSET 4.0
 
-#define SPEEDBAR_OUTER_RADIUS ( ENERGY_GAUGE_CENTER_X )
+#define SPEEDBAR_OUTER_RADIUS ( 70 )
 #define SPEEDBAR_BASE_ANGLE 225
 #define SPEEDBAR_MAX_ANGLE 45
 #define SPEEDBAR_GREEN_MAX_SPEED ( MAX_PADDLING_SPEED * M_PER_SEC_TO_KM_PER_H )
@@ -351,7 +348,7 @@ static void draw_score( player_data_t *plyr )
     glPopMatrix();
 }
 
-#define CIRCLE_DIVISIONS 30
+#define CIRCLE_DIVISIONS 20
 
 point2d_t calc_new_fan_pt( scalar_t angle )
 {
@@ -367,8 +364,8 @@ point2d_t calc_new_fan_pt( scalar_t angle )
 point2d_t calc_new_fan_tex_pt( scalar_t angle )
 {
     point2d_t pt;
-    pt.x = (cos(ANGLES_TO_RADIANS(angle)) + 1)/2;
-    pt.y = (sin( ANGLES_TO_RADIANS(angle)) + 1)/2;
+    pt.x = (cos(ANGLES_TO_RADIANS(angle))*SPEEDBAR_OUTER_RADIUS+ENERGY_GAUGE_CENTER_X)/128;
+    pt.y = (sin(ANGLES_TO_RADIANS(angle))*SPEEDBAR_OUTER_RADIUS+ENERGY_GAUGE_CENTER_Y)/128;
     
     return pt;
 }
@@ -392,22 +389,10 @@ void draw_partial_tri_fan( scalar_t fraction )
     vertices[1]=ENERGY_GAUGE_CENTER_Y;
     vertices[2]=0;
 
-	texcoords[0]=ENERGY_GAUGE_TEX_CENTER_X/128;
-	texcoords[1]=ENERGY_GAUGE_TEX_CENTER_Y/128;
-    
-    pt = calc_new_fan_pt( cur_angle );
-    vertices[3]=pt.x;
-    vertices[4]=pt.y;
-    vertices[5]=0;
-
-    pt = calc_new_fan_tex_pt( cur_angle );    
-    texcoords[3]=pt.x;
-	texcoords[4]=pt.y;
-	texcoords[5]=0;
+	texcoords[0]=ENERGY_GAUGE_CENTER_X/128;
+	texcoords[1]=ENERGY_GAUGE_CENTER_Y/128;
 
     for (i=1; i<divs-1; i++) {
-        cur_angle -= angle_incr;
-        
         pt = calc_new_fan_pt( cur_angle );
         
         vertices[i*3]=pt.x;
@@ -418,24 +403,22 @@ void draw_partial_tri_fan( scalar_t fraction )
         
         texcoords[i*2]=pt.x;
 		texcoords[i*2+1]=pt.y;
+
+        cur_angle -= angle_incr;
     }
-    cur_angle = angle;
-        
-    pt = calc_new_fan_pt( cur_angle );
-        
+
+    pt = calc_new_fan_pt( angle );
     vertices[sizeof(vertices)/sizeof(GLfloat)-3]=pt.x;
 	vertices[sizeof(vertices)/sizeof(GLfloat)-2]=pt.y;
 	vertices[sizeof(vertices)/sizeof(GLfloat)-1]=0;
 
-
-    pt = calc_new_fan_tex_pt( cur_angle );
-        
+    pt = calc_new_fan_tex_pt( angle );
     texcoords[sizeof(texcoords)/sizeof(GLfloat)-2]=pt.x;
 	texcoords[sizeof(texcoords)/sizeof(GLfloat)-1]=pt.y;
         
     glVertexPointer(3, GL_FLOAT , 0, vertices);
     glTexCoordPointer(2, GL_FLOAT , 0, texcoords);
-    glDrawArrays(GL_TRIANGLE_FAN, 0, CIRCLE_DIVISIONS);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, divs);
 
 	return;
 }
@@ -499,7 +482,6 @@ void draw_gauge( scalar_t speed, scalar_t energy )
                      0,
                      0 );
         
-        glColor4f(energy_background_color[0], energy_background_color[1], energy_background_color[2], energy_background_color[3]);
 
         y = ENERGY_GAUGE_BOTTOM + energy * ENERGY_GAUGE_HEIGHT;
 
@@ -535,6 +517,13 @@ void draw_gauge( scalar_t speed, scalar_t energy )
 			1, 1,
 			1, 0,
 			0, 0,
+
+			0, 0,
+			0, y/GAUGE_IMG_SIZE,
+			1, y/GAUGE_IMG_SIZE,
+			1, y/GAUGE_IMG_SIZE,
+			1, 0,
+			0, 0
         };
 
 		glEnableClientState (GL_VERTEX_ARRAY);
@@ -542,14 +531,17 @@ void draw_gauge( scalar_t speed, scalar_t energy )
         
         glBindTexture( GL_TEXTURE_2D, energymask_texobj );
 
-        glVertexPointer (3, GL_FLOAT , 0, verticesItem);
+        glColor4f(energy_background_color[0], energy_background_color[1], energy_background_color[2], energy_background_color[3]);
+
+        glVertexPointer (3, GL_FLOAT , 0, verticesItem+36);
         glTexCoordPointer (2, GL_FLOAT , 0, texcoordItem);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         
+        glBindTexture( GL_TEXTURE_2D, energymask_texobj );
         glColor4f(energy_foreground_color[0], energy_foreground_color[1], energy_foreground_color[2], energy_foreground_color[3]);
         
-        glVertexPointer (3, GL_FLOAT , 0, verticesItem+3*6);
-        glTexCoordPointer (2, GL_FLOAT , 0, texcoordItem);
+        glVertexPointer (3, GL_FLOAT , 0, verticesItem+18);
+        glTexCoordPointer (2, GL_FLOAT , 0, texcoordItem+12);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         
         /* Calculate the fraction of the speed bar to fill */
@@ -585,8 +577,6 @@ void draw_gauge( scalar_t speed, scalar_t energy )
         
         glBindTexture( GL_TEXTURE_2D, speedmask_texobj );
 
-		glTexCoordPointer(2, GL_FLOAT , 0, NULL);
-		glVertexPointer(3, GL_FLOAT , 0, NULL);
 
 		glColor4f(speedbar_background_color[0], speedbar_background_color[1], speedbar_background_color[2], speedbar_background_color[3]);
         draw_partial_tri_fan( 1.0 );
@@ -594,12 +584,9 @@ void draw_gauge( scalar_t speed, scalar_t energy )
         draw_partial_tri_fan( min( 1.0, speedbar_frac ) );
         
         glBindTexture( GL_TEXTURE_2D, outline_texobj );
-        glVertexPointer(3, GL_FLOAT , 0, verticesItem);
+        glVertexPointer(3, GL_FLOAT , 0, verticesItem+36);
         glTexCoordPointer(2, GL_FLOAT , 0, texcoordItem);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-        glVertexPointer(3, GL_FLOAT , 0, verticesItem+9);
-        glTexCoordPointer(2, GL_FLOAT , 0, texcoordItem+6);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
         
         sprintf( buff, "%d", (int)speed );
         string = buff;
