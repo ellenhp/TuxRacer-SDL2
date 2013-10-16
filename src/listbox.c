@@ -33,10 +33,10 @@
 #define DEFAULT_BORDER_WIDTH 2
 #define DEFAULT_TEXT_PAD 8
 #else
-#define DEFAULT_ARROW_BUTTON_HEIGHT 15
-#define DEFAULT_ARROW_BUTTON_WIDTH  27
-#define DEFAULT_ARROW_REGION_WIDTH  36
-#define DEFAULT_ARROW_VERT_SEPARATION  4
+#define DEFAULT_ARROW_BUTTON_HEIGHT 70
+#define DEFAULT_ARROW_BUTTON_WIDTH  50
+#define DEFAULT_ARROW_REGION_WIDTH  50
+#define DEFAULT_ARROW_VERT_SEPARATION  10
 #define DEFAULT_BORDER_WIDTH 4
 #define DEFAULT_TEXT_PAD 8
 #endif
@@ -48,7 +48,7 @@ struct listbox_ {
     scalar_t arrow_width;
     scalar_t border_width;
     scalar_t text_pad;
-    scalar_t arrow_vert_separation;
+    scalar_t arrow_separation;
     char *font_binding;
     colour_t border_colour;
     colour_t background_colour;
@@ -127,18 +127,19 @@ static void update_button_positions( listbox_t *listbox )
     button_set_position( 
 	listbox->up_button,
 	make_point2d( 
-	    listbox->pos.x + listbox->w - 
-	    button_get_width( listbox->up_button ),
-	    listbox->pos.y + listbox->h / 2.0 + 
-	    listbox->arrow_vert_separation / 2.0 ) );
+	    listbox->pos.x + listbox->w +
+		listbox->arrow_separation,
+	    listbox->pos.y -
+		DEFAULT_ARROW_BUTTON_HEIGHT ) );
 
     button_set_position( 
 	listbox->down_button,
 	make_point2d( 
-	    listbox->pos.x + listbox->w - 
-	    button_get_width( listbox->down_button ),
-	    listbox->pos.y + listbox->h / 2.0 - 
-	    listbox->arrow_vert_separation / 2.0 -
+	    listbox->pos.x + listbox->w +
+		listbox->arrow_separation,
+	    listbox->pos.y - 
+		DEFAULT_ARROW_BUTTON_HEIGHT -
+	    listbox->arrow_separation -
 	    button_get_height( listbox->up_button ) ) );
 }
 
@@ -353,7 +354,7 @@ listbox_t* listbox_create( point2d_t pos, scalar_t w, scalar_t h,
     listbox->arrow_width = DEFAULT_ARROW_REGION_WIDTH;
     listbox->border_width = DEFAULT_BORDER_WIDTH;
     listbox->text_pad = DEFAULT_TEXT_PAD;
-    listbox->arrow_vert_separation = DEFAULT_ARROW_VERT_SEPARATION;
+    listbox->arrow_separation = DEFAULT_ARROW_VERT_SEPARATION;
     listbox->font_binding = font_binding;
     listbox->border_colour = ui_foreground_colour;
     listbox->background_colour = ui_background_colour; 
