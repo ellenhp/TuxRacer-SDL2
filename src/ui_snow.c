@@ -253,8 +253,6 @@ void draw_ui_snow( void )
 	    tex_max = &particles[i].tex_max;
 	    glPushMatrix();
 	    {
-		glTranslatef( pt->x*xres, pt->y*yres, 0 );
-    	
     	const GLfloat vertices []=
     	{
     	    0, 0,
@@ -271,6 +269,8 @@ void draw_ui_snow( void )
     	    tex_min->x, tex_max->y
     	};
 
+		glTranslatef( pt->x*xres, pt->y*yres, 0 );
+		
     	glEnableClientState (GL_VERTEX_ARRAY);
     	glEnableClientState (GL_TEXTURE_COORD_ARRAY);
     	glVertexPointer (2, GL_FLOAT , 0, vertices);	
