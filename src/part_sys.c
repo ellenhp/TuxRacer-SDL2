@@ -32,8 +32,8 @@
 #define MAX_PARTICLES 500000
 
 #define START_RADIUS 0.04
-#define OLD_PART_SIZE 0.07
-#define NEW_PART_SIZE 0.02
+#define OLD_PART_SIZE 0.1
+#define NEW_PART_SIZE 0.03
 #define MIN_AGE     -0.2
 #define MAX_AGE      1.0
 
