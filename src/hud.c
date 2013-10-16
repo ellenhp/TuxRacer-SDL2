@@ -632,6 +632,7 @@ void print_fps()
     char *string;
     char *binding;
     font_t *font;
+	int w, asc, desc;
 
     /* This is needed since this can be called from outside */
     ui_setup_display();
@@ -647,18 +648,20 @@ void print_fps()
 	return;
     }
 
+
     bind_font_texture( font );
     set_gl_options( TEXFONT );
 
     glColor4f( 1, 1, 1, 1 );
 
     sprintf( buff, "FPS: %.1f", get_fps() );
+	get_font_metrics(font, buff, &w, &asc, &desc);
     string = buff;
 
     glPushMatrix();
     {
 	glTranslatef( FPS_X_OFFSET,
-		      FPS_Y_OFFSET,
+		      FPS_Y_OFFSET+asc+desc,
 		      0 );
 	draw_string( font, string );
     }
