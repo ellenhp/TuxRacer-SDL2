@@ -67,6 +67,11 @@ static void goto_next_mode()
     winsys_post_redisplay();
 }
 
+void splash_screen_js_func(int btn)
+{
+	goto_next_mode();
+}
+
 static void splash_screen_mouse_func( int button, int state, int x, int y )
 {
 #ifdef TARGET_OS_IPHONE
@@ -88,6 +93,8 @@ void splash_screen_init(void)
     winsys_set_mouse_func( splash_screen_mouse_func );
     winsys_set_motion_func( ui_event_motion_func );
     winsys_set_passive_motion_func( ui_event_motion_func );
+
+	winsys_set_joystick_button_func( splash_screen_js_func );
 
 #ifndef TARGET_OS_IPHONE
     play_music( "splash_screen" );
