@@ -46,10 +46,10 @@ const unsigned int PRECISION = 16;
 GLfixed ONE  = 1 << 16 /*PRECISION*/; 
 const GLfixed ZERO = 0;
 
-inline GLfixed FixedFromInt(int value) {return value << PRECISION;}; 
-inline GLfixed FixedFromFloat(float value)  
+__inline GLfixed FixedFromInt(int value) {return value << PRECISION;}; 
+__inline GLfixed FixedFromFloat(float value)  
 { return (GLfixed)value;}; 
-inline GLfixed MultiplyFixed(GLfixed op1, GLfixed op2) 
+__inline GLfixed MultiplyFixed(GLfixed op1, GLfixed op2) 
 { return (op1 * op2) >> PRECISION;};
 
 void glesPerspective(GLfloat fovy, GLfloat aspect, GLfloat zNear, GLfloat zFar)
@@ -160,7 +160,7 @@ void draw_billboard( player_data_t *plyr,
 		     bool_t use_world_y_axis, 
 		     point2d_t min_tex_coord, point2d_t max_tex_coord )
 {
-    point_t pt;
+    point_t pt, pt2, pt3, pt4;
     vector_t x_vec;
     vector_t y_vec;
     vector_t z_vec;
@@ -187,10 +187,11 @@ void draw_billboard( player_data_t *plyr,
 
     pt = move_point( center_pt, scale_vector( -width/2.0, x_vec ) );
     pt = move_point( pt, scale_vector( -height/2.0, y_vec ) );
-    point_t pt2 = move_point( pt, scale_vector( width, x_vec ) );
-    point_t pt3 = move_point( pt2, scale_vector( height, y_vec ) );
-    point_t pt4 = move_point( pt3, scale_vector( -width, x_vec ) );
+    pt2 = move_point( pt, scale_vector( width, x_vec ) );
+    pt3 = move_point( pt2, scale_vector( height, y_vec ) );
+    pt4 = move_point( pt3, scale_vector( -width, x_vec ) );
 
+	{
     const GLfloat vertices2 []=
     {
        pt.x, pt.y, pt.z,
@@ -216,4 +217,5 @@ void draw_billboard( player_data_t *plyr,
 
     glDisableClientState (GL_VERTEX_ARRAY);
     glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+	}
 }

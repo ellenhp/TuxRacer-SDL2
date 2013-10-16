@@ -37,9 +37,6 @@
 #include "ui_snow.h"
 #include "joystick.h"
 
-extern "C"
-{
-
 #ifdef _TARGET_OS_IPHONE
 #define BOX_WIDTH		300
 #define BOX_HEIGHT		310
@@ -191,6 +188,9 @@ static void set_widget_positions_and_draw_decorations()
     int text_width, asc, desc;
     list_t cup_list;
     GLuint texobj;
+    point2d_t tll, tur;
+    point2d_t ll, ur;
+
     
 #ifdef TARGET_OS_IPHONE
     /* set the dimensions of the box in which all widgets should fit */
@@ -279,9 +279,6 @@ static void set_widget_positions_and_draw_decorations()
     }
     
 
-    point2d_t tll, tur;
-    point2d_t ll, ur;
-
 	glBindTexture( GL_TEXTURE_2D, texobj );
 
     ll = make_point2d( x_org, y_org + 193 );
@@ -289,6 +286,7 @@ static void set_widget_positions_and_draw_decorations()
     tll = make_point2d( 0, 0 );
     tur = make_point2d( 44.0/64.0, 44.0/64.0 );
 
+	{
 	GLfloat texcoords[]={
 		tll.x, tll.y,
 		tll.x, tur.y,
@@ -322,14 +320,6 @@ static void set_widget_positions_and_draw_decorations()
     glBindTexture( GL_TEXTURE_2D, texobj );
     
     {
-        point2d_t tll, tur;
-        point2d_t ll, ur;
-        
-        ll = make_point2d( x_org, y_org + 103 );
-        ur = make_point2d( x_org + 44, y_org + 103 + 44 );
-        tll = make_point2d( 0, 0 );
-        tur = make_point2d( 44.0/64.0, 44.0/64.0 );
-        
         const GLfloat vertices []=
         {
             ll.x, ll.y,
@@ -345,6 +335,14 @@ static void set_widget_positions_and_draw_decorations()
             tur.x, tur.y,
             tll.x, tur.y,
         };
+        
+        point2d_t tll, tur;
+        point2d_t ll, ur;
+        
+        ll = make_point2d( x_org, y_org + 103 );
+        ur = make_point2d( x_org + 44, y_org + 103 + 44 );
+        tll = make_point2d( 0, 0 );
+        tur = make_point2d( 44.0/64.0, 44.0/64.0 );
         
         glEnableClientState (GL_VERTEX_ARRAY);
         glVertexPointer (2, GL_FLOAT , 0, vertices);	
@@ -473,6 +471,7 @@ static void set_widget_positions_and_draw_decorations()
         }
         glPopMatrix();
     }
+	}
 #endif
 }
 
@@ -683,6 +682,5 @@ void zappe_event_screen(void* button, void* userdata)
     event_select_term();
 }
 
-}
 
 /* EOF */

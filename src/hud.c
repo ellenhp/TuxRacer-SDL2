@@ -30,9 +30,6 @@
 #include "course_load.h"
 #include "bonus.h"
 
-extern "C"
-{
-
 #define SECONDS_IN_MINUTE 60
 
 #define TIME_LABEL_X_OFFSET 12.0
@@ -372,12 +369,12 @@ point2d_t calc_new_fan_tex_pt( scalar_t angle )
 
 void draw_partial_tri_fan( scalar_t fraction )
 {
-    const int divs=CIRCLE_DIVISIONS+2;
+#define DIVS (CIRCLE_DIVISIONS+2)
     scalar_t angle, angle_incr, cur_angle;
     int i;
     point2d_t pt;
-	GLfloat vertices[divs*3];
-	GLfloat texcoords[divs*2];
+	GLfloat vertices[DIVS*3];
+	GLfloat texcoords[DIVS*2];
 	
     angle = SPEEDBAR_BASE_ANGLE + ( SPEEDBAR_MAX_ANGLE - SPEEDBAR_BASE_ANGLE ) * fraction;
     
@@ -392,7 +389,7 @@ void draw_partial_tri_fan( scalar_t fraction )
 	texcoords[0]=ENERGY_GAUGE_CENTER_X/128;
 	texcoords[1]=ENERGY_GAUGE_CENTER_Y/128;
 
-    for (i=1; i<divs-1; i++) {
+    for (i=1; i<DIVS-1; i++) {
         pt = calc_new_fan_pt( cur_angle );
         
         vertices[i*3]=pt.x;
@@ -418,7 +415,7 @@ void draw_partial_tri_fan( scalar_t fraction )
         
     glVertexPointer(3, GL_FLOAT , 0, vertices);
     glTexCoordPointer(2, GL_FLOAT , 0, texcoords);
-    glDrawArrays(GL_TRIANGLE_FAN, 0, divs);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, DIVS);
 
 	return;
 }
@@ -476,15 +473,10 @@ void draw_gauge( scalar_t speed, scalar_t energy )
     //glTexGenfv( GL_S, GL_OBJECT_PLANE, xplane );
     //glTexGenfv( GL_T, GL_OBJECT_PLANE, yplane );
     
+    y = ENERGY_GAUGE_BOTTOM + energy * ENERGY_GAUGE_HEIGHT;
+
     glPushMatrix();
     {
-        glTranslatef( getparam_x_resolution() - GAUGE_WIDTH,
-                     0,
-                     0 );
-        
-
-        y = ENERGY_GAUGE_BOTTOM + energy * ENERGY_GAUGE_HEIGHT;
-
         const GLfloat verticesItem []=
         {
             0.0, y, 0,
@@ -525,6 +517,10 @@ void draw_gauge( scalar_t speed, scalar_t energy )
 			1, 0,
 			0, 0
         };
+
+        glTranslatef( getparam_x_resolution() - GAUGE_WIDTH,
+                     0,
+                     0 );
 
 		glEnableClientState (GL_VERTEX_ARRAY);
         glEnableClientState (GL_TEXTURE_COORD_ARRAY);
@@ -691,4 +687,3 @@ void draw_hud( player_data_t *plyr )
     print_fps();
 }
 
-}

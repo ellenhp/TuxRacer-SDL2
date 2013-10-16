@@ -35,9 +35,6 @@
     #include "sharedGeneralFunctions.h"
 #endif
 
-extern "C"
-{
-
 static int step = -1;
 static  uint32_t first_time_true = 0;
 static bool_t is_condition_verified = False;
@@ -64,6 +61,7 @@ static void print_instruction(const char* string, int line) {
     glDisable(GL_TEXTURE_2D);
     glColor4f(1.0,1.0,1.0,0.4);
     
+	{
     GLfloat vertices[]={
 		0.0, (float)(200-(line-2)*(asc+desc)) -5.0, 0,
 		0.0, (float)(200-(line-1)*(asc+desc)) -5.0, 0,
@@ -88,12 +86,15 @@ static void print_instruction(const char* string, int line) {
         draw_string( font, (char*)string );
     }
     glPopMatrix();
+	}
 }
 
 static void drawRedCircle(GLint x, GLint y) {
     int x_org = x;
     int y_org = y;
     GLuint texobj;
+    point2d_t tll, tur;
+    point2d_t ll, ur;
     if ( !get_texture_binding( "red_circle", &texobj ) ) {
         texobj = 0;
     }
@@ -101,14 +102,13 @@ static void drawRedCircle(GLint x, GLint y) {
     
     glBindTexture( GL_TEXTURE_2D, texobj );
 
-    point2d_t tll, tur;
-    point2d_t ll, ur;
         
     ll = make_point2d( x_org, y_org);
     ur = make_point2d( x_org + 110, y_org + 110 );
     tll = make_point2d( 0, 0 );
     tur = make_point2d(1, 1 );
-        
+    
+	{
  	GLfloat texcoords[]={
 		tll.x, tll.y,
 		tll.x, tur.y,
@@ -135,7 +135,7 @@ static void drawRedCircle(GLint x, GLint y) {
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
-    
+	}
 }  
 
 /* verifie qu'une condition a bien été vérifiée pendant au moins "sec" secondes */
@@ -415,7 +415,5 @@ void init_starting_tutorial_step(int i){
     training_abort=False;
     pause_for_long_tutorial_explanation=False;
     step = i;
-}
-
 }
 

@@ -44,9 +44,6 @@
 	#import "sharedGeneralFunctions.h"
 #endif
 
-extern "C"
-{
-
 #ifdef TARGET_OS_IPHONE
 	#define SCREEN_WIDTH	320
 	#define RACE_DESC_X		170
@@ -708,7 +705,7 @@ static void set_widget_positions_and_draw_decorations()
     glDisable( GL_TEXTURE_2D );
     
     glColor4f( 0.0, 0.0, 0.0, 0.3 );
-    
+	{
     GLfloat vertices[]={
 		x_org+box_width-140, y_org+66, 0,
 		x_org+box_width, y_org+66, 0,
@@ -716,26 +713,6 @@ static void set_widget_positions_and_draw_decorations()
 		x_org+box_width-140, y_org+66+107, 0};
 
 	GLubyte indices[] = {0, 1, 2, 2, 3, 0};
-
-	glEnableClientState(GL_VERTEX_ARRAY);
-
-	glVertexPointer(3, GL_FLOAT, 0, vertices);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
-		
-	glDisableClientState(GL_VERTEX_ARRAY);
-
-
-    
-    glColor4f( 1.0, 1.0, 1.0, 1.0 );
-    glEnable( GL_TEXTURE_2D );
-    
-    if ( !get_texture_binding( current_course, &texobj ) ) {
-        if ( !get_texture_binding( "no_preview", &texobj ) ) {
-            texobj = 0;
-        }
-    }
-    
-    glBindTexture( GL_TEXTURE_2D, texobj );
 
 	GLfloat texcoords2[]={
 		0, 0,
@@ -751,6 +728,24 @@ static void set_widget_positions_and_draw_decorations()
     
 	GLubyte indices2[] = {0, 1, 2, 2, 3, 0};
 
+	glEnableClientState(GL_VERTEX_ARRAY);
+
+	glVertexPointer(3, GL_FLOAT, 0, vertices);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
+		
+	glDisableClientState(GL_VERTEX_ARRAY);
+    
+    glColor4f( 1.0, 1.0, 1.0, 1.0 );
+    glEnable( GL_TEXTURE_2D );
+    
+    if ( !get_texture_binding( current_course, &texobj ) ) {
+        if ( !get_texture_binding( "no_preview", &texobj ) ) {
+            texobj = 0;
+        }
+    }
+    
+    glBindTexture( GL_TEXTURE_2D, texobj );
+	
     glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
@@ -760,8 +755,8 @@ static void set_widget_positions_and_draw_decorations()
 		
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-
-
+	
+	}
 }
 
 
@@ -1296,8 +1291,6 @@ void race_select_register()
                         race_select_init,
                         race_select_loop,
                         race_select_term );
-}
-
 }
 
 /* EOF */

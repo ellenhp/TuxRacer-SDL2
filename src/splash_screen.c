@@ -40,9 +40,6 @@ static char *logo_bindings = "splash_screen";
 #else
 #define NUM_LOGOS	4
 
-extern "C"
-{
-
 static char *logo_bindings[NUM_LOGOS] =
 {
 	"splash_screen_tl",
@@ -134,6 +131,7 @@ static void draw_logo()
 		w = 512;
 		h = 512;
 
+		{
 		GLfloat texcoords[]={
 			0, 0,
 			0, 1,
@@ -157,7 +155,7 @@ static void draw_logo()
 		
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-
+		}
 	}
 }
 
@@ -221,4 +219,3 @@ void splash_screen_register()
 
 }
 
-}
