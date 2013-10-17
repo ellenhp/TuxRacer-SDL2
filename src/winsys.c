@@ -331,6 +331,29 @@ static void setup_sdl_video_mode()
 #endif
 }
 
+/*---------------------------------------------------------------------------*/
+/*! 
+  Handles time-critical events on mobile devices.
+  \author  nopoe
+  \date    Created:  2013-10-08
+  \date    Modified: 2013-10-08 */
+int winsys_event_filter(void* userdata, SDL_Event* event)
+{
+	switch (event->type)
+	{
+	case SDL_APP_WILLENTERBACKGROUND:
+	    mute_audio();
+		return 0;
+	case SDL_APP_WILLENTERFOREGROUND:
+		unmute_audio();
+		return 0;
+	case SDL_APP_TERMINATING:
+		winsys_exit(0);
+		return 1;
+	}
+	return 1;
+}
+
 
 /*---------------------------------------------------------------------------*/
 /*! 
@@ -377,6 +400,7 @@ void winsys_init( int *argc, char **argv, char *window_title,
 #endif
 
 	winsys_init_joystick();
+	SDL_SetEventFilter(winsys_event_filter, NULL);
 }
 
 void winsys_init_joystick()
@@ -414,8 +438,6 @@ void winsys_init_joystick()
 
 		js_name = (char*) SDL_GameControllerName(winsys_game_controller);
 
-		print_debug(DEBUG_JOYSTICK, "opening errors: %s", SDL_GetError());
-
 		SDL_GameControllerEventState(SDL_ENABLE);
 	}
 	else
@@ -431,7 +453,7 @@ void winsys_init_joystick()
 		js_name = (char*) SDL_JoystickName(winsys_joystick);
 		SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(winsys_joystick), guid, sizeof(guid));
 
-		print_debug(DEBUG_JOYSTICK, "Using joystick '%s' with GUID '%s'", js_name, guid);
+		print_debug(DEBUG_JOYSTICK, "Incompatible joystick '%s' with GUID '%s'", js_name, guid);
 
 		SDL_JoystickEventState(SDL_ENABLE);
 
@@ -646,6 +668,10 @@ void winsys_process_events()
 		}
 		break;
 
+		case SDL_QUIT:
+			winsys_exit(0);
+			break;
+
 #if SDL_MAJOR_VERSION==1
 	    case SDL_VIDEORESIZE:
 		setup_sdl_video_mode();
@@ -677,7 +703,6 @@ void winsys_process_events()
     /* Never exits */
     code_not_reached();
 }
-
 
 /*---------------------------------------------------------------------------*/
 /*! 

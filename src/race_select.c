@@ -1232,6 +1232,11 @@ START_KEYBOARD_CB( race_select_key_cb )
                     listbox_goto_next_item( race_listbox );
                 }
                 break;
+            case SDLK_AC_BACK:
+                if ( back_btn ) {
+                    button_simulate_mouse_click( back_btn );
+                    ui_set_dirty();
+                }
         }
     } else {
         key = (int) tolower( (char) key );

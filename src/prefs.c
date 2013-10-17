@@ -299,6 +299,7 @@ START_KEYBOARD_CB( prefs_key_cb )
 	{
 	case SDLK_ESCAPE:
 	case SDLK_q:
+	case SDLK_AC_BACK:
 		GameMenu_simulate_click(back_btn);
 		break;
 	default:

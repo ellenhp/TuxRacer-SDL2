@@ -654,10 +654,24 @@ START_KEYBOARD_CB( jump_cb )
 }
 END_KEYBOARD_CB
 
+START_KEYBOARD_CB( racing_default_cb )
+{
+	if (key==SDLK_AC_BACK)
+	{
+		if ( release ) return;
+		g_game.race_aborted = True;
+		set_game_mode( GAME_OVER );
+	}
+}
+END_KEYBOARD_CB
+
 void racing_register()
 {
     int status = 0;
-    
+
+    status |= add_keymap_entry( RACING, DEFAULT_CALLBACK, 
+                               NULL, NULL, racing_default_cb );
+
     status |= add_keymap_entry( RACING, CONFIGURABLE_KEY, 
                                "escape", getparam_quit_key, quit_racing_cb );
     status |= add_keymap_entry( RACING, CONFIGURABLE_KEY, 

@@ -56,6 +56,8 @@ static bool_t initialized_ = False;
 static Mix_Music *current_music_data_ = NULL;
 static char *current_music_name_ = NULL;
 
+static bool_t muted=False;
+
 /*! 
   Initializes the audio module.
   \author  jfpatry
@@ -638,6 +640,17 @@ bool_t play_music( char *music_context )
     return True;
 }
 
+void mute_audio()
+{
+	muted=True;
+	update_audio();
+}
+
+void unmute_audio()
+{
+	muted=False;
+	update_audio();
+}
 
 /*! 
   Updates audio status.  Must be called at every frame.
@@ -672,6 +685,11 @@ update_audio()
     }
     setparam_sound_volume( volume );
 
+	if (muted)
+	{
+		volume=0;
+	}
+
     Mix_Volume( -1, volume * 12 ); /* channel of -1 sets volume for all channels */
 
     /* Set music volume level */
@@ -684,6 +702,11 @@ update_audio()
     }
     setparam_music_volume( volume );
  
+	if (muted)
+	{
+		volume=0;
+	}
+
     Mix_VolumeMusic( volume * 8 );
 
     /* Update music status */

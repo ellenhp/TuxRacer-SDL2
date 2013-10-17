@@ -50,6 +50,9 @@ bool_t isSSFromContext(char *context);
 
 void update_audio();
 
+void mute_audio();
+void unmute_audio();
+
 void shutdown_audio();
 
 void register_sound_tcl_callbacks( Tcl_Interp *ip );

@@ -173,10 +173,12 @@ START_KEYBOARD_CB( game_type_select_cb )
 
     if ( !special ) {
 	key = (int) tolower( (char) key );
+	}
 
 	switch( key ) {
 	case 'q':
 	case 27: /* Esc */
+	case SDLK_AC_BACK:
 	    winsys_exit(0);
 	    break;
 	case 'e':
@@ -195,10 +197,9 @@ START_KEYBOARD_CB( game_type_select_cb )
 	    }
 	    break;
 	}
-    }
-    
-	GameMenu_keypress(key);
 
+	GameMenu_keypress(key);
+    
 	winsys_post_redisplay();
 }
 END_KEYBOARD_CB
