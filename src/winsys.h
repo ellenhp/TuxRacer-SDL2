@@ -386,6 +386,10 @@ void winsys_perform_on_main_thread_sync1( void (*func)(void*), void * arg1 );
 void winsys_perform_on_main_thread_sync2( void (*func)(void*, void*), void * arg1, void * arg2 );
 void winsys_show_rankings( void );
 
+
+void winsys_init_joystick();
+bool_t winsys_is_joystick_active();
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

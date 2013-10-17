@@ -287,7 +287,6 @@ int main( int argc, char **argv )
     init_audio();
     init_ui_manager();
     init_course_manager();
-    init_joystick();
     
     /* Read the tuxracer_init.tcl file */
     read_game_init_script();

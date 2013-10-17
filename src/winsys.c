@@ -72,8 +72,15 @@ int winsys_joystick_x_status=0, winsys_joystick_y_status=0;
 int winsys_joystick_x_trigger_time=INT_MAX, winsys_joystick_y_trigger_time=INT_MAX;
 int winsys_joystick_x_repeating=0, winsys_joystick_y_repeating=0;
 
+static SDL_Joystick *winsys_joystick = NULL;
+static SDL_GameController* winsys_game_controller=NULL;
+static int winsys_num_buttons = 0;
+static int winsys_num_axes = 0;
+
 int num_js_bindings=0;
 js_binding_t js_bindings[MAX_JS_BINDINGS];
+
+static Uint32 sdl_flags = SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER;
 
 bool_t bind_js_axes=False;
 
@@ -336,7 +343,6 @@ static void setup_sdl_video_mode()
 void winsys_init( int *argc, char **argv, char *window_title, 
 		  char *icon_title )
 {
-    Uint32 sdl_flags = SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE;
 	int i;
 	int initResult;
     /*
@@ -369,8 +375,82 @@ void winsys_init( int *argc, char **argv, char *window_title,
 #else
     SDL_WM_SetCaption( window_title, icon_title );
 #endif
+
+	winsys_init_joystick();
 }
 
+void winsys_init_joystick()
+{
+    int num_joysticks = 0;
+    char *js_name;
+	char guid[64];
+
+	SDL_GameControllerAddMapping("8e06f600000000000000504944564944,CH FLIGHTSTICK PRO,a:b1,b:b3,leftx:a0,lefty:a1,x:b0,y:b2,");
+    SDL_GameControllerAddMapping("4f5559412047616d6520436f6e74726f,OUYA Game Controller,a:b5,b:b6,leftx:a0,lefty:a1,x:b8,y:b9,");
+
+    /* Initialize SDL SDL joystick module */
+    if ( SDL_Init( SDL_INIT_JOYSTICK ) < 0 ) {
+	handle_error( 1, "Couldn't initialize SDL: %s", SDL_GetError() );
+    }
+
+    num_joysticks = SDL_NumJoysticks();
+
+    print_debug( DEBUG_JOYSTICK, "Found %d joysticks", num_joysticks );
+
+    if ( num_joysticks == 0 )
+	{
+		winsys_joystick = NULL;
+		return;
+    }
+
+	if (SDL_IsGameController(0))
+	{
+		winsys_game_controller=SDL_GameControllerOpen(0);
+		if (winsys_game_controller == NULL)
+		{
+			print_debug( DEBUG_JOYSTICK, "Cannot open game controller" );
+			return;
+		}
+
+		js_name = (char*) SDL_GameControllerName(winsys_game_controller);
+
+		print_debug(DEBUG_JOYSTICK, "opening errors: %s", SDL_GetError());
+
+		SDL_GameControllerEventState(SDL_ENABLE);
+	}
+	else
+	{
+		winsys_joystick = SDL_JoystickOpen( 0 );
+
+		if (winsys_joystick == NULL)
+		{
+			print_debug( DEBUG_JOYSTICK, "Cannot open joystick" );
+			return;
+		}
+
+		js_name = (char*) SDL_JoystickName(winsys_joystick);
+		SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(winsys_joystick), guid, sizeof(guid));
+
+		print_debug(DEBUG_JOYSTICK, "Using joystick '%s' with GUID '%s'", js_name, guid);
+
+		SDL_JoystickEventState(SDL_ENABLE);
+
+		/* Get number of buttons */
+		winsys_num_buttons = SDL_JoystickNumButtons(winsys_joystick);
+		print_debug( DEBUG_JOYSTICK, "Joystick has %d button%s", 
+			 winsys_num_buttons, winsys_num_buttons == 1 ? "" : "s" );
+
+		/* Get number of axes */
+		winsys_num_axes = SDL_JoystickNumAxes(winsys_joystick);
+		print_debug( DEBUG_JOYSTICK, "Joystick has %d ax%ss", 
+			 winsys_num_axes, winsys_num_axes == 1 ? "i" : "e" );
+	}
+}
+
+bool_t winsys_is_joystick_active()
+{
+	return (bool_t)(winsys_game_controller!=NULL);
+}
 
 /*---------------------------------------------------------------------------*/
 /*! 
@@ -381,7 +461,8 @@ void winsys_init( int *argc, char **argv, char *window_title,
 */
 void winsys_shutdown()
 {
-    SDL_Quit();
+	IMG_Quit();
+    SDL_QuitSubSystem(sdl_flags);
 }
 
 
@@ -464,43 +545,52 @@ void winsys_process_events()
 		}
 		break;
 
-		case SDL_JOYAXISMOTION:
-			if (SDL_GetNumTouchDevices()>0)
+		case SDL_CONTROLLERAXISMOTION:
+			if (event.caxis.axis==SDL_CONTROLLER_AXIS_LEFTX)
 			{
-				break;
+				x_joystick=event.caxis.value/32767.0;
 			}
-			if (event.jaxis.axis == getparam_joystick_x_axis())
+			else if (event.caxis.axis==SDL_CONTROLLER_AXIS_LEFTY)
 			{
-				x_joystick=(double)event.jaxis.value/(SHRT_MAX+1);
-			}
-			if (event.jaxis.axis == getparam_joystick_y_axis())
-			{
-				y_joystick=(double)event.jaxis.value/(SHRT_MAX+1);
+				y_joystick=event.caxis.value/32767.0;
 			}
 			if (joystick_func)
 			{
 				joystick_func(x_joystick, y_joystick);
 			}
 			break;
-		case SDL_JOYBUTTONDOWN:
-			if (SDL_GetNumTouchDevices()>0)
+
+		case SDL_CONTROLLERBUTTONDOWN:
+			if (joystick_button_func)
+			{
+				joystick_button_func(event.cbutton.button);
+			}
+			if (!keyboard_func)
 			{
 				break;
 			}
 			for (i=0; i<num_js_bindings; i++)
 			{
-				if (event.jbutton.button==js_bindings[i].js_button)
+				if (js_bindings[i].js_button==event.cbutton.button)
 				{
-					if (keyboard_func)
-					{
-						keyboard_func(js_bindings[i].sdl_key, js_bindings[i].sdl_key>=256, False, 0, 0);
-					}
+					keyboard_func(js_bindings[i].sdl_key, js_bindings[i].sdl_key>255, False, 0, 0);
 				}
 			}
-			if (joystick_button_func)
+			break;
+
+		case SDL_CONTROLLERBUTTONUP:
+			if (!keyboard_func)
 			{
-				joystick_button_func(event.jbutton.button);
+				break;
 			}
+			for (i=0; i<num_js_bindings; i++)
+			{
+				if (js_bindings[i].js_button==event.cbutton.button)
+				{
+					keyboard_func(js_bindings[i].sdl_key, js_bindings[i].sdl_key>255, True, 0, 0);
+				}
+			}
+			break;
 			break;
 
 	    case SDL_MOUSEBUTTONDOWN:

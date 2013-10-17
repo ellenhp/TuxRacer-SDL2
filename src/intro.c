@@ -54,6 +54,13 @@ static void abort_intro( player_data_t *plyr ) {
     winsys_post_redisplay();
 }
 
+void intro_js_func(int button)
+{
+    player_data_t *plyr = get_player_data( local_player() );
+	winsys_set_joystick_button_func(NULL);
+	abort_intro( plyr );
+}
+
 void intro_init(void) 
 {
     int i, num_items;
@@ -70,6 +77,7 @@ void intro_init(void)
     winsys_set_mouse_func( NULL );
     winsys_set_motion_func( NULL );
     winsys_set_passive_motion_func( NULL );
+	winsys_set_joystick_button_func( intro_js_func );
     
     /* order trees */
     course_render_init();
@@ -126,16 +134,6 @@ void intro_loop( scalar_t time_step )
     height = getparam_y_resolution();
 
     check_gl_error();
-
-    /* Check joystick */
-    if ( is_joystick_active() ) {
-	update_joystick();
-
-	if ( is_joystick_continue_button_down() ) {
-	    abort_intro( plyr );
-	    return;
-	}
-    }
 
 #ifdef TARGET_OS_IPHONE
     int saved_tux_sphere_divisions = getparam_tux_sphere_divisions();

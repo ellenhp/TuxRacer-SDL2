@@ -106,6 +106,7 @@ static scalar_t y_offset = 0;
 static void go_back() 
 {
     set_game_mode( GAME_TYPE_SELECT );
+	winsys_set_joystick_button_func(NULL);
     winsys_post_redisplay();
 }
 

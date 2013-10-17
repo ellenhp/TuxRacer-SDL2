@@ -407,6 +407,13 @@ void saveAndDisplayRankings() {
 }
 #endif
 
+void game_over_js_func(int button)
+{
+    set_game_mode( NEXT_MODE );
+	winsys_set_joystick_button_func(NULL);
+    winsys_post_redisplay();
+}
+
 void game_over_init(void) 
 {
     winsys_set_display_func( main_loop );
@@ -415,6 +422,7 @@ void game_over_init(void)
     winsys_set_mouse_func( mouse_cb );
     winsys_set_motion_func( ui_event_motion_func );
     winsys_set_passive_motion_func( ui_event_motion_func );
+	winsys_set_joystick_button_func( game_over_js_func );
     
     remove_all_bonuses();
     
@@ -448,18 +456,6 @@ void game_over_loop( scalar_t time_step )
     height = getparam_y_resolution();
     
     check_gl_error();
-    
-    /* Check joystick */
-    if ( is_joystick_active() ) {
-        update_joystick();
-        
-        if ( is_joystick_continue_button_down() )
-        {
-            set_game_mode( NEXT_MODE );
-            winsys_post_redisplay();
-            return;
-        }
-    }
     
     new_frame_for_fps_calc();
     

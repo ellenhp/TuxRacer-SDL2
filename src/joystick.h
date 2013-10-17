@@ -27,13 +27,6 @@ extern "C"
 
 #include "tuxracer.h"
 
-void init_joystick();
-bool_t is_joystick_active();
-void update_joystick();
-scalar_t get_joystick_x_axis();
-scalar_t get_joystick_y_axis();
-bool_t is_joystick_button_down( int button ); 
-bool_t is_joystick_continue_button_down();
 
 #endif /* JOYSTICK_H */
 

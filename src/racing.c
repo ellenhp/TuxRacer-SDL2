@@ -71,6 +71,17 @@ static bool_t braking;
 static scalar_t charge_start_time;
 static int last_terrain;
 
+static scalar_t joy_x;
+static scalar_t joy_y;
+static bool_t joy_left_turn = False;
+static bool_t joy_right_turn = False;
+static scalar_t joy_turn_fact = 0.0;
+static bool_t joy_paddling = False;
+static bool_t joy_braking = False;
+static bool_t joy_tricks = False;
+static bool_t joy_charging = False;
+
+
 #ifdef FLYING_TIME_LIMIT
 
 bool_t get_trick_modifier() {
@@ -87,6 +98,12 @@ void racing_init_for_tutorial(point_t point) {
 
 #endif
 
+void racing_joystick_func(double x, double y)
+{
+	joy_x=x;
+	joy_y=y;
+}
+
 void racing_init(void) 
 {
     player_data_t *plyr = get_player_data( local_player() );
@@ -98,6 +115,12 @@ void racing_init(void)
     winsys_set_motion_func( NULL );
     winsys_set_passive_motion_func( NULL );
     winsys_set_mouse_func( NULL );
+	winsys_set_joystick_func( racing_joystick_func );
+
+	winsys_reset_js_bindings();
+	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_A, getparam_jump_key()[0]);
+	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_B, getparam_trick_modifier_key()[0]);
+	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_X, getparam_quit_key()[0]);
         
     /* Initialize view */
     if ( getparam_view_mode() < 0 || 
@@ -166,13 +189,6 @@ void racing_loop( scalar_t time_step )
 {
     int width, height;
     player_data_t *plyr = get_player_data( local_player() );
-    bool_t joy_left_turn = False;
-    bool_t joy_right_turn = False;
-    scalar_t joy_turn_fact = 0.0;
-    bool_t joy_paddling = False;
-    bool_t joy_braking = False;
-    bool_t joy_tricks = False;
-    bool_t joy_charging = False;
     bool_t airborne;
     vector_t dir;
     scalar_t speed;
@@ -204,48 +220,30 @@ void racing_loop( scalar_t time_step )
     /*
      * Joystick
      */
-    if ( is_joystick_active() ) {
-	scalar_t joy_x;
-	scalar_t joy_y;
+    if ( winsys_is_joystick_active() ) {
+		joy_left_turn = False;
+		joy_right_turn = False;
+		joy_turn_fact = 0.0;
+		joy_paddling = False;
+		joy_braking = False;
+		joy_tricks = False;
+		joy_charging = False;
 
-	update_joystick();
+		if ( joy_x > 0.1 ) {
+			joy_right_turn = True;
+			joy_turn_fact = joy_x;
+		} else if ( joy_x < -0.1 ) {
+			joy_left_turn = True;
+			joy_turn_fact = joy_x;
+		}
 
-	joy_x = get_joystick_x_axis();
-	joy_y = get_joystick_y_axis();
+		if ( !joy_braking ) {
+			joy_braking = (bool_t) ( joy_y > 0.5 );
+		}
 
-	if ( joy_x > 0.1 ) {
-	    joy_right_turn = True;
-	    joy_turn_fact = joy_x;
-	} else if ( joy_x < -0.1 ) {
-	    joy_left_turn = True;
-	    joy_turn_fact = joy_x;
-	}
-
-	if ( getparam_joystick_brake_button() >= 0 ) {
-	    joy_braking = 
-		is_joystick_button_down( getparam_joystick_brake_button() );
-	} 
-	if ( !joy_braking ) {
-	    joy_braking = (bool_t) ( joy_y > 0.5 );
-	}
-
-	if ( getparam_joystick_paddle_button() >= 0 ) {
-	    joy_paddling = 
-		is_joystick_button_down( getparam_joystick_paddle_button() );
-	}
-	if ( !joy_paddling ) {
-	    joy_paddling = (bool_t) ( joy_y < -0.5 );
-	}
-
-	if ( getparam_joystick_jump_button() >= 0 ) {
-	    joy_charging = 
-		is_joystick_button_down( getparam_joystick_jump_button() );
-	}
-
-	if ( getparam_joystick_trick_button() >= 0 ) {
-	    joy_tricks = 
-		is_joystick_button_down( getparam_joystick_trick_button() );
-	}
+		if ( !joy_paddling ) {
+			joy_paddling = (bool_t) ( joy_y < -0.5 );
+		}
     }
 #endif
     /* Update braking */

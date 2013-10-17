@@ -781,8 +781,8 @@ static void race_select_init(void)
     winsys_set_passive_motion_func( ui_event_motion_func );
     
 	winsys_add_js_axis_bindings();
-	winsys_add_js_button_binding(getparam_joystick_continue_button(), SDLK_RETURN);
-	winsys_add_js_button_binding(getparam_joystick_brake_button(), SDLK_ESCAPE);
+	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_A, SDLK_RETURN);
+	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_B, SDLK_ESCAPE);
 
     plyr = get_player_data( local_player() );
     
