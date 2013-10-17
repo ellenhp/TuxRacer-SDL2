@@ -408,6 +408,8 @@ void winsys_init_joystick()
     int num_joysticks = 0;
     char *js_name;
 	char guid[64];
+	winsys_joystick = NULL;
+	winsys_game_controller = NULL;
 
 	SDL_GameControllerAddMapping("8e06f600000000000000504944564944,CH FLIGHTSTICK PRO,a:b1,b:b3,leftx:a0,lefty:a1,x:b0,y:b2,");
     SDL_GameControllerAddMapping("4f5559412047616d6520436f6e74726f,OUYA Game Controller,a:b5,b:b6,leftx:a0,lefty:a1,x:b8,y:b9,");
@@ -423,7 +425,6 @@ void winsys_init_joystick()
 
     if ( num_joysticks == 0 )
 	{
-		winsys_joystick = NULL;
 		return;
     }
 
@@ -667,6 +668,11 @@ void winsys_process_events()
 		    }
 		}
 		break;
+
+		case SDL_CONTROLLERDEVICEADDED:
+		case SDL_CONTROLLERDEVICEREMOVED:
+			winsys_init_joystick();
+			break;
 
 		case SDL_QUIT:
 			winsys_exit(0);
