@@ -647,6 +647,7 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
             } else if (event.getAction() == KeyEvent.ACTION_UP) {
                 SDLActivity.onNativePadUp(id, keyCode);
             }
+            return true;
         }
         
         return false;
