@@ -454,11 +454,6 @@ void winsys_init_joystick()
 		js_name = (char*) SDL_JoystickName(winsys_joystick);
 		SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(winsys_joystick), guid, sizeof(guid));
 
-		print_debug(DEBUG_JOYSTICK, "Incompatible joystick '%s' with GUID '%s'", js_name, guid);
-
-		SDL_JoystickEventState(SDL_ENABLE);
-
-		/* Get number of buttons */
 		winsys_num_buttons = SDL_JoystickNumButtons(winsys_joystick);
 		print_debug( DEBUG_JOYSTICK, "Joystick has %d button%s", 
 			 winsys_num_buttons, winsys_num_buttons == 1 ? "" : "s" );
@@ -467,12 +462,24 @@ void winsys_init_joystick()
 		winsys_num_axes = SDL_JoystickNumAxes(winsys_joystick);
 		print_debug( DEBUG_JOYSTICK, "Joystick has %d ax%ss", 
 			 winsys_num_axes, winsys_num_axes == 1 ? "i" : "e" );
+
+		if (winsys_num_axes==3 && winsys_num_buttons==0)
+		{
+			print_debug(DEBUG_JOYSTICK, "Using accelerometer");
+			SDL_JoystickEventState(SDL_ENABLE);
+		}
+		else
+		{
+			print_debug(DEBUG_JOYSTICK, "Incompatible joystick '%s' with GUID '%s'", js_name, guid);
+		}
+
+		/* Get number of buttons */
 	}
 }
 
 bool_t winsys_is_joystick_active()
 {
-	return (bool_t)(winsys_game_controller!=NULL);
+	return (bool_t)(winsys_game_controller!=NULL || winsys_joystick!=NULL);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -567,6 +574,22 @@ void winsys_process_events()
 				      x, y );
 		}
 		break;
+
+		case SDL_JOYAXISMOTION:
+			if (!winsys_game_controller && event.jaxis.axis==getparam_joystick_x_axis())
+			{
+				//accelerometer
+				x_joystick=2*event.jaxis.value/32767.0;
+				if (x_joystick>1)
+					x_joystick=1;
+				if (x_joystick<-1)
+					x_joystick=-1;
+			}
+			if (joystick_func)
+			{
+				joystick_func(x_joystick, 0);
+			}
+			break;
 
 		case SDL_CONTROLLERAXISMOTION:
 			if (event.caxis.axis==SDL_CONTROLLER_AXIS_LEFTX)
@@ -760,7 +783,7 @@ void winsys_reset_js_bindings()
   \date    Modified: 2013-10-08 */
 void winsys_update_joysticks()
 {
-	if (!keyboard_func)
+	if (!keyboard_func || !winsys_game_controller)
 	{
 		return;
 	}
