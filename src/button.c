@@ -293,7 +293,7 @@ void button_draw( button_t *button )
                           tex->binding );
             texobj = 0;
         } 
-        
+		{
 		GLfloat texcoords[]={
 			tex->ll.x, tex->ll.y,
 			tex->ll.x, tex->ur.y,
@@ -320,26 +320,7 @@ void button_draw( button_t *button )
 		
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-
-        /*glBindTexture( GL_TEXTURE_2D, texobj );
-        
-        glColor4dv( (scalar_t*) &tex->colour );
-        
-        glBegin( GL_QUADS );
-        {
-            glTexCoord2f( tex->ll.x, tex->ll.y );
-            glVertex3f( pos.x, pos.y, 0 );
-            
-            glTexCoord2f( tex->ur.x, tex->ll.y );
-            glVertex3f( pos.x + w, pos.y, 0 );
-            
-            glTexCoord2f( tex->ur.x, tex->ur.y );
-            glVertex3f( pos.x + w, pos.y + h, 0 );
-            
-            glTexCoord2f( tex->ll.x, tex->ur.y );
-            glVertex3f( pos.x, pos.y + h, 0 );
-        }
-        glEnd();*/
+		}
     }
     if ( font_binding && button->label != NULL ) {
         font_t *font;

@@ -94,11 +94,11 @@
     <ClCompile Include="..\src\audio.c" />
     <ClCompile Include="..\src\audio_data.c" />
     <ClCompile Include="..\src\bonus.c" />
-    <ClCompile Include="..\src\button.cpp" />
+    <ClCompile Include="..\src\button.c" />
     <ClCompile Include="..\src\course_load.c" />
     <ClCompile Include="..\src\course_mgr.c" />
     <ClCompile Include="..\src\course_quad.cpp" />
-    <ClCompile Include="..\src\course_render.cpp" />
+    <ClCompile Include="..\src\course_render.c" />
     <ClCompile Include="..\src\credits.c" />
     <ClCompile Include="..\src\debug.c" />
     <ClCompile Include="..\src\error_util.c" />

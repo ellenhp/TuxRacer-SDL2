@@ -603,6 +603,7 @@ void draw_trees()
     int       item_type = -1;
     char *    item_name = 0;
     item_type_t *item_types;
+	bool_t drawTwoPlanes;
 
     static const GLfloat verticesTree []=
     {
@@ -639,7 +640,27 @@ void draw_trees()
         
     };
     
-    treeLocs = treeLocsOrderedByZ;
+    static const GLfloat verticesItem []=
+    {
+        -1.0, 0.0,  1.0,
+        1.0, 0.0, -1.0,
+        1.0, 1.0, -1.0,
+        -1.0, 1.0,  1.0,
+        -1.0, 0.0,  1.0,
+        1.0, 1.0, -1.0,
+    };
+        
+    static const GLfloat texCoordsItem []=
+    {
+        0.0, 0.0 ,
+        1.0, 0.0 ,
+        1.0, 1.0 ,
+        0.0, 1.0 ,
+        0.0, 0.0 ,
+        1.0, 1.0 ,
+    };
+
+	treeLocs = treeLocsOrderedByZ;
     numTrees = get_num_trees();
     item_types = get_item_types();
     
@@ -694,7 +715,7 @@ void draw_trees()
         
         glScalef(treeRadius, treeHeight, treeRadius);
         
-        bool_t drawTwoPlanes = False;
+        drawTwoPlanes = False;
         if ( !clip_course ||
             eye_pt.z - treeLocs[i].ray.pt.z < fwd_tree_detail_limit )
             drawTwoPlanes = True;
@@ -704,30 +725,9 @@ void draw_trees()
         glPopMatrix();
     } 
     
-    
-        
     itemLocs = get_item_locs();
     numItems = get_num_items();
         
-    static const GLfloat verticesItem []=
-    {
-        -1.0, 0.0,  1.0,
-        1.0, 0.0, -1.0,
-        1.0, 1.0, -1.0,
-        -1.0, 1.0,  1.0,
-        -1.0, 0.0,  1.0,
-        1.0, 1.0, -1.0,
-    };
-        
-    static const GLfloat texCoordsItem []=
-    {
-        0.0, 0.0 ,
-        1.0, 0.0 ,
-        1.0, 1.0 ,
-        0.0, 1.0 ,
-        0.0, 0.0 ,
-        1.0, 1.0 ,
-    };
     glVertexPointer (3, GL_FLOAT , 0, verticesItem);
     glTexCoordPointer(2, GL_FLOAT, 0, texCoordsItem);
 
@@ -822,7 +822,9 @@ void draw_fog_plane()
     
     GLfloat *fog_colour;
     
-    if ( is_fog_on() == False ) {
+    point_t pt1,pt2,pt3,pt4;
+
+	if ( is_fog_on() == False ) {
         return;
     }
     
@@ -897,14 +899,13 @@ void draw_fog_plane()
     fog_colour = get_fog_colour();
     
     glColor4f( fog_colour[0], fog_colour[1], fog_colour[2], fog_colour[3] );
-    
-    point_t pt1,pt2,pt3,pt4;
-    
+        
     pt1 = move_point( top_left_pt, left_vec );
     pt2 = move_point( top_right_pt, right_vec );
     pt3 = move_point( top_left_pt, scale_vector( 3.0, left_vec ) );
     pt4 = move_point( top_right_pt, scale_vector( 3.0, right_vec ) );
     
+	{
     const GLfloat verticesFog []=
     {
         bottom_left_pt.x, bottom_left_pt.y, bottom_left_pt.z,
@@ -944,6 +945,7 @@ void draw_fog_plane()
 
     glDisableClientState(GL_COLOR_ARRAY);
     glDisableClientState (GL_VERTEX_ARRAY);
+	}
 }
 
 void course_render_init() {
