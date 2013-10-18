@@ -587,7 +587,7 @@ void winsys_process_events()
 					x_joystick=-1;
 				if (joystick_func)
 				{
-					joystick_func(x_joystick, 0);
+					joystick_func(-x_joystick, 0);
 				}
 			}
 			break;

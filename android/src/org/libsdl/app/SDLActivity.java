@@ -45,7 +45,7 @@ public class SDLActivity extends Activity {
     // Audio
     protected static Thread mAudioThread;
     protected static AudioTrack mAudioTrack;
-
+    
     // Load the .so
     static {
         System.loadLibrary("SDL2");
@@ -67,7 +67,7 @@ public class SDLActivity extends Activity {
         mSingleton = this;
 
         // Set up the surface
-        mSurface = new SDLSurface(getApplication());
+        mSurface = new SDLSurface(getApplication(), getWindowManager().getDefaultDisplay().getRotation());
 
         mLayout = new AbsoluteLayout(this);
         mLayout.addView(mSurface);
@@ -504,9 +504,11 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
 
     // Keep track of the surface size to normalize touch events
     protected static float mWidth, mHeight;
+    
+    protected int mScreenRotation;
 
     // Startup    
-    public SDLSurface(Context context) {
+    public SDLSurface(Context context, int screenRotation) {
         super(context);
         getHolder().addCallback(this); 
     
@@ -704,6 +706,18 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            float[] adjustedValues = new float[3];
+
+            final int axisSwap[][] = {
+            {  1,  -1,  0,  1  },     // ROTATION_0 
+            {-1,  -1,  1,  0  },     // ROTATION_90 
+            {-1,    1,  0,  1  },     // ROTATION_180 
+            {  1,    1,  1,  0  }  }; // ROTATION_270 
+
+            final int[] as = axisSwap[mScreenRotation];
+            adjustedValues[0]  =  (float)as[0] * event.values[ as[2] ]; 
+            adjustedValues[1]  =  (float)as[1] * event.values[ as[3] ]; 
+            adjustedValues[2]  =  event.values[2];
             SDLActivity.onNativeAccel(event.values[0] / SensorManager.GRAVITY_EARTH,
                                       event.values[1] / SensorManager.GRAVITY_EARTH,
                                       event.values[2] / SensorManager.GRAVITY_EARTH);
