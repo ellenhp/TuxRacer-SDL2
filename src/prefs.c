@@ -225,6 +225,8 @@ static void prefs_init(void)
 	winsys_set_joystick_func( GameMenu_joystick_func );
 	winsys_set_joystick_button_func( GameMenu_joystick_button_func );
 
+	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_B, SDLK_ESCAPE);
+
 	GameMenu_init();
 	setup_gui();
 

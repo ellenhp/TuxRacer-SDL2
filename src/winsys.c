@@ -403,7 +403,7 @@ void winsys_init( int *argc, char **argv, char *window_title,
 	SDL_SetEventFilter(winsys_event_filter, NULL);
 }
 
-void winsys_init_joystick()
+void winsys_scan_joysticks()
 {
     int num_joysticks = 0;
     char *js_name;
@@ -411,15 +411,7 @@ void winsys_init_joystick()
 	winsys_joystick = NULL;
 	winsys_game_controller = NULL;
 
-	SDL_GameControllerAddMapping("8e06f600000000000000504944564944,CH FLIGHTSTICK PRO,a:b1,b:b3,leftx:a0,lefty:a1,x:b0,y:b2,");
-    SDL_GameControllerAddMapping("4f5559412047616d6520436f6e74726f,OUYA Game Controller,a:b5,b:b6,leftx:a0,lefty:a1,x:b8,y:b9,");
-
-    /* Initialize SDL SDL joystick module */
-    if ( SDL_Init( SDL_INIT_JOYSTICK ) < 0 ) {
-	handle_error( 1, "Couldn't initialize SDL: %s", SDL_GetError() );
-    }
-
-    num_joysticks = SDL_NumJoysticks();
+	num_joysticks = SDL_NumJoysticks();
 
     print_debug( DEBUG_JOYSTICK, "Found %d joysticks", num_joysticks );
 
@@ -438,6 +430,8 @@ void winsys_init_joystick()
 		}
 
 		js_name = (char*) SDL_GameControllerName(winsys_game_controller);
+
+		print_debug( DEBUG_JOYSTICK, "Using game controller %s", js_name );
 
 		SDL_GameControllerEventState(SDL_ENABLE);
 	}
@@ -472,9 +466,16 @@ void winsys_init_joystick()
 		{
 			print_debug(DEBUG_JOYSTICK, "Incompatible joystick '%s' with GUID '%s'", js_name, guid);
 		}
-
-		/* Get number of buttons */
 	}
+}
+
+void winsys_init_joystick()
+{
+
+	SDL_GameControllerAddMapping("8e06f600000000000000504944564944,CH FLIGHTSTICK PRO,a:b1,b:b3,leftx:a0,lefty:a1,x:b0,y:b2,");
+    SDL_GameControllerAddMapping("4f5559412047616d6520436f6e74726f,OUYA Game Controller,a:b5,b:b6,leftx:a0,lefty:a1,x:b8,y:b9,");
+
+	winsys_scan_joysticks();
 }
 
 bool_t winsys_is_joystick_active()
@@ -584,10 +585,10 @@ void winsys_process_events()
 					x_joystick=1;
 				if (x_joystick<-1)
 					x_joystick=-1;
-			}
-			if (joystick_func)
-			{
-				joystick_func(x_joystick, 0);
+				if (joystick_func)
+				{
+					joystick_func(x_joystick, 0);
+				}
 			}
 			break;
 
@@ -694,7 +695,7 @@ void winsys_process_events()
 
 		case SDL_CONTROLLERDEVICEADDED:
 		case SDL_CONTROLLERDEVICEREMOVED:
-			winsys_init_joystick();
+			winsys_scan_joysticks();
 			break;
 
 		case SDL_QUIT:

@@ -127,6 +127,7 @@ static void game_type_select_init(void)
 	gui_add_widget(credits_btn=create_button("Credits", credits_click_cb), NULL);
 	gui_add_widget(quit_btn=create_button("Quit", quit_click_cb), NULL);
 
+	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_B, SDLK_ESCAPE);
 
     play_music( "start_screen" );
 
