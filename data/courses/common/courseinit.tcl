@@ -41,7 +41,7 @@ tux_item_spec -name start -diameter 9.0 -height 6.0 \
 tux_item_spec -name float -nocollision -colour {255 128 255} -reset_point
 
 
-tux_trees "$::course_dir/trees.rgb"
+tux_trees "$::course_dir/trees.png"
 
 
 tux_ice_tex courses/textures/terrain/ice.png

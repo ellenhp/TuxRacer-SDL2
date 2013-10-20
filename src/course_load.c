@@ -544,10 +544,11 @@ static int angle_cb ( ClientData cd, Tcl_Interp *ip, int argc, const char *argv[
 
 static int elev_cb ( ClientData cd, Tcl_Interp *ip, int argc, const char *argv[]) 
 {
-    IMAGE *elev_img;
+    SDL_Surface *elev_img;
     scalar_t slope;
-    int   x,y;
-    int   pad;
+    int x,y;
+    int pad;
+	int pixel_value;
 
     if ( argc != 2 ) {
         Tcl_AppendResult(ip, argv[0], ": invalid number of arguments\n", 
@@ -562,14 +563,14 @@ static int elev_cb ( ClientData cd, Tcl_Interp *ip, int argc, const char *argv[]
 	return TCL_OK;
     }
 
-    elev_img = LegacyImageLoad( argv[1] );
+    elev_img = ImageLoad( argv[1] );
     if ( elev_img == NULL ) {
 	print_warning( TCL_WARNING, "%s: couldn't load %s", argv[0], argv[1] );
 	return TCL_ERROR;
     }
 
-    nx = elev_img->sizeX;
-    ny = elev_img->sizeY;
+	nx = elev_img->w;
+    ny = elev_img->h;
 
     elevation = (scalar_t *)malloc( sizeof(scalar_t)*nx*ny );
 
@@ -579,29 +580,27 @@ static int elev_cb ( ClientData cd, Tcl_Interp *ip, int argc, const char *argv[]
 
     slope = tan( ANGLES_TO_RADIANS( course_angle ) );
 
-    pad = 0;    /* RGBA images rows are aligned on 4-byte boundaries */
+	SDL_LockSurface(elev_img);
+
     for (y=0; y<ny; y++) {
         for (x=0; x<nx; x++) {
-	    ELEV(nx-1-x, ny-1-y) = 
-		( ( elev_img->data[ (x + nx * y) * elev_img->sizeZ + pad ] 
-		    - base_height_value ) / 255.0 ) * elev_scale
-		- (scalar_t) (ny-1.-y)/ny * course_length * slope;
-        } 
-        pad += (nx*elev_img->sizeZ) % 4;
+			pixel_value=((unsigned char*)elev_img->pixels)[x*elev_img->format->BytesPerPixel+y*elev_img->pitch];
+			ELEV(nx-1-x, ny-1-y) = ((pixel_value - base_height_value)/255.0) * elev_scale - (scalar_t) (ny-1.-y)/ny * course_length * slope;
+        }
     } 
 
-    free( elev_img->data );
-    free( elev_img );
+	SDL_UnlockSurface(elev_img);
+	SDL_FreeSurface(elev_img);
 
     return TCL_OK;
 } 
 
 static int terrain_cb ( ClientData cd, Tcl_Interp *ip, int argc, const char *argv[]) 
 {
-    IMAGE *terrain_img;
-    int   x,y;
-    int   pad;
-    int   idx;
+    SDL_Surface *terrain_img;
+    int x,y;
+    int idx;
+	int pixel_value;
 
     if ( argc != 2 ) {
         Tcl_AppendResult(ip, argv[0], ": invalid number of arguments\n", 
@@ -610,7 +609,7 @@ static int terrain_cb ( ClientData cd, Tcl_Interp *ip, int argc, const char *arg
         return TCL_ERROR;
     } 
 
-    terrain_img = LegacyImageLoad( argv[1] );
+    terrain_img = ImageLoad( argv[1] );
 
     if ( terrain_img == NULL ) {
 	print_warning( TCL_WARNING, "%s: couldn't load %s", argv[0], argv[1] );
@@ -619,7 +618,7 @@ static int terrain_cb ( ClientData cd, Tcl_Interp *ip, int argc, const char *arg
 	return TCL_ERROR;
     }
 
-    if ( nx != terrain_img->sizeX || ny != terrain_img->sizeY ) {
+	if ( nx != terrain_img->w || ny != terrain_img->h ) {
         Tcl_AppendResult(ip, argv[0], ": terrain bitmap must have same " 
 			 "dimensions as elevation bitmap",
 			 (char *)0 );
@@ -633,18 +632,17 @@ static int terrain_cb ( ClientData cd, Tcl_Interp *ip, int argc, const char *arg
 	handle_system_error( 1, "malloc failed" );
     }
 
-    pad = 0;
+	SDL_LockSurface(terrain_img);
+
     for (y=0; y<ny; y++) {
         for (x=0; x<nx; x++) {
             idx = (nx-1-x) + nx*(ny-1-y);
-	    terrain[idx] = intensity_to_terrain(
-		terrain_img->data[(x+nx*y)*terrain_img->sizeZ+pad] );
-        } 
-        pad += (nx*terrain_img->sizeZ) % 4;
+			terrain[idx] = intensity_to_terrain(((unsigned char*)terrain_img->pixels)[x*terrain_img->format->BytesPerPixel+y*terrain_img->pitch]);
+        }
     } 
 
-    free( terrain_img->data );
-    free( terrain_img );
+	SDL_UnlockSurface(terrain_img);
+	SDL_FreeSurface(terrain_img);
 
     return TCL_OK;
 } 
@@ -891,7 +889,7 @@ static int is_item( unsigned char pixel[], item_type_t ** which_type )
 */
 static int trees_cb ( ClientData cd, Tcl_Interp *ip, int argc, const char *argv[]) 
 {
-    IMAGE *treeImg;
+    SDL_Surface *treeImg;
     int sx, sy, sz;
     int x,y;
     int pad;
@@ -902,83 +900,90 @@ static int trees_cb ( ClientData cd, Tcl_Interp *ip, int argc, const char *argv[
     list_elem_t elem;
     int best_tree_dist, best_item_dist;
 
-    if ( argc != 2 ) {
+    if ( argc != 2 )
+	{
         Tcl_AppendResult(ip, argv[0], ": invalid number of arguments\n", 
 			 "Usage: ", argv[0], " <tree location bitmap>",
 			 (char *)0 );
         return TCL_ERROR;
     } 
 
-    treeImg = LegacyImageLoad( argv[1] );
-    if ( treeImg == NULL ) {
-	print_warning( TCL_WARNING, "%s: couldn't load %s", 
-		       argv[0], argv[1] );
-        Tcl_AppendResult(ip, argv[0], ": couldn't load ", argv[1], 
-			 (char *)0 );
-	return TCL_ERROR;
+    treeImg = ImageLoad(argv[1]);
+    if (treeImg == NULL)
+	{
+		print_warning( TCL_WARNING, "%s: couldn't load %s", 
+				   argv[0], argv[1] );
+		Tcl_AppendResult(ip, argv[0], ": couldn't load ", argv[1], 
+				(char *)0 );
+		return TCL_ERROR;
     }
 
-    if ( num_tree_types == 0 && num_item_types == 0 ) {
-	print_warning( IMPORTANT_WARNING,
-		       "tux_trees callback called with no tree or item "
-		       "types set" );
+    if (num_tree_types == 0 && num_item_types == 0)
+	{
+		print_warning( IMPORTANT_WARNING,
+				   "tux_trees callback called with no tree or item "
+				   "types set" );
     }
 
-    sx = treeImg->sizeX;
-    sy = treeImg->sizeY;
-    sz = treeImg->sizeZ;
+    sx = treeImg->w;
+    sy = treeImg->h;
+	sz = treeImg->format->BytesPerPixel;
 
-    for (i = 0; i < num_tree_types; i++) {
-	tree_types[i].pos = create_list();
-	tree_types[i].insert_pos = 0;
-	tree_types[i].num_trees = 0;
+    for (i = 0; i < num_tree_types; i++)
+	{
+		tree_types[i].pos = create_list();
+		tree_types[i].insert_pos = 0;
+		tree_types[i].num_trees = 0;
     }
 
-    for (i = 0; i < num_item_types; i++) {
-	item_types[i].pos = create_list();
-	item_types[i].insert_pos = 0;
-	item_types[i].num_items = 0;
+    for (i = 0; i < num_item_types; i++)
+	{
+		item_types[i].pos = create_list();
+		item_types[i].insert_pos = 0;
+		item_types[i].num_items = 0;
     }
+
+	SDL_LockSurface(treeImg);
 
     num_trees = 0;
     num_items = 0;
     pad = 0;
-    for (y=0; y<sy; y++) {
-        for (x=0; x<sx; x++) {
-            best_tree_dist = is_tree ( &treeImg->data[ (x + y*sx)*sz + pad ],
-					 &which_tree );
-            best_item_dist = is_item ( &treeImg->data[ (x + y*sx)*sz + pad ],
-					 &which_item );
+    for (y=0; y<sy; y++)
+	{
+        for (x=0; x<sx; x++)
+		{
+            best_tree_dist = is_tree(((unsigned char*)treeImg->pixels)+(x+y*sx)*sz+pad, &which_tree);
+            best_item_dist = is_item(((unsigned char*)treeImg->pixels)+(x+y*sx)*sz+pad, &which_item);
 
-	    if ( best_tree_dist < best_item_dist && which_tree != NULL ) {
-                if (num_trees+1 == MAX_TREES ) {
-                    print_debug(DEBUG_OTHER, "%s: maximum number of trees reached.\n", 
-			     argv[0] );
+			if ( best_tree_dist < best_item_dist && which_tree != NULL )
+			{
+                if (num_trees+1 == MAX_TREES )
+				{
+                    print_debug(DEBUG_OTHER, "%s: maximum number of trees reached.\n", argv[0] );
+                    break;
+				}
+				num_trees += 1;
+				which_tree->num_trees += 1;
+				pos = (point2d_t *) malloc(sizeof(point2d_t));
+				pos->x = (sx-x)/(scalar_t)(sx-1.)*course_width;
+				pos->y = -(sy-y)/(scalar_t)(sy-1.)*course_length;
+				which_tree->insert_pos = insert_list_elem(which_tree->pos, which_tree->insert_pos, (list_elem_data_t) pos);
+            }
+			else if ( which_item != NULL )
+			{
+                if (num_items+1 == MAX_ITEMS )
+				{
+                    print_debug(DEBUG_OTHER, "%s: maximum number of items reached.\n", argv[0]);
                     break;
                 }
-		num_trees += 1;
-		which_tree->num_trees += 1;
-		pos = (point2d_t *) malloc(sizeof(point2d_t));
-		pos->x = (sx-x)/(scalar_t)(sx-1.)*course_width;
-		pos->y = -(sy-y)/(scalar_t)(sy-1.)*course_length;
-		which_tree->insert_pos = insert_list_elem(which_tree->pos,
-			which_tree->insert_pos, (list_elem_data_t) pos);
-
-            } else if ( which_item != NULL ) {
-                if (num_items+1 == MAX_ITEMS ) {
-                    print_debug(DEBUG_OTHER, "%s: maximum number of items reached.\n", 
-			     argv[0] );
-                    break;
-                }
-		num_items += 1;
-		which_item->num_items += 1;
-		pos = (point2d_t *) malloc(sizeof(point2d_t));
-		pos->x = (sx-x)/(scalar_t)(sx-1.)*course_width;
-		pos->y = -(sy-y)/(scalar_t)(sy-1.)*course_length;
-		which_item->insert_pos = insert_list_elem(which_item->pos,
-			which_item->insert_pos, (list_elem_data_t) pos);
-	    }
-
+				num_items += 1;
+				which_item->num_items += 1;
+				pos = (point2d_t *) malloc(sizeof(point2d_t));
+				pos->x = (sx-x)/(scalar_t)(sx-1.)*course_width;
+				pos->y = -(sy-y)/(scalar_t)(sy-1.)*course_length;
+				which_item->insert_pos = insert_list_elem(which_item->pos,
+					which_item->insert_pos, (list_elem_data_t) pos);
+			}
         }
         pad += ( sx * sz ) % 4; /* to compensate for word-aligned rows */
     }
@@ -988,68 +993,78 @@ static int trees_cb ( ClientData cd, Tcl_Interp *ip, int argc, const char *argv[
     // texture switching
     */
     num_trees = 0;
-    for (i = 0; i < num_tree_types; i++) {
-	elem = get_list_head(tree_types[i].pos);
-	while (elem != NULL) {
-	    pos = (point2d_t *) get_list_elem_data(elem);
+    for (i = 0; i < num_tree_types; i++)
+	{
+		elem = get_list_head(tree_types[i].pos);
+		while (elem != NULL)
+		{
+			pos = (point2d_t *) get_list_elem_data(elem);
 
-	    tree_locs[num_trees].ray.pt.x = pos->x;
-	    tree_locs[num_trees].ray.pt.z = pos->y;
-	    tree_locs[num_trees].ray.pt.y = find_y_coord( pos->x, pos->y );
-	    free( pos );
-	    elem = get_next_list_elem(tree_types[i].pos, elem);
+			tree_locs[num_trees].ray.pt.x = pos->x;
+			tree_locs[num_trees].ray.pt.z = pos->y;
+			tree_locs[num_trees].ray.pt.y = find_y_coord( pos->x, pos->y );
+			free( pos );
+			elem = get_next_list_elem(tree_types[i].pos, elem);
 
-	    tree_locs[num_trees].ray.vec = make_vector( 0, 1, 0);
+			tree_locs[num_trees].ray.vec = make_vector( 0, 1, 0);
 
-	    tree_locs[num_trees].height = 
-		    (scalar_t)rand()/RAND_MAX*tree_types[i].vary*2;
-	    tree_locs[num_trees].height -= tree_types[i].vary;
-	    tree_locs[num_trees].height = tree_types[i].height + 
-			tree_locs[num_trees].height * tree_types[i].height;
-	    tree_locs[num_trees].diam = (tree_locs[num_trees].height /
-			tree_types[i].height) * tree_types[i].diam;
-	    tree_locs[num_trees].tree_type = i;
-	    num_trees++;
-	}
-	del_list( tree_types[i].pos );
+			tree_locs[num_trees].height = 
+				(scalar_t)rand()/RAND_MAX*tree_types[i].vary*2;
+			tree_locs[num_trees].height -= tree_types[i].vary;
+			tree_locs[num_trees].height = tree_types[i].height + 
+				tree_locs[num_trees].height * tree_types[i].height;
+			tree_locs[num_trees].diam = (tree_locs[num_trees].height /
+				tree_types[i].height) * tree_types[i].diam;
+			tree_locs[num_trees].tree_type = i;
+			num_trees++;
+		}
+		del_list( tree_types[i].pos );
     }
 
     num_items = 0;
-    for (i = 0; i < num_item_types; i++) {
-	elem = get_list_head(item_types[i].pos);
-	while (elem != NULL) {
-	    pos = (point2d_t *) get_list_elem_data(elem);
+    for (i = 0; i < num_item_types; i++)
+	{
+		elem = get_list_head(item_types[i].pos);
+		while (elem != NULL)
+		{
+			pos = (point2d_t *) get_list_elem_data(elem);
 
-	    item_locs[num_items].ray.pt.x = pos->x;
-	    item_locs[num_items].ray.pt.z = pos->y;
-	    item_locs[num_items].ray.pt.y = find_y_coord( pos->x, pos->y )
-					    + item_types[i].above_ground;
-	    free( pos );
-	    elem = get_next_list_elem(item_types[i].pos, elem);
+			item_locs[num_items].ray.pt.x = pos->x;
+			item_locs[num_items].ray.pt.z = pos->y;
+			item_locs[num_items].ray.pt.y = find_y_coord( pos->x, pos->y ) + item_types[i].above_ground;
+			free( pos );
+			elem = get_next_list_elem(item_types[i].pos, elem);
 
-	    item_locs[num_items].ray.vec = make_vector( 0, 1, 0);
+			item_locs[num_items].ray.vec = make_vector( 0, 1, 0);
 
-	    item_locs[num_items].height = item_types[i].height ; 
-	    item_locs[num_items].diam = item_types[i].diam;
-	    item_locs[num_items].item_type = i;
-	    if ( item_types[i].nocollision )  {
-		item_locs[num_items].collectable = -1;
-	    } else {
-		item_locs[num_items].collectable = 1;
-	    }
-	    if ( item_types[i].reset_point )  {
-		item_locs[num_items].drawable = False;
-	    } else {
-		item_locs[num_items].drawable = True;
-	    }
-	    num_items++;
-	}
-	del_list( item_types[i].pos );
+			item_locs[num_items].height = item_types[i].height ; 
+			item_locs[num_items].diam = item_types[i].diam;
+			item_locs[num_items].item_type = i;
+
+			if ( item_types[i].nocollision )
+			{
+				item_locs[num_items].collectable = -1;
+			}
+			else
+			{
+				item_locs[num_items].collectable = 1;
+			}
+			if (item_types[i].reset_point) 
+			{
+				item_locs[num_items].drawable = False;
+			}
+			else
+			{
+				item_locs[num_items].drawable = True;
+			}
+			num_items++;
+		}
+		del_list( item_types[i].pos );
     }
 
 
-    free( treeImg->data );
-    free( treeImg );
+ 	SDL_UnlockSurface(treeImg);
+	SDL_FreeSurface(treeImg);
 
     return TCL_OK;
 } 
