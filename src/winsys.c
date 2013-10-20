@@ -409,6 +409,7 @@ void winsys_scan_joysticks()
     char *js_name;
 	char guid[64];
 	int js_index=0;
+	int controllerIndex=0;
 	int i=0;
 
 	if (winsys_joystick)
@@ -435,13 +436,14 @@ void winsys_scan_joysticks()
 	{
 		if (SDL_IsGameController(i))
 		{
+			controllerIndex=i;
 			break;
 		}
 	}
 
 	if (SDL_IsGameController(i))
 	{
-		winsys_game_controller=SDL_GameControllerOpen(i);
+		winsys_game_controller=SDL_GameControllerOpen(controllerIndex);
 		if (winsys_game_controller == NULL)
 		{
 			print_debug( DEBUG_JOYSTICK, "Cannot open game controller" );
@@ -456,7 +458,7 @@ void winsys_scan_joysticks()
 	}
 	else
 	{
-		winsys_joystick = SDL_JoystickOpen(i);
+		winsys_joystick = SDL_JoystickOpen(controllerIndex);
 
 		if (winsys_joystick == NULL)
 		{
