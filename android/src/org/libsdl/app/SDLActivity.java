@@ -247,7 +247,9 @@ public class SDLActivity extends Activity {
     public static native void onNativePadDown(int padId, int keycode);
     public static native void onNativePadUp(int padId, int keycode);
     public static native void onNativeJoy(int joyId, int axis,
-                                          double value);
+            double value);
+    public static native void onNativeJoyAttached(int joyId);
+    public static native void onNativeJoyRemoved(int joyId);
     public static native void onNativeKeyDown(int keycode);
     public static native void onNativeKeyUp(int keycode);
     public static native void onNativeKeyboardFocusLost();
@@ -270,10 +272,6 @@ public class SDLActivity extends Activity {
     
     // Create a list of valid ID's the first time this function is called
     private static void createJoystickList() {
-        if(mJoyIdList != null) {
-            return;
-        }
-        
         mJoyIdList = new ArrayList<Integer>();
         // InputDevice.getDeviceIds requires SDK >= 16
         if(Build.VERSION.SDK_INT >= 16) {
@@ -294,7 +292,8 @@ public class SDLActivity extends Activity {
     
     public static String getJoystickName(int joy) {
         createJoystickList();
-        
+        Log.d("joyid", ""+joy);
+        Log.d("joyname", ""+InputDevice.getDevice(mJoyIdList.get(joy)).getName());
         return InputDevice.getDevice(mJoyIdList.get(joy)).getName();
     }
     
@@ -521,7 +520,12 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         mSensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
         
         if(Build.VERSION.SDK_INT >= 12) {
-            setOnGenericMotionListener(new genericMotionHandler());
+        	genericInputHandler handler=new genericInputHandler();
+            setOnGenericMotionListener(handler);
+            if (Build.VERSION.SDK_INT >= 16)
+            {
+            	((android.hardware.input.InputManager)getContext().getSystemService(Context.INPUT_SERVICE)).registerInputDeviceListener(handler, null);
+            }
         }
 
         // Some arbitrary defaults to avoid a potential division by zero
@@ -724,8 +728,8 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         }
     }
     
-    class genericMotionHandler extends Activity implements View.OnGenericMotionListener {
-        // Generic Motion (mouse hover, joystick...) events go here
+    class genericInputHandler extends Activity implements View.OnGenericMotionListener, android.hardware.input.InputManager.InputDeviceListener {
+        // Generic Input (mouse hover, joystick...) events go here
         // We only have joysticks yet
         @Override
         public boolean onGenericMotion(View v, MotionEvent event) {
@@ -747,6 +751,21 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
             }
             return true;
         }
+
+		@Override
+		public void onInputDeviceAdded(int joyId) {
+			SDLActivity.onNativeJoyAttached(joyId);
+		}
+
+		@Override
+		public void onInputDeviceChanged(int joyId) {
+			// not sure what to do here
+		}
+
+		@Override
+		public void onInputDeviceRemoved(int joyId) {
+			SDLActivity.onNativeJoyRemoved(joyId);
+		}
         
     }
     

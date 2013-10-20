@@ -408,8 +408,19 @@ void winsys_scan_joysticks()
     int num_joysticks = 0;
     char *js_name;
 	char guid[64];
-	winsys_joystick = NULL;
-	winsys_game_controller = NULL;
+	int js_index=0;
+	int i=0;
+
+	if (winsys_joystick)
+	{
+		SDL_JoystickClose(winsys_joystick);
+		winsys_joystick = NULL;
+	}
+	if (winsys_game_controller)
+	{
+		SDL_GameControllerClose(winsys_game_controller);
+		winsys_game_controller = NULL;
+	}
 
 	num_joysticks = SDL_NumJoysticks();
 
@@ -420,9 +431,17 @@ void winsys_scan_joysticks()
 		return;
     }
 
-	if (SDL_IsGameController(0))
+	for (i=0; i<num_joysticks; i++)
 	{
-		winsys_game_controller=SDL_GameControllerOpen(0);
+		if (SDL_IsGameController(i))
+		{
+			break;
+		}
+	}
+
+	if (SDL_IsGameController(i))
+	{
+		winsys_game_controller=SDL_GameControllerOpen(i);
 		if (winsys_game_controller == NULL)
 		{
 			print_debug( DEBUG_JOYSTICK, "Cannot open game controller" );
@@ -437,7 +456,7 @@ void winsys_scan_joysticks()
 	}
 	else
 	{
-		winsys_joystick = SDL_JoystickOpen( 0 );
+		winsys_joystick = SDL_JoystickOpen(i);
 
 		if (winsys_joystick == NULL)
 		{
@@ -695,6 +714,8 @@ void winsys_process_events()
 
 		case SDL_CONTROLLERDEVICEADDED:
 		case SDL_CONTROLLERDEVICEREMOVED:
+		case SDL_JOYDEVICEADDED:
+		case SDL_JOYDEVICEREMOVED:
 			winsys_scan_joysticks();
 			break;
 
