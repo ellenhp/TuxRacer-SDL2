@@ -524,7 +524,24 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
             setOnGenericMotionListener(handler);
             if (Build.VERSION.SDK_INT >= 16)
             {
-            	((android.hardware.input.InputManager)getContext().getSystemService(Context.INPUT_SERVICE)).registerInputDeviceListener(handler, null);
+            	((android.hardware.input.InputManager)getContext().getSystemService(Context.INPUT_SERVICE)).registerInputDeviceListener(
+            			new android.hardware.input.InputManager.InputDeviceListener() {
+            				@Override
+            				public void onInputDeviceAdded(int joyId) {
+            					SDLActivity.onNativeJoyAttached(joyId);
+            				}
+
+            				@Override
+            				public void onInputDeviceChanged(int joyId) {
+            					// not sure what to do here
+            				}
+
+            				@Override
+            				public void onInputDeviceRemoved(int joyId) {
+            					SDLActivity.onNativeJoyRemoved(joyId);
+            				}
+            		        
+            			}, null);
             }
         }
 
@@ -728,7 +745,7 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         }
     }
     
-    class genericInputHandler extends Activity implements View.OnGenericMotionListener, android.hardware.input.InputManager.InputDeviceListener {
+    class genericInputHandler extends Activity implements View.OnGenericMotionListener {
         // Generic Input (mouse hover, joystick...) events go here
         // We only have joysticks yet
         @Override
@@ -751,22 +768,6 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
             }
             return true;
         }
-
-		@Override
-		public void onInputDeviceAdded(int joyId) {
-			SDLActivity.onNativeJoyAttached(joyId);
-		}
-
-		@Override
-		public void onInputDeviceChanged(int joyId) {
-			// not sure what to do here
-		}
-
-		@Override
-		public void onInputDeviceRemoved(int joyId) {
-			SDLActivity.onNativeJoyRemoved(joyId);
-		}
-        
     }
     
 }
