@@ -341,14 +341,20 @@ int winsys_event_filter(void* userdata, SDL_Event* event)
 {
 	switch (event->type)
 	{
-	case SDL_APP_WILLENTERBACKGROUND:
-	    mute_audio();
-		return 0;
+    case SDL_APP_WILLENTERBACKGROUND:
+        mute_audio();
+        return 0;
+    case SDL_APP_DIDENTERBACKGROUND:
+        mute_audio();
+        set_game_mode( GAME_TYPE_SELECT );
+        ui_set_dirty();
+        return 0;
 	case SDL_APP_WILLENTERFOREGROUND:
-		unmute_audio();
+        init_ui_snow();
+        unmute_audio();
 		return 0;
 	case SDL_APP_TERMINATING:
-		winsys_exit(0);
+		winsys_shutdown(0);
 		return 1;
 	}
 	return 1;
@@ -939,11 +945,14 @@ void winsys_atexit( winsys_atexit_func_t func )
 */
 void winsys_exit( int code )
 {
+#ifdef __ANDROID__
+    SDL_MinimizeWindow(window);
+#else
     if ( atexit_func ) {
 	(*atexit_func)();
     }
-    
     exit( code );
+#endif
 }
 
 void winsys_show_preferences( void )

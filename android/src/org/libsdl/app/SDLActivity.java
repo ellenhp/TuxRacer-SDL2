@@ -168,11 +168,24 @@ public class SDLActivity extends Activity {
         }
     }
 
+    public void minimize()
+    {
+    	Runnable minimizeTask=new Runnable() {
+			@Override
+			public void run() {
+		    	Intent intent = new Intent(Intent.ACTION_MAIN);
+		        intent.addCategory(Intent.CATEGORY_HOME);
+		        startActivity(intent);
+			}
+    	};
+    	runOnUiThread(minimizeTask);
+    }
 
     // Messages from the SDLMain thread
     static final int COMMAND_CHANGE_TITLE = 1;
     static final int COMMAND_UNUSED = 2;
     static final int COMMAND_TEXTEDIT_HIDE = 3;
+    static final int COMMAND_MINIMIZE = 4;
 
     protected static final int COMMAND_USER = 0x8000;
 
@@ -217,7 +230,13 @@ public class SDLActivity extends Activity {
                     imm.hideSoftInputFromWindow(mTextEdit.getWindowToken(), 0);
                 }
                 break;
-
+            case COMMAND_MINIMIZE:
+                if (context instanceof SDLActivity) {
+                    ((SDLActivity) context).minimize();
+                } else {
+                    Log.e(TAG, "error handling message, getContext() returned no SDLActivity");
+                }
+                break;
             default:
                 if ((context instanceof SDLActivity) && !((SDLActivity) context).onUnhandledMessage(msg.arg1, msg.obj)) {
                     Log.e(TAG, "error handling message, command is " + msg.arg1);
