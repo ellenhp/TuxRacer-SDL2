@@ -325,6 +325,10 @@ void racing_loop( scalar_t time_step )
 			trick_modifier = (bool_t)((SDL_GetTicks()-last_trick_tap)<TAP_EFFECT_LENGTH_TICKS);
 		}
         if ( trick_modifier || joy_tricks) {
+			if ((view_mode_t)getparam_view_mode()==TUXEYE)
+			{
+				set_view_mode( plyr, ABOVE );
+			}
             if (left_turn || joy_left_turn) {
                 plyr->control.barrel_roll_left = True;
             }
@@ -355,6 +359,8 @@ void racing_loop( scalar_t time_step )
         
     } else {
         
+		set_view_mode( plyr, (view_mode_t)getparam_view_mode() );
+
         get_surface_type(plyr->pos.x, plyr->pos.z, terrain_weights);
         if (terrain_weights[Snow] > 0) {
             new_terrain |= (1<<Snow);
