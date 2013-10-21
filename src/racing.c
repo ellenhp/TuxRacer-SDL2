@@ -165,7 +165,7 @@ void racing_init(void)
     winsys_set_display_func( main_loop );
     winsys_set_idle_func( main_loop );
     winsys_set_reshape_func( reshape );
-    if (SDL_GetNumTouchDevices()>0 || 1)
+    if (SDL_GetNumTouchDevices()>0)
 	{
 		winsys_set_mouse_func(racing_mouse_func);
 	}
