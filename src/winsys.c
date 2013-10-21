@@ -678,6 +678,7 @@ void winsys_process_events()
 		if ( mouse_func ) {
 		    (*mouse_func)( event.button.button,
 				   event.button.state,
+				   -1,
 				   event.button.x,
 				   event.button.y );
 		}
@@ -685,15 +686,21 @@ void winsys_process_events()
 
 	    case SDL_FINGERDOWN:
 	    
-	    print_debug(DEBUG_OTHER, "finger click: %d, %d", (int)(event.tfinger.x*getparam_x_resolution()), (int)(event.tfinger.y*getparam_y_resolution()));
-
 		if ( mouse_func ) {
 		    (*mouse_func)( SDL_BUTTON_LEFT,
 				   SDL_PRESSED,
+				   event.tfinger.fingerId,
 				   (int)(event.tfinger.x*getparam_x_resolution()),
 				   (int)(event.tfinger.y*getparam_y_resolution()) );
+		}
+		break;
+
+	    case SDL_FINGERUP:
+	    
+		if ( mouse_func ) {
 		    (*mouse_func)( SDL_BUTTON_LEFT,
 				   SDL_RELEASED,
+				   event.tfinger.fingerId,
 				   (int)(event.tfinger.x*getparam_x_resolution()),
 				   (int)(event.tfinger.y*getparam_y_resolution()) );
 		}

@@ -51,9 +51,12 @@ void come_back_to_game(void) {
 }
 
 
-static void mouse_cb( int button, int state, int x, int y )
+static void mouse_cb( int button, int state, int finger_index, int x, int y )
 {
-    come_back_to_game();
+	if (state==SDL_PRESSED)
+	{
+		come_back_to_game();
+	}
 }
 
 static void cont_click_cb(button_t *button, void *userdata)

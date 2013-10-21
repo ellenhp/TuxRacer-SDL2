@@ -51,7 +51,7 @@ void ui_draw_cursor();
 point2d_t ui_get_mouse_position( void );
 
 /* GLUT callbacks */
-void ui_event_mouse_func( int button, int state, int x, int y );
+void ui_event_mouse_func( int button, int state, int finger_index, int x, int y );
 void ui_event_motion_func( int x, int y );
 
 #endif /* UI_MGR_H */

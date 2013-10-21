@@ -436,7 +436,7 @@ static void trigger_mouse_motion_cbs( hash_table_t table,
   \date    Created:  2000-09-16
   \date    Modified: 2000-09-16
 */
-void ui_event_mouse_func( int button, int state, int x, int y )
+void ui_event_mouse_func( int button, int state, int finger_index, int x, int y )
 {
     if ( is_mode_change_pending() ) {
 	/* Don't process events until mode change occurs */

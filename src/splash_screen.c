@@ -69,7 +69,7 @@ void splash_screen_js_func(int btn)
 	goto_next_mode();
 }
 
-static void splash_screen_mouse_func( int button, int state, int x, int y )
+static void splash_screen_mouse_func( int button, int state, int finger_index, int x, int y )
 {
 #ifdef TARGET_OS_IPHONE
     if (state==WS_MOUSE_DOWN) {

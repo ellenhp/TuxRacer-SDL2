@@ -335,7 +335,7 @@ typedef void (*winsys_idle_func_t)();
 typedef void (*winsys_reshape_func_t)( int w, int h );
 typedef void (*winsys_keyboard_func_t)( unsigned int key, bool_t special,
 					bool_t release, int x, int y );
-typedef void (*winsys_mouse_func_t)( int button, int state, int x, int y );
+typedef void (*winsys_mouse_func_t)( int button, int state, int finger_index, int x, int y );
 typedef void (*winsys_motion_func_t)( int x, int y );
 typedef void (*winsys_joystick_func_t)( double x, double y );
 typedef void (*winsys_joystick_button_func_t)( int button );

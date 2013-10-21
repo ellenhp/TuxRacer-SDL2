@@ -62,6 +62,8 @@
 /* factor limit to be considered as a left or a right turn. useful only for tricks */
 #define TURN_FACTOR_LIMIT 0.1
 
+#define TAP_EFFECT_LENGTH_TICKS 500
+
 static bool_t right_turn;
 static bool_t left_turn;
 static bool_t trick_modifier;
@@ -70,6 +72,12 @@ static bool_t charging;
 static bool_t braking;
 static scalar_t charge_start_time;
 static int last_terrain;
+
+static bool_t touch_control=False;
+static int last_paddle_tap=0;
+static int last_brake_tap=0;
+static int last_trick_tap=0;
+static int charge_finger_index=-1;
 
 static scalar_t joy_x;
 static scalar_t joy_y;
@@ -98,6 +106,52 @@ void racing_init_for_tutorial(point_t point) {
 
 #endif
 
+void racing_mouse_func(int button, int state, int finger_index, int absolute_x, int absolute_y)
+{
+	float width=getparam_x_resolution(), height=getparam_y_resolution();
+	float x=absolute_x/width, y=absolute_y/height;
+
+	touch_control=True;
+
+	if (state==SDL_PRESSED)
+	{
+		if (x>0.33 && x<0.67)
+		{
+			if (state==SDL_PRESSED)
+				set_game_mode(PAUSED);
+		}
+		else if (x<0.33)
+		{
+			if (y>0.5)
+			{
+				last_brake_tap=SDL_GetTicks();
+			}
+			else
+			{
+				charging=True;
+				charge_finger_index=finger_index;
+			}
+		}
+		else if (x>0.67)
+		{
+			if (y>0.5)
+			{
+				last_paddle_tap=SDL_GetTicks();
+			}
+			else
+			{
+				last_trick_tap=SDL_GetTicks();
+			}
+		}
+	}
+	else if (charging && charge_finger_index==finger_index)
+	{
+		charging=False;
+		charge_finger_index=-1;
+	}
+
+}
+
 void racing_joystick_func(double x, double y)
 {
 	joy_x=x;
@@ -111,10 +165,16 @@ void racing_init(void)
     winsys_set_display_func( main_loop );
     winsys_set_idle_func( main_loop );
     winsys_set_reshape_func( reshape );
-    winsys_set_mouse_func( NULL );
+    if (SDL_GetNumTouchDevices()>0 || 1)
+	{
+		winsys_set_mouse_func(racing_mouse_func);
+	}
+	else
+	{
+		winsys_set_mouse_func(NULL);
+	}
     winsys_set_motion_func( NULL );
     winsys_set_passive_motion_func( NULL );
-    winsys_set_mouse_func( NULL );
 	winsys_set_joystick_func( racing_joystick_func );
 
 	winsys_reset_js_bindings();
@@ -248,6 +308,11 @@ void racing_loop( scalar_t time_step )
 #endif
     /* Update braking */
     plyr->control.is_braking = (bool_t) ( braking || joy_braking );
+
+	if (touch_control)
+	{
+		braking = (bool_t)((SDL_GetTicks()-last_brake_tap)<TAP_EFFECT_LENGTH_TICKS);
+	}
     
     if ( airborne ) {
         new_terrain = (1<<NumTerrains);
@@ -255,6 +320,10 @@ void racing_loop( scalar_t time_step )
         /*
          * Tricks
          */
+		if (touch_control)
+		{
+			trick_modifier = (bool_t)((SDL_GetTicks()-last_trick_tap)<TAP_EFFECT_LENGTH_TICKS);
+		}
         if ( trick_modifier || joy_tricks) {
             if (left_turn || joy_left_turn) {
                 plyr->control.barrel_roll_left = True;
@@ -366,6 +435,11 @@ void racing_loop( scalar_t time_step )
     /*
      * Paddling
      */
+	if (touch_control)
+	{
+		paddling = (bool_t)((SDL_GetTicks()-last_paddle_tap)<TAP_EFFECT_LENGTH_TICKS);
+	}
+
     if ( ( paddling || joy_paddling ) && plyr->control.is_paddling == False ) {
         plyr->control.is_paddling = True;
         plyr->control.paddle_time = g_game.time;
@@ -560,6 +634,7 @@ static void racing_term(void)
 
 START_KEYBOARD_CB( quit_racing_cb )
 {
+	touch_control=False;
     if ( release ) return;
     g_game.race_aborted = True;
     set_game_mode( GAME_OVER );
@@ -569,6 +644,7 @@ END_KEYBOARD_CB
 
 START_KEYBOARD_CB( turn_left_cb )
 {
+	touch_control=False;
     left_turn = (bool_t) !release;
 }
 END_KEYBOARD_CB
@@ -576,6 +652,7 @@ END_KEYBOARD_CB
 
 START_KEYBOARD_CB( turn_right_cb )
 {
+	touch_control=False;
     right_turn = (bool_t) !release;
 }
 END_KEYBOARD_CB
@@ -583,6 +660,7 @@ END_KEYBOARD_CB
 
 START_KEYBOARD_CB( trick_modifier_cb )
 {
+	touch_control=False;
     trick_modifier = (bool_t) !release;
 }
 END_KEYBOARD_CB
@@ -590,12 +668,14 @@ END_KEYBOARD_CB
 
 START_KEYBOARD_CB( brake_cb )
 {
+	touch_control=False;
     braking = (bool_t) !release;
 }
 END_KEYBOARD_CB
 
 START_KEYBOARD_CB( paddle_cb )
 {
+	touch_control=False;
     paddling = (bool_t) !release;
     if (paddling) plyr->control.is_accelerating = True; else  plyr->control.is_accelerating = False;
 }
@@ -604,6 +684,7 @@ END_KEYBOARD_CB
 
 START_KEYBOARD_CB( above_view_cb )
 {
+	touch_control=False;
     if ( release ) return;
     set_view_mode( plyr, ABOVE );
     setparam_view_mode( ABOVE );
@@ -612,6 +693,7 @@ END_KEYBOARD_CB
 
 START_KEYBOARD_CB( follow_view_cb )
 {
+	touch_control=False;
     if ( release ) return;
     set_view_mode( plyr, FOLLOW );
     setparam_view_mode( FOLLOW );
@@ -620,6 +702,7 @@ END_KEYBOARD_CB
 
 START_KEYBOARD_CB( behind_view_cb )
 {
+	touch_control=False;
     if ( release ) return;
     set_view_mode( plyr, BEHIND );
     setparam_view_mode( BEHIND );
@@ -628,6 +711,7 @@ END_KEYBOARD_CB
 
 START_KEYBOARD_CB( screenshot_cb )
 {
+	touch_control=False;
     if ( release ) return;
     screenshot();
 }
@@ -635,6 +719,7 @@ END_KEYBOARD_CB
 
 START_KEYBOARD_CB( pause_cb )
 {
+	touch_control=False;
     if ( release ) return;
     g_game.race_paused;
     set_game_mode( PAUSED );
@@ -643,6 +728,7 @@ END_KEYBOARD_CB
 
 START_KEYBOARD_CB( reset_cb )
 {
+	touch_control=False;
     if ( release ) return;
     set_game_mode( RESET );
 }
@@ -650,6 +736,7 @@ END_KEYBOARD_CB
 
 START_KEYBOARD_CB( jump_cb )
 {
+	touch_control=False;
     charging = (bool_t) !release;
 }
 END_KEYBOARD_CB

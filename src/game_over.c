@@ -55,7 +55,7 @@ static char* countryRanking = NULL;
 static char* worldRanking = NULL;
 static scalar_t friendsPercent,countryPercent,worldPercent;
 
-static void mouse_cb( int button, int state, int x, int y )
+static void mouse_cb( int button, int state, int finger_index, int x, int y )
 {
 #ifdef TARGET_OS_IPHONE
     if (g_game.practicing && !g_game.race_aborted && g_game.race.name!=NULL && did_player_beat_best_results()  && g_game.rankings_displayed==False) {

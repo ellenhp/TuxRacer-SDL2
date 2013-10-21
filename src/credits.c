@@ -118,7 +118,7 @@ static void go_back()
  \date    Created:  2000-09-27
  \date    Modified: 2000-09-27
  */
-void mouse_cb( int button, int state, int x, int y )
+void mouse_cb( int button, int state, int finger_index, int x, int y )
 {
     if ( state == WS_MOUSE_DOWN ) {
         go_back();

@@ -20,7 +20,7 @@ void GameMenu_motion_func( int x, int y )
 /*
  * This is here solely to hide the internals of the GUI library from tux racer
  */
-void GameMenu_mouse_func( int button, int state, int x, int y )
+void GameMenu_mouse_func( int button, int state, int finger_index, int x, int y )
 {
 	gui_mouse_button_event( button, state, x, y );
 }
