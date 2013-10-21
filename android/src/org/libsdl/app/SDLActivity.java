@@ -173,9 +173,7 @@ public class SDLActivity extends Activity {
     	Runnable minimizeTask=new Runnable() {
 			@Override
 			public void run() {
-		    	Intent intent = new Intent(Intent.ACTION_MAIN);
-		        intent.addCategory(Intent.CATEGORY_HOME);
-		        startActivity(intent);
+				android.os.Process.killProcess(android.os.Process.myPid());
 			}
     	};
     	runOnUiThread(minimizeTask);
