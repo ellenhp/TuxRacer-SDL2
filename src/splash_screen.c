@@ -33,10 +33,13 @@
 #endif
 
 #define COORD_OFFSET_AMT -0.5
+#define SPLASH_DISPLAY_TICKS 1500
 
 static const colour_t background_colour = { 0.48, 0.63, 0.90, 1.0 };
 
 static char* logo_binding = "logo";
+
+static int splash_start_ticks=0;
 
 static void goto_next_mode()
 {
@@ -85,6 +88,8 @@ void splash_screen_init(void)
 #endif
 
     reshape( getparam_x_resolution(), getparam_y_resolution() );
+
+	splash_start_ticks=SDL_GetTicks();
     
 #ifdef TARGET_OS_IPHONE
     // Skip the splash screen directly
@@ -148,6 +153,11 @@ static void draw_logo()
 
 void splash_screen_loop( scalar_t time_step )
 {
+	if (SDL_GetTicks()-splash_start_ticks>SPLASH_DISPLAY_TICKS)
+	{
+	    goto_next_mode();
+	}
+
     check_gl_error();
 
     update_audio();

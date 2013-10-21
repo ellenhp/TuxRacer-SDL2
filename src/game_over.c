@@ -47,6 +47,7 @@
 #include "bonus.h"
 
 #define NEXT_MODE RACE_SELECT
+#define GAME_OVER_DISPLAY_TICKS 1000
 
 static bool_t aborted = False;
 static bool_t race_won = False;
@@ -54,6 +55,7 @@ static char* friendsRanking = NULL;
 static char* countryRanking = NULL;
 static char* worldRanking = NULL;
 static scalar_t friendsPercent,countryPercent,worldPercent;
+static int game_over_start_ticks=0;
 
 static void mouse_cb( int button, int state, int finger_index, int x, int y )
 {
@@ -83,8 +85,11 @@ static void mouse_cb( int button, int state, int finger_index, int x, int y )
         winsys_post_redisplay();
     }
 #else
-    set_game_mode( NEXT_MODE );
-    winsys_post_redisplay();
+	if (SDL_GetTicks()-game_over_start_ticks>GAME_OVER_DISPLAY_TICKS)
+	{
+	    set_game_mode( NEXT_MODE );
+		winsys_post_redisplay();
+	}
 #endif
 }
 
@@ -446,6 +451,8 @@ void game_over_init(void)
     
     g_game.needs_save_or_display_rankings=False;
     g_game.rankings_displayed=False;
+
+	game_over_start_ticks=SDL_GetTicks();
 }
 
 void game_over_loop( scalar_t time_step )
