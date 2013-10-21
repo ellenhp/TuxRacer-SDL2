@@ -100,6 +100,9 @@ void loading_init(void)
     winsys_set_mouse_func( ui_event_mouse_func );
     winsys_set_motion_func( ui_event_motion_func );
     winsys_set_passive_motion_func( NULL );
+
+	reset_fog();
+
 #ifdef ASYNC_LOADING
     passInLoop = 0;
     
