@@ -119,13 +119,13 @@ static void draw_logo()
 	ur.y = ll.y + h;
 
 	{
-		GLint texcoords[]={
+		GLfloat texcoords[]={
 			0, 0,
 			0, 1,
 			1, 1,
 			1, 0};
 
-		GLint vertices[]={
+		GLfloat vertices[]={
 			ll.x, ll.y, 0,
 			ll.x, ur.y, 0,
 			ur.x, ur.y, 0,
@@ -136,8 +136,8 @@ static void draw_logo()
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-		glTexCoordPointer(2, GL_INT, 0, texcoords);
-		glVertexPointer(3, GL_INT, 0, vertices);
+		glTexCoordPointer(2, GL_FLOAT, 0, texcoords);
+		glVertexPointer(3, GL_FLOAT, 0, vertices);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
 		
 		glDisableClientState(GL_VERTEX_ARRAY);
