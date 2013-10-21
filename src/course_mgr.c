@@ -612,7 +612,8 @@ static int open_courses_cb( ClientData cd, Tcl_Interp *ip,
     list_elem_t last_elem = NULL;
     list_elem_t last_speed_elem = NULL;
     list_elem_t last_score_elem = NULL;
-    int i;
+    int i, j;
+	char preview_file[100];
     
     check_assertion( initialized,
                     "course_mgr module not initialized" );
@@ -635,6 +636,15 @@ static int open_courses_cb( ClientData cd, Tcl_Interp *ip,
     for ( i=0; i<num_courses; i++ ) {
         open_course_data_t *data;
         data = create_open_course_data( ip, list[i], &err_msg );
+
+#ifdef __ANDROID__
+		sprintf(preview_file, "courses/%s/preview.png", data->course);
+#else
+		sprintf(preview_file, "%s/courses/%s/preview.png", getparam_data_dir(), data->course);
+#endif
+
+		load_texture(data->course, preview_file, 1);
+		bind_texture(data->course, data->course);
         
         if ( data == NULL ) {
             goto bail_open_courses;

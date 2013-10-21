@@ -50,22 +50,6 @@ tux_load_texture noicon textures/noicon.png
 tux_load_texture no_preview courses/textures/hud/nopreview.png
 tux_bind_texture no_preview no_preview
 
-
-global ::course_dir
-
-#
-# Bind preview textures if they exist
-#
-foreach course_path [glob -nocomplain courses/*] {
-    if { $course_path == "courses/common" || $course_path == "courses/textures" || $course_path == "courses/course_idx.tcl" } {
-	continue;
-    }
-	set ::course_dir $course_path
-	set course_name [lindex [split $course_path "/"] 1 ]
-	tux_load_texture $course_name "$course_path/preview.png"
-	tux_bind_texture $course_name $course_name
-}
-
 tux_open_courses [concat \
     { \
     { \
@@ -119,13 +103,13 @@ tux_open_courses [concat \
                     -par_time 60.0 -conditions sunny -no_score \
     } \
     { \
-        -course ski_jump -name "Ski-Jump" \
+        -course ski_jump -name "Ski Jump" \
             -description "Try to get the longest flying time, make tricks, and to catch as many fishes as possible..." \
                     -par_time 40.0 \
                     -conditions evening -no_speed \
     } \
     { \
-        -course Half_Pipe -name "Half-Pipe" \
+        -course Half_Pipe -name "Half Pipe" \
             -description "Make tricks shaking the iPhone while jumping to earn points. Be carefull of the time remaining..." \
                     -par_time 80.0 \
                     -conditions sunny -no_speed \
