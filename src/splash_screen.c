@@ -33,21 +33,10 @@
 #endif
 
 #define COORD_OFFSET_AMT -0.5
-static const colour_t background_colour = { 0.48, 0.63, 0.90, 1.0 };
-#ifdef TARGET_OS_IPHONE
-#define NUM_LOGOS	1
-static char *logo_bindings = "splash_screen";
-#else
-#define NUM_LOGOS	4
 
-static char *logo_bindings[NUM_LOGOS] =
-{
-	"splash_screen_tl",
-	"splash_screen_bl",
-	"splash_screen_tr",
-	"splash_screen_br"
-};
-#endif
+static const colour_t background_colour = { 0.48, 0.63, 0.90, 1.0 };
+
+static char* logo_binding = "logo";
 
 static void goto_next_mode()
 {
@@ -57,9 +46,7 @@ static void goto_next_mode()
     /* 
      * Free textures
      */
-    for (i=0; i<NUM_LOGOS; i++) {
-	unbind_texture( logo_bindings[i] );
-    }
+	unbind_texture( logo_binding );
     flush_textures();
     winsys_post_redisplay();
 }
@@ -108,54 +95,53 @@ void splash_screen_init(void)
 
 static void draw_logo()
 {
-	GLuint texid[4];
-	int xoffsets[4] = { -1, -1, 0, 0 };
-	int yoffsets[4] = { 0, -1, 0, -1 };
+	GLuint texid;
 	point2d_t ll, ur;
 	GLint w, h;
 	int i;
 
 	glEnable( GL_TEXTURE_2D );
 
-	for (i=0; i<NUM_LOGOS; i++) {
-		if ( ! get_texture_binding( logo_bindings[i], &texid[i] ) ) {
-			return;
-		}
+	if ( ! get_texture_binding( logo_binding, &texid ) ) {
+		return;
 	}
 
 	glColor4f( 1.0, 1.0, 1.0, 1.0 );
 
-	for (i=0; i<NUM_LOGOS; i++) {
-		glBindTexture( GL_TEXTURE_2D, texid[i] );
+	glBindTexture( GL_TEXTURE_2D, texid );
 
-		w = 512;
-		h = 512;
+	h = getparam_y_resolution()/2; //scale to screen size
+	w = h*2;
 
-		{
-		GLfloat texcoords[]={
+	ll.x = getparam_x_resolution()/2 - w/2;
+	ll.y = getparam_y_resolution()/2 - h/2;
+	ur.x = ll.x + w;
+	ur.y = ll.y + h;
+
+	{
+		GLint texcoords[]={
 			0, 0,
 			0, 1,
 			1, 1,
 			1, 0};
 
-		GLfloat vertices[]={
-			ll.x, ll.y,
-			ll.x, ur.y,
-			ur.x, ur.y,
-			ur.x, ll.y};
+		GLint vertices[]={
+			ll.x, ll.y, 0,
+			ll.x, ur.y, 0,
+			ur.x, ur.y, 0,
+			ur.x, ll.y, 0};
 
 		GLubyte indices[] = {0, 1, 2, 2, 3, 0};
 
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-		glTexCoordPointer(2, GL_FLOAT, 0, texcoords);
-		glVertexPointer(3, GL_FLOAT, 0, vertices);
+		glTexCoordPointer(2, GL_INT, 0, texcoords);
+		glVertexPointer(3, GL_INT, 0, vertices);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
 		
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-		}
 	}
 }
 

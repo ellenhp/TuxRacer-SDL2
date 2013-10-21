@@ -122,8 +122,8 @@ tux_bind_texture track_mark track_mark
 tux_bind_texture track_tail track_tail
 
 # Splash screen
-# tux_load_texture splash_screen textures/splash_bl.png 0
-# tux_bind_texture splash_screen splash_screen
+tux_load_texture logo textures/logo.png 0
+tux_bind_texture logo logo
 
 # Snow Particle
 tux_load_texture snow_particle courses/textures/terrain/snowparticles.png 0

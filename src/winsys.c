@@ -344,17 +344,11 @@ int winsys_event_filter(void* userdata, SDL_Event* event)
     case SDL_APP_WILLENTERBACKGROUND:
         mute_audio();
         return 0;
-    case SDL_APP_DIDENTERBACKGROUND:
-        mute_audio();
-        set_game_mode( GAME_TYPE_SELECT );
-        ui_set_dirty();
-        return 0;
 	case SDL_APP_WILLENTERFOREGROUND:
-        init_ui_snow();
         unmute_audio();
 		return 0;
 	case SDL_APP_TERMINATING:
-		winsys_shutdown(0);
+		winsys_shutdown();
 		return 1;
 	}
 	return 1;
