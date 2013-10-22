@@ -45,6 +45,10 @@
 #define NEXT_MODE RACING
 
 void come_back_to_game(void) {
+	if (pause_is_for_long_tutorial_explanation)
+	{
+		training_resume_from_tutorial_explanation();
+	}
     g_game.race_paused=False;
     set_game_mode( NEXT_MODE );
     winsys_post_redisplay();
@@ -57,6 +61,11 @@ static void mouse_cb( int button, int state, int finger_index, int x, int y )
 	{
 		come_back_to_game();
 	}
+}
+
+void paused_joystick_button_func(int button)
+{
+	come_back_to_game();
 }
 
 static void cont_click_cb(button_t *button, void *userdata)
@@ -108,7 +117,6 @@ void draw_paused_text( void )
     }
 }
 
-static button_t * cont_btn = NULL;
 void paused_init(void) 
 {
     point2d_t dummy_pos = {0, 0};
@@ -116,29 +124,16 @@ void paused_init(void)
     winsys_set_display_func( main_loop );
     winsys_set_idle_func( main_loop );
     winsys_set_reshape_func( reshape );
-    if(pause_is_for_long_tutorial_explanation())
-        winsys_set_mouse_func( ui_event_mouse_func );
-    else
-        winsys_set_mouse_func( mouse_cb );
+    winsys_set_mouse_func( mouse_cb );
 
     winsys_set_motion_func( ui_event_motion_func );
     winsys_set_passive_motion_func( ui_event_motion_func );
     
-    g_game.race_paused=True;
+	winsys_set_joystick_button_func( paused_joystick_button_func );
 
-    cont_btn = button_create( dummy_pos, 150, 40, "instructions_button_label", Localize("Continue","src/paused.c") );
-    button_set_hilit_font_binding( cont_btn, "instructions_button_label_hilit" );
-    button_set_visible( cont_btn, True );
-    button_set_enabled( cont_btn, True );
-    button_set_click_event_cb( cont_btn, cont_click_cb, NULL );
+	g_game.race_paused=True;
 
     play_music( "paused" );
-}
-
-static void paused_term(void)
-{
-    button_delete( cont_btn );
-    cont_btn = NULL;
 }
 
 void paused_loop( scalar_t time_step )
@@ -184,11 +179,8 @@ void paused_loop( scalar_t time_step )
 
     ui_setup_display();
     
-    if (pause_is_for_long_tutorial_explanation()) {
-        button_set_position( cont_btn, make_point2d( 0 + 232 - button_get_width( cont_btn )/2.0, 12 ) );
-        ui_draw();
-    }
-    else {
+    if (!pause_is_for_long_tutorial_explanation())
+	{
         draw_paused_text();
     }
     
@@ -219,5 +211,5 @@ void paused_register()
 
     check_assertion( status == 0, "out of keymap entries" );
 
-    register_loop_funcs( PAUSED, paused_init, paused_loop, paused_term );
+    register_loop_funcs( PAUSED, paused_init, paused_loop, NULL );
 }

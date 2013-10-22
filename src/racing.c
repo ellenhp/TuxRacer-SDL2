@@ -70,7 +70,7 @@ static bool_t trick_modifier;
 static bool_t paddling;
 static bool_t charging;
 static bool_t braking;
-static scalar_t charge_start_time;
+static scalar_t charge_start_time=1000000;
 static int last_terrain;
 
 static bool_t touch_control=False;
@@ -110,6 +110,8 @@ void racing_mouse_func(int button, int state, int finger_index, int absolute_x, 
 {
 	float width=getparam_x_resolution(), height=getparam_y_resolution();
 	float x=absolute_x/width, y=absolute_y/height;
+
+	training_resume_from_tutorial_explanation();
 
 	touch_control=True;
 
@@ -181,6 +183,7 @@ void racing_init(void)
 	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_A, getparam_jump_key()[0]);
 	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_B, getparam_trick_modifier_key()[0]);
 	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_X, getparam_quit_key()[0]);
+	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_Y, getparam_pause_key()[0]);
         
     /* Initialize view */
     if ( getparam_view_mode() < 0 || 
@@ -446,11 +449,13 @@ void racing_loop( scalar_t time_step )
 		paddling = (bool_t)((SDL_GetTicks()-last_paddle_tap)<TAP_EFFECT_LENGTH_TICKS);
 	}
 
+	plyr->control.is_accelerating = paddling || joy_paddling;
+
     if ( ( paddling || joy_paddling ) && plyr->control.is_paddling == False ) {
         plyr->control.is_paddling = True;
         plyr->control.paddle_time = g_game.time;
     }
-    
+
     /*
      * Play flying sound and add Flying time to plyr->control.fly_total_time)
      */
@@ -683,7 +688,6 @@ START_KEYBOARD_CB( paddle_cb )
 {
 	touch_control=False;
     paddling = (bool_t) !release;
-    if (paddling) plyr->control.is_accelerating = True; else  plyr->control.is_accelerating = False;
 }
 END_KEYBOARD_CB
 

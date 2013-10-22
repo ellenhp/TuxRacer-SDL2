@@ -36,7 +36,7 @@
 #endif
 
 static int step = -1;
-static  uint32_t first_time_true = 0;
+static Uint32 first_time_true = 0;
 static bool_t is_condition_verified = False;
 static bool_t training_abort = False;
 static bool_t pause_for_long_tutorial_explanation = False;
@@ -89,7 +89,7 @@ static void print_instruction(const char* string, int line) {
 	}
 }
 
-static void drawRedCircle(GLint x, GLint y) {
+static void drawRedCircle(GLint x, GLint y, GLint radius) {
     int x_org = x;
     int y_org = y;
     GLuint texobj;
@@ -104,7 +104,7 @@ static void drawRedCircle(GLint x, GLint y) {
 
         
     ll = make_point2d( x_org, y_org);
-    ur = make_point2d( x_org + 110, y_org + 110 );
+    ur = make_point2d( x_org + radius, y_org + radius );
     tll = make_point2d( 0, 0 );
     tur = make_point2d(1, 1 );
     
@@ -139,26 +139,26 @@ static void drawRedCircle(GLint x, GLint y) {
 }  
 
 /* verifie qu'une condition a bien été vérifiée pendant au moins "sec" secondes */
-static bool_t check_condition_for_time(bool_t condition,int sec) {
-    uint32_t now;
-    if (!condition) {
-        first_time_true = get_clock_time();
-        is_condition_verified=False;
-        return False;
-    }
-    else {
-        if (is_condition_verified==False) {
-            first_time_true = get_clock_time();
-        }
-        is_condition_verified=True;
-        now = get_clock_time();
-        if ((now-first_time_true) >= sec) {
-            is_condition_verified=False;
-            return True;
-        }
-        else return False;
-    }
-    return False;
+static bool_t check_condition_for_time(bool_t condition, unsigned int ms) {
+    if (condition)
+	{
+        if (first_time_true==UINT_MAX)
+		{
+			first_time_true = SDL_GetTicks();
+		}
+		else
+		{
+			if (SDL_GetTicks()-first_time_true>ms)
+			{
+				return True;
+			}
+		}
+	}
+	else
+	{
+		first_time_true=UINT_MAX;
+	}
+	return False;
 }
 
 static void training_pause_for_tutorial_explanation(void)
@@ -197,194 +197,221 @@ void training_resume_from_tutorial_explanation(void)
     resume_from_tutorial_explanation = True;
 }
 
-
-
 static void draw_instructions(player_data_t *plyr)
 {
     switch (step) {
         case 0:
             print_instruction(Localize("Welcome to the basic tutorial.", ""),1);
-            print_instruction(Localize("You will learn here how to turn, to", ""),2);
-            print_instruction(Localize("accelerate, to brake to pause and to abort.", ""),3);
+            print_instruction(Localize("You will learn here how to turn,", ""),2);
+            print_instruction(Localize("accelerate, brake and pause.", ""),3);
             //N'est affiché que endant l'intro
             if(g_game.time>0) step++;
             break;
         case 1:
             print_instruction(Localize("Try to make tux turn right.", ""),1);
-            print_instruction(Localize("(Inclinate your iPhone.)", ""),2);
-            if (plyr->control.turn_fact>0.5) step = 2;
+			if (SDL_GetNumTouchDevices()>0)
+			{
+				print_instruction(Localize("(Turn your device to the right)", ""),2);
+			}
+			else
+			{
+				print_instruction(Localize("(Use the left analog stick)", ""),2);
+			}
+            if (plyr->control.turn_fact>0.5) step++;
             break;
         case 2:
-            print_instruction(Localize("Try to make tux turn left.", ""),1);
-            print_instruction(Localize("(Inclinate your iPhone.)", ""),2);
-            if (plyr->control.turn_fact<-0.4) step = 3;
+            print_instruction(Localize("Now make tux turn left.", ""),1);
+            if (plyr->control.turn_fact<-0.4) step++;
             break;
         case 3:
-            print_instruction(Localize("Push the red area to make tux paddling.", ""),1);
-            drawRedCircle(370.0, 0.0);
-            if (check_condition_for_time(plyr->control.is_accelerating,2)) step = 4;
+			print_instruction(Localize("Tux can paddle to go faster.", ""),1);
+			if (SDL_GetNumTouchDevices()>0)
+			{
+				print_instruction(Localize("(Tap the bottom right corner of the screen)", ""),2);
+	            drawRedCircle(getparam_x_resolution()-150, 50, 100);
+			}
+			else
+			{
+				print_instruction(Localize("(Push the analog stick forward)", ""),2);
+			}
+            if (check_condition_for_time(plyr->control.is_accelerating,1000)) step++;
             break;
         case 4:
-            training_pause_for_tutorial_explanation();
-            print_instruction(Localize("While the speed indicator is green,", ""),1);
-            print_instruction(Localize("paddling increases the speed of Tux.", ""),2);
-            print_instruction(Localize("But when it becomes yellow, it has the ", ""),3);
-            print_instruction(Localize("opposite effect. Then you must release", ""),4);
-            print_instruction(Localize("it to continue going faster", ""),5);
-            if(training_is_resumed()) step++;
+            print_instruction(Localize("Braking lets tux turn harder at high speed.", ""),1);
+			if (SDL_GetNumTouchDevices()>0)
+			{
+				print_instruction(Localize("Press and hold the bottom right corner to brake.", ""),2);
+	            drawRedCircle(10, 10, 100);
+			}
+			else
+			{
+				print_instruction(Localize("Pull the analog stick back to brake.", ""),2);
+			}
+            if (check_condition_for_time(plyr->control.is_braking,1000))
+			{
+				step++;
+				check_condition_for_time(False,0);
+			}
             break;
         case 5:
-            print_instruction(Localize("Push the red area to brake.", ""),1);
-            print_instruction(Localize("(Braking is useful when going fast to", ""),2);
-            print_instruction(Localize("turn harder).", ""),3);
-            drawRedCircle(10, 0.0);
-            if (check_condition_for_time(plyr->control.is_braking,2)) step = 6;
+            print_instruction(Localize("Now let's learn how to pause.", ""),1);
+            if(check_condition_for_time(True,2000)) step++;
             break;
         case 6:
-            print_instruction(Localize("Now let's learn how to Pause and to Abort.", ""),1);
-            if(check_condition_for_time(True,2)) step = 7;
+ 			if (SDL_GetNumTouchDevices()>0)
+			{
+	            print_instruction(Localize("Tap the center of the screen", ""),1);
+			}
+			else
+			{
+	            print_instruction(Localize("Press the Y button", ""),1);
+			}
+            if(g_game.race_paused==True) step++;
             break;
         case 7:
-            print_instruction(Localize("Double tap in the middle of the screen", ""),1);
-            print_instruction(Localize("to Pause.", ""),2);
-            if(g_game.race_paused==True) step = 8;
-            break;
-        case 8:
             print_instruction(Localize("Cool! Now come back to game.", ""),0);
-            print_instruction(Localize("Tap anywhere on the screen.", ""),1);
-            if(g_game.race_paused==False) step = 9;
-            break;
-        case 9:
-            print_instruction(Localize("Drag your finger from one area", ""),2);
-            print_instruction(Localize("to the other to abort.", ""),3);
-            drawRedCircle(10, 0.0);
-            drawRedCircle(370.0, 200);
-            if(g_game.race_aborted==True) step = -1;
-            training_abort=True;
+ 			if (SDL_GetNumTouchDevices()>0)
+			{
+	            print_instruction(Localize("Tap anywhere on the screen.", ""),1);
+			}
+			else
+			{
+	            print_instruction(Localize("Press any button", ""),1);
+			}
+            if(g_game.race_paused==False) step=-1;
             break;
         case -1:
-            print_instruction(Localize("Congratulation, you finished this tutorial.", ""),1);
-            print_instruction(Localize("You can now try the next one, to learn", ""),2);
-            print_instruction(Localize("some more advanced things and get better !", ""),3);
+            print_instruction(Localize("Good job. Now you know the basics of racing", ""),1);
+            print_instruction(Localize("The next tutorial will teach you how to jump", ""),2);
+            print_instruction(Localize("and do tricks!", ""),3);
             set_game_mode( GAME_OVER );
             break;
             					/* Fin du premier Tutorial */
                                 
                                 /* Début du second Tutorial */
         case 10:
-            print_instruction(Localize("Welcome to the Jump tutorial.", ""),1);
-            print_instruction(Localize("You will learn here to jump, to fly,", ""),2);
-            print_instruction(Localize("and to make tricks.", ""),3);
+            print_instruction(Localize("Welcome to the Jump tutorial where", ""),1);
+            print_instruction(Localize("you'll will learn to jump, fly and", ""),2);
+            print_instruction(Localize("do tricks!", ""),3);
             //N'est affiché que endant l'intro
             if(g_game.time>0) step=11;
             break;
         case 11:
-             print_instruction(Localize("Let's learn how to jump !", ""),1);
-             if (check_condition_for_time( True,1)) step = 12;
+ 			if (SDL_GetNumTouchDevices()>0)
+			{
+				print_instruction(Localize("Push the red area to accumulate enough", ""),1);
+				print_instruction(Localize("energy to jump.", ""),2);
+				drawRedCircle(370.0, 200, 100);
+			}
+			else
+			{
+				print_instruction(Localize("Hold down the O button to accumulate enough", ""),1);
+				print_instruction(Localize("energy to jump.", ""),2);
+			}
+			check_condition_for_time(False,0);
+            if (plyr->control.jump_charging) step++;
             break;
         case 12:
-            print_instruction(Localize("Push the red area to accumulate enough ", ""),2);
-            print_instruction(Localize("energy to jump.", ""),3);
-            drawRedCircle(370.0, 200);
-            if (plyr->control.jump_charging) step = 13;
+            print_instruction(Localize("You can see the energy gauge filling...", ""),1);
+            if (check_condition_for_time(True,1000))
+			{
+				check_condition_for_time(False,0);
+				step++;
+			}
             break;
         case 13:
-            print_instruction(Localize("You can see the energy gauge filling.", ""),1);
-            print_instruction(Localize("When you release the finger, all the energy", ""),2);
-            print_instruction(Localize("accumulated is released and used to jump.", ""),3);
-            if (check_condition_for_time( True,6)) step = 14;
+            print_instruction(Localize("Release the jump button to jump!", ""),1);
+            if (plyr->control.jumping) step++;
             break;
         case 14:
-            print_instruction(Localize("Now try to do a jump.", ""),1);
-            if (check_condition_for_time( True,1)) step = 15;
+            print_instruction(Localize("Ok, now try to do a longer jump. See", ""),1);
+            print_instruction(Localize("if you can spend a whole second in the", ""),2);
+            print_instruction(Localize("air. Use the terrain to your advantage.", ""),3);
+            if (check_condition_for_time(True,5000))
+			{
+				check_condition_for_time(False,0);
+				step++;
+			}
             break;
         case 15:
-            print_instruction(Localize("Try to do a jump.", ""),-3);
-            if (plyr->control.jumping) step = 16;
+            print_instruction(Localize("Try to do a longer jump (>1sec) off a bump.", ""),-3);
+            if (check_condition_for_time(plyr->control.is_flying,1000)) step++;
             break;
         case 16:
-            print_instruction(Localize("Ok, now try to do a longer jump.", ""),1);
-            print_instruction(Localize("(At least 1 second in the air.)", ""),2);
-            print_instruction(Localize("Go fast and jump on a bump.", ""),3);
-            if (check_condition_for_time( True,5)) step = 17;
+            print_instruction(Localize("Great!", ""),1);
+            if (check_condition_for_time( True,1)) step++;
             break;
         case 17:
-            print_instruction(Localize("Try to do a longer jump (>1sec) on a bump.", ""),-3);
-            if (check_condition_for_time(plyr->control.is_flying,1)) step = 18;
+            if (check_condition_for_time( True,1)) step++;
             break;
         case 18:
-            print_instruction(Localize("Great !.", ""),1);
-            if (check_condition_for_time( True,1)) step = 19;
-            break;
+            training_pause_for_tutorial_explanation();
+            print_instruction(Localize("Thera are two main things you can do while", ""),1);
+            print_instruction(Localize("you're in the air. First, you can try and", ""),2);
+            print_instruction(Localize("do a cool trick. Second, you can accelerate", ""),3);
+            print_instruction(Localize("to fly longer and go faster.", ""),4);
+            if(training_is_resumed())
+			{
+				step++;
+			}
+			else
+			{
+				break;
+			}
         case 19:
-            if (check_condition_for_time( True,1)) step = 20;
+            training_pause_for_tutorial_explanation();
+            print_instruction(Localize("To do a trick, find a bump while you're going", ""),1);
+            print_instruction(Localize("fast, jump off of it. While you're in the air,", ""),2);
+ 			if (SDL_GetNumTouchDevices()>0)
+			{
+				print_instruction(Localize("tap the upper right corner of the screen.", ""),3);
+	            drawRedCircle(getparam_x_resolution()-150, getparam_y_resolution()-150, 100);
+			}
+			else
+			{
+				print_instruction(Localize("press the A button.", ""),3);
+			}
+            if(training_is_resumed()) step++;
             break;
         case 20:
-            training_pause_for_tutorial_explanation();
-            print_instruction(Localize("Well, while you are in the air, there", ""),1);
-            print_instruction(Localize("are two things that you can do : doing", ""),2);
-            print_instruction(Localize("some funny tricks shaking the iPhone,", ""),3);
-            print_instruction(Localize("and flapping the wings (accelerate button)", ""),4);
-            print_instruction(Localize("to fly longer and get faster.", ""),5);
-            if(training_is_resumed()) step++;
+            print_instruction(Localize("Try to jump and do a trick.", ""),1);
+			check_condition_for_time(False,0);
+            if (plyr->tricks>0) step++;
             break;
         case 21:
-            training_pause_for_tutorial_explanation();
-            print_instruction(Localize("First of all, find a bump, go fast", ""),1);
-            print_instruction(Localize("on it, jump high and try to make a trick.", ""),2);
-            print_instruction(Localize("You can vary the tricks inclinating the iPhone", ""),3);
-            print_instruction(Localize("or pushing either brake or accelerating button", ""),4);
-            print_instruction(Localize("before shaking your iPhone.", ""),5);
-            if(training_is_resumed()) step++;
+            print_instruction(Localize("Great!", ""),1);
+            if (check_condition_for_time(True,2000)) step++;
             break;
         case 22:
-            print_instruction(Localize("Try to jump and make a trick.", ""),-3);
-            if (plyr->tricks>0) step = 23;
-            break;
-        case 23:
-            print_instruction(Localize("Great !.", ""),1);
-            if (check_condition_for_time( True,2)) step = 24;
-            break;
-        case 24:
             training_pause_for_tutorial_explanation();
-            print_instruction(Localize("Now, to finish, try to make a big jump ", ""),1);
-            print_instruction(Localize("(at least 1 seconds in the air) on a big bump", ""),2);
-            print_instruction(Localize("flapping your wings (pushing accelerate button).", ""),3);
+            print_instruction(Localize("Now, to finish, try to do a big jump", ""),1);
+            print_instruction(Localize("while flapping your wings to go faster.", ""),2);
             if(training_is_resumed()) {
                 step++;
-                step = 25;
                 if ((plyr->pos.z)<(-200)) {
                     point_t p = make_point(48.0,-105.8,-200.0);
                     racing_init_for_tutorial(p);
                 }
             }
             break;
-        case 25:
+        case 23:
             print_instruction(Localize("Try to do a long jump flying (>1sec).", ""),-3);
-            if (check_condition_for_time( (bool_t)(plyr->control.is_flying && plyr->control.is_accelerating),1)) step = -2;
+            if (check_condition_for_time( (bool_t)(plyr->control.is_flying && plyr->control.is_accelerating),1000)) step = -2;
             break;
         case -2:
-            print_instruction(Localize("Congratulation, you finished this tutorial.", ""),1);
-            print_instruction(Localize("You are now ready to participate to the", ""),2);
-            print_instruction(Localize("world challenge !", ""),3);
-            print_instruction(Localize("Try to be the best !", ""),4);
-            if (!(plyr->control.is_accelerating)) step = -3;
-            break;
-        case -3:
-            print_instruction(Localize("Congratulation, you finished this tutorial.", ""),1);
-            print_instruction(Localize("You are now ready to participate to the", ""),2);
-            print_instruction(Localize("world challenge !", ""),3);
-            print_instruction(Localize("Try to be the best !", ""),4);
-            training_abort=True;
-            g_game.race_aborted = True;
+            print_instruction(Localize("Congratulations, you finished this tutorial.", ""),1);
+            print_instruction(Localize("You can apply these skills to different", ""),2);
+            print_instruction(Localize("courses. Sometimes you should focus on speed", ""),3);
+            print_instruction(Localize("and picking up food. Sometimes you have to", ""),4);
+            print_instruction(Localize("do tricks to get a good score.", ""),5);
             set_game_mode( GAME_OVER );
             break;
             						/* Fin du second Tutorial */ 
             break;
             		        			/*    abandon     */
         case -100:
-            print_instruction(Localize("You didn't finished this tutorial.", ""),1);
-            print_instruction(Localize("You should try again !", ""),2);
+            print_instruction(Localize("You didn't finish this tutorial.", ""),1);
+            print_instruction(Localize("You should try again!", ""),2);
             break;
             
         default:

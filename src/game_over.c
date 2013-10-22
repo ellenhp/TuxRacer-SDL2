@@ -446,7 +446,6 @@ void game_over_init(void)
     
     if ( (!g_game.practicing &&!aborted) || (!g_game.practicing && aborted && !game_abort_is_for_tutorial())) {
         race_won = was_current_race_won();
-        init_starting_tutorial_step(-100);
     }
     
     g_game.needs_save_or_display_rankings=False;
