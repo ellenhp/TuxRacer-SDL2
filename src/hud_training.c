@@ -210,7 +210,7 @@ static void draw_instructions(player_data_t *plyr)
             break;
         case 1:
             print_instruction(Localize("Try to make tux turn right.", ""),1);
-			if (SDL_GetNumTouchDevices()>0)
+			if (!winsys_is_controller_active())
 			{
 				print_instruction(Localize("(Turn your device to the right)", ""),2);
 			}
@@ -226,7 +226,7 @@ static void draw_instructions(player_data_t *plyr)
             break;
         case 3:
 			print_instruction(Localize("Tux can paddle to go faster.", ""),1);
-			if (SDL_GetNumTouchDevices()>0)
+			if (!winsys_is_controller_active())
 			{
 				print_instruction(Localize("(Tap the bottom right corner of the screen)", ""),2);
 	            drawRedCircle(getparam_x_resolution()-150, 50, 100);
@@ -239,7 +239,7 @@ static void draw_instructions(player_data_t *plyr)
             break;
         case 4:
             print_instruction(Localize("Braking lets tux turn harder at high speed.", ""),1);
-			if (SDL_GetNumTouchDevices()>0)
+			if (!winsys_is_controller_active())
 			{
 				print_instruction(Localize("Press and hold the bottom right corner to brake.", ""),2);
 	            drawRedCircle(10, 10, 100);
@@ -259,7 +259,7 @@ static void draw_instructions(player_data_t *plyr)
             if(check_condition_for_time(True,2000)) step++;
             break;
         case 6:
- 			if (SDL_GetNumTouchDevices()>0)
+ 			if (!winsys_is_controller_active())
 			{
 	            print_instruction(Localize("Tap the center of the screen", ""),1);
 			}
@@ -271,7 +271,7 @@ static void draw_instructions(player_data_t *plyr)
             break;
         case 7:
             print_instruction(Localize("Cool! Now come back to game.", ""),0);
- 			if (SDL_GetNumTouchDevices()>0)
+ 			if (!winsys_is_controller_active())
 			{
 	            print_instruction(Localize("Tap anywhere on the screen.", ""),1);
 			}
@@ -298,7 +298,7 @@ static void draw_instructions(player_data_t *plyr)
             if(g_game.time>0) step=11;
             break;
         case 11:
- 			if (SDL_GetNumTouchDevices()>0)
+ 			if (!winsys_is_controller_active())
 			{
 				print_instruction(Localize("Push the red area to accumulate enough", ""),1);
 				print_instruction(Localize("energy to jump.", ""),2);
@@ -363,7 +363,7 @@ static void draw_instructions(player_data_t *plyr)
             training_pause_for_tutorial_explanation();
             print_instruction(Localize("To do a trick, find a bump while you're going", ""),1);
             print_instruction(Localize("fast, jump off of it. While you're in the air,", ""),2);
- 			if (SDL_GetNumTouchDevices()>0)
+ 			if (!winsys_is_controller_active())
 			{
 				print_instruction(Localize("tap the upper right corner of the screen.", ""),3);
 	            drawRedCircle(getparam_x_resolution()-150, getparam_y_resolution()-150, 100);

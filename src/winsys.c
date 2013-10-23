@@ -504,6 +504,11 @@ bool_t winsys_is_joystick_active()
 	return (bool_t)(winsys_game_controller!=NULL || winsys_joystick!=NULL);
 }
 
+bool_t winsys_is_controller_active()
+{
+	return (bool_t)(winsys_game_controller!=NULL);
+}
+
 /*---------------------------------------------------------------------------*/
 /*! 
   Deallocates resources in preparation for program termination

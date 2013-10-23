@@ -389,6 +389,7 @@ void winsys_show_rankings( void );
 
 void winsys_init_joystick();
 bool_t winsys_is_joystick_active();
+bool_t winsys_is_controller_active();
 
 #ifdef __cplusplus
 } /* extern "C" */
