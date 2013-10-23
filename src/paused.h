@@ -29,6 +29,7 @@ extern "C"
     void paused_loop( scalar_t time_step );
     void paused_register();
     void come_back_to_game();
+    void force_pause_for_ticks(int ticks);
         
 #endif
         

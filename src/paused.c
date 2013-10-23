@@ -44,7 +44,14 @@
 
 #define NEXT_MODE RACING
 
+unsigned int pause_start;
+unsigned int pause_min_ticks;
+
+
 void come_back_to_game(void) {
+	if (SDL_GetTicks()-pause_start<pause_min_ticks)
+		return;
+	pause_min_ticks=0;
 	if (pause_is_for_long_tutorial_explanation)
 	{
 		training_resume_from_tutorial_explanation();
@@ -54,6 +61,10 @@ void come_back_to_game(void) {
     winsys_post_redisplay();
 }
 
+void force_pause_for_ticks(int ticks)
+{
+	pause_min_ticks=(unsigned int)ticks;
+}
 
 static void mouse_cb( int button, int state, int finger_index, int x, int y )
 {
@@ -132,6 +143,8 @@ void paused_init(void)
 	winsys_set_joystick_button_func( paused_joystick_button_func );
 
 	g_game.race_paused=True;
+
+	pause_start=SDL_GetTicks();
 
     play_music( "paused" );
 }

@@ -167,6 +167,7 @@ static void training_pause_for_tutorial_explanation(void)
     {
         pause_for_long_tutorial_explanation = True;
         resume_from_tutorial_explanation = False;
+		force_pause_for_ticks(1000);
         set_game_mode(PAUSED);
     }
 }
