@@ -362,7 +362,7 @@ static void draw_instructions(player_data_t *plyr)
         case 19:
             training_pause_for_tutorial_explanation();
             print_instruction(Localize("To do a trick, find a bump while you're going", ""),1);
-            print_instruction(Localize("fast, jump off of it. While you're in the air,", ""),2);
+            print_instruction(Localize("fast and jump off of it. While you're in the air,", ""),2);
  			if (!winsys_is_controller_active())
 			{
 				print_instruction(Localize("tap the upper right corner of the screen.", ""),3);
@@ -372,6 +372,7 @@ static void draw_instructions(player_data_t *plyr)
 			{
 				print_instruction(Localize("press the A button.", ""),3);
 			}
+			plyr->tricks=0;
             if(training_is_resumed()) step++;
             break;
         case 20:
@@ -389,14 +390,17 @@ static void draw_instructions(player_data_t *plyr)
             print_instruction(Localize("while flapping your wings to go faster.", ""),2);
             if(training_is_resumed()) {
                 step++;
-                if ((plyr->pos.z)<(-200)) {
+				check_condition_for_time(False,0);
+                /* This code resets the player to somewhere else on the map. Why was this put here???
+				if ((plyr->pos.z)<(-200)) {
                     point_t p = make_point(48.0,-105.8,-200.0);
                     racing_init_for_tutorial(p);
                 }
+				*/
             }
             break;
         case 23:
-            print_instruction(Localize("Try to do a long jump flying (>1sec).", ""),-3);
+            print_instruction(Localize("Try to do a long flying jump (>1sec).", ""),-3);
             if (check_condition_for_time( (bool_t)(plyr->control.is_flying && plyr->control.is_accelerating),1000)) step = -2;
             break;
         case -2:
