@@ -178,6 +178,7 @@ void racing_init(void)
     winsys_set_motion_func( NULL );
     winsys_set_passive_motion_func( NULL );
 	winsys_set_joystick_func( racing_joystick_func );
+	winsys_set_joystick_button_func( NULL );
 
 	winsys_reset_js_bindings();
 	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_A, getparam_jump_key()[0]);
