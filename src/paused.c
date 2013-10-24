@@ -79,12 +79,6 @@ void paused_joystick_button_func(int button)
 	come_back_to_game();
 }
 
-static void cont_click_cb(button_t *button, void *userdata)
-{
-    training_resume_from_tutorial_explanation();
-    come_back_to_game();
-}
-
 /*---------------------------------------------------------------------------*/
 /*! 
   Draws the text for the paused screen

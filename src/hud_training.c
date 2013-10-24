@@ -241,8 +241,8 @@ static void draw_instructions(player_data_t *plyr)
             print_instruction(Localize("Braking lets tux turn harder at high speed.", ""),1);
 			if (!winsys_is_controller_active())
 			{
-				print_instruction(Localize("Press and hold the bottom right corner to brake.", ""),2);
-	            drawRedCircle(10, 10, 100);
+				print_instruction(Localize("Tap the bottom right corner to brake.", ""),2);
+	            drawRedCircle(50, 50, 100);
 			}
 			else
 			{
@@ -302,7 +302,7 @@ static void draw_instructions(player_data_t *plyr)
 			{
 				print_instruction(Localize("Push the red area to accumulate enough", ""),1);
 				print_instruction(Localize("energy to jump.", ""),2);
-				drawRedCircle(370.0, 200, 100);
+				drawRedCircle(50, getparam_y_resolution()-150, 100);
 			}
 			else
 			{
@@ -336,16 +336,17 @@ static void draw_instructions(player_data_t *plyr)
             break;
         case 15:
             print_instruction(Localize("Try to do a longer jump (>1sec) off a bump.", ""),-3);
-            if (check_condition_for_time(plyr->control.is_flying,1000)) step++;
+            if (check_condition_for_time(plyr->control.is_flying,1000))
+			{
+				check_condition_for_time(False,0);
+				step++;
+			}
             break;
         case 16:
             print_instruction(Localize("Great!", ""),1);
-            if (check_condition_for_time( True,1)) step++;
+            if (check_condition_for_time( True,2000)) step++;
             break;
         case 17:
-            if (check_condition_for_time( True,1)) step++;
-            break;
-        case 18:
             training_pause_for_tutorial_explanation();
             print_instruction(Localize("Thera are two main things you can do while", ""),1);
             print_instruction(Localize("you're in the air. First, you can try and", ""),2);
@@ -359,7 +360,7 @@ static void draw_instructions(player_data_t *plyr)
 			{
 				break;
 			}
-        case 19:
+        case 18:
             training_pause_for_tutorial_explanation();
             print_instruction(Localize("To do a trick, find a bump while you're going", ""),1);
             print_instruction(Localize("fast and jump off of it. While you're in the air,", ""),2);
@@ -375,16 +376,16 @@ static void draw_instructions(player_data_t *plyr)
 			plyr->tricks=0;
             if(training_is_resumed()) step++;
             break;
-        case 20:
+        case 19:
             print_instruction(Localize("Try to jump and do a trick.", ""),1);
 			check_condition_for_time(False,0);
             if (plyr->tricks>0) step++;
             break;
-        case 21:
+        case 20:
             print_instruction(Localize("Great!", ""),1);
             if (check_condition_for_time(True,2000)) step++;
             break;
-        case 22:
+        case 21:
             training_pause_for_tutorial_explanation();
             print_instruction(Localize("Now, to finish, try to do a big jump", ""),1);
             print_instruction(Localize("while flapping your wings to go faster.", ""),2);
@@ -399,7 +400,7 @@ static void draw_instructions(player_data_t *plyr)
 				*/
             }
             break;
-        case 23:
+        case 22:
             print_instruction(Localize("Try to do a long flying jump (>1sec).", ""),-3);
             if (check_condition_for_time( (bool_t)(plyr->control.is_flying && plyr->control.is_accelerating),1000)) step = -2;
             break;
