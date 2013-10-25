@@ -32,9 +32,9 @@ struct char_dims {
     unsigned short ch;
     unsigned char w;
     unsigned char h;
-    char x_offset;
-    char y_offset;
-    char kern_width;
+    signed char x_offset;
+    signed char y_offset;
+    signed char kern_width;
     short x_pixel;
     short y_pixel;
 };
@@ -115,6 +115,8 @@ tex_font_metrics_t* load_tex_font_metrics( const char *filename )
 	goto bail;
     }
 
+	print_debug(DEBUG_OTHER, "swap bytes: %d", swap_bytes);
+
     /* Read in texture_width, texture_height, max_ascent, max_descent */
     READ_BYTES( tfm_file, &texture_width, sizeof(int), swap_bytes );
     READ_BYTES( tfm_file, &texture_height, sizeof(int), swap_bytes );
@@ -169,7 +171,11 @@ tex_font_metrics_t* load_tex_font_metrics( const char *filename )
 	cd->kern_width = ch_dims.kern_width;
 
 	tfm->char_data[ch_dims.ch] = cd;
+
+	print_debug(DEBUG_OTHER, "character: %c w: %d h: %d x_offset: %d y_offset: %d kern_width: %d y_pixel: %d x_pixel: %d", ch_dims.ch, ch_dims.w, ch_dims.h, ch_dims.x_offset, ch_dims.y_offset, ch_dims.kern_width,
+		ch_dims.y_pixel, ch_dims.x_pixel);
     }
+
 
     SDL_RWclose( tfm_file );
 
