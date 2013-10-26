@@ -31,6 +31,7 @@
 #include "loop.h"
 #include "racing.h"
 #include "paused.h"
+#include "hud.h"
 #ifdef TARGET_OS_IPHONE
     #include "sharedGeneralFunctions.h"
 #endif
@@ -63,10 +64,10 @@ static void print_instruction(const char* string, int line) {
     
 	{
     GLfloat vertices[]={
-		0.0, (float)(200-(line-2)*(asc+desc)) -5.0, 0,
-		0.0, (float)(200-(line-1)*(asc+desc)) -5.0, 0,
-		480.0, (float)(200-(line-1)*(asc+desc)) -5.0, 0,
-		480.0, (float)(200-(line-2)*(asc+desc)) -5.0, 0};
+		OVERSCAN_MARGIN_X, (float)(200-(line-2)*(asc+desc)) -5.0, 0,
+		OVERSCAN_MARGIN_X, (float)(200-(line-1)*(asc+desc)) -5.0, 0,
+		OVERSCAN_MARGIN_X+480.0, (float)(200-(line-1)*(asc+desc)) -5.0, 0,
+		OVERSCAN_MARGIN_X+480.0, (float)(200-(line-2)*(asc+desc)) -5.0, 0};
 
 	GLubyte indices[] = {0, 1, 2, 2, 3, 0};
 
@@ -80,7 +81,7 @@ static void print_instruction(const char* string, int line) {
     glEnable(GL_TEXTURE_2D);
     glPushMatrix();
     {
-        glTranslatef( 240.0-(float)w/2.0,
+        glTranslatef( 240.0-(float)w/2.0+OVERSCAN_MARGIN_X,
                      200-(line-1)*(asc+desc),
                      0 );
         draw_string( font, (char*)string );
