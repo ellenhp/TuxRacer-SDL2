@@ -771,16 +771,27 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         public boolean onGenericMotion(View v, MotionEvent event) {
             int actionPointerIndex = event.getActionIndex();
             int action = event.getActionMasked();
-
             if ( (event.getSource() & InputDevice.SOURCE_JOYSTICK) != 0) {
                 switch(action) {
                     case MotionEvent.ACTION_MOVE:
                         int id = SDLActivity.getJoyId( event.getDeviceId() );
-                        float axes[]=new float[2];
-                        axes[0]= event.getAxisValue(MotionEvent.AXIS_X, actionPointerIndex);
-                        axes[1]= event.getAxisValue(MotionEvent.AXIS_Y, actionPointerIndex);
-                        for (int i=0; i<axes.length; i++) {
-                        	SDLActivity.onNativeJoy(id, i, axes[i]);
+                        int axisIndices[]=new int[2];
+                        float axisValues[]=new float[2];
+                        int rotation=getWindowManager().getDefaultDisplay().getRotation();
+                        if (rotation==Surface.ROTATION_0 || rotation==Surface.ROTATION_180)
+                        {
+                        	axisIndices[0]=0;
+                        	axisIndices[1]=1;
+                        }
+                        else
+                        {
+                        	axisIndices[0]=1;
+                        	axisIndices[1]=0;
+                        }
+                        axisValues[axisIndices[0]]= event.getAxisValue(MotionEvent.AXIS_X, actionPointerIndex);
+                        axisValues[axisIndices[1]]= event.getAxisValue(MotionEvent.AXIS_Y, actionPointerIndex);
+                        for (int i=0; i<axisValues.length; i++) {
+                        	SDLActivity.onNativeJoy(id, i, axisValues[i]);
                         }
                         break;
                 }
