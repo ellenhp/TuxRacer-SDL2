@@ -64,7 +64,7 @@ widget_t* graphics_slider=NULL;
 #define NUM_VIEW_OPTIONS 4
 widget_t* view_slider=NULL;
 
-widget_t* fps_btn=NULL;
+widget_t* fps_slider=NULL;
 
 int music_volume_ticks=0;
 int sound_volume_ticks=0;
@@ -143,11 +143,11 @@ void update_fps()
 {
 	if (display_fps)
 	{
-		widget_set_text(fps_btn, "Show FPS: Yes");
+		widget_set_text(fps_slider, "Show FPS: Yes");
 	}
 	else
 	{
-		widget_set_text(fps_btn, "Show FPS: No");
+		widget_set_text(fps_slider, "Show FPS: No");
 	}
 
 	setparam_display_fps(display_fps);
@@ -205,12 +205,14 @@ void view_down(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, i
 	update_view_slider();
 }
 
-void fps_click(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
+void fps_up(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
 {
-	if (display_fps)
-		display_fps=False;
-	else
-		display_fps=True;
+	display_fps=True;
+	update_fps();
+}
+void fps_down(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
+{
+	display_fps=False;
 	update_fps();
 }
 
@@ -244,7 +246,7 @@ static void prefs_init(void)
 	view_slider=create_slider("", view_down, view_up);
 	gui_add_widget(view_slider, NULL);
 
-	gui_add_widget(fps_btn=create_button("", fps_click), NULL);
+	gui_add_widget(fps_slider=create_slider("", fps_down, fps_up), NULL);
 	
 	music_volume_ticks=getparam_music_volume();
 	sound_volume_ticks=getparam_sound_volume();
