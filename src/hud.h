@@ -27,6 +27,16 @@ extern "C"
 
 #include "tuxracer.h"
 
+//#define OVERSCAN_COMPENSATION
+
+#ifdef OVERSCAN_COMPENSATION
+#define OVERSCAN_MARGIN_X (getparam_x_resolution()/10.0)
+#define OVERSCAN_MARGIN_Y (getparam_y_resolution()/10.0)
+#else
+#define OVERSCAN_MARGIN_X 0
+#define OVERSCAN_MARGIN_Y 0
+#endif
+
 void draw_hud( player_data_t *plyr );
 void print_fps();
 

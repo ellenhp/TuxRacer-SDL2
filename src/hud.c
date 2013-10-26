@@ -29,6 +29,7 @@
 #include "game_logic_util.h"
 #include "course_load.h"
 #include "bonus.h"
+#include "hud.h"
 
 #define SECONDS_IN_MINUTE 60
 
@@ -164,8 +165,8 @@ static void draw_time(player_data_t* plyr)
 
     glPushMatrix();
     {
-	glTranslatef( TIME_LABEL_X_OFFSET, 
-		      getparam_y_resolution() - TIME_LABEL_Y_OFFSET - 
+	glTranslatef( TIME_LABEL_X_OFFSET + OVERSCAN_MARGIN_X, 
+		      getparam_y_resolution() - TIME_LABEL_Y_OFFSET - OVERSCAN_MARGIN_Y - 
 		      asc, 
 		      0 );
 	draw_string( font, string );
@@ -192,8 +193,8 @@ static void draw_time(player_data_t* plyr)
 
     glPushMatrix();
     {
-	glTranslatef( TIME_X_OFFSET, 
-		      time_y_refval - TIME_Y_OFFSET - asc, 
+	glTranslatef( TIME_X_OFFSET + OVERSCAN_MARGIN_X, 
+		      time_y_refval - TIME_Y_OFFSET - OVERSCAN_MARGIN_Y - asc, 
 		      0 );
 	draw_string( font, string );
     }
@@ -214,8 +215,8 @@ static void draw_time(player_data_t* plyr)
 
     glPushMatrix();
     {
-	glTranslatef( TIME_X_OFFSET + w + 5, 
-		      time_y_refval - TIME_Y_OFFSET,  
+	glTranslatef( TIME_X_OFFSET + OVERSCAN_MARGIN_X + w + 5, 
+		      time_y_refval - TIME_Y_OFFSET - OVERSCAN_MARGIN_Y,  
 		      0 );
 	get_font_metrics( font, string, &w, &asc, &desc );
 	glTranslatef( 0, -asc-2, 0 );
@@ -284,8 +285,8 @@ static void draw_herring_count( int herring_count )
 
     glPushMatrix();
 	{        
-        glTranslatef( getparam_x_resolution() - HERRING_ICON_X_OFFSET,
-                     getparam_y_resolution() - HERRING_ICON_Y_OFFSET - asc, 
+        glTranslatef( getparam_x_resolution() - HERRING_ICON_X_OFFSET - OVERSCAN_MARGIN_X,
+                     getparam_y_resolution() - HERRING_ICON_Y_OFFSET - OVERSCAN_MARGIN_Y - asc, 
                      0 );
         
         glEnableClientState (GL_VERTEX_ARRAY);
@@ -337,8 +338,8 @@ static void draw_score( player_data_t *plyr )
     
     glPushMatrix();
     {
-        glTranslatef( SCORE_X_OFFSET,
-                     SCORE_Y_OFFSET,
+        glTranslatef( SCORE_X_OFFSET + OVERSCAN_MARGIN_X,
+                     SCORE_Y_OFFSET + OVERSCAN_MARGIN_Y,
                      0 );
         draw_string( font, string );
     }
@@ -518,8 +519,8 @@ void draw_gauge( scalar_t speed, scalar_t energy )
 			0, 0
         };
 
-        glTranslatef( getparam_x_resolution() - GAUGE_WIDTH,
-                     0,
+        glTranslatef( getparam_x_resolution() - GAUGE_WIDTH - OVERSCAN_MARGIN_X,
+                     OVERSCAN_MARGIN_Y,
                      0 );
 
 		glEnableClientState (GL_VERTEX_ARRAY);
@@ -660,8 +661,8 @@ void print_fps()
 
     glPushMatrix();
     {
-	glTranslatef( FPS_X_OFFSET,
-		      FPS_Y_OFFSET+asc+desc,
+	glTranslatef( FPS_X_OFFSET+OVERSCAN_MARGIN_X,
+		      FPS_Y_OFFSET+OVERSCAN_MARGIN_Y+asc+desc,
 		      0 );
 	draw_string( font, string );
     }
