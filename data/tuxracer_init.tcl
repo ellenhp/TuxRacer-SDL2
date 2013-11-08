@@ -130,22 +130,28 @@ tux_load_texture snow_particle courses/textures/terrain/snowparticles.png 0
 tux_bind_texture snow_particle snow_particle
 
 # Fonts
-tux_load_texture trebuchet_yel_blk fonts/trebuchet_yel_blk.png 0
-tux_load_font -name trebuchet_yel_blk -file fonts/trebuchet.tfm \
-              -texture trebuchet_yel_blk
-tux_bind_font -binding time_label -font trebuchet_yel_blk -size 20
-tux_bind_font -binding time_value -font trebuchet_yel_blk -size 30
-tux_bind_font -binding time_hundredths -font trebuchet_yel_blk -size 20
-tux_bind_font -binding herring_count -font trebuchet_yel_blk -size 30
-tux_bind_font -binding speed_digits -font trebuchet_yel_blk -size 35
-tux_bind_font -binding speed_units -font trebuchet_yel_blk -size 20
-tux_bind_font -binding fps -font trebuchet_yel_blk -size 20 
-
+tux_load_texture trebuchet_outline fonts/trebuchet_outline.png 0
+tux_load_font -name trebuchet_outline -file fonts/trebuchet.tfm \
+              -texture trebuchet_outline -colour { 1.00 0.89 0.01 1.0 }
+tux_bind_font -binding time_label -font trebuchet_outline -size 20 \
+			  -colour { 1.00 0.89 0.01 1.0 }
+tux_bind_font -binding time_value -font trebuchet_outline -size 30 \
+			  -colour { 1.00 0.89 0.01 1.0 }
+tux_bind_font -binding time_hundredths -font trebuchet_outline -size 20 \
+			  -colour { 1.00 0.89 0.01 1.0 }
+tux_bind_font -binding herring_count -font trebuchet_outline -size 30 \
+			  -colour { 1.00 0.89 0.01 1.0 }
+tux_bind_font -binding speed_digits -font trebuchet_outline -size 35 \
+			  -colour { 1.00 0.89 0.01 1.0 }
+tux_bind_font -binding speed_units -font trebuchet_outline -size 20 \
+			  -colour { 1.00 0.89 0.01 1.0 }
+tux_bind_font -binding fps -font trebuchet_outline -size 20 \
+			  -colour { 1.00 0.89 0.01 1.0 }
 
 tux_load_texture trebuchet_white fonts/trebuchet_white.png 0
 tux_load_font -name trebuchet_white -file fonts/trebuchet.tfm \
               -texture trebuchet_white
-tux_bind_font -binding bonus -font trebuchet_yel_blk -size 15 \
+tux_bind_font -binding bonus -font trebuchet_outline -size 15 \
 			              -colour { 1.00 0.0 0.00 1.0 }
 tux_bind_font -binding button_label -font trebuchet_white -size 30
 tux_bind_font -binding button_label_hilit -font trebuchet_white -size 30 \
@@ -171,18 +177,26 @@ tux_bind_font -binding cup_status -font trebuchet_white -size 16 \
               -colour { 1.00 0.89 0.01 1.0 }
 tux_bind_font -binding racing_mode_info -font trebuchet_white -size 13 \
 			              -colour { 1.00 1.00 1.00 1.0 }
-tux_bind_font -binding race_over -font trebuchet_yel_blk -size 40
-tux_bind_font -binding race_stats -font trebuchet_yel_blk -size 25
-tux_bind_font -binding race_stats_label -font trebuchet_yel_blk -size 25
-tux_bind_font -binding race_result_msg -font trebuchet_yel_blk -size 25
-tux_bind_font -binding paused -font trebuchet_yel_blk -size 40
+tux_bind_font -binding race_over -font trebuchet_outline -size 40\
+			  -colour { 1.00 0.89 0.01 1.0 }
+tux_bind_font -binding race_stats -font trebuchet_outline -size 25\
+			  -colour { 1.00 0.89 0.01 1.0 }
+tux_bind_font -binding race_stats_label -font trebuchet_outline -size 25\
+			  -colour { 1.00 0.89 0.01 1.0 }
+tux_bind_font -binding race_result_msg -font trebuchet_outline -size 25\
+			  -colour { 1.00 0.89 0.01 1.0 }
+tux_bind_font -binding paused -font trebuchet_outline -size 40\
+			  -colour { 1.00 0.89 0.01 1.0 }
 
-tux_bind_font -binding credits_h1 -font trebuchet_yel_blk -size 30
-tux_bind_font -binding credits_h2 -font trebuchet_yel_blk -size 20
+tux_bind_font -binding credits_h1 -font trebuchet_outline -size 30 \
+			  -colour { 1.00 0.89 0.01 1.0 }
+tux_bind_font -binding credits_h2 -font trebuchet_outline -size 20 \
+			  -colour { 1.00 0.89 0.01 1.0 }
 tux_bind_font -binding credits_text -font trebuchet_white -size 20
 tux_bind_font -binding credits_text_small -font trebuchet_white -size 14
 
-tux_bind_font -binding loading -font trebuchet_yel_blk -size 30
+tux_bind_font -binding loading -font trebuchet_outline -size 30 \
+			  -colour { 1.00 0.89 0.01 1.0 }
 
 # HUD
 tux_load_texture herring_icon textures/herringicon.png 0
