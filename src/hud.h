@@ -27,15 +27,10 @@ extern "C"
 
 #include "tuxracer.h"
 
-//#define OVERSCAN_COMPENSATION
+extern int overscan_percent;
 
-#ifdef OVERSCAN_COMPENSATION
-#define OVERSCAN_MARGIN_X (getparam_x_resolution()/10.0)
-#define OVERSCAN_MARGIN_Y (getparam_y_resolution()/10.0)
-#else
-#define OVERSCAN_MARGIN_X 0
-#define OVERSCAN_MARGIN_Y 0
-#endif
+#define OVERSCAN_MARGIN_X (overscan_percent*getparam_x_resolution()/100)
+#define OVERSCAN_MARGIN_Y (overscan_percent*getparam_y_resolution()/100)
 
 void draw_hud( player_data_t *plyr );
 void print_fps();

@@ -72,6 +72,8 @@
 #define FPS_X_OFFSET 12
 #define FPS_Y_OFFSET 12
 
+int overscan_percent=5;
+
 static GLfloat energy_background_color[] = { 0.2, 0.2, 0.2, 0.5 };
 static GLfloat energy_foreground_color[] = { 0.54, 0.59, 1.00, 0.5 };
 static GLfloat speedbar_background_color[] = { 0.2, 0.2, 0.2, 0.5 };
