@@ -63,7 +63,7 @@ void set_font_color(font_t* font, colour_t c) {
 }
 
 void set_font_size(font_t* font, scalar_t s) {
-    font->size=s;
+    font->size = s;
 }
 
 bool_t get_font_binding( const char *binding, font_t **font )
@@ -225,7 +225,7 @@ static scalar_t get_scale_factor( font_t *font )
     get_tex_font_string_bbox( font->node->tfm, empty_string, &dummy1, 
 			      &max_ascent, &dummy2 );
 
-    return font->size / max_ascent;
+    return winsys_scale(font->size) / max_ascent;
 }
 
 static void start_font_draw( font_t *font )
