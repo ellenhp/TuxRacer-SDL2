@@ -326,7 +326,7 @@ static void setup_sdl_video_mode()
 	else
 	{
         SDL_GetWindowSize(window, &width, &height);
-		print_debug(DEBUG_SYSTEM, "width=%d height=%d", width, height);
+		print_debug(DEBUG_OTHER, "width=%d height=%d", width, height);
 		/* Set scale factor for fonts & HUD */
 		scale_factor = height / 480.0;
         setparam_x_resolution(width);
