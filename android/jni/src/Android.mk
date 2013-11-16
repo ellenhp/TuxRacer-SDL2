@@ -11,10 +11,13 @@ LOCAL_C_INCLUDES += $(GAMEMENU_HOME)/src
 LOCAL_C_INCLUDES += $(TCL_HOME)/generic
 
 # Add your application source files here...
-LOCAL_SRC_FILES := $(wildcard $(LOCAL_PATH)/src/*.c)
+LOCAL_SRC_FILES := $(SDL2_HOME)/src/main/android/SDL_android_main.c
+LOCAL_SRC_FILES += $(wildcard $(LOCAL_PATH)/src/*.c)
 LOCAL_SRC_FILES += $(wildcard $(LOCAL_PATH)/src/*.cpp)
 LOCAL_SRC_FILES += $(wildcard $(LOCAL_PATH)/src/android/*.c)
 LOCAL_SRC_FILES += $(wildcard $(GAMEMENU_HOME)/src/*.c)
+
+LOCAL_CFLAGS += -DSDL_PREFIX=com_moonlite_tuxracer
 
 LOCAL_SHARED_LIBRARIES := SDL2
 LOCAL_SHARED_LIBRARIES += SDL2_mixer
