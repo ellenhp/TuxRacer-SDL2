@@ -49,7 +49,10 @@ static void print_instruction(const char* string, int line) {
     char* binding = "instructions";
     font_t *font;
     int w, asc, desc;
-    
+	const int width = getparam_x_resolution();
+	const int height = getparam_y_resolution();
+	const int y_base = winsys_scale(75);
+
     if ( !get_font_binding( binding, &font ) ) {
         print_warning( IMPORTANT_WARNING,
                       "Couldn't get font for binding %s", binding );
@@ -64,10 +67,10 @@ static void print_instruction(const char* string, int line) {
     
 	{
     GLfloat vertices[]={
-		OVERSCAN_MARGIN_X, (float)(200-(line-2)*(asc+desc)) -5.0, 0,
-		OVERSCAN_MARGIN_X, (float)(200-(line-1)*(asc+desc)) -5.0, 0,
-		OVERSCAN_MARGIN_X+480.0, (float)(200-(line-1)*(asc+desc)) -5.0, 0,
-		OVERSCAN_MARGIN_X+480.0, (float)(200-(line-2)*(asc+desc)) -5.0, 0};
+		width * 0.20, (float)(y_base-(line-2)*(asc+desc)) - winsys_scale(5.0), 0,
+		width * 0.20, (float)(y_base-(line-1)*(asc+desc)) - winsys_scale(5.0), 0,
+		width * 0.8, (float)(y_base-(line-1)*(asc+desc)) - winsys_scale(5.0), 0,
+		width * 0.8, (float)(y_base-(line-2)*(asc+desc)) - winsys_scale(5.0), 0};
 
 	GLubyte indices[] = {0, 1, 2, 2, 3, 0};
 
@@ -81,8 +84,8 @@ static void print_instruction(const char* string, int line) {
     glEnable(GL_TEXTURE_2D);
     glPushMatrix();
     {
-        glTranslatef( 240.0-(float)w/2.0+OVERSCAN_MARGIN_X,
-                     200-(line-1)*(asc+desc),
+        glTranslatef( width / 2 - (float)w / 2.0,
+                     y_base-(line-1)*(asc+desc),
                      0 );
         draw_string( font, (char*)string );
     }
@@ -90,7 +93,7 @@ static void print_instruction(const char* string, int line) {
 	}
 }
 
-static void drawRedCircle(GLint x, GLint y, GLint radius) {
+static void drawRedCircle(GLint x, GLint y, GLint diameter) {
     int x_org = x;
     int y_org = y;
     GLuint texobj;
@@ -105,7 +108,7 @@ static void drawRedCircle(GLint x, GLint y, GLint radius) {
 
         
     ll = make_point2d( x_org, y_org);
-    ur = make_point2d( x_org + radius, y_org + radius );
+    ur = make_point2d( x_org + diameter, y_org + diameter );
     tll = make_point2d( 0, 0 );
     tur = make_point2d(1, 1 );
     
@@ -229,8 +232,9 @@ static void draw_instructions(player_data_t *plyr)
 			print_instruction(Localize("Tux can paddle to go faster.", ""),1);
 			if (!winsys_is_controller_active())
 			{
+				const GLint radius = winsys_scale(55);
 				print_instruction(Localize("(Tap the bottom right corner of the screen)", ""),2);
-	            drawRedCircle(getparam_x_resolution()-150, 50, 100);
+	            drawRedCircle(getparam_x_resolution() - radius * 2, 0, radius * 2);
 			}
 			else
 			{
@@ -242,8 +246,9 @@ static void draw_instructions(player_data_t *plyr)
             print_instruction(Localize("Braking lets tux turn harder at high speed.", ""),1);
 			if (!winsys_is_controller_active())
 			{
+				const GLint radius = winsys_scale(55);
 				print_instruction(Localize("Tap the bottom right corner to brake.", ""),2);
-	            drawRedCircle(50, 50, 100);
+	            drawRedCircle(0, 0, radius * 2);
 			}
 			else
 			{
@@ -301,9 +306,10 @@ static void draw_instructions(player_data_t *plyr)
         case 11:
  			if (!winsys_is_controller_active())
 			{
+				const GLint radius = winsys_scale(55);
 				print_instruction(Localize("Push the red area to accumulate enough", ""),1);
 				print_instruction(Localize("energy to jump.", ""),2);
-				drawRedCircle(50, getparam_y_resolution()-150, 100);
+				drawRedCircle(0, getparam_y_resolution() - radius * 2, radius * 2);
 			}
 			else
 			{
@@ -367,8 +373,9 @@ static void draw_instructions(player_data_t *plyr)
             print_instruction(Localize("fast and jump off of it. While you're in the air,", ""),2);
  			if (!winsys_is_controller_active())
 			{
+				const GLint radius = winsys_scale(55);
 				print_instruction(Localize("tap the upper right corner of the screen.", ""),3);
-	            drawRedCircle(getparam_x_resolution()-150, getparam_y_resolution()-150, 100);
+	            drawRedCircle(getparam_x_resolution() - radius * 2, getparam_y_resolution() - radius * 2, radius * 2);
 			}
 			else
 			{
