@@ -27,7 +27,11 @@ extern "C"
 
 typedef struct font_ font_t;
 
+void set_scale_factor(scalar_t scale);
+scalar_t scale_size(scalar_t value);
+
 void init_fonts();
+
 void set_font_color(font_t* font, colour_t c);
 void set_font_size(font_t* font, scalar_t size);
 scalar_t get_font_size(font_t* font);

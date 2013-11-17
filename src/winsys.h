@@ -369,6 +369,8 @@ void winsys_enable_key_repeat( bool_t enabled );
 void winsys_warp_pointer( int x, int y );
 void winsys_show_cursor( bool_t visible );
 
+float winsys_scale(float x);
+
 void winsys_init( int *argc, char **argv, char *window_title,
 		  char *icon_title );
 void winsys_get_gravity(float * grav_x, float * grav_y);

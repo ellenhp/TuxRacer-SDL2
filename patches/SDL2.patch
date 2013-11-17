@@ -1,6 +1,6 @@
 diff -r 5ce21e1ca0c3 VisualC/SDL/SDL_VS2008.vcproj
 --- a/VisualC/SDL/SDL_VS2008.vcproj	Mon Oct 14 09:15:41 2013 -0700
-+++ b/VisualC/SDL/SDL_VS2008.vcproj	Sun Nov 03 12:10:04 2013 -0800
++++ b/VisualC/SDL/SDL_VS2008.vcproj	Sat Nov 16 12:08:10 2013 -0800
 @@ -1,1338 +1,1340 @@
 -<?xml version="1.0" encoding="Windows-1252"?>
 -<VisualStudioProject
@@ -2682,7 +2682,7 @@ diff -r 5ce21e1ca0c3 VisualC/SDL/SDL_VS2008.vcproj
 +</VisualStudioProject>
 diff -r 5ce21e1ca0c3 VisualC/SDLmain/SDLmain_VS2008.vcproj
 --- a/VisualC/SDLmain/SDLmain_VS2008.vcproj	Mon Oct 14 09:15:41 2013 -0700
-+++ b/VisualC/SDLmain/SDLmain_VS2008.vcproj	Sun Nov 03 12:10:04 2013 -0800
++++ b/VisualC/SDLmain/SDLmain_VS2008.vcproj	Sat Nov 16 12:08:10 2013 -0800
 @@ -1,424 +1,427 @@
 -<?xml version="1.0" encoding="Windows-1252"?>
 -<VisualStudioProject
@@ -3537,7 +3537,7 @@ diff -r 5ce21e1ca0c3 VisualC/SDLmain/SDLmain_VS2008.vcproj
 +</VisualStudioProject>
 diff -r 5ce21e1ca0c3 android-project/src/org/libsdl/app/SDLActivity.java
 --- a/android-project/src/org/libsdl/app/SDLActivity.java	Mon Oct 14 09:15:41 2013 -0700
-+++ b/android-project/src/org/libsdl/app/SDLActivity.java	Sun Nov 03 12:10:04 2013 -0800
++++ b/android-project/src/org/libsdl/app/SDLActivity.java	Sat Nov 16 12:08:10 2013 -0800
 @@ -16,6 +16,10 @@
  import android.media.*;
  import android.hardware.*;
@@ -3715,7 +3715,7 @@ diff -r 5ce21e1ca0c3 android-project/src/org/libsdl/app/SDLActivity.java
  /* This is a fake invisible editor view that receives the input and defines the
 diff -r 5ce21e1ca0c3 android/drummix/.classpath
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/drummix/.classpath	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/drummix/.classpath	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,9 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<classpath>
@@ -3728,7 +3728,7 @@ diff -r 5ce21e1ca0c3 android/drummix/.classpath
 +</classpath>
 diff -r 5ce21e1ca0c3 android/drummix/.project
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/drummix/.project	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/drummix/.project	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,33 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<projectDescription>
@@ -3765,20 +3765,20 @@ diff -r 5ce21e1ca0c3 android/drummix/.project
 +</projectDescription>
 diff -r 5ce21e1ca0c3 android/drummix/.settings/org.eclipse.ltk.core.refactoring.prefs
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/drummix/.settings/org.eclipse.ltk.core.refactoring.prefs	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/drummix/.settings/org.eclipse.ltk.core.refactoring.prefs	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,2 @@
 +eclipse.preferences.version=1
 +org.eclipse.ltk.core.refactoring.enable.project.refactoring.history=false
 diff -r 5ce21e1ca0c3 android/drummix/AndroidManifest.xml
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/drummix/AndroidManifest.xml	Sun Nov 03 12:10:04 2013 -0800
-@@ -0,0 +1,43 @@
++++ b/android/drummix/AndroidManifest.xml	Sat Nov 16 12:08:10 2013 -0800
+@@ -0,0 +1,42 @@
 +<?xml version="1.0" encoding="utf-8"?>
 +<!-- Replace org.libsdl.app with the identifier of your game below, e.g.
 +     com.gamemaker.game
 +-->
 +<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-+      package="org.libsdl.app"
++      package="org.libsdl.drummix"
 +      android:versionCode="1"
 +      android:versionName="1.0"
 +      android:installLocation="auto">
@@ -3797,8 +3797,7 @@ diff -r 5ce21e1ca0c3 android/drummix/AndroidManifest.xml
 +                 android:allowBackup="true"
 +                 android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
 +        <activity android:name="SDLActivity"
-+                  android:label="@string/app_name"
-+                  android:screenOrientation="landscape">
++                  android:label="@string/app_name">
 +            <intent-filter>
 +                <action android:name="android.intent.action.MAIN" />
 +                <category android:name="android.intent.category.LAUNCHER" />
@@ -3818,7 +3817,7 @@ diff -r 5ce21e1ca0c3 android/drummix/AndroidManifest.xml
 +</manifest> 
 diff -r 5ce21e1ca0c3 android/drummix/ant.properties
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/drummix/ant.properties	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/drummix/ant.properties	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,17 @@
 +# This file is used to override default values used by the Ant build system.
 +#
@@ -3839,7 +3838,7 @@ diff -r 5ce21e1ca0c3 android/drummix/ant.properties
 +
 diff -r 5ce21e1ca0c3 android/drummix/build.properties
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/drummix/build.properties	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/drummix/build.properties	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,17 @@
 +# This file is used to override default values used by the Ant build system.
 +# 
@@ -3860,7 +3859,7 @@ diff -r 5ce21e1ca0c3 android/drummix/build.properties
 +
 diff -r 5ce21e1ca0c3 android/drummix/build.xml
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/drummix/build.xml	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/drummix/build.xml	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,93 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<!-- This should be changed to the name of your project -->
@@ -3957,7 +3956,7 @@ diff -r 5ce21e1ca0c3 android/drummix/build.xml
 +</project>
 diff -r 5ce21e1ca0c3 android/drummix/clean.sh
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/drummix/clean.sh	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/drummix/clean.sh	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,5 @@
 +rm -rf bin
 +rm -rf gen
@@ -3966,7 +3965,7 @@ diff -r 5ce21e1ca0c3 android/drummix/clean.sh
 +rm -f assets/*.wav
 diff -r 5ce21e1ca0c3 android/drummix/default.properties
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/drummix/default.properties	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/drummix/default.properties	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,11 @@
 +# This file is automatically generated by Android Tools.
 +# Do not modify this file -- YOUR CHANGES WILL BE ERASED!
@@ -3981,12 +3980,12 @@ diff -r 5ce21e1ca0c3 android/drummix/default.properties
 +target=android-7
 diff -r 5ce21e1ca0c3 android/drummix/jni/Android.mk
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/drummix/jni/Android.mk	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/drummix/jni/Android.mk	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,1 @@
 +include $(call all-subdir-makefiles)
 diff -r 5ce21e1ca0c3 android/drummix/jni/Application.mk
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/drummix/jni/Application.mk	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/drummix/jni/Application.mk	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,6 @@
 +APP_ABI := armeabi
 +APP_PLATFORM := android-9
@@ -3996,7 +3995,7 @@ diff -r 5ce21e1ca0c3 android/drummix/jni/Application.mk
 +# APP_STL := stlport_static 
 diff -r 5ce21e1ca0c3 android/drummix/jni/SDL/Android.mk
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/drummix/jni/SDL/Android.mk	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/drummix/jni/SDL/Android.mk	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,50 @@
 +LOCAL_PATH := $(SDL2_HOME)
 +
@@ -4043,15 +4042,15 @@ diff -r 5ce21e1ca0c3 android/drummix/jni/SDL/Android.mk
 +	$(wildcard $(LOCAL_PATH)/src/video/*.c) \
 +	$(wildcard $(LOCAL_PATH)/src/video/android/*.c))
 +
-+LOCAL_CFLAGS += -DGL_GLEXT_PROTOTYPES
++LOCAL_CFLAGS += -DGL_GLEXT_PROTOTYPES -DSDL_PREFIX=org_libsdl_drummix
 +LOCAL_LDLIBS := -ldl -lGLESv1_CM -lGLESv2 -llog -landroid
 +
 +
 +include $(BUILD_SHARED_LIBRARY)
 diff -r 5ce21e1ca0c3 android/drummix/jni/src/Android.mk
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/drummix/jni/src/Android.mk	Sun Nov 03 12:10:04 2013 -0800
-@@ -0,0 +1,39 @@
++++ b/android/drummix/jni/src/Android.mk	Sat Nov 16 12:08:10 2013 -0800
+@@ -0,0 +1,41 @@
 +LOCAL_PATH := $(call my-dir)
 +
 +include $(CLEAR_VARS)
@@ -4086,6 +4085,8 @@ diff -r 5ce21e1ca0c3 android/drummix/jni/src/Android.mk
 +	$(SDL2_PATH)/Xcode-iOS/Demos/src/common.c \
 +	$(SDL2_PATH)/Xcode-iOS/Demos/src/mixer.c
 +
++LOCAL_CFLAGS += -DSDL_PREFIX=org_libsdl_drummix
++
 +LOCAL_SHARED_LIBRARIES := SDL2
 +
 +LOCAL_LDLIBS := -lGLESv1_CM -llog
@@ -4093,7 +4094,7 @@ diff -r 5ce21e1ca0c3 android/drummix/jni/src/Android.mk
 +include $(BUILD_SHARED_LIBRARY)
 diff -r 5ce21e1ca0c3 android/drummix/lint.xml
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/drummix/lint.xml	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/drummix/lint.xml	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,3 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<lint>
@@ -4101,7 +4102,7 @@ diff -r 5ce21e1ca0c3 android/drummix/lint.xml
 \ No newline at end of file
 diff -r 5ce21e1ca0c3 android/drummix/proguard-project.txt
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/drummix/proguard-project.txt	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/drummix/proguard-project.txt	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,20 @@
 +# To enable ProGuard in your project, edit project.properties
 +# to define the proguard.config property as described in that file.
@@ -4125,7 +4126,7 @@ diff -r 5ce21e1ca0c3 android/drummix/proguard-project.txt
 +#}
 diff -r 5ce21e1ca0c3 android/drummix/project.properties
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/drummix/project.properties	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/drummix/project.properties	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,14 @@
 +# This file is automatically generated by Android Tools.
 +# Do not modify this file -- YOUR CHANGES WILL BE ERASED!
@@ -4151,7 +4152,7 @@ diff -r 5ce21e1ca0c3 android/drummix/res/drawable-xxhdpi/ic_launcher.png
 Binary file android/drummix/res/drawable-xxhdpi/ic_launcher.png has changed
 diff -r 5ce21e1ca0c3 android/drummix/res/layout/main.xml
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/drummix/res/layout/main.xml	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/drummix/res/layout/main.xml	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,13 @@
 +<?xml version="1.0" encoding="utf-8"?>
 +<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -4168,17 +4169,17 @@ diff -r 5ce21e1ca0c3 android/drummix/res/layout/main.xml
 +
 diff -r 5ce21e1ca0c3 android/drummix/res/values/strings.xml
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/drummix/res/values/strings.xml	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/drummix/res/values/strings.xml	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,4 @@
 +<?xml version="1.0" encoding="utf-8"?>
 +<resources>
-+    <string name="app_name">mixer</string>
++    <string name="app_name">Drum Mix</string>
 +</resources>
-diff -r 5ce21e1ca0c3 android/drummix/src/org/libsdl/app/SDLActivity.java
+diff -r 5ce21e1ca0c3 android/drummix/src/org/libsdl/drummix/SDLActivity.java
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/drummix/src/org/libsdl/app/SDLActivity.java	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/drummix/src/org/libsdl/drummix/SDLActivity.java	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,856 @@
-+package org.libsdl.app;
++package org.libsdl.drummix;
 +
 +import java.util.Arrays;
 +
@@ -5036,7 +5037,7 @@ diff -r 5ce21e1ca0c3 android/drummix/src/org/libsdl/app/SDLActivity.java
 +
 diff -r 5ce21e1ca0c3 android/fireworks/.classpath
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/fireworks/.classpath	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/fireworks/.classpath	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,9 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<classpath>
@@ -5049,7 +5050,7 @@ diff -r 5ce21e1ca0c3 android/fireworks/.classpath
 +</classpath>
 diff -r 5ce21e1ca0c3 android/fireworks/.project
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/fireworks/.project	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/fireworks/.project	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,33 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<projectDescription>
@@ -5086,20 +5087,20 @@ diff -r 5ce21e1ca0c3 android/fireworks/.project
 +</projectDescription>
 diff -r 5ce21e1ca0c3 android/fireworks/.settings/org.eclipse.ltk.core.refactoring.prefs
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/fireworks/.settings/org.eclipse.ltk.core.refactoring.prefs	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/fireworks/.settings/org.eclipse.ltk.core.refactoring.prefs	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,2 @@
 +eclipse.preferences.version=1
 +org.eclipse.ltk.core.refactoring.enable.project.refactoring.history=false
 diff -r 5ce21e1ca0c3 android/fireworks/AndroidManifest.xml
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/fireworks/AndroidManifest.xml	Sun Nov 03 12:10:04 2013 -0800
-@@ -0,0 +1,43 @@
++++ b/android/fireworks/AndroidManifest.xml	Sat Nov 16 12:08:10 2013 -0800
+@@ -0,0 +1,42 @@
 +<?xml version="1.0" encoding="utf-8"?>
 +<!-- Replace org.libsdl.app with the identifier of your game below, e.g.
 +     com.gamemaker.game
 +-->
 +<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-+      package="org.libsdl.app"
++      package="org.libsdl.fireworks"
 +      android:versionCode="1"
 +      android:versionName="1.0"
 +      android:installLocation="auto">
@@ -5118,8 +5119,7 @@ diff -r 5ce21e1ca0c3 android/fireworks/AndroidManifest.xml
 +                 android:allowBackup="true"
 +                 android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
 +        <activity android:name="SDLActivity"
-+                  android:label="@string/app_name"
-+                  android:screenOrientation="landscape">
++                  android:label="@string/app_name">
 +            <intent-filter>
 +                <action android:name="android.intent.action.MAIN" />
 +                <category android:name="android.intent.category.LAUNCHER" />
@@ -5139,7 +5139,7 @@ diff -r 5ce21e1ca0c3 android/fireworks/AndroidManifest.xml
 +</manifest> 
 diff -r 5ce21e1ca0c3 android/fireworks/ant.properties
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/fireworks/ant.properties	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/fireworks/ant.properties	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,17 @@
 +# This file is used to override default values used by the Ant build system.
 +#
@@ -5160,7 +5160,7 @@ diff -r 5ce21e1ca0c3 android/fireworks/ant.properties
 +
 diff -r 5ce21e1ca0c3 android/fireworks/build.properties
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/fireworks/build.properties	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/fireworks/build.properties	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,17 @@
 +# This file is used to override default values used by the Ant build system.
 +# 
@@ -5181,7 +5181,7 @@ diff -r 5ce21e1ca0c3 android/fireworks/build.properties
 +
 diff -r 5ce21e1ca0c3 android/fireworks/build.xml
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/fireworks/build.xml	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/fireworks/build.xml	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,93 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<!-- This should be changed to the name of your project -->
@@ -5278,7 +5278,7 @@ diff -r 5ce21e1ca0c3 android/fireworks/build.xml
 +</project>
 diff -r 5ce21e1ca0c3 android/fireworks/clean.sh
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/fireworks/clean.sh	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/fireworks/clean.sh	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,5 @@
 +rm -rf bin
 +rm -rf gen
@@ -5287,7 +5287,7 @@ diff -r 5ce21e1ca0c3 android/fireworks/clean.sh
 +rm -f assets/*.bmp
 diff -r 5ce21e1ca0c3 android/fireworks/default.properties
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/fireworks/default.properties	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/fireworks/default.properties	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,11 @@
 +# This file is automatically generated by Android Tools.
 +# Do not modify this file -- YOUR CHANGES WILL BE ERASED!
@@ -5302,12 +5302,12 @@ diff -r 5ce21e1ca0c3 android/fireworks/default.properties
 +target=android-7
 diff -r 5ce21e1ca0c3 android/fireworks/jni/Android.mk
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/fireworks/jni/Android.mk	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/fireworks/jni/Android.mk	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,1 @@
 +include $(call all-subdir-makefiles)
 diff -r 5ce21e1ca0c3 android/fireworks/jni/Application.mk
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/fireworks/jni/Application.mk	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/fireworks/jni/Application.mk	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,6 @@
 +APP_ABI := armeabi
 +APP_PLATFORM := android-9
@@ -5317,7 +5317,7 @@ diff -r 5ce21e1ca0c3 android/fireworks/jni/Application.mk
 +# APP_STL := stlport_static 
 diff -r 5ce21e1ca0c3 android/fireworks/jni/SDL/Android.mk
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/fireworks/jni/SDL/Android.mk	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/fireworks/jni/SDL/Android.mk	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,50 @@
 +LOCAL_PATH := $(SDL2_HOME)
 +
@@ -5364,15 +5364,15 @@ diff -r 5ce21e1ca0c3 android/fireworks/jni/SDL/Android.mk
 +	$(wildcard $(LOCAL_PATH)/src/video/*.c) \
 +	$(wildcard $(LOCAL_PATH)/src/video/android/*.c))
 +
-+LOCAL_CFLAGS += -DGL_GLEXT_PROTOTYPES
++LOCAL_CFLAGS += -DGL_GLEXT_PROTOTYPES -DSDL_PREFIX=org_libsdl_fireworks
 +LOCAL_LDLIBS := -ldl -lGLESv1_CM -lGLESv2 -llog -landroid
 +
 +
 +include $(BUILD_SHARED_LIBRARY)
 diff -r 5ce21e1ca0c3 android/fireworks/jni/src/Android.mk
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/fireworks/jni/src/Android.mk	Sun Nov 03 12:10:04 2013 -0800
-@@ -0,0 +1,36 @@
++++ b/android/fireworks/jni/src/Android.mk	Sat Nov 16 12:08:10 2013 -0800
+@@ -0,0 +1,38 @@
 +LOCAL_PATH := $(call my-dir)
 +
 +include $(CLEAR_VARS)
@@ -5393,7 +5393,7 @@ diff -r 5ce21e1ca0c3 android/fireworks/jni/src/Android.mk
 +
 +# Copy assets
 +ASSETS_PATH = assets
-+ASSETS_SRC = ../../Demos/data
++ASSETS_SRC = ../../Xcode-iOS/Demos/data
 +
 +post-build:
 +	@echo Copy assets
@@ -5401,8 +5401,10 @@ diff -r 5ce21e1ca0c3 android/fireworks/jni/src/Android.mk
 +
 +# Add your application source files here...
 +LOCAL_SRC_FILES := $(SDL2_PATH)/src/main/android/SDL_android_main.c \
-+	$(SDL2_PATH)/Demos/src/fireworks.c \
-+	$(SDL2_PATH)/Demos/src/common.c
++	$(SDL2_PATH)/Xcode-iOS/Demos/src/fireworks.c \
++	$(SDL2_PATH)/Xcode-iOS/Demos/src/common.c
++
++LOCAL_CFLAGS += -DSDL_PREFIX=org_libsdl_fireworks
 +
 +LOCAL_SHARED_LIBRARIES := SDL2
 +
@@ -5411,7 +5413,7 @@ diff -r 5ce21e1ca0c3 android/fireworks/jni/src/Android.mk
 +include $(BUILD_SHARED_LIBRARY)
 diff -r 5ce21e1ca0c3 android/fireworks/lint.xml
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/fireworks/lint.xml	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/fireworks/lint.xml	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,3 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<lint>
@@ -5419,7 +5421,7 @@ diff -r 5ce21e1ca0c3 android/fireworks/lint.xml
 \ No newline at end of file
 diff -r 5ce21e1ca0c3 android/fireworks/proguard-project.txt
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/fireworks/proguard-project.txt	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/fireworks/proguard-project.txt	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,20 @@
 +# To enable ProGuard in your project, edit project.properties
 +# to define the proguard.config property as described in that file.
@@ -5443,7 +5445,7 @@ diff -r 5ce21e1ca0c3 android/fireworks/proguard-project.txt
 +#}
 diff -r 5ce21e1ca0c3 android/fireworks/project.properties
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/fireworks/project.properties	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/fireworks/project.properties	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,14 @@
 +# This file is automatically generated by Android Tools.
 +# Do not modify this file -- YOUR CHANGES WILL BE ERASED!
@@ -5469,7 +5471,7 @@ diff -r 5ce21e1ca0c3 android/fireworks/res/drawable-xxhdpi/ic_launcher.png
 Binary file android/fireworks/res/drawable-xxhdpi/ic_launcher.png has changed
 diff -r 5ce21e1ca0c3 android/fireworks/res/layout/main.xml
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/fireworks/res/layout/main.xml	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/fireworks/res/layout/main.xml	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,13 @@
 +<?xml version="1.0" encoding="utf-8"?>
 +<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -5486,17 +5488,17 @@ diff -r 5ce21e1ca0c3 android/fireworks/res/layout/main.xml
 +
 diff -r 5ce21e1ca0c3 android/fireworks/res/values/strings.xml
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/fireworks/res/values/strings.xml	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/fireworks/res/values/strings.xml	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,4 @@
 +<?xml version="1.0" encoding="utf-8"?>
 +<resources>
-+    <string name="app_name">mixer</string>
++    <string name="app_name">Fireworks</string>
 +</resources>
-diff -r 5ce21e1ca0c3 android/fireworks/src/org/libsdl/app/SDLActivity.java
+diff -r 5ce21e1ca0c3 android/fireworks/src/org/libsdl/fireworks/SDLActivity.java
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/fireworks/src/org/libsdl/app/SDLActivity.java	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/fireworks/src/org/libsdl/fireworks/SDLActivity.java	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,856 @@
-+package org.libsdl.app;
++package org.libsdl.fireworks;
 +
 +import java.util.Arrays;
 +
@@ -6354,7 +6356,7 @@ diff -r 5ce21e1ca0c3 android/fireworks/src/org/libsdl/app/SDLActivity.java
 +
 diff -r 5ce21e1ca0c3 android/spritetest2/.classpath
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/spritetest2/.classpath	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/spritetest2/.classpath	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,9 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<classpath>
@@ -6367,7 +6369,7 @@ diff -r 5ce21e1ca0c3 android/spritetest2/.classpath
 +</classpath>
 diff -r 5ce21e1ca0c3 android/spritetest2/.project
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/spritetest2/.project	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/spritetest2/.project	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,33 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<projectDescription>
@@ -6404,20 +6406,20 @@ diff -r 5ce21e1ca0c3 android/spritetest2/.project
 +</projectDescription>
 diff -r 5ce21e1ca0c3 android/spritetest2/.settings/org.eclipse.ltk.core.refactoring.prefs
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/spritetest2/.settings/org.eclipse.ltk.core.refactoring.prefs	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/spritetest2/.settings/org.eclipse.ltk.core.refactoring.prefs	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,2 @@
 +eclipse.preferences.version=1
 +org.eclipse.ltk.core.refactoring.enable.project.refactoring.history=false
 diff -r 5ce21e1ca0c3 android/spritetest2/AndroidManifest.xml
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/spritetest2/AndroidManifest.xml	Sun Nov 03 12:10:04 2013 -0800
-@@ -0,0 +1,44 @@
++++ b/android/spritetest2/AndroidManifest.xml	Sat Nov 16 12:08:10 2013 -0800
+@@ -0,0 +1,43 @@
 +<?xml version="1.0" encoding="utf-8"?>
 +<!-- Replace org.libsdl.app with the identifier of your game below, e.g.
 +     com.gamemaker.game
 +-->
 +<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-+      package="org.libsdl.app"
++      package="org.libsdl.spritetest2"
 +      android:versionCode="1"
 +      android:versionName="1.0"
 +      android:installLocation="auto">
@@ -6436,8 +6438,7 @@ diff -r 5ce21e1ca0c3 android/spritetest2/AndroidManifest.xml
 +                 android:allowBackup="true"
 +                 android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
 +        <activity android:name="SDLActivity"
-+                  android:label="@string/app_name"
-+                  android:screenOrientation="landscape">
++                  android:label="@string/app_name">
 +            <intent-filter>
 +                <action android:name="android.intent.action.MAIN" />
 +                <category android:name="android.intent.category.LAUNCHER" />
@@ -6458,7 +6459,7 @@ diff -r 5ce21e1ca0c3 android/spritetest2/AndroidManifest.xml
 +</manifest> 
 diff -r 5ce21e1ca0c3 android/spritetest2/ant.properties
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/spritetest2/ant.properties	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/spritetest2/ant.properties	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,17 @@
 +# This file is used to override default values used by the Ant build system.
 +#
@@ -6479,7 +6480,7 @@ diff -r 5ce21e1ca0c3 android/spritetest2/ant.properties
 +
 diff -r 5ce21e1ca0c3 android/spritetest2/build.properties
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/spritetest2/build.properties	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/spritetest2/build.properties	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,17 @@
 +# This file is used to override default values used by the Ant build system.
 +# 
@@ -6500,7 +6501,7 @@ diff -r 5ce21e1ca0c3 android/spritetest2/build.properties
 +
 diff -r 5ce21e1ca0c3 android/spritetest2/build.xml
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/spritetest2/build.xml	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/spritetest2/build.xml	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,93 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<!-- This should be changed to the name of your project -->
@@ -6597,7 +6598,7 @@ diff -r 5ce21e1ca0c3 android/spritetest2/build.xml
 +</project>
 diff -r 5ce21e1ca0c3 android/spritetest2/clean.sh
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/spritetest2/clean.sh	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/spritetest2/clean.sh	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,5 @@
 +rm -rf bin
 +rm -rf gen
@@ -6606,7 +6607,7 @@ diff -r 5ce21e1ca0c3 android/spritetest2/clean.sh
 +rm -f assets/*.bmp
 diff -r 5ce21e1ca0c3 android/spritetest2/default.properties
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/spritetest2/default.properties	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/spritetest2/default.properties	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,11 @@
 +# This file is automatically generated by Android Tools.
 +# Do not modify this file -- YOUR CHANGES WILL BE ERASED!
@@ -6621,12 +6622,12 @@ diff -r 5ce21e1ca0c3 android/spritetest2/default.properties
 +target=android-7
 diff -r 5ce21e1ca0c3 android/spritetest2/jni/Android.mk
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/spritetest2/jni/Android.mk	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/spritetest2/jni/Android.mk	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,1 @@
 +include $(call all-subdir-makefiles)
 diff -r 5ce21e1ca0c3 android/spritetest2/jni/Application.mk
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/spritetest2/jni/Application.mk	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/spritetest2/jni/Application.mk	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,6 @@
 +APP_ABI := armeabi
 +APP_PLATFORM := android-9
@@ -6636,7 +6637,7 @@ diff -r 5ce21e1ca0c3 android/spritetest2/jni/Application.mk
 +# APP_STL := stlport_static 
 diff -r 5ce21e1ca0c3 android/spritetest2/jni/SDL/Android.mk
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/spritetest2/jni/SDL/Android.mk	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/spritetest2/jni/SDL/Android.mk	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,50 @@
 +LOCAL_PATH := $(SDL2_HOME)
 +
@@ -6683,15 +6684,15 @@ diff -r 5ce21e1ca0c3 android/spritetest2/jni/SDL/Android.mk
 +	$(wildcard $(LOCAL_PATH)/src/video/*.c) \
 +	$(wildcard $(LOCAL_PATH)/src/video/android/*.c))
 +
-+LOCAL_CFLAGS += -DGL_GLEXT_PROTOTYPES
++LOCAL_CFLAGS += -DGL_GLEXT_PROTOTYPES -DSDL_PREFIX=org_libsdl_spritetest2
 +LOCAL_LDLIBS := -ldl -lGLESv1_CM -lGLESv2 -llog -landroid
 +
 +
 +include $(BUILD_SHARED_LIBRARY)
 diff -r 5ce21e1ca0c3 android/spritetest2/jni/src/Android.mk
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/spritetest2/jni/src/Android.mk	Sun Nov 03 12:10:04 2013 -0800
-@@ -0,0 +1,38 @@
++++ b/android/spritetest2/jni/src/Android.mk	Sat Nov 16 12:08:10 2013 -0800
+@@ -0,0 +1,40 @@
 +LOCAL_PATH := $(call my-dir)
 +
 +include $(CLEAR_VARS)
@@ -6725,6 +6726,8 @@ diff -r 5ce21e1ca0c3 android/spritetest2/jni/src/Android.mk
 +	$(SDL2_PATH)/src/test/SDL_test_fuzzer.c \
 +	$(SDL2_PATH)/src/test/SDL_test_random.c
 +
++LOCAL_CFLAGS += -DSDL_PREFIX=org_libsdl_spritetest2
++
 +LOCAL_SHARED_LIBRARIES := SDL2
 +
 +LOCAL_LDLIBS := -lGLESv1_CM -llog
@@ -6732,7 +6735,7 @@ diff -r 5ce21e1ca0c3 android/spritetest2/jni/src/Android.mk
 +include $(BUILD_SHARED_LIBRARY)
 diff -r 5ce21e1ca0c3 android/spritetest2/lint.xml
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/spritetest2/lint.xml	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/spritetest2/lint.xml	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,3 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<lint>
@@ -6740,7 +6743,7 @@ diff -r 5ce21e1ca0c3 android/spritetest2/lint.xml
 \ No newline at end of file
 diff -r 5ce21e1ca0c3 android/spritetest2/proguard-project.txt
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/spritetest2/proguard-project.txt	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/spritetest2/proguard-project.txt	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,20 @@
 +# To enable ProGuard in your project, edit project.properties
 +# to define the proguard.config property as described in that file.
@@ -6764,7 +6767,7 @@ diff -r 5ce21e1ca0c3 android/spritetest2/proguard-project.txt
 +#}
 diff -r 5ce21e1ca0c3 android/spritetest2/project.properties
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/spritetest2/project.properties	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/spritetest2/project.properties	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,14 @@
 +# This file is automatically generated by Android Tools.
 +# Do not modify this file -- YOUR CHANGES WILL BE ERASED!
@@ -6790,7 +6793,7 @@ diff -r 5ce21e1ca0c3 android/spritetest2/res/drawable-xxhdpi/ic_launcher.png
 Binary file android/spritetest2/res/drawable-xxhdpi/ic_launcher.png has changed
 diff -r 5ce21e1ca0c3 android/spritetest2/res/layout/main.xml
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/spritetest2/res/layout/main.xml	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/spritetest2/res/layout/main.xml	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,13 @@
 +<?xml version="1.0" encoding="utf-8"?>
 +<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -6807,17 +6810,17 @@ diff -r 5ce21e1ca0c3 android/spritetest2/res/layout/main.xml
 +
 diff -r 5ce21e1ca0c3 android/spritetest2/res/values/strings.xml
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/spritetest2/res/values/strings.xml	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/spritetest2/res/values/strings.xml	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,4 @@
 +<?xml version="1.0" encoding="utf-8"?>
 +<resources>
 +    <string name="app_name">Sprite Test2</string>
 +</resources>
-diff -r 5ce21e1ca0c3 android/spritetest2/src/org/libsdl/app/SDLActivity.java
+diff -r 5ce21e1ca0c3 android/spritetest2/src/org/libsdl/spritetest2/SDLActivity.java
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/spritetest2/src/org/libsdl/app/SDLActivity.java	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/spritetest2/src/org/libsdl/spritetest2/SDLActivity.java	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,856 @@
-+package org.libsdl.app;
++package org.libsdl.spritetest2;
 +
 +import java.util.Arrays;
 +
@@ -7675,7 +7678,7 @@ diff -r 5ce21e1ca0c3 android/spritetest2/src/org/libsdl/app/SDLActivity.java
 +
 diff -r 5ce21e1ca0c3 android/testgles/.classpath
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testgles/.classpath	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testgles/.classpath	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,9 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<classpath>
@@ -7688,7 +7691,7 @@ diff -r 5ce21e1ca0c3 android/testgles/.classpath
 +</classpath>
 diff -r 5ce21e1ca0c3 android/testgles/.project
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testgles/.project	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testgles/.project	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,33 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<projectDescription>
@@ -7725,20 +7728,20 @@ diff -r 5ce21e1ca0c3 android/testgles/.project
 +</projectDescription>
 diff -r 5ce21e1ca0c3 android/testgles/.settings/org.eclipse.ltk.core.refactoring.prefs
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testgles/.settings/org.eclipse.ltk.core.refactoring.prefs	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testgles/.settings/org.eclipse.ltk.core.refactoring.prefs	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,2 @@
 +eclipse.preferences.version=1
 +org.eclipse.ltk.core.refactoring.enable.project.refactoring.history=false
 diff -r 5ce21e1ca0c3 android/testgles/AndroidManifest.xml
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testgles/AndroidManifest.xml	Sun Nov 03 12:10:04 2013 -0800
-@@ -0,0 +1,43 @@
++++ b/android/testgles/AndroidManifest.xml	Sat Nov 16 12:08:10 2013 -0800
+@@ -0,0 +1,42 @@
 +<?xml version="1.0" encoding="utf-8"?>
 +<!-- Replace org.libsdl.app with the identifier of your game below, e.g.
 +     com.gamemaker.game
 +-->
 +<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-+      package="org.libsdl.app"
++      package="org.libsdl.testgles"
 +      android:versionCode="1"
 +      android:versionName="1.0"
 +      android:installLocation="auto">
@@ -7757,8 +7760,7 @@ diff -r 5ce21e1ca0c3 android/testgles/AndroidManifest.xml
 +                 android:allowBackup="true"
 +                 android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
 +        <activity android:name="SDLActivity"
-+                  android:label="@string/app_name"
-+                  android:screenOrientation="landscape">
++                  android:label="@string/app_name">
 +            <intent-filter>
 +                <action android:name="android.intent.action.MAIN" />
 +                <category android:name="android.intent.category.LAUNCHER" />
@@ -7778,7 +7780,7 @@ diff -r 5ce21e1ca0c3 android/testgles/AndroidManifest.xml
 +</manifest> 
 diff -r 5ce21e1ca0c3 android/testgles/ant.properties
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testgles/ant.properties	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testgles/ant.properties	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,17 @@
 +# This file is used to override default values used by the Ant build system.
 +#
@@ -7799,7 +7801,7 @@ diff -r 5ce21e1ca0c3 android/testgles/ant.properties
 +
 diff -r 5ce21e1ca0c3 android/testgles/build.properties
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testgles/build.properties	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testgles/build.properties	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,17 @@
 +# This file is used to override default values used by the Ant build system.
 +# 
@@ -7820,7 +7822,7 @@ diff -r 5ce21e1ca0c3 android/testgles/build.properties
 +
 diff -r 5ce21e1ca0c3 android/testgles/build.xml
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testgles/build.xml	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testgles/build.xml	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,93 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<!-- This should be changed to the name of your project -->
@@ -7917,7 +7919,7 @@ diff -r 5ce21e1ca0c3 android/testgles/build.xml
 +</project>
 diff -r 5ce21e1ca0c3 android/testgles/clean.sh
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testgles/clean.sh	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testgles/clean.sh	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,4 @@
 +rm -rf bin
 +rm -rf gen
@@ -7925,7 +7927,7 @@ diff -r 5ce21e1ca0c3 android/testgles/clean.sh
 +rm -rf libs
 diff -r 5ce21e1ca0c3 android/testgles/default.properties
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testgles/default.properties	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testgles/default.properties	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,11 @@
 +# This file is automatically generated by Android Tools.
 +# Do not modify this file -- YOUR CHANGES WILL BE ERASED!
@@ -7940,12 +7942,12 @@ diff -r 5ce21e1ca0c3 android/testgles/default.properties
 +target=android-7
 diff -r 5ce21e1ca0c3 android/testgles/jni/Android.mk
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testgles/jni/Android.mk	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testgles/jni/Android.mk	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,1 @@
 +include $(call all-subdir-makefiles)
 diff -r 5ce21e1ca0c3 android/testgles/jni/Application.mk
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testgles/jni/Application.mk	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testgles/jni/Application.mk	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,6 @@
 +APP_ABI := armeabi
 +APP_PLATFORM := android-9
@@ -7955,7 +7957,7 @@ diff -r 5ce21e1ca0c3 android/testgles/jni/Application.mk
 +# APP_STL := stlport_static 
 diff -r 5ce21e1ca0c3 android/testgles/jni/SDL/Android.mk
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testgles/jni/SDL/Android.mk	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testgles/jni/SDL/Android.mk	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,50 @@
 +LOCAL_PATH := $(SDL2_HOME)
 +
@@ -8002,15 +8004,15 @@ diff -r 5ce21e1ca0c3 android/testgles/jni/SDL/Android.mk
 +	$(wildcard $(LOCAL_PATH)/src/video/*.c) \
 +	$(wildcard $(LOCAL_PATH)/src/video/android/*.c))
 +
-+LOCAL_CFLAGS += -DGL_GLEXT_PROTOTYPES
++LOCAL_CFLAGS += -DGL_GLEXT_PROTOTYPES -DSDL_PREFIX=org_libsdl_testgles
 +LOCAL_LDLIBS := -ldl -lGLESv1_CM -lGLESv2 -llog -landroid
 +
 +
 +include $(BUILD_SHARED_LIBRARY)
 diff -r 5ce21e1ca0c3 android/testgles/jni/src/Android.mk
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testgles/jni/src/Android.mk	Sun Nov 03 12:10:04 2013 -0800
-@@ -0,0 +1,20 @@
++++ b/android/testgles/jni/src/Android.mk	Sat Nov 16 12:08:10 2013 -0800
+@@ -0,0 +1,22 @@
 +LOCAL_PATH := $(call my-dir)
 +
 +include $(CLEAR_VARS)
@@ -8026,6 +8028,8 @@ diff -r 5ce21e1ca0c3 android/testgles/jni/src/Android.mk
 +	$(SDL_PATH)/test/testgles.c \
 +	$(SDL_PATH)/src/test/SDL_test_common.c
 +
++LOCAL_CFLAGS += -DSDL_PREFIX=org_libsdl_testgles
++
 +LOCAL_SHARED_LIBRARIES := SDL2
 +
 +LOCAL_LDLIBS := -lGLESv1_CM -llog
@@ -8033,7 +8037,7 @@ diff -r 5ce21e1ca0c3 android/testgles/jni/src/Android.mk
 +include $(BUILD_SHARED_LIBRARY)
 diff -r 5ce21e1ca0c3 android/testgles/lint.xml
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testgles/lint.xml	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testgles/lint.xml	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,3 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<lint>
@@ -8041,7 +8045,7 @@ diff -r 5ce21e1ca0c3 android/testgles/lint.xml
 \ No newline at end of file
 diff -r 5ce21e1ca0c3 android/testgles/proguard-project.txt
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testgles/proguard-project.txt	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testgles/proguard-project.txt	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,20 @@
 +# To enable ProGuard in your project, edit project.properties
 +# to define the proguard.config property as described in that file.
@@ -8065,7 +8069,7 @@ diff -r 5ce21e1ca0c3 android/testgles/proguard-project.txt
 +#}
 diff -r 5ce21e1ca0c3 android/testgles/project.properties
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testgles/project.properties	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testgles/project.properties	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,14 @@
 +# This file is automatically generated by Android Tools.
 +# Do not modify this file -- YOUR CHANGES WILL BE ERASED!
@@ -8091,7 +8095,7 @@ diff -r 5ce21e1ca0c3 android/testgles/res/drawable-xxhdpi/ic_launcher.png
 Binary file android/testgles/res/drawable-xxhdpi/ic_launcher.png has changed
 diff -r 5ce21e1ca0c3 android/testgles/res/layout/main.xml
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testgles/res/layout/main.xml	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testgles/res/layout/main.xml	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,13 @@
 +<?xml version="1.0" encoding="utf-8"?>
 +<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -8108,17 +8112,17 @@ diff -r 5ce21e1ca0c3 android/testgles/res/layout/main.xml
 +
 diff -r 5ce21e1ca0c3 android/testgles/res/values/strings.xml
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testgles/res/values/strings.xml	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testgles/res/values/strings.xml	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,4 @@
 +<?xml version="1.0" encoding="utf-8"?>
 +<resources>
 +    <string name="app_name">Test GLES</string>
 +</resources>
-diff -r 5ce21e1ca0c3 android/testgles/src/org/libsdl/app/SDLActivity.java
+diff -r 5ce21e1ca0c3 android/testgles/src/org/libsdl/testgles/SDLActivity.java
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testgles/src/org/libsdl/app/SDLActivity.java	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testgles/src/org/libsdl/testgles/SDLActivity.java	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,856 @@
-+package org.libsdl.app;
++package org.libsdl.testgles;
 +
 +import java.util.Arrays;
 +
@@ -8976,7 +8980,7 @@ diff -r 5ce21e1ca0c3 android/testgles/src/org/libsdl/app/SDLActivity.java
 +
 diff -r 5ce21e1ca0c3 android/testjoystick/.classpath
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testjoystick/.classpath	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testjoystick/.classpath	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,9 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<classpath>
@@ -8989,7 +8993,7 @@ diff -r 5ce21e1ca0c3 android/testjoystick/.classpath
 +</classpath>
 diff -r 5ce21e1ca0c3 android/testjoystick/.project
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testjoystick/.project	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testjoystick/.project	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,33 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<projectDescription>
@@ -9026,20 +9030,20 @@ diff -r 5ce21e1ca0c3 android/testjoystick/.project
 +</projectDescription>
 diff -r 5ce21e1ca0c3 android/testjoystick/.settings/org.eclipse.ltk.core.refactoring.prefs
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testjoystick/.settings/org.eclipse.ltk.core.refactoring.prefs	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testjoystick/.settings/org.eclipse.ltk.core.refactoring.prefs	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,2 @@
 +eclipse.preferences.version=1
 +org.eclipse.ltk.core.refactoring.enable.project.refactoring.history=false
 diff -r 5ce21e1ca0c3 android/testjoystick/AndroidManifest.xml
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testjoystick/AndroidManifest.xml	Sun Nov 03 12:10:04 2013 -0800
-@@ -0,0 +1,43 @@
++++ b/android/testjoystick/AndroidManifest.xml	Sat Nov 16 12:08:10 2013 -0800
+@@ -0,0 +1,42 @@
 +<?xml version="1.0" encoding="utf-8"?>
 +<!-- Replace org.libsdl.app with the identifier of your game below, e.g.
 +     com.gamemaker.game
 +-->
 +<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-+      package="org.libsdl.app"
++      package="org.libsdl.testjoystick"
 +      android:versionCode="1"
 +      android:versionName="1.0"
 +      android:installLocation="auto">
@@ -9058,8 +9062,7 @@ diff -r 5ce21e1ca0c3 android/testjoystick/AndroidManifest.xml
 +                 android:allowBackup="true"
 +                 android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
 +        <activity android:name="SDLActivity"
-+                  android:label="@string/app_name"
-+                  android:screenOrientation="landscape">
++                  android:label="@string/app_name">
 +            <intent-filter>
 +                <action android:name="android.intent.action.MAIN" />
 +                <category android:name="android.intent.category.LAUNCHER" />
@@ -9079,7 +9082,7 @@ diff -r 5ce21e1ca0c3 android/testjoystick/AndroidManifest.xml
 +</manifest> 
 diff -r 5ce21e1ca0c3 android/testjoystick/ant.properties
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testjoystick/ant.properties	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testjoystick/ant.properties	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,17 @@
 +# This file is used to override default values used by the Ant build system.
 +#
@@ -9100,7 +9103,7 @@ diff -r 5ce21e1ca0c3 android/testjoystick/ant.properties
 +
 diff -r 5ce21e1ca0c3 android/testjoystick/build.properties
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testjoystick/build.properties	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testjoystick/build.properties	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,17 @@
 +# This file is used to override default values used by the Ant build system.
 +# 
@@ -9121,7 +9124,7 @@ diff -r 5ce21e1ca0c3 android/testjoystick/build.properties
 +
 diff -r 5ce21e1ca0c3 android/testjoystick/build.xml
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testjoystick/build.xml	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testjoystick/build.xml	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,93 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<!-- This should be changed to the name of your project -->
@@ -9218,7 +9221,7 @@ diff -r 5ce21e1ca0c3 android/testjoystick/build.xml
 +</project>
 diff -r 5ce21e1ca0c3 android/testjoystick/clean.sh
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testjoystick/clean.sh	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testjoystick/clean.sh	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,4 @@
 +rm -rf bin
 +rm -rf gen
@@ -9226,7 +9229,7 @@ diff -r 5ce21e1ca0c3 android/testjoystick/clean.sh
 +rm -rf libs
 diff -r 5ce21e1ca0c3 android/testjoystick/default.properties
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testjoystick/default.properties	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testjoystick/default.properties	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,11 @@
 +# This file is automatically generated by Android Tools.
 +# Do not modify this file -- YOUR CHANGES WILL BE ERASED!
@@ -9241,12 +9244,12 @@ diff -r 5ce21e1ca0c3 android/testjoystick/default.properties
 +target=android-7
 diff -r 5ce21e1ca0c3 android/testjoystick/jni/Android.mk
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testjoystick/jni/Android.mk	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testjoystick/jni/Android.mk	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,1 @@
 +include $(call all-subdir-makefiles)
 diff -r 5ce21e1ca0c3 android/testjoystick/jni/Application.mk
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testjoystick/jni/Application.mk	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testjoystick/jni/Application.mk	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,6 @@
 +APP_ABI := armeabi
 +APP_PLATFORM := android-9
@@ -9256,7 +9259,7 @@ diff -r 5ce21e1ca0c3 android/testjoystick/jni/Application.mk
 +# APP_STL := stlport_static 
 diff -r 5ce21e1ca0c3 android/testjoystick/jni/SDL/Android.mk
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testjoystick/jni/SDL/Android.mk	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testjoystick/jni/SDL/Android.mk	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,50 @@
 +LOCAL_PATH := $(SDL2_HOME)
 +
@@ -9303,15 +9306,15 @@ diff -r 5ce21e1ca0c3 android/testjoystick/jni/SDL/Android.mk
 +	$(wildcard $(LOCAL_PATH)/src/video/*.c) \
 +	$(wildcard $(LOCAL_PATH)/src/video/android/*.c))
 +
-+LOCAL_CFLAGS += -DGL_GLEXT_PROTOTYPES
++LOCAL_CFLAGS += -DGL_GLEXT_PROTOTYPES -DSDL_PREFIX=org_libsdl_testjoystick
 +LOCAL_LDLIBS := -ldl -lGLESv1_CM -lGLESv2 -llog -landroid
 +
 +
 +include $(BUILD_SHARED_LIBRARY)
 diff -r 5ce21e1ca0c3 android/testjoystick/jni/src/Android.mk
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testjoystick/jni/src/Android.mk	Sun Nov 03 12:10:04 2013 -0800
-@@ -0,0 +1,19 @@
++++ b/android/testjoystick/jni/src/Android.mk	Sat Nov 16 12:08:10 2013 -0800
+@@ -0,0 +1,21 @@
 +LOCAL_PATH := $(call my-dir)
 +
 +include $(CLEAR_VARS)
@@ -9326,6 +9329,8 @@ diff -r 5ce21e1ca0c3 android/testjoystick/jni/src/Android.mk
 +LOCAL_SRC_FILES := $(SDL2_PATH)/src/main/android/SDL_android_main.c \
 +	$(SDL2_PATH)/test/testjoystick.c
 +
++LOCAL_CFLAGS += -DSDL_PREFIX=org_libsdl_testjoystick
++
 +LOCAL_SHARED_LIBRARIES := SDL2
 +
 +LOCAL_LDLIBS := -lGLESv1_CM -llog
@@ -9333,7 +9338,7 @@ diff -r 5ce21e1ca0c3 android/testjoystick/jni/src/Android.mk
 +include $(BUILD_SHARED_LIBRARY)
 diff -r 5ce21e1ca0c3 android/testjoystick/lint.xml
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testjoystick/lint.xml	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testjoystick/lint.xml	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,3 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +<lint>
@@ -9341,7 +9346,7 @@ diff -r 5ce21e1ca0c3 android/testjoystick/lint.xml
 \ No newline at end of file
 diff -r 5ce21e1ca0c3 android/testjoystick/proguard-project.txt
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testjoystick/proguard-project.txt	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testjoystick/proguard-project.txt	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,20 @@
 +# To enable ProGuard in your project, edit project.properties
 +# to define the proguard.config property as described in that file.
@@ -9365,7 +9370,7 @@ diff -r 5ce21e1ca0c3 android/testjoystick/proguard-project.txt
 +#}
 diff -r 5ce21e1ca0c3 android/testjoystick/project.properties
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testjoystick/project.properties	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testjoystick/project.properties	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,14 @@
 +# This file is automatically generated by Android Tools.
 +# Do not modify this file -- YOUR CHANGES WILL BE ERASED!
@@ -9391,7 +9396,7 @@ diff -r 5ce21e1ca0c3 android/testjoystick/res/drawable-xxhdpi/ic_launcher.png
 Binary file android/testjoystick/res/drawable-xxhdpi/ic_launcher.png has changed
 diff -r 5ce21e1ca0c3 android/testjoystick/res/layout/main.xml
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testjoystick/res/layout/main.xml	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testjoystick/res/layout/main.xml	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,13 @@
 +<?xml version="1.0" encoding="utf-8"?>
 +<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -9408,17 +9413,17 @@ diff -r 5ce21e1ca0c3 android/testjoystick/res/layout/main.xml
 +
 diff -r 5ce21e1ca0c3 android/testjoystick/res/values/strings.xml
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testjoystick/res/values/strings.xml	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testjoystick/res/values/strings.xml	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,4 @@
 +<?xml version="1.0" encoding="utf-8"?>
 +<resources>
 +    <string name="app_name">Test Joystick</string>
 +</resources>
-diff -r 5ce21e1ca0c3 android/testjoystick/src/org/libsdl/app/SDLActivity.java
+diff -r 5ce21e1ca0c3 android/testjoystick/src/org/libsdl/testjoystick/SDLActivity.java
 --- /dev/null	Thu Jan 01 00:00:00 1970 +0000
-+++ b/android/testjoystick/src/org/libsdl/app/SDLActivity.java	Sun Nov 03 12:10:04 2013 -0800
++++ b/android/testjoystick/src/org/libsdl/testjoystick/SDLActivity.java	Sat Nov 16 12:08:10 2013 -0800
 @@ -0,0 +1,856 @@
-+package org.libsdl.app;
++package org.libsdl.testjoystick;
 +
 +import java.util.Arrays;
 +
@@ -10276,7 +10281,7 @@ diff -r 5ce21e1ca0c3 android/testjoystick/src/org/libsdl/app/SDLActivity.java
 +
 diff -r 5ce21e1ca0c3 include/SDL_hints.h
 --- a/include/SDL_hints.h	Mon Oct 14 09:15:41 2013 -0700
-+++ b/include/SDL_hints.h	Sun Nov 03 12:10:04 2013 -0800
++++ b/include/SDL_hints.h	Sat Nov 16 12:08:10 2013 -0800
 @@ -203,6 +203,17 @@
   *    "LandscapeLeft", "LandscapeRight", "Portrait" "PortraitUpsideDown"
   */
@@ -10297,13 +10302,63 @@ diff -r 5ce21e1ca0c3 include/SDL_hints.h
  /**
 diff -r 5ce21e1ca0c3 src/core/android/SDL_android.c
 --- a/src/core/android/SDL_android.c	Mon Oct 14 09:15:41 2013 -0700
-+++ b/src/core/android/SDL_android.c	Sun Nov 03 12:10:04 2013 -0800
-@@ -205,6 +205,30 @@
++++ b/src/core/android/SDL_android.c	Sat Nov 16 12:08:10 2013 -0800
+@@ -48,6 +48,16 @@
+ /* Uncomment this to log messages entering and exiting methods in this file */
+ /* #define DEBUG_JNI */
+ 
++#ifndef SDL_PREFIX
++    #pragma warning Defaulting to org.libsdl.app
++	#define SDL_PREFIX		org_libdl_app
++#endif
++
++#define CONCAT1(p,f)	CONCAT2(p,f)
++#define CONCAT2(p,f)	Java_ ## p ## _ ## f
++
++#define JNI(f)			CONCAT1(SDL_PREFIX,f)
++
+ static void Android_JNI_ThreadDestroyed(void*);
+ 
+ /*******************************************************************************
+@@ -139,7 +149,7 @@
+ }
+ 
+ /* Resize */
+-void Java_org_libsdl_app_SDLActivity_onNativeResize(
++void JNI(SDLActivity_onNativeResize)(
+                                     JNIEnv* env, jclass jcls,
+                                     jint width, jint height, jint format)
+ {
+@@ -148,7 +158,7 @@
+ 
+ 
+ /* Surface Created */
+-void Java_org_libsdl_app_SDLActivity_onNativeSurfaceChanged(JNIEnv* env, jclass jcls)
++void JNI(SDLActivity_onNativeSurfaceChanged)(JNIEnv* env, jclass jcls)
+ {
+     SDL_WindowData *data;
+     SDL_VideoDevice *_this;
+@@ -174,7 +184,7 @@
+ }
+ 
+ /* Surface Destroyed */
+-void Java_org_libsdl_app_SDLActivity_onNativeSurfaceDestroyed(JNIEnv* env, jclass jcls)
++void JNI(SDLActivity_onNativeSurfaceDestroyed)(JNIEnv* env, jclass jcls)
+ {
+     /* We have to clear the current context and destroy the egl surface here
+      * Otherwise there's BAD_NATIVE_WINDOW errors coming from eglCreateWindowSurface on resume
+@@ -200,27 +210,51 @@
+ 
+ }
+ 
+-void Java_org_libsdl_app_SDLActivity_nativeFlipBuffers(JNIEnv* env, jclass jcls)
++void JNI(SDLActivity_nativeFlipBuffers)(JNIEnv* env, jclass jcls)
+ {
      SDL_GL_SwapWindow(Android_Window);
  }
  
 +/* Paddown */
-+void Java_org_libsdl_app_SDLActivity_onNativePadDown(
++void JNI(SDLActivity_onNativePadDown)(
 +                                                     JNIEnv* env, jclass jcls,
 +                                                     jint padId, jint keycode)
 +{
@@ -10311,7 +10366,7 @@ diff -r 5ce21e1ca0c3 src/core/android/SDL_android.c
 +}
 +
 +/* Padup */
-+void Java_org_libsdl_app_SDLActivity_onNativePadUp(
++void JNI(SDLActivity_onNativePadUp)(
 +                                                   JNIEnv* env, jclass jcls,
 +                                                   jint padId, jint keycode)
 +{
@@ -10319,7 +10374,7 @@ diff -r 5ce21e1ca0c3 src/core/android/SDL_android.c
 +}
 +
 +/* OnJoy */
-+void Java_org_libsdl_app_SDLActivity_onNativeJoy(
++void JNI(SDLActivity_onNativeJoy)(
 +                                                 JNIEnv* env, jclass jcls,
 +                                                 jint joyId, jint axis, jfloat value)
 +{
@@ -10327,9 +10382,99 @@ diff -r 5ce21e1ca0c3 src/core/android/SDL_android.c
 +}
 +
  /* Keydown */
- void Java_org_libsdl_app_SDLActivity_onNativeKeyDown(
+-void Java_org_libsdl_app_SDLActivity_onNativeKeyDown(
++void JNI(SDLActivity_onNativeKeyDown)(
                                      JNIEnv* env, jclass jcls, jint keycode)
-@@ -1212,6 +1236,61 @@
+ {
+     Android_OnKeyDown(keycode);
+ }
+ 
+ /* Keyup */
+-void Java_org_libsdl_app_SDLActivity_onNativeKeyUp(
++void JNI(SDLActivity_onNativeKeyUp)(
+                                     JNIEnv* env, jclass jcls, jint keycode)
+ {
+     Android_OnKeyUp(keycode);
+ }
+ 
+ /* Keyboard Focus Lost */
+-void Java_org_libsdl_app_SDLActivity_onNativeKeyboardFocusLost(
++void JNI(SDLActivity_onNativeKeyboardFocusLost)(
+                                     JNIEnv* env, jclass jcls)
+ {
+     /* Calling SDL_StopTextInput will take care of hiding the keyboard and cleaning up the DummyText widget */
+@@ -229,7 +263,7 @@
+ 
+ 
+ /* Touch */
+-void Java_org_libsdl_app_SDLActivity_onNativeTouch(
++void JNI(SDLActivity_onNativeTouch)(
+                                     JNIEnv* env, jclass jcls,
+                                     jint touch_device_id_in, jint pointer_finger_id_in,
+                                     jint action, jfloat x, jfloat y, jfloat p)
+@@ -238,7 +272,7 @@
+ }
+ 
+ /* Accelerometer */
+-void Java_org_libsdl_app_SDLActivity_onNativeAccel(
++void JNI(SDLActivity_onNativeAccel)(
+                                     JNIEnv* env, jclass jcls,
+                                     jfloat x, jfloat y, jfloat z)
+ {
+@@ -249,14 +283,14 @@
+ }
+ 
+ /* Low memory */
+-void Java_org_libsdl_app_SDLActivity_nativeLowMemory(
++void JNI(SDLActivity_nativeLowMemory)(
+                                     JNIEnv* env, jclass cls)
+ {
+     SDL_SendAppEvent(SDL_APP_LOWMEMORY);
+ }
+ 
+ /* Quit */
+-void Java_org_libsdl_app_SDLActivity_nativeQuit(
++void JNI(SDLActivity_nativeQuit)(
+                                     JNIEnv* env, jclass cls)
+ {
+     /* Inject a SDL_QUIT event */
+@@ -265,7 +299,7 @@
+ }
+ 
+ /* Pause */
+-void Java_org_libsdl_app_SDLActivity_nativePause(
++void JNI(SDLActivity_nativePause)(
+                                     JNIEnv* env, jclass cls)
+ {
+     if (Android_Window) {
+@@ -281,7 +315,7 @@
+ }
+ 
+ /* Resume */
+-void Java_org_libsdl_app_SDLActivity_nativeResume(
++void JNI(SDLActivity_nativeResume)(
+                                     JNIEnv* env, jclass cls)
+ {
+     __android_log_print(ANDROID_LOG_VERBOSE, "SDL", "nativeResume()");
+@@ -299,7 +333,7 @@
+     }
+ }
+ 
+-void Java_org_libsdl_app_SDLInputConnection_nativeCommitText(
++void JNI(SDLInputConnection_nativeCommitText)(
+                                     JNIEnv* env, jclass cls,
+                                     jstring text, jint newCursorPosition)
+ {
+@@ -310,7 +344,7 @@
+     (*env)->ReleaseStringUTFChars(env, text, utftext);
+ }
+ 
+-void Java_org_libsdl_app_SDLInputConnection_nativeSetComposingText(
++void JNI(SDLInputConnection_nativeSetComposingText)(
+                                     JNIEnv* env, jclass cls,
+                                     jstring text, jint newCursorPosition)
+ {
+@@ -1212,6 +1246,61 @@
      return number;
  }
  
@@ -10393,7 +10538,7 @@ diff -r 5ce21e1ca0c3 src/core/android/SDL_android.c
  {
 diff -r 5ce21e1ca0c3 src/core/android/SDL_android.h
 --- a/src/core/android/SDL_android.h	Mon Oct 14 09:15:41 2013 -0700
-+++ b/src/core/android/SDL_android.h	Sun Nov 03 12:10:04 2013 -0800
++++ b/src/core/android/SDL_android.h	Sat Nov 16 12:08:10 2013 -0800
 @@ -64,6 +64,11 @@
  
  /* Power support */
@@ -10408,7 +10553,7 @@ diff -r 5ce21e1ca0c3 src/core/android/SDL_android.h
  int Android_JNI_GetTouchDeviceIds(int **ids);
 diff -r 5ce21e1ca0c3 src/joystick/android/SDL_sysjoystick.c
 --- a/src/joystick/android/SDL_sysjoystick.c	Mon Oct 14 09:15:41 2013 -0700
-+++ b/src/joystick/android/SDL_sysjoystick.c	Sun Nov 03 12:10:04 2013 -0800
++++ b/src/joystick/android/SDL_sysjoystick.c	Sat Nov 16 12:08:10 2013 -0800
 @@ -29,12 +29,48 @@
  #include "SDL_error.h"
  #include "SDL_events.h"
@@ -10604,9 +10749,38 @@ diff -r 5ce21e1ca0c3 src/joystick/android/SDL_sysjoystick.c
  #endif /* SDL_JOYSTICK_ANDROID */
  
  /* vi: set ts=4 sw=4 expandtab: */
+diff -r 5ce21e1ca0c3 src/main/android/SDL_android_main.c
+--- a/src/main/android/SDL_android_main.c	Mon Oct 14 09:15:41 2013 -0700
++++ b/src/main/android/SDL_android_main.c	Sat Nov 16 12:08:10 2013 -0800
+@@ -6,6 +6,16 @@
+ /* Include the SDL main definition header */
+ #include "SDL_main.h"
+ 
++#ifndef SDL_PREFIX
++    #pragma warning Defaulting to org.libsdl.app
++	#define SDL_PREFIX		org_libdl_app
++#endif
++
++#define CONCAT1(p,f)	CONCAT2(p,f)
++#define CONCAT2(p,f)	Java_ ## p ## _ ## f
++
++#define JNI(f)			CONCAT1(SDL_PREFIX,f)
++
+ /*******************************************************************************
+                  Functions called by JNI
+ *******************************************************************************/
+@@ -15,7 +25,7 @@
+ extern void SDL_Android_Init(JNIEnv* env, jclass cls);
+ 
+ /* Start up the SDL app */
+-void Java_org_libsdl_app_SDLActivity_nativeInit(JNIEnv* env, jclass cls, jobject obj)
++void JNI(SDLActivity_nativeInit)(JNIEnv* env, jclass cls, jobject obj)
+ {
+     /* This interface could expand with ABI negotiation, calbacks, etc. */
+     SDL_Android_Init(env, cls);
 diff -r 5ce21e1ca0c3 test/testjoystick.c
 --- a/test/testjoystick.c	Mon Oct 14 09:15:41 2013 -0700
-+++ b/test/testjoystick.c	Sun Nov 03 12:10:04 2013 -0800
++++ b/test/testjoystick.c	Sat Nov 16 12:08:10 2013 -0800
 @@ -20,20 +20,32 @@
  
  #ifndef SDL_JOYSTICK_DISABLED

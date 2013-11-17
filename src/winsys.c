@@ -254,6 +254,8 @@ void winsys_warp_pointer( int x, int y )
   \date    Created:  2000-10-20
   \date    Modified: 2000-10-20
 */
+static float scale_factor = 1.0;
+
 static void setup_sdl_video_mode()
 {
 #if SDL_MAJOR_VERSION==2
@@ -324,6 +326,9 @@ static void setup_sdl_video_mode()
 	else
 	{
         SDL_GetWindowSize(window, &width, &height);
+		print_debug(DEBUG_OTHER, "width=%d height=%d", width, height);
+		/* Set scale factor for fonts & HUD */
+		scale_factor = height / 480.0;
         setparam_x_resolution(width);
         setparam_y_resolution(height);
 		SDL_GL_CreateContext(window);
@@ -398,9 +403,13 @@ void winsys_init( int *argc, char **argv, char *window_title,
 #else
     SDL_WM_SetCaption( window_title, icon_title );
 #endif
-
 	winsys_init_joystick();
 	SDL_SetEventFilter(winsys_event_filter, NULL);
+}
+
+float winsys_scale(float x)
+{
+	return x * scale_factor;
 }
 
 void winsys_scan_joysticks()

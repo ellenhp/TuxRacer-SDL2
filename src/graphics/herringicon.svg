@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="128"
+   height="128"
+   id="svg3756"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="herringicon.svg"
+   inkscape:export-filename="C:\dev\TuxRacer-SDL2\src\graphics\herringicon.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
+  <defs
+     id="defs3758" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="5.3984375"
+     inkscape:cx="17.706117"
+     inkscape:cy="37.973138"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     inkscape:document-units="px"
+     inkscape:grid-bbox="true"
+     inkscape:window-width="1600"
+     inkscape:window-height="878"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata3761">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     transform="translate(0,64)">
+    <path
+       style="fill:none;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 49.273517,10.465992 c -7.508197,3.95944 -3.188208,2.904081 -15.560058,3.704776 -49.564305,10.293167 -29.8329538,35.010131 -2.96382,40.011578 0,0 11.698745,0.587086 13.151953,0.555715 7.958842,0.218784 8.855941,2.81082 12.040521,6.298119 7.673792,3.530803 7.29133,-0.14224 7.039074,-6.298119 1.634556,-5.206701 7.812638,-5.579781 15.004345,-15.560058 4.048403,-3.822135 6.844443,4.059874 11.670043,6.853835 14.088345,3.224062 -3.32464,-12.618057 -0.74096,-21.302461 10.47572,-24.01212643 -0.550154,-13.443278 -6.483355,-8.335745 -0.13098,0.130984 -3.759027,2.647599 -3.890017,2.778583 -5.438304,5.958357 -16.149332,1.082038 -18.76257,-4.650807 -1.977202,-4.993325 0.910496,-15.8150604 -10.505156,-4.055416 z"
+       id="path3779"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccccccccccc" />
+    <path
+       style="fill:#ffe503;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 57.386913,84.228075 c 0,-0.560347 0.03473,-0.78958 0.07717,-0.509406 0.04244,0.280173 0.04244,0.738639 0,1.018813 -0.04244,0.280174 -0.07717,0.05094 -0.07717,-0.509407 z"
+       id="path3781"
+       inkscape:connector-curvature="0"
+       transform="translate(0,-64)" />
+    <path
+       style="fill:#ffe503;fill-opacity:1;stroke:#000000;stroke-width:0.55571634;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 59.959084,124.76673 c -0.203763,-0.0435 -0.967284,-0.28961 -1.696713,-0.54691 -1.152043,-0.40638 -1.455175,-0.61607 -2.307944,-1.59652 -2.400582,-2.76001 -3.798838,-3.80325 -6.100508,-4.55159 -2.001629,-0.65079 -3.166935,-0.77361 -9.993243,-1.05331 -8.411236,-0.34463 -9.077709,-0.40016 -11.352482,-0.94583 -7.981029,-1.91447 -14.755726,-5.39866 -19.2119178,-9.88058 -2.926818,-2.94372 -4.1918899,-5.20765 -4.3919859,-7.859729 -0.337753,-4.476591 2.6074269,-8.318622 9.1589587,-11.947993 5.742982,-3.181458 16.738168,-6.497319 22.463128,-6.774293 4.229923,-0.204644 6.994235,-0.475795 7.822073,-0.767264 0.435343,-0.153278 1.875178,-0.873046 3.199635,-1.599485 1.856754,-1.018392 2.768603,-1.660223 3.982634,-2.803287 2.582112,-2.431173 4.5505,-3.826944 5.002766,-3.547428 0.256945,0.1588 0.495984,1.214039 0.839045,3.70396 0.58724,4.262167 1.097267,5.492341 3.202234,7.723716 2.004367,2.124735 5.113207,3.939778 8.052846,4.701514 3.701381,0.959125 7.716883,0.19762 10.150265,-1.924907 0.449086,-0.391717 1.733452,-1.376334 2.854146,-2.188038 1.120695,-0.811704 3.079595,-2.37409 4.353112,-3.471968 2.093056,-1.80439 5.097101,-4.006743 5.465261,-4.006743 0.295337,0 -0.107076,2.272305 -0.761307,4.29888 -0.371419,1.150522 -1.303276,3.633971 -2.070792,5.518776 -1.312767,3.223788 -1.400003,3.525737 -1.47172,5.094067 -0.06156,1.346226 0.01178,2.008527 0.381017,3.440558 0.620895,2.408076 1.13719,3.661871 3.465068,8.414724 1.992937,4.069 2.587263,5.50196 2.587263,6.23808 0,0.37391 -0.06571,0.38602 -1.581973,0.29142 -1.892395,-0.11806 -2.326799,-0.36841 -4.357366,-2.51122 -4.793467,-5.05843 -5.50458,-5.59281 -7.442442,-5.59281 -1.738611,0 -2.662426,0.62087 -4.687688,3.15044 -2.142585,2.67611 -4.526197,4.95314 -8.04733,7.68748 -3.869103,3.00455 -5.018458,4.24901 -5.783255,6.2618 -0.288478,0.75921 -0.329257,1.18596 -0.226208,2.3673 0.160918,1.84472 -0.05035,4.16214 -0.412446,4.52424 -0.277758,0.27776 -0.409987,0.29645 -1.082131,0.15295 z"
+       id="path4297"
+       inkscape:connector-curvature="0"
+       transform="translate(0,-64)"
+       sodipodi:nodetypes="cssssssssssssssssssssssssssssssssssc"
+       inkscape:export-filename="C:\dev\TuxRacer-SDL2\src\graphics\herringicon.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+  </g>
+</svg>

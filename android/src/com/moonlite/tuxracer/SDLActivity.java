@@ -1,4 +1,4 @@
-package org.libsdl.app;
+package com.moonlite.tuxracer;
 
 import java.util.Arrays;
 

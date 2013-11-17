@@ -31,6 +31,8 @@
 #include "bonus.h"
 #include "hud.h"
 
+#define HUD_SCALE(x)		winsys_scale(x)
+
 #define SECONDS_IN_MINUTE 60
 
 #define TIME_LABEL_X_OFFSET 12.0
@@ -42,24 +44,24 @@
 #define SCORE_X_OFFSET 12.0
 #define SCORE_Y_OFFSET 12.0
 
-#define HERRING_ICON_HEIGHT 30.0
-#define HERRING_ICON_WIDTH 48.0
-#define HERRING_ICON_IMG_SIZE 64.0
-#define HERRING_ICON_X_OFFSET 160.0
+#define HERRING_ICON_HEIGHT HUD_SCALE(30.0)
+#define HERRING_ICON_WIDTH HUD_SCALE(48.0)
+#define HERRING_ICON_IMG_SIZE HUD_SCALE(64.0)
+#define HERRING_ICON_X_OFFSET HUD_SCALE(160.0)
 #define HERRING_ICON_Y_OFFSET 41.0
 #define HERRING_COUNT_Y_OFFSET 37.0
 
-#define GAUGE_IMG_SIZE 128
+#define GAUGE_IMG_SIZE HUD_SCALE(128)
 
-#define ENERGY_GAUGE_BOTTOM 3.0
-#define ENERGY_GAUGE_HEIGHT 103.0
-#define ENERGY_GAUGE_CENTER_X 71.0
-#define ENERGY_GAUGE_CENTER_Y 55.0
+#define ENERGY_GAUGE_BOTTOM HUD_SCALE(1.0)
+#define ENERGY_GAUGE_HEIGHT HUD_SCALE(103.0)
+#define ENERGY_GAUGE_CENTER_X (GAUGE_IMG_SIZE / 2.0 + HUD_SCALE(7.0))
+#define ENERGY_GAUGE_CENTER_Y (GAUGE_IMG_SIZE / 2.0 - HUD_SCALE(9.0))
 
-#define GAUGE_WIDTH 127.0
-#define SPEED_UNITS_Y_OFFSET 4.0
+#define GAUGE_WIDTH (GAUGE_IMG_SIZE - 1.0)
+#define SPEED_UNITS_Y_OFFSET HUD_SCALE(4.0)
 
-#define SPEEDBAR_OUTER_RADIUS ( 70 )
+#define SPEEDBAR_OUTER_RADIUS (GAUGE_IMG_SIZE / 2 + HUD_SCALE(6))
 #define SPEEDBAR_BASE_ANGLE 225
 #define SPEEDBAR_MAX_ANGLE 45
 #define SPEEDBAR_GREEN_MAX_SPEED ( MAX_PADDLING_SPEED * M_PER_SEC_TO_KM_PER_H )
@@ -364,8 +366,8 @@ point2d_t calc_new_fan_pt( scalar_t angle )
 point2d_t calc_new_fan_tex_pt( scalar_t angle )
 {
     point2d_t pt;
-    pt.x = (cos(ANGLES_TO_RADIANS(angle))*SPEEDBAR_OUTER_RADIUS+ENERGY_GAUGE_CENTER_X)/128;
-    pt.y = (sin(ANGLES_TO_RADIANS(angle))*SPEEDBAR_OUTER_RADIUS+ENERGY_GAUGE_CENTER_Y)/128;
+    pt.x = (cos(ANGLES_TO_RADIANS(angle))*SPEEDBAR_OUTER_RADIUS+ENERGY_GAUGE_CENTER_X)/GAUGE_IMG_SIZE;
+    pt.y = (sin(ANGLES_TO_RADIANS(angle))*SPEEDBAR_OUTER_RADIUS+ENERGY_GAUGE_CENTER_Y)/GAUGE_IMG_SIZE;
     
     return pt;
 }
@@ -389,8 +391,8 @@ void draw_partial_tri_fan( scalar_t fraction )
     vertices[1]=ENERGY_GAUGE_CENTER_Y;
     vertices[2]=0;
 
-	texcoords[0]=ENERGY_GAUGE_CENTER_X/128;
-	texcoords[1]=ENERGY_GAUGE_CENTER_Y/128;
+	texcoords[0]=ENERGY_GAUGE_CENTER_X/GAUGE_IMG_SIZE;
+	texcoords[1]=ENERGY_GAUGE_CENTER_Y/GAUGE_IMG_SIZE;
 
     for (i=1; i<DIVS-1; i++) {
         pt = calc_new_fan_pt( cur_angle );
