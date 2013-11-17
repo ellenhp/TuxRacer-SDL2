@@ -440,6 +440,10 @@ void winsys_scan_joysticks()
 			break;
 		}
 	}
+	if (i==num_joysticks) //exhausted our options, there are no game controllers attached.
+	{
+		i=0; //use the first device
+	}
 
 	if (SDL_IsGameController(i))
 	{
@@ -486,6 +490,8 @@ void winsys_scan_joysticks()
 		else
 		{
 			print_debug(DEBUG_JOYSTICK, "Incompatible joystick '%s' with GUID '%s'", js_name, guid);
+			SDL_JoystickClose(winsys_joystick);
+			winsys_joystick=NULL;
 		}
 	}
 }
