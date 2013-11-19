@@ -247,14 +247,13 @@ static void prefs_init(void)
 	gui_add_widget(view_slider, NULL);
 
 	gui_add_widget(fps_slider=create_slider("", fps_down, fps_up), NULL);
+
+	gui_balance_lines(0);
 	
 	music_volume_ticks=getparam_music_volume();
 	sound_volume_ticks=getparam_sound_volume();
-
 	graphics_ticks=getparam_graphics_slider_tick();
-
 	view_mode=getparam_view_mode();
-
 	display_fps=getparam_display_fps();
 
 	update_volume();

@@ -60,7 +60,8 @@ void GameMenu_draw()
 
 coord_t get_absolute(coord_t coord, int asc, int desc)
 {
-	int w, h, num_lines;
+	double w, h;
+	int num_lines;
 	coord_t absolute;
 
 	w=GameMenu_get_window_width();
@@ -74,10 +75,10 @@ coord_t get_absolute(coord_t coord, int asc, int desc)
 	switch (coord.x_coord_type)
 	{
 	case ABSOLUTE_COORD:
-		absolute.x=coord.x;
+		absolute.x=(int)coord.x;
 		break;
 	case NORMALIZED_COORD:
-		absolute.x=(int)((coord.x+1)/2.0f*w);
+		absolute.x=(int)(coord.x*w);
 		break;
 	case LINE_COORD:
 		print_warning( IMPORTANT_WARNING,"LINE coords only available on Y axis.\n" );
@@ -87,17 +88,17 @@ coord_t get_absolute(coord_t coord, int asc, int desc)
 	switch (coord.y_coord_type)
 	{
 	case ABSOLUTE_COORD:
-		absolute.y=coord.y;
+		absolute.y=(int)coord.y;
 		break;
 	case NORMALIZED_COORD:
-		absolute.y=(int)((coord.y+1)/2.0f*h);
+		absolute.y=(int)(coord.y*h);
 		break;
 	case LINE_COORD:
 		absolute.y_just=CENTER_JUST; //justification is overriden in lines mode
-		num_lines=(int)((float)h/asc+desc);
+		num_lines=(int)(h/asc+desc);
 		if (num_lines%2==0)
 			num_lines--; // num_lines should be odd so we have a line 0 centered vertically
-		absolute.y=h/2-coord.y*(asc+desc);
+		absolute.y=(int)(h/2-coord.y*(asc+desc));
 		break;
 	}
 	return absolute;
@@ -139,8 +140,11 @@ widget_bounding_box_t GameMenu_get_bb(widget_t* widget)
 	case CENTER_JUST:
 		bb.x-=bb.width/2;
 		break;
+	case LEFT_JUST:
+		//do nothing
+		break;
 	default:
-        print_warning( IMPORTANT_WARNING,"Justification x/y mismatch\n" );
+        print_warning( IMPORTANT_WARNING,"Justification x/y mismatch 0\n" );
 		break;
 	}
 	
@@ -152,8 +156,11 @@ widget_bounding_box_t GameMenu_get_bb(widget_t* widget)
 	case CENTER_JUST:
 		bb.y-=bb.height/2;
 		break;
+	case TOP_JUST:
+		//do nothing
+		break;
 	default:
-        print_warning( IMPORTANT_WARNING,"Justification x/y mismatch\n" );
+        print_warning( IMPORTANT_WARNING,"Justification x/y mismatch 1\n" );
 		break;
 	}
 	return bb;
@@ -164,7 +171,7 @@ void GameMenu_draw_text(char* text, int active, coord_t coord)
     font_t *font;
     int w, asc, desc;
 	coord_t absolute_coord;
-	int x_render_pos, y_render_pos;
+	double x_render_pos, y_render_pos;
 
     if (!get_font_binding( active ? "button_label_hilit" : "button_label" , &font )) {
         print_warning( IMPORTANT_WARNING, 
@@ -176,7 +183,6 @@ void GameMenu_draw_text(char* text, int active, coord_t coord)
 	{
 		bind_font_texture( font );
 		get_font_metrics( font, text, &w, &asc, &desc );
-
 
 		absolute_coord=get_absolute(coord, asc, desc);
 
@@ -192,7 +198,7 @@ void GameMenu_draw_text(char* text, int active, coord_t coord)
 			x_render_pos=absolute_coord.x-w/2;
 			break;
 		default:
-	        print_warning( IMPORTANT_WARNING,"Justification x/y mismatch\n" );
+	        print_warning( IMPORTANT_WARNING,"Justification x/y mismatch 2\n" );
 			return;
 			break;
 		}
@@ -209,7 +215,7 @@ void GameMenu_draw_text(char* text, int active, coord_t coord)
 			y_render_pos=absolute_coord.y-asc/2.0+desc/2.0;
 			break;
 		default:
-	        print_warning( IMPORTANT_WARNING,"Justification x/y mismatch\n" );
+	        print_warning( IMPORTANT_WARNING,"Justification x/y mismatch 3\n" );
 			return;
 			break;
 		}
@@ -222,6 +228,67 @@ void GameMenu_draw_text(char* text, int active, coord_t coord)
         }
         glPopMatrix();
     }
+}
+
+void rect_to_absolute(rect_t* rect)
+{
+	if (rect->lower_left.x_coord_type==NORMALIZED_COORD)
+	{
+		rect->lower_left.x_coord_type==ABSOLUTE_COORD;
+		rect->lower_left.x*=GameMenu_get_window_width();
+	}
+	if (rect->lower_left.y_coord_type==NORMALIZED_COORD)
+	{
+		rect->lower_left.y_coord_type==ABSOLUTE_COORD;
+		rect->lower_left.y*=GameMenu_get_window_height();
+	}
+	if (rect->upper_right.x_coord_type==NORMALIZED_COORD)
+	{
+		rect->upper_right.x_coord_type==ABSOLUTE_COORD;
+		rect->upper_right.x*=GameMenu_get_window_width();
+	}
+	if (rect->upper_right.y_coord_type==NORMALIZED_COORD)
+	{
+		rect->upper_right.y_coord_type==ABSOLUTE_COORD;
+		rect->upper_right.y*=GameMenu_get_window_height();
+	}
+}
+
+void GameMenu_draw_image(GLuint binding, rect_t image_rect, rect_t screen_rect)
+{
+	glBindTexture( GL_TEXTURE_2D, binding );
+
+	rect_to_absolute(&screen_rect);
+
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+	glPushMatrix();
+    {
+		GLfloat vertices []=
+		{
+    		screen_rect.upper_right.x, screen_rect.upper_right.y, 0,
+			screen_rect.upper_right.x, screen_rect.lower_left.y, 0,
+    		screen_rect.lower_left.x, screen_rect.lower_left.y, 0,
+    		screen_rect.lower_left.y, screen_rect.upper_right.y, 0
+		};
+		GLfloat texCoords []=
+		{
+			image_rect.lower_left.x,image_rect.lower_left.y,
+    		image_rect.lower_left.x,image_rect.upper_right.y,
+    		image_rect.upper_right.x,image_rect.upper_right.y,
+    		image_rect.upper_right.x,image_rect.lower_left.y
+		};
+		GLubyte indices[]={0, 1, 2, 0, 2, 3};
+    	
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glVertexPointer(3, GL_FLOAT , 0, vertices);	
+		glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
+		glDisableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    }
+    glPopMatrix();
 }
 
 int GameMenu_get_window_height()
