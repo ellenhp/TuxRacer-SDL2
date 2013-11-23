@@ -22,10 +22,9 @@
 #include "ui_mgr.h"
 #include "ui_theme.h"
 #include "ui_snow.h"
-#include "gui_abstraction.h"
-#include "gui_mgr.h"
-#include "gui_button.h"
 #include "gui_slider.h"
+#include "gui_button.h"
+#include "gui_abstraction.h"
 #include "joystick.h"
 
 #define VOLUME_TOTAL_TICKS 10
@@ -44,17 +43,14 @@ typedef struct graphics_options_t
 	int tux_sphere_divisions;
 	bool_t draw_particles;
 	bool_t track_marks;
-	char* name;
 } graphics_options_t;
 
 #define NUM_GRAPHICS_OPTIONS 3
 graphics_options_t graphics_options[]={
-	{5, 30, 0, False, False, False, 3, False, False, "Graphics Preset: Low"},
-	{10, 70, 20, True, False, True, 16, True, False, "Graphics Preset: Medium"},
-	{20, 300, 300, True, True, True, 64, True, True, "Graphics Preset: High"},
+	{5, 30, 0, False, False, False, 3, False, False},
+	{10, 70, 20, True, False, True, 16, True, False},
+	{20, 300, 300, True, True, True, 64, True, True},
 };
-
-widget_t* back_btn=NULL;
 
 widget_t* music_volume_slider=NULL;
 widget_t* sound_volume_slider=NULL;
@@ -66,38 +62,30 @@ widget_t* view_slider=NULL;
 
 widget_t* fps_slider=NULL;
 
-int music_volume_ticks=0;
-int sound_volume_ticks=0;
-
 int graphics_ticks=0;
 
 int view_mode=0;
 
 bool_t display_fps;
 
-void update_volume()
+void update_music_volume(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type, widget_t* widget)
 {
-	char* str;
-
-	setparam_music_volume(music_volume_ticks);
-	str=(char*)malloc(strlen(MUSIC_VOLUME_STRING)+1);
-	sprintf(str, MUSIC_VOLUME_STRING, music_volume_ticks);
-	widget_set_text(music_volume_slider, str);
-
-	setparam_sound_volume(sound_volume_ticks);
-	str=(char*)malloc(strlen(SOUND_VOLUME_STRING)+1);
-	sprintf(str, SOUND_VOLUME_STRING, sound_volume_ticks);
-	widget_set_text(sound_volume_slider, str);
-
-	free(str);
-
+	setparam_music_volume(widget->option);
 	write_config_file();
 }
 
-void update_graphics()
+void update_sound_volume(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type, widget_t* widget)
 {
-	graphics_options_t options=graphics_options[graphics_ticks];
-	widget_set_text(graphics_slider, options.name);
+	setparam_sound_volume(widget->option);
+	write_config_file();
+}
+
+void update_graphics(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type, widget_t* widget)
+{
+	graphics_options_t options;
+
+	graphics_ticks=widget->option;
+	options=graphics_options[graphics_ticks];
 	
 	//apply tick param to remember setting for next start
 	setparam_graphics_slider_tick(graphics_ticks);
@@ -116,104 +104,20 @@ void update_graphics()
 	write_config_file();
 }
 
-void update_view_slider()
+void update_view_mode(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type, widget_t* widget)
 {
-	switch (view_mode)
-	{
-	case 0:
-		widget_set_text(view_slider, "View Mode: Behind");
-		break;
-	case 1:
-		widget_set_text(view_slider, "View Mode: Follow");
-		break;
-	case 2:
-		widget_set_text(view_slider, "View Mode: Above");
-		break;
-	case 3:
-		widget_set_text(view_slider, "View Mode: Tux's Eyes");
-		break;
-	}
-
-	setparam_view_mode(view_mode);
-
+	setparam_view_mode(widget->option+1);
 	write_config_file();
 }
 
-void update_fps()
+void update_fps(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type, widget_t* widget)
 {
-	if (display_fps)
-	{
-		widget_set_text(fps_slider, "Show FPS: Yes");
-	}
+	if (widget->option)
+		setparam_display_fps(True);
 	else
-	{
-		widget_set_text(fps_slider, "Show FPS: No");
-	}
-
-	setparam_display_fps(display_fps);
+		setparam_display_fps(False);
 
 	write_config_file();
-}
-
-void music_volume_down(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
-{
-	music_volume_ticks=GameMenu_resolve_bounds(music_volume_ticks-1, 0, 10, input_type);
-	update_volume();
-}
-void music_volume_up(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
-{
-	music_volume_ticks=GameMenu_resolve_bounds(music_volume_ticks+1, 0, 10, input_type);
-	update_volume();
-}
-
-void sound_volume_down(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
-{
-	sound_volume_ticks=GameMenu_resolve_bounds(sound_volume_ticks-1, 0, 10, input_type);
-	update_volume();
-}
-void sound_volume_up(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
-{
-	sound_volume_ticks=GameMenu_resolve_bounds(sound_volume_ticks+1, 0, 10, input_type);
-	update_volume();
-}
-
-void back_click(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
-{
-	set_game_mode( GAME_TYPE_SELECT );
-	reset_gui();
-}
-
-void graphics_up(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
-{
-	graphics_ticks=GameMenu_resolve_bounds(graphics_ticks+1, 0, NUM_GRAPHICS_OPTIONS-1, input_type);
-	update_graphics();
-}
-void graphics_down(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
-{
-	graphics_ticks=GameMenu_resolve_bounds(graphics_ticks-1, 0, NUM_GRAPHICS_OPTIONS-1, input_type);
-	update_graphics();
-}
-
-void view_up(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
-{
-	view_mode=GameMenu_resolve_bounds(view_mode+1, 1, NUM_VIEW_OPTIONS-1, input_type);
-	update_view_slider();
-}
-void view_down(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
-{
-	view_mode=GameMenu_resolve_bounds(view_mode-1, 1, NUM_VIEW_OPTIONS-1, input_type);
-	update_view_slider();
-}
-
-void fps_up(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
-{
-	display_fps=True;
-	update_fps();
-}
-void fps_down(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type)
-{
-	display_fps=False;
-	update_fps();
 }
 
 static void prefs_init(void) 
@@ -232,34 +136,29 @@ static void prefs_init(void)
 	GameMenu_init();
 	setup_gui();
 
-	gui_add_widget(back_btn=create_button("Back", back_click), NULL);
-
-	music_volume_slider=create_slider("", music_volume_down, music_volume_up);
+	music_volume_slider=create_slider("Music Volume: ", 11, NULL, update_music_volume);
+	slider_set_value(music_volume_slider, getparam_music_volume());
 	gui_add_widget(music_volume_slider, NULL);
 
-	sound_volume_slider=create_slider("", sound_volume_down, sound_volume_up);
+	sound_volume_slider=create_slider("Effects Volume: ", 11, NULL, update_sound_volume);
+	slider_set_value(sound_volume_slider, getparam_sound_volume());
 	gui_add_widget(sound_volume_slider, NULL);
 
-	graphics_slider=create_slider("", graphics_down, graphics_up);
+	graphics_slider=create_slider("Graphics Setting: ", 3, "Low|Medium|High", update_graphics);
+	slider_set_value(graphics_slider, getparam_graphics_slider_tick());
 	gui_add_widget(graphics_slider, NULL);
 
-	view_slider=create_slider("", view_down, view_up);
+	view_slider=create_slider("View Mode: ", 3, "Follow|Above|1st Person", update_view_mode);
+	slider_set_value(view_slider, getparam_view_mode()-1);
 	gui_add_widget(view_slider, NULL);
 
-	gui_add_widget(fps_slider=create_slider("", fps_down, fps_up), NULL);
+	fps_slider=create_slider("Show FPS: ", 2, "No|Yes", update_fps);
+	slider_set_value(fps_slider, getparam_display_fps());
+	gui_add_widget(fps_slider, NULL);
 
 	gui_balance_lines(0);
 	
-	music_volume_ticks=getparam_music_volume();
-	sound_volume_ticks=getparam_sound_volume();
-	graphics_ticks=getparam_graphics_slider_tick();
-	view_mode=getparam_view_mode();
 	display_fps=getparam_display_fps();
-
-	update_volume();
-	update_graphics();
-	update_fps();
-	update_view_slider();
 
     play_music( "start_screen" );
 }
@@ -303,7 +202,7 @@ START_KEYBOARD_CB( prefs_key_cb )
 	case SDLK_ESCAPE:
 	case SDLK_q:
 	case SDLK_AC_BACK:
-		GameMenu_simulate_click(back_btn);
+        set_game_mode( GAME_TYPE_SELECT );
 		break;
 	default:
 	    GameMenu_keypress(key);

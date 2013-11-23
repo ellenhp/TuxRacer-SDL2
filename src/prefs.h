@@ -4,14 +4,14 @@ extern "C"
 {
 #endif
 
-#ifndef CREDITS_H
-#define CREDITS_H 1
+#ifndef PREFS_H
+#define PREFS_H 1
 
 #include "tuxracer.h"
 
-void credits_register();
+void prefs_register();
 
-#endif /* CREDITS_H */
+#endif /* PREFS_H */
 
 #ifdef __cplusplus
 } /* extern "C" */

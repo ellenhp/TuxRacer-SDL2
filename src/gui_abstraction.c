@@ -44,7 +44,7 @@ void GameMenu_simulate_click(widget_t* widget)
 {
 	//call back is the same regardless of what the widget type is
 	widget_bounding_box_t bb={0, 0, 0, 0};
-	widget->callback1(1, 0, 0, bb, CLICK_INPUT);
+	widget->callback1(1, 0, 0, bb, CLICK_INPUT, widget);
 }
 
 void GameMenu_init()
@@ -234,22 +234,22 @@ void rect_to_absolute(rect_t* rect)
 {
 	if (rect->lower_left.x_coord_type==NORMALIZED_COORD)
 	{
-		rect->lower_left.x_coord_type==ABSOLUTE_COORD;
+		rect->lower_left.x_coord_type=ABSOLUTE_COORD;
 		rect->lower_left.x*=GameMenu_get_window_width();
 	}
 	if (rect->lower_left.y_coord_type==NORMALIZED_COORD)
 	{
-		rect->lower_left.y_coord_type==ABSOLUTE_COORD;
+		rect->lower_left.y_coord_type=ABSOLUTE_COORD;
 		rect->lower_left.y*=GameMenu_get_window_height();
 	}
 	if (rect->upper_right.x_coord_type==NORMALIZED_COORD)
 	{
-		rect->upper_right.x_coord_type==ABSOLUTE_COORD;
+		rect->upper_right.x_coord_type=ABSOLUTE_COORD;
 		rect->upper_right.x*=GameMenu_get_window_width();
 	}
 	if (rect->upper_right.y_coord_type==NORMALIZED_COORD)
 	{
-		rect->upper_right.y_coord_type==ABSOLUTE_COORD;
+		rect->upper_right.y_coord_type=ABSOLUTE_COORD;
 		rect->upper_right.y*=GameMenu_get_window_height();
 	}
 }
