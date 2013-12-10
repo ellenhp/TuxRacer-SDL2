@@ -239,17 +239,17 @@ tux_bind_texture wind_button wind_button
 
 
 # Menu decorations
-# Not Used: tux_load_texture menu_bottom_left textures/menu_bottom_left.png 0
-# Not Used: tux_bind_texture menu_bottom_left menu_bottom_left
+tux_load_texture menu_bottom_left textures/menu_bottom_left.png 0
+tux_bind_texture menu_bottom_left menu_bottom_left
 
-# Not Used: tux_load_texture menu_bottom_right textures/menu_bottom_right.png 0
-# Not Used: tux_bind_texture menu_bottom_right menu_bottom_right
+tux_load_texture menu_bottom_right textures/menu_bottom_right.png 0
+tux_bind_texture menu_bottom_right menu_bottom_right
 
-# Not Used: tux_load_texture menu_top_left textures/menu_top_left.png 0
-# Not Used: tux_bind_texture menu_top_left menu_top_left
+tux_load_texture menu_top_left textures/menu_top_left.png 0
+tux_bind_texture menu_top_left menu_top_left
 
-# Not Used: tux_load_texture menu_top_right textures/menu_top_right.png 0
-# Not Used: tux_bind_texture menu_top_right menu_top_right
+tux_load_texture menu_top_right textures/menu_top_right.png 0
+tux_bind_texture menu_top_right menu_top_right
 
 tux_load_texture menu_title textures/menu_title.png 0
 tux_bind_texture menu_title menu_title
