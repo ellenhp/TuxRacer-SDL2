@@ -84,23 +84,23 @@ tux_open_courses [concat \
         -course slippy_slidey -name "Slippy Slidey" \
             -description "Choose your way to be the best !" \
                     -par_time 120.0 \
-                    -conditions sunny -no_score \
+                    -conditions sunny \
     } \
     { \
         -course chinese_wall -name "Chinese Wall" \
             -description "Choose your way to be the best !" \
                     -par_time 120.0 \
-                    -conditions sunny -no_score \
+                    -conditions sunny \
     } \
     { \
         -course bobsled_ride -name "Bobsled Ride" \
             -description "Just like a real bobsled ride, only more dangerous !" \
-                    -par_time 80.0 -conditions sunny -no_score \
+                    -par_time 80.0 -conditions sunny \
     } \
     { \
         -course deadman -name "Dead Mans Drop" \
             -description "Pretty tough hill. It's fast, steep, lumpy, twisty, and full of trees. Don't forget the drop." \
-                    -par_time 60.0 -conditions sunny -no_score \
+                    -par_time 60.0 -conditions sunny \
     } \
     { \
         -course ski_jump -name "Ski Jump" \
