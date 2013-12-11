@@ -266,17 +266,17 @@ void GameMenu_draw_image(GLuint binding, rect_t image_rect, rect_t screen_rect)
     {
 		GLfloat vertices []=
 		{
-    		screen_rect.upper_right.x, screen_rect.upper_right.y, 0,
-			screen_rect.upper_right.x, screen_rect.lower_left.y, 0,
-    		screen_rect.lower_left.x, screen_rect.lower_left.y, 0,
-    		screen_rect.lower_left.y, screen_rect.upper_right.y, 0
+    		screen_rect.upper_right.x, screen_rect.lower_left.y, 0,
+			screen_rect.upper_right.x, screen_rect.upper_right.y, 0,
+    		screen_rect.lower_left.x, screen_rect.upper_right.y, 0,
+    		screen_rect.lower_left.x, screen_rect.lower_left.y, 0
 		};
 		GLfloat texCoords []=
 		{
-			image_rect.lower_left.x,image_rect.lower_left.y,
-    		image_rect.lower_left.x,image_rect.upper_right.y,
+			image_rect.upper_right.x,image_rect.lower_left.y,
     		image_rect.upper_right.x,image_rect.upper_right.y,
-    		image_rect.upper_right.x,image_rect.lower_left.y
+    		image_rect.lower_left.x,image_rect.upper_right.y,
+    		image_rect.lower_left.x,image_rect.lower_left.y
 		};
 		GLubyte indices[]={0, 1, 2, 0, 2, 3};
     	
@@ -289,6 +289,18 @@ void GameMenu_draw_image(GLuint binding, rect_t image_rect, rect_t screen_rect)
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     }
     glPopMatrix();
+}
+
+void GameMenu_draw_image_full(GLuint binding, rect_t screen_rect)
+{
+	rect_t image_rect;
+
+	image_rect.lower_left.x=image_rect.lower_left.y=0;
+	image_rect.upper_right.x=image_rect.upper_right.y=1;
+
+	image_rect.lower_left.x_coord_type=image_rect.lower_left.y_coord_type=image_rect.upper_right.x_coord_type=image_rect.upper_right.y_coord_type=NORMALIZED_COORD;
+
+	GameMenu_draw_image(binding, image_rect, screen_rect);
 }
 
 int GameMenu_get_window_height()

@@ -40,6 +40,9 @@
 #include "ui_snow.h"
 #include "joystick.h"
 #include "hud_training.h"
+#include "gui_abstraction.h"
+#include "gui_label.h"
+#include "gui_button.h"
 #ifdef TARGET_OS_IPHONE
 	#import "sharedGeneralFunctions.h"
 #endif
@@ -67,13 +70,6 @@
 #endif
 
 static textarea_t *desc_ta = NULL;
-static listbox_t *race_listbox = NULL;
-static button_t  *back_btn = NULL;
-static button_t  *start_btn = NULL;
-static ssbutton_t *conditions_ssbtn = NULL;
-static ssbutton_t *snow_ssbtn = NULL;
-static ssbutton_t *wind_ssbtn = NULL;
-static ssbutton_t *mirror_ssbtn = NULL;
 static list_elem_t cur_elem = NULL;
 static bool_t cup_complete = False; /* has this cup been completed? */
 static list_elem_t last_completed_race = NULL; /* last race that's been won */
@@ -82,24 +78,12 @@ static cup_data_t *cup_data = NULL;
 static list_t race_list = NULL;
 static player_data_t *plyr = NULL;
 
+static widget_t* course_title_label=NULL;
+static widget_t* play_button=NULL;
+static widget_t* back_button=NULL;
+
 /* Forward declaration */
 static void race_select_loop( scalar_t time_step );
-
-/*---------------------------------------------------------------------------*/
-/*! 
- Function used by listbox to convert list element to a string to display
- \author  jfpatry
- \date    Created:  2000-09-24
- \date    Modified: 2000-09-24
- */
-static char* get_name_from_open_course_data( list_elem_data_t elem )
-{
-    open_course_data_t *data;
-    
-    data = (open_course_data_t*) elem;
-    return data->name;
-}
-
 
 /*---------------------------------------------------------------------------*/
 /*! 
@@ -115,63 +99,6 @@ static char* get_name_from_race_data( list_elem_data_t elem )
     data = (race_data_t*) elem;
     return data->name;
 }
-
-
-#if 0
-/*---------------------------------------------------------------------------*/
-/*! 
-  Returns true iff the current race is completed
- \author  jfpatry
- \date    Created:  2000-09-24
- \date    Modified: 2000-09-24
- */
-static bool_t is_current_race_completed( void )
-{
-    check_assertion( cur_elem != NULL, "current race is null" );
-    
-    if ( last_completed_race == NULL ) {
-        return False;
-    }
-    
-    if ( compare_race_positions( cup_data, cur_elem,
-                                last_completed_race ) >= 0 )
-    {
-        return True;
-    }
-    
-    return False;
-}
-
-
-/*---------------------------------------------------------------------------*/
-/*! 
-  Returns true iff the current race is the first incomplete race
- \author  jfpatry
- \date    Created:  2000-09-24
- \date    Modified: 2000-09-24
- */
-static bool_t is_current_race_first_incomplete( void )
-{
-    check_assertion( cur_elem != NULL, "current race is null" );
-    
-    if ( last_completed_race == NULL ) {
-        if ( cur_elem == get_list_head( race_list ) ) {
-            return True;
-        } else {
-            return False;
-        }
-    }
-    
-    if ( compare_race_positions( cup_data, last_completed_race,
-                                cur_elem ) == 1 )
-    {
-        return True;
-    }
-    
-    return False;
-}
-
-#endif
 
 /*---------------------------------------------------------------------------*/
 /*! 
@@ -192,7 +119,6 @@ void update_race_data( void )
         g_game.race.name = data->name;
         g_game.race.description = data->description;
         g_game.race.conditions = data->conditions;
-        ssbutton_set_state( conditions_ssbtn, (int) data->conditions );
         for (i=0; i<DIFFICULTY_NUM_LEVELS; i++) {
             g_game.race.herring_req[i] = 0;
             g_game.race.time_req[i] = 0;
@@ -200,48 +126,12 @@ void update_race_data( void )
         }
         
         g_game.race.time_req[0] = data->par_time;
-        
-        g_game.race.mirrored = (bool_t) ssbutton_get_state( mirror_ssbtn );
-		//g_game.race.conditions = (race_conditions_t) ssbutton_get_state(conditions_ssbtn );
-        g_game.race.windy = (bool_t) ssbutton_get_state( wind_ssbtn );
-        g_game.race.snowing = (bool_t) ssbutton_get_state( snow_ssbtn );
     } else {
         race_data_t *data;
         data = (race_data_t*) get_list_elem_data( cur_elem );
         g_game.race = *data;
-        
-        if ( cup_complete && 
-            mirror_ssbtn != NULL &&
-            conditions_ssbtn != NULL &&
-            wind_ssbtn != NULL &&
-            snow_ssbtn != NULL )
-        {
-            /* If the cup is complete, allowed to customize settings */
-            g_game.race.mirrored = (bool_t) ssbutton_get_state( mirror_ssbtn );
-            g_game.race.conditions = (race_conditions_t) ssbutton_get_state(
-                                                                            conditions_ssbtn );
-            g_game.race.windy = (bool_t) ssbutton_get_state( wind_ssbtn );
-            g_game.race.snowing = (bool_t) ssbutton_get_state( snow_ssbtn );
-        }
     }
 }
-
-
-/*---------------------------------------------------------------------------*/
-/*! 
- Updates the enabled states of the buttons
- \author  jfpatry
- \date    Created:  2000-09-24
- \date    Modified: 2000-09-24
- */
-void update_button_enabled_states( void )
-{
-    if ( start_btn == NULL ) {
-        return;
-    }
-    button_set_enabled( start_btn, True );
-}
-
 
 /*---------------------------------------------------------------------------*/
 /*! 
@@ -352,74 +242,10 @@ void update_for_won_race( void )
             }
         }
     }
-	
-    update_button_enabled_states();
 }
 
-
-
-/*---------------------------------------------------------------------------*/
-/*! 
- Callback called when race listbox item changes
- \author  jfpatry
- \date    Created:  2000-09-24
- \date    Modified: 2000-09-24
- */
-static void race_listbox_item_change_cb( listbox_t *listbox, void *userdata )
+static void back()
 {
-    check_assertion( userdata == NULL, "userdata is not null" );
-    
-    cur_elem = listbox_get_current_item( listbox );
-    
-    if ( g_game.practicing ) {
-        open_course_data_t *data;
-        
-        data = (open_course_data_t*) get_list_elem_data( cur_elem );
-        textarea_set_text( desc_ta, data->description );
-        
-        ui_set_dirty();
-    } else {
-        race_data_t *data;
-        
-        data = (race_data_t*) get_list_elem_data( cur_elem );
-        textarea_set_text( desc_ta, data->description );
-        
-        if ( cup_complete && 
-            conditions_ssbtn &&
-            wind_ssbtn &&
-            snow_ssbtn &&
-            mirror_ssbtn ) 
-        {
-            ssbutton_set_state( conditions_ssbtn,
-                               (int) data->conditions );
-            ssbutton_set_state( wind_ssbtn,
-                               (int) data->windy );
-            ssbutton_set_state( snow_ssbtn,
-                               (int) data->snowing );
-            ssbutton_set_state( mirror_ssbtn,
-                               (int) data->mirrored );
-        }
-        
-        update_button_enabled_states();
-        
-        ui_set_dirty();
-    } 
-    
-    update_race_data();
-}
-
-
-/*---------------------------------------------------------------------------*/
-/*! 
- Callback called when back button is clicked
- \author  jfpatry
- \date    Created:  2000-09-24
- \date    Modified: 2000-09-24
- */
-static void back_click_cb( button_t *button, void *userdata )
-{
-    check_assertion( userdata == NULL, "userdata is not null" );
-    
     if ( g_game.practicing ) {
 #ifdef SPEED_MODE
         set_game_mode( RACING_MODE_SELECT );
@@ -435,31 +261,11 @@ static void back_click_cb( button_t *button, void *userdata )
     ui_set_dirty();
 }
 
-
-/*---------------------------------------------------------------------------*/
-/*! 
- Callback called when start button is clicked
- \author  jfpatry
- \date    Created:  2000-09-24
- \date    Modified: 2000-09-24
- */
-static void start_click_cb( button_t *button, void *userdata )
+static void start_race()
 {
-    check_assertion( userdata == NULL, "userdata is not null" );
-    
-    button_set_highlight( start_btn, True );
     race_select_loop( 0 );
     
     update_race_data();
-    
-#ifdef TARGET_OS_IPHONE
-    //set landscape resolution
-    setparam_x_resolution(480);
-    setparam_y_resolution(320);
-    
-    //rotate screen
-    turnScreenToLandscape();
-#endif
     
     //Select the starting step
     if (!strcmp(g_game.race.name,"Basic tutorial")) init_starting_tutorial_step(0);
@@ -468,115 +274,8 @@ static void start_click_cb( button_t *button, void *userdata )
 	winsys_reset_js_bindings();
 
     set_game_mode( LOADING );
-
 }
 
-
-/*---------------------------------------------------------------------------*/
-/*! 
- Draws a status message on the screen
- \author  jfpatry
- \date    Created:  2000-09-24
- \date    Modified: 2000-09-24
- */
-void draw_status_msg( int x_org, int y_org, int box_width, int box_height )
-{
-    const char *msg;
-    scalar_t time;
-    int herring;
-    int score;
-    font_t *label_font;
-    font_t *font;
-    char buff[BUFF_LEN];
-    bool_t draw_stats = True;
-    
-    if ( g_game.practicing ) {
-        open_course_data_t *data;
-        
-        data = (open_course_data_t*)get_list_elem_data( cur_elem );
-        
-        msg = Localize("Best result:","");
-        
-        if ( !get_saved_race_results( plyr->name,
-                                     g_game.current_event,
-                                     g_game.current_cup,
-                                     data->name,
-                                     g_game.difficulty,
-                                     &time,
-                                     &herring,
-                                     &score ) )
-        {
-            /* Don't display anything if no score saved */
-            return;
-        }
-        
-        
-#ifdef TARGET_OS_IPHONE
-#define yTranslation -10
-#else
-#define yTranslation 0
-#endif
-        
-        if ( !get_font_binding( "race_requirements", &font ) ||
-            !get_font_binding( "race_requirements_label", &label_font ) ) 
-        {
-            print_warning( IMPORTANT_WARNING,
-                          "Couldn't get fonts for race requirements" );
-        } else {
-            glPushMatrix();
-            {
-                glTranslatef( x_org + 0,
-                             y_org + 200+yTranslation,
-                             0 );
-                
-                bind_font_texture( label_font );
-                draw_string( label_font, msg );
-            }
-            glPopMatrix();
-            
-            if ( draw_stats ) {
-                glPushMatrix();
-                {
-                    int minutes;
-                    int seconds;
-                    int hundredths;
-                    
-                    get_time_components( time, &minutes, &seconds, &hundredths );
-                    
-                    glTranslatef( x_org + 0,
-                                 y_org + 184+yTranslation,
-                                 0 );
-                    
-                    
-                    bind_font_texture( label_font );
-                    draw_string( label_font, Localize("Time: ","") );
-                    
-                    sprintf( buff, "%02d:%02d.%02d",
-                            minutes, seconds, hundredths );
-                    bind_font_texture( font );
-                    draw_string( font, buff );
-
-                    if (game_has_herring()) {
-                        bind_font_texture( label_font );
-                        draw_string( label_font, Localize("    Fish: ","") );
-                        
-                        sprintf( buff, "%03d", herring ); 
-                        bind_font_texture( font );
-                        draw_string( font, buff );
-                        
-                        bind_font_texture( label_font );
-                        draw_string( label_font, Localize("     Score: ","") );
-                        
-                        sprintf( buff, "%06d", score );
-                        bind_font_texture( font );
-                        draw_string( font, buff );
-                    }
-                }
-                glPopMatrix();
-            }
-        }
-    }
-}
 
 /*---------------------------------------------------------------------------*/
 /*! 
@@ -585,180 +284,56 @@ void draw_status_msg( int x_org, int y_org, int box_width, int box_height )
  \date    Created:  2000-09-24
  \date    Modified: 2000-09-24
  */
-static void set_widget_positions_and_draw_decorations()
+static void draw_preview()
 {
-    int w = getparam_x_resolution();
-    int h = getparam_y_resolution();
-    int box_width, box_height, box_max_y;
-    int x_org, y_org;
-    char *current_course;
     GLuint texobj;
     
-    /* set the dimensions of the box in which all widgets should fit */
-    box_width = BOX_WIDTH;
-    box_height = 310;
-    box_max_y = h - 128;
-
-#ifdef TARGET_OS_IPHONE
-    x_org = 10;
-    y_org = h/2 - box_height/2;
-
-    y_org = h/2 - box_height/2;
-    
-    if ( y_org + box_height > box_max_y ) {
-        y_org = box_max_y - box_height;
-    }
-    
-    button_set_position( 
-                        back_btn,
-                        make_point2d(MARGIN_WIDTH,
-                                     MARGIN_HEIGHT ) );
-    
-    button_set_position(
-                        start_btn,
-                        make_point2d(w - button_get_width( start_btn ) - MARGIN_WIDTH,
-                                     MARGIN_HEIGHT ) );
-    
-    listbox_set_position(
-                         race_listbox,
-                         make_point2d( x_org,
-                                      y_org + 235 ) );
-    textarea_set_position( 
-                          desc_ta,
-                          make_point2d( x_org + w - textarea_get_width(desc_ta) - 10,
-                                       y_org + TEXT_LINE_Y));
-#else
-    x_org = w/2 - box_width/2;
-    y_org = h/2 - box_height/2;
-
-    button_set_position( 
-	back_btn,
-	make_point2d( x_org + 131 - button_get_width( back_btn )/2.0,
-		      42 ) );
-
-    button_set_position(
-	start_btn,
-	make_point2d( x_org + 343 - button_get_width( start_btn )/2.0,
-		      42 ) );
-
-    listbox_set_position(
-	race_listbox,
-	make_point2d( x_org,
-		      y_org + 221 ) );
-
-    textarea_set_position( 
-	desc_ta,
-	make_point2d( x_org,
-		      y_org + 66 ) );
-#endif
-
-    if ( g_game.practicing || 
-        ( cup_complete &&
-         conditions_ssbtn &&
-         wind_ssbtn &&
-         snow_ssbtn &&
-         mirror_ssbtn ) ) 
-    {
-        ssbutton_set_position(
-                              conditions_ssbtn,
-                              make_point2d( x_org + box_width - 4*36 + 4,
-                                           y_org + BUTTON_LINE_Y ) );
-        
-        ssbutton_set_position(
-                              wind_ssbtn,
-                              make_point2d( x_org + box_width - 3*36 + 4 ,
-                                           y_org + BUTTON_LINE_Y ) );
-        
-        ssbutton_set_position(
-                              snow_ssbtn,
-                              make_point2d( x_org + box_width - 2*36 + 4,
-                                           y_org + BUTTON_LINE_Y ) );
-        
-        ssbutton_set_position(
-                              mirror_ssbtn,
-                              make_point2d( x_org + box_width - 1*36 + 4,
-                                           y_org + BUTTON_LINE_Y ) );
-        
-    } 
-    
-    /* Draw text indicating race requirements (if race not completed), 
-     or results in race if race completed. */
-    draw_status_msg( x_org, y_org, box_width, box_height );
-    
-    /* Draw preview */
-    if ( g_game.practicing ) {
-        list_elem_t elem;
-        open_course_data_t *data;
-        
-        elem = listbox_get_current_item( race_listbox );
-        data = (open_course_data_t*) get_list_elem_data( elem );
-        current_course = data->course;
-    } else {
-        list_elem_t elem;
-        race_data_t *data;
-        
-        elem = listbox_get_current_item( race_listbox );
-        data = (race_data_t*) get_list_elem_data( elem );
-        current_course = data->course;
-    }
-    
-    glDisable( GL_TEXTURE_2D );
-    
-    glColor4f( 0.0, 0.0, 0.0, 0.3 );
 	{
-    GLfloat vertices[]={
-		x_org+box_width-140, y_org+66, 0,
-		x_org+box_width, y_org+66, 0,
-		x_org+box_width, y_org+66+107, 0,
-		x_org+box_width-140, y_org+66+107, 0};
+		rect_t screen_rect;
+		open_course_data_t *data;
 
-	GLubyte indices[] = {0, 1, 2, 2, 3, 0};
+		screen_rect.lower_left.x=0.15;
+		screen_rect.lower_left.y=0.45;
+		screen_rect.lower_left.x_coord_type=screen_rect.lower_left.y_coord_type=NORMALIZED_COORD;
 
-	GLfloat texcoords2[]={
-		0, 0,
-		1, 0,
-		1, 1,
-		0, 1};
+		screen_rect.upper_right.x=0.45;
+		screen_rect.upper_right.y=0.75;
+		screen_rect.upper_right.x_coord_type=screen_rect.upper_right.y_coord_type=NORMALIZED_COORD;
 
-	GLfloat vertices2[]={
-		x_org+box_width-136, y_org+70, 0,
-		x_org+box_width-4, y_org+70, 0,
-		x_org+box_width-4, y_org+70+99, 0,
-		x_org+box_width-136, y_org+70+99, 0};
-    
-	GLubyte indices2[] = {0, 1, 2, 2, 3, 0};
-
-	glEnableClientState(GL_VERTEX_ARRAY);
-
-	glVertexPointer(3, GL_FLOAT, 0, vertices);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
-		
-	glDisableClientState(GL_VERTEX_ARRAY);
-    
-    glColor4f( 1.0, 1.0, 1.0, 1.0 );
-    glEnable( GL_TEXTURE_2D );
-    
-    if ( !get_texture_binding( current_course, &texobj ) ) {
-        if ( !get_texture_binding( "no_preview", &texobj ) ) {
-            texobj = 0;
-        }
-    }
-    
-    glBindTexture( GL_TEXTURE_2D, texobj );
-	
-    glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-	glTexCoordPointer(2, GL_FLOAT, 0, texcoords2);
-	glVertexPointer(3, GL_FLOAT, 0, vertices2);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices2);
-		
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	
+        data = (open_course_data_t*) get_list_elem_data( cur_elem );
+		if ( !get_texture_binding( data->course, &texobj ) ) {
+			if ( !get_texture_binding( "no_preview", &texobj ) ) {
+				texobj = 0;
+			}
+		}
+		GameMenu_draw_image_full(texobj, screen_rect);
 	}
 }
 
+void update_text()
+{
+    if ( g_game.practicing ) {
+        open_course_data_t *data;
+        data = (open_course_data_t*) get_list_elem_data( cur_elem );
+        textarea_set_text( desc_ta, data->description );
+		button_set_text(course_title_label, data->name);
+    } else {
+        race_data_t *data;
+        data = (race_data_t*) get_list_elem_data( cur_elem );
+        textarea_set_text( desc_ta, data->description );
+		button_set_text(course_title_label, data->name);
+    }
+}
+
+void play_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type, widget_t* widget)
+{
+	start_race();
+}
+
+void back_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type, widget_t* widget)
+{
+	back();
+}
 
 /*---------------------------------------------------------------------------*/
 /*! 
@@ -769,20 +344,36 @@ static void set_widget_positions_and_draw_decorations()
  */
 static void race_select_init(void)
 {
-    listbox_list_elem_to_string_fptr_t conv_func = NULL;
     point2d_t dummy_pos = {0, 0};
+	coord_t course_title_coord;
     int i;
     
     winsys_set_display_func( main_loop );
     winsys_set_idle_func( main_loop );
     winsys_set_reshape_func( reshape );
-    winsys_set_mouse_func( ui_event_mouse_func );
-    winsys_set_motion_func( ui_event_motion_func );
-    winsys_set_passive_motion_func( ui_event_motion_func );
+    winsys_set_mouse_func( GameMenu_mouse_func );
+    winsys_set_motion_func( GameMenu_motion_func );
+    winsys_set_passive_motion_func( GameMenu_motion_func );
     
 	winsys_add_js_axis_bindings();
 	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_A, SDLK_RETURN);
 	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_B, SDLK_ESCAPE);
+
+	GameMenu_init();
+	setup_gui();
+
+	course_title_coord.x_coord_type=course_title_coord.y_coord_type=NORMALIZED_COORD;
+	course_title_coord.x=0.30;
+	course_title_coord.y=0.78;
+	course_title_coord.x_just=CENTER_JUST;
+	course_title_coord.y_just=CENTER_JUST;
+	gui_add_widget(course_title_label=create_label(""), &course_title_coord);
+
+	course_title_coord.y=0.13;
+	gui_add_widget(play_button=create_button("O Race", play_cb), &course_title_coord);
+
+	course_title_coord.x=0.70;
+	gui_add_widget(back_button=create_button("A Back", back_cb), &course_title_coord);
 
     plyr = get_player_data( local_player() );
     
@@ -798,7 +389,6 @@ static void race_select_init(void)
 #else
         race_list = get_score_courses_list();
 #endif
-        conv_func = get_name_from_open_course_data;
         cup_data = NULL;
         last_completed_race = NULL;
         event_data = NULL;
@@ -812,7 +402,6 @@ static void race_select_init(void)
         check_assertion( cup_data != NULL,
                         "Couldn't find current cup." );
         race_list = get_cup_race_list( cup_data );
-        conv_func = get_name_from_race_data;
     }
     
     /* Unless we're coming back from a race, initialize the race data to 
@@ -864,219 +453,23 @@ static void race_select_init(void)
         if ( !g_game.race_aborted ) {
             update_race_results();
         }
-        
-    }
-    
-    back_btn = button_create( dummy_pos,
-                             150, 40, 
-                             "button_label", 
-                             Localize("Back","") );
-    button_set_hilit_font_binding( back_btn, "button_label_hilit" );
-    button_set_visible( back_btn, True );
-    button_set_click_event_cb( back_btn, back_click_cb, NULL );
-    
-    start_btn = button_create( dummy_pos,
-                              150, 40,
-                              "button_label",
-                              Localize("Race!","") );
-    button_set_hilit_font_binding( start_btn, "button_label_hilit" );
-    button_set_disabled_font_binding( start_btn, "button_label_disabled" );
-    button_set_visible( start_btn, True );
-    button_set_click_event_cb( start_btn, start_click_cb, NULL );
-    
-#ifdef TARGET_OS_IPHONE
-    race_listbox = listbox_create( dummy_pos,
-                                  300, 44,
-                                  "course_name_label",
-                                  race_list,
-                                  conv_func );
-    
-#else
-    race_listbox = listbox_create( dummy_pos,
-                                  460, 44,
-                                  "listbox_item",
-                                  race_list,
-                                  conv_func );
-    
-#endif
-    
-    
-    listbox_set_current_item( race_listbox, cur_elem );
-    
-    listbox_set_item_change_event_cb( race_listbox, 
-                                     race_listbox_item_change_cb, 
-                                     NULL );
-    
-    listbox_set_visible( race_listbox, True );
+	}
     
     /* 
      * Create text area 
      */
-    desc_ta = textarea_create( dummy_pos,
-                              RACE_DESC_X, RACE_DESC_Y,
-                              "race_description",
-                              "" );
+    desc_ta = textarea_create( make_point2d(
+		0.15*getparam_x_resolution(), 0.2*getparam_y_resolution()),
+		0.3*getparam_x_resolution(), 0.23*getparam_y_resolution(), "race_description", "" );
 
-    if ( g_game.practicing ) {
-        open_course_data_t *data;
-        data = (open_course_data_t*) get_list_elem_data( cur_elem );
-        textarea_set_text( desc_ta, data->description );
-    } else {
-        race_data_t *data;
-        data = (race_data_t*) get_list_elem_data( cur_elem );
-        textarea_set_text( desc_ta, data->description );
-    }
+	update_text();
     
     textarea_set_visible( desc_ta, True );
     
-    
-    /* 
-     * Create state buttons - only if practicing or if cup_complete
-     */
-    
-    if ( g_game.practicing || cup_complete ) {
-        float border = 2.0;
-
-        /* mirror */
-        mirror_ssbtn = ssbutton_create( dummy_pos,
-                                       32, 32,
-                                       2 );
-        ssbutton_set_state_image( mirror_ssbtn, 
-                                 0, 
-                                 "mirror_button",
-                                 make_point2d( 0.0/64.0, 32.0/64.0 ),
-                                 make_point2d( 32.0/64.0, 64.0/64.0 ),
-                                 white );
-        
-        ssbutton_set_state_image( mirror_ssbtn, 
-                                 1, 
-                                 "mirror_button",
-                                 make_point2d( 32.0/64.0, 32.0/64.0 ),
-                                 make_point2d( 64.0/64.0, 64.0/64.0 ),
-                                 white );
-        
-        ssbutton_set_state( mirror_ssbtn, (int)g_game.race.mirrored );
-#ifdef TARGET_OS_IPHONE
-        ssbutton_set_visible( mirror_ssbtn, False );
-#else
-        ssbutton_set_visible( mirror_ssbtn, True );
-#endif
-        
-        /* conditions */
-        conditions_ssbtn = ssbutton_create( dummy_pos,
-                                           32, 32,
-                                           4 );
-        
-        ssbutton_set_state_image( conditions_ssbtn, 
-                                 0, 
-                                 "conditions_button",
-                                 make_point2d( (0.0 + border)/64.0, (32.0 + border)/64.0 ),
-                                 make_point2d( (32.0 - border)/64.0, (64.0 - border)/64.0 ),
-                                 white );
-        
-        ssbutton_set_state_image( conditions_ssbtn, 
-                                 1, 
-                                 "conditions_button",
-                                 make_point2d( (32.0 + border)/64.0, (0.0 + border)/64.0 ),
-                                 make_point2d( (64.0 - border)/64.0, (32.0 - border)/64.0 ),
-                                 white );
-        
-        ssbutton_set_state_image( conditions_ssbtn, 
-                                 2, 
-                                 "conditions_button",
-                                 make_point2d( (32.0 + border)/64.0, (32.0 + border)/64.0 ),
-                                 make_point2d( (64.0 - border)/64.0, (64.0 - border)/64.0 ),
-                                 white );
-        
-        ssbutton_set_state_image( conditions_ssbtn, 
-                                 3, 
-                                 "conditions_button",
-                                 make_point2d( (0.0 + border)/64.0, (0.0 + border)/64.0 ),
-                                 make_point2d( (32.0 - border)/64.0, (32.0 - border)/64.0 ),
-                                 white );
-        
-        ssbutton_set_state( conditions_ssbtn, (int)g_game.race.conditions );
-        ssbutton_set_visible( conditions_ssbtn, True );
-        
-#ifdef TARGET_OS_IPHONE
-        ssbutton_set_visible( conditions_ssbtn, False );
-#else
-        ssbutton_set_visible( conditions_ssbtn, True );
-#endif
-        
-        /* wind */
-        wind_ssbtn = ssbutton_create( dummy_pos,
-                                     32, 32,
-                                     2 );
-        ssbutton_set_state_image( wind_ssbtn, 
-                                 0, 
-                                 "wind_button",
-                                 make_point2d( 0.0/64.0, 32.0/64.0 ),
-                                 make_point2d( 32.0/64.0, 64.0/64.0 ),
-                                 white );
-        
-        ssbutton_set_state_image( wind_ssbtn, 
-                                 1, 
-                                 "wind_button",
-                                 make_point2d( 32.0/64.0, 32.0/64.0 ),
-                                 make_point2d( 64.0/64.0, 64.0/64.0 ),
-                                 white );
-        
-        ssbutton_set_state( wind_ssbtn, (int)g_game.race.windy );
-#ifdef TARGET_OS_IPHONE
-        ssbutton_set_visible( wind_ssbtn, False );
-#else
-        ssbutton_set_visible( wind_ssbtn, True );
-#endif
-        
-        /* snow */
-        snow_ssbtn = ssbutton_create( dummy_pos,
-                                     32, 32,
-                                     2 );
-        ssbutton_set_state_image( snow_ssbtn, 
-                                 0, 
-                                 "snow_button",
-                                 make_point2d( 0.0/64.0, 32.0/64.0 ),
-                                 make_point2d( 32.0/64.0, 64.0/64.0 ),
-                                 white );
-        
-        ssbutton_set_state_image( snow_ssbtn, 
-                                 1, 
-                                 "snow_button",
-                                 make_point2d( 32.0/64.0, 32.0/64.0 ),
-                                 make_point2d( 64.0/64.0, 64.0/64.0 ),
-                                 white );
-        
-        ssbutton_set_state( snow_ssbtn, (int)g_game.race.snowing );
-#ifdef TARGET_OS_IPHONE
-        ssbutton_set_visible( snow_ssbtn, False );
-#else
-        ssbutton_set_visible( snow_ssbtn, True );
-#endif
-        /* XXX snow button doesn't do anything, so disable for now */
-        ssbutton_set_enabled( snow_ssbtn, False );
-        
-        /* Can't change conditions if in cup mode */
-        if ( !g_game.practicing ) {
-            ssbutton_set_enabled( conditions_ssbtn, False );
-            ssbutton_set_enabled( wind_ssbtn, False );
-            ssbutton_set_enabled( snow_ssbtn, False );
-            ssbutton_set_enabled( mirror_ssbtn, False );
-        }
-        
-    } else {
-        conditions_ssbtn = NULL;
-        wind_ssbtn = NULL;
-        snow_ssbtn = NULL;
-        mirror_ssbtn = NULL;
-    }
-    
     update_race_data();
-    update_button_enabled_states();
     
     play_music( "start_screen" );
 }
-
 
 /*---------------------------------------------------------------------------*/
 /*! 
@@ -1098,15 +491,15 @@ static void race_select_loop( scalar_t time_step )
     ui_setup_display();
     
     if (getparam_ui_snow()) {
-        update_ui_snow( time_step, 
-                       (bool_t) ( wind_ssbtn != NULL && 
-                                 ssbutton_get_state( wind_ssbtn ) ) );
+        update_ui_snow( time_step, False );
         draw_ui_snow();
     }
     
     ui_draw_menu_decorations();
     
-    set_widget_positions_and_draw_decorations();
+	GameMenu_draw();
+
+	draw_preview();
     
 	winsys_update_joysticks();
 
@@ -1127,90 +520,9 @@ static void race_select_loop( scalar_t time_step )
  */
 static void race_select_term(void)
 {
-    if ( back_btn ) {
-        button_delete( back_btn );
-    }
-    back_btn = NULL;
-    
-    if ( start_btn ) {
-        button_delete( start_btn );
-    }
-    start_btn = NULL;
-    
-    if ( race_listbox ) {
-        listbox_delete( race_listbox );
-    }
-    race_listbox = NULL;
-    
-    if ( conditions_ssbtn ) {
-        ssbutton_delete( conditions_ssbtn );
-    }
-    conditions_ssbtn = NULL;
-    
-    if ( snow_ssbtn ) {
-        ssbutton_delete( snow_ssbtn );
-    }
-    snow_ssbtn = NULL;
-    
-    if ( wind_ssbtn ) {
-        ssbutton_delete( wind_ssbtn );
-    }
-    wind_ssbtn = NULL;
-    
-    if ( mirror_ssbtn ) {
-        ssbutton_delete( mirror_ssbtn );
-    }
-    mirror_ssbtn = NULL;
-    
     textarea_delete( desc_ta );
     desc_ta = NULL;
 }
-
-
-/*---------------------------------------------------------------------------*/
-/*! 
- Advances to the next race condition
- \author  jfpatry
- \date    Created:  2000-09-30
- \date    Modified: 2000-09-30
- */
-void next_race_condition( void )
-{
-    if ( conditions_ssbtn ) {
-        ssbutton_simulate_mouse_click( conditions_ssbtn );
-    }
-}
-
-
-/*---------------------------------------------------------------------------*/
-/*! 
- Toggles the mirrored state of the course
- \author  jfpatry
- \date    Created:  2000-09-30
- \date    Modified: 2000-09-30
- */
-void toggle_mirror( void )
-{
-    if ( mirror_ssbtn ) {
-        ssbutton_simulate_mouse_click( mirror_ssbtn );
-    }
-}
-
-
-/*---------------------------------------------------------------------------*/
-/*! 
- Toggles the windy state of the course
- \author  jfpatry
- \date    Created:  2000-09-30
- \date    Modified: 2000-09-30
- */
-void toggle_wind( void )
-{
-    if ( wind_ssbtn ) {
-        ssbutton_simulate_mouse_click( conditions_ssbtn );
-    }
-}
-
 
 START_KEYBOARD_CB( race_select_key_cb )
 {
@@ -1222,46 +534,37 @@ START_KEYBOARD_CB( race_select_key_cb )
         switch (key) {
             case WSK_UP:
             case WSK_LEFT:
-                if ( race_listbox ) {
-                    listbox_goto_prev_item( race_listbox );
-                }
+				if (get_prev_list_elem(race_list, cur_elem))
+					cur_elem=get_prev_list_elem(race_list, cur_elem);
                 break;
             case WSK_RIGHT:
             case WSK_DOWN:
-                if ( race_listbox ) {
-                    listbox_goto_next_item( race_listbox );
-                }
+				if (get_next_list_elem(race_list, cur_elem))
+					cur_elem=get_next_list_elem(race_list, cur_elem);
                 break;
             case SDLK_AC_BACK:
-                if ( back_btn ) {
-                    button_simulate_mouse_click( back_btn );
-                    ui_set_dirty();
-                }
+				back();
+				break;
         }
+		update_text();
     } else {
         key = (int) tolower( (char) key );
         
         switch (key) {
             case 13: /* Enter */
-                if ( start_btn ) {
-                    button_simulate_mouse_click( start_btn );
-                    ui_set_dirty();
-                }
+				start_race();
                 break;
             case 27: /* Esc */
-                if ( back_btn ) {
-                    button_simulate_mouse_click( back_btn );
-                    ui_set_dirty();
-                }
+				back();
                 break;
             case 'c': 
-                next_race_condition();
+                //next_race_condition();
                 break;
             case 'w': 
-                toggle_wind();
+                //toggle_wind();
                 break;
             case 'm':
-                toggle_mirror();
+                //toggle_mirror();
                 break;
             case 's':
                 /* XXX snow disabled for now */
