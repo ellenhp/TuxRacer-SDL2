@@ -412,7 +412,10 @@ static void race_select_init(void)
     winsys_set_mouse_func( GameMenu_mouse_func );
     winsys_set_motion_func( GameMenu_motion_func );
     winsys_set_passive_motion_func( GameMenu_motion_func );
+	winsys_set_joystick_func( NULL );
+	winsys_set_joystick_button_func( NULL );
     
+	winsys_reset_js_bindings();
 	winsys_add_js_axis_bindings();
 	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_A, SDLK_RETURN);
 	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_B, SDLK_ESCAPE);
