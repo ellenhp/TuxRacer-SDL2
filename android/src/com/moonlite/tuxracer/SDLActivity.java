@@ -17,8 +17,19 @@ import android.media.*;
 import android.hardware.*;
 
 import java.lang.*;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.ArrayList;
+
+import com.amazon.ags.api.*;
+import com.amazon.ags.api.achievements.AchievementsClient;
+import com.amazon.ags.api.achievements.UpdateProgressResponse;
+import com.amazon.ags.api.leaderboards.LeaderboardsClient;
+import com.amazon.ags.api.leaderboards.SubmitScoreResponse;
+import com.amazon.ags.api.profiles.RequestPlayerProfileResponse;
+import com.amazon.ags.api.whispersync.GameDataMap;
+import com.amazon.ags.api.whispersync.WhispersyncEventListener;
+import com.amazon.ags.api.whispersync.model.SyncableNumber;
 
 
 /**
@@ -45,6 +56,83 @@ public class SDLActivity extends Activity {
     // Audio
     protected static Thread mAudioThread;
     protected static AudioTrack mAudioTrack;
+	
+	    //reference to the agsClient
+    AmazonGamesClient agsClient;
+	
+    private static SDLActivity myActivity;
+
+    AmazonGamesCallback callback = new AmazonGamesCallback() {
+        @Override
+        public void onServiceNotReady(AmazonGamesStatus status) {
+            //unable to use service
+            System.out.println("com.amazon.example.gamecircle2.MyActivity.onServiceNotReady");
+        }
+
+        @Override
+        public void onServiceReady(AmazonGamesClient amazonGamesClient) {
+            System.out.println("MyActivity.onServiceReady");
+            getPlayerAlias();
+            agsClient = amazonGamesClient;
+            //ready to use GameCircle
+            AmazonGamesClient.getWhispersyncClient().setWhispersyncEventListener(new WhispersyncEventListener() {
+                public void onNewCloudData() {
+                    // refresh visible game data
+                    System.out.println("MyActivity.onNewCloudData");
+                    GameDataMap gameDataMap = AmazonGamesClient.getWhispersyncClient().getGameData();
+                    SyncableNumber highScore = gameDataMap.getHighestNumber("highScore");
+                    System.out.println("highScore.isSet() = " + highScore.isSet());
+                    if (highScore.isSet()) {
+                        System.out.println("highScore.asLong() = " + highScore.asLong());
+                    }
+                }
+
+                // The following three methods are mainly useful for debugging purposes and don't have to be overridden
+
+                public void onDataUploadedToCloud() {
+                    System.out.println("MyActivity.onDataUploadedToCloud");
+                }
+
+                public void onThrottled() {
+                    System.out.println("MyActivity.onThrottled");
+                }
+
+                public void onDiskWriteComplete() {
+                    System.out.println("MyActivity.onDiskWriteComplete");
+                }
+            });
+        }
+    };
+
+    public void getPlayerAlias() {
+        if (AmazonGamesClient.getInstance() == null) return;
+        AmazonGamesClient.getInstance().getProfilesClient()
+                .getLocalPlayerProfile(new Object[]{})
+                .setCallback(new AGResponseCallback<RequestPlayerProfileResponse>() {
+                                    @Override
+                                    public void onComplete(RequestPlayerProfileResponse result) {
+                                        if (result.isError()) {
+
+                                            Log.i(TAG, "GameCircleGetPlayerAlias ERROR: " + result.getError());
+                                        } else {
+                                            Log.i(TAG, "GameCircleGetPlayerAlias OK");
+
+                                            String alias = result.getPlayer().getAlias();
+                                            Log.i(TAG, "alias: " + alias);
+                                            Log.i(TAG, "playerid: " + result.getPlayer().getPlayerId());
+
+                                        }
+                                    }
+                                });
+
+
+    }
+
+
+    //list of features your game uses (in this example, achievements and leaderboards)
+    EnumSet<AmazonGamesFeature> myGameFeatures = EnumSet.of(
+            AmazonGamesFeature.Achievements, AmazonGamesFeature.Leaderboards, AmazonGamesFeature.Whispersync);
+
     
     // Load the .so
     static {
@@ -75,6 +163,9 @@ public class SDLActivity extends Activity {
         setContentView(mLayout);
         
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		
+        myActivity = this;
+        AmazonGamesClient.initialize(this, callback, myGameFeatures);
     }
 
     // Events
@@ -83,14 +174,18 @@ public class SDLActivity extends Activity {
         Log.v("SDL", "onPause()");
         super.onPause();
         SDLActivity.handlePause();
-    }
+        if (agsClient != null) {
+            AmazonGamesClient.release();
+        }
+  }
 
     @Override
     protected void onResume() {
         Log.v("SDL", "onResume()");
         super.onResume();
         SDLActivity.handleResume();
-    }
+        AmazonGamesClient.initialize(this, callback, myGameFeatures);
+     }
 
 
     @Override
