@@ -8,7 +8,7 @@ static int overscan_percent=0;
 static char* player_name=0;
 
 #ifdef __ANDROID__
-JNIEXPORT jdouble JNICALL Java_com_moonlite_SDLActivity_nativeSetPlayerData
+JNIEXPORT jdouble JNICALL Java_com_moonlite_tuxracer_SDLActivity_nativeSetPlayerData
 (JNIEnv * env, jobject jobj, jstring path, jboolean on_ouya)
 {
 	char* name = (*env)->GetStringUTFChars(env, path , 0);
