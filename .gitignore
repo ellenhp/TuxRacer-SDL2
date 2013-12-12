@@ -160,6 +160,7 @@ data/config/options.txt
 *.dll
 
 android/assets/*
+android/gen
 android/bin
 android/obj
 android/libs
