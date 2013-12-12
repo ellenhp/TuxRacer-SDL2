@@ -966,14 +966,10 @@ void winsys_atexit( winsys_atexit_func_t func )
 */
 void winsys_exit( int code )
 {
-#ifdef __ANDROID__
-    SDL_MinimizeWindow(window);
-#else
     if ( atexit_func ) {
 	(*atexit_func)();
     }
     exit( code );
-#endif
 }
 
 void winsys_show_preferences( void )

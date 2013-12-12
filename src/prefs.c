@@ -184,6 +184,8 @@ static void prefs_loop( scalar_t time_step )
         draw_ui_snow();
     }
 
+	ui_draw_menu_decorations();
+
 	GameMenu_draw();
 
     ui_draw_cursor();

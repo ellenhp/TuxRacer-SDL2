@@ -630,6 +630,8 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         requestFocus();
         setOnKeyListener(this); 
         setOnTouchListener(this);   
+        
+        mScreenRotation=screenRotation;
 
         mSensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
         
