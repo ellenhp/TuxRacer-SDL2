@@ -40,8 +40,6 @@
 #include "game_config.h"
 #include "joystick.h"
 
-int overscan_percent;
-
 static void abort_intro( player_data_t *plyr ) {
     point2d_t start_pt = get_start_pt();
     
@@ -70,8 +68,6 @@ void intro_init(void)
     
     player_data_t *plyr = get_player_data( local_player() );
     point2d_t start_pt = get_start_pt();
-
-	overscan_percent=0;
 
     init_key_frame();
 

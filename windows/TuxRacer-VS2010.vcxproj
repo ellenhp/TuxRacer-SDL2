@@ -139,6 +139,7 @@
     <ClCompile Include="..\src\part_sys.c" />
     <ClCompile Include="..\src\paused.c" />
     <ClCompile Include="..\src\phys_sim.c" />
+    <ClCompile Include="..\src\platform.c" />
     <ClCompile Include="..\src\prefs.c" />
     <ClCompile Include="..\src\preview.c" />
     <ClCompile Include="..\src\quadgeom.cpp" />
@@ -213,6 +214,7 @@
     <ClInclude Include="..\src\part_sys.h" />
     <ClInclude Include="..\src\paused.h" />
     <ClInclude Include="..\src\phys_sim.h" />
+    <ClInclude Include="..\src\platform.h" />
     <ClInclude Include="..\src\prefs.h" />
     <ClInclude Include="..\src\preview.h" />
     <ClInclude Include="..\src\quadgeom.hpp" />
