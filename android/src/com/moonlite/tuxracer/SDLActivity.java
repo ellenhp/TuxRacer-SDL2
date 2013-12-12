@@ -31,6 +31,7 @@ import com.amazon.ags.api.whispersync.GameDataMap;
 import com.amazon.ags.api.whispersync.WhispersyncEventListener;
 import com.amazon.ags.api.whispersync.model.SyncableNumber;
 
+import tv.ouya.console.api.*;
 
 /**
     SDL Activity
@@ -166,6 +167,8 @@ public class SDLActivity extends Activity {
 		
         myActivity = this;
         AmazonGamesClient.initialize(this, callback, myGameFeatures);
+        
+        nativeSetPlayerData("", OuyaFacade.getInstance().isRunningOnOUYAHardware());
     }
 
     // Events
@@ -357,6 +360,7 @@ public class SDLActivity extends Activity {
     public static native void nativeQuit();
     public static native void nativePause();
     public static native void nativeResume();
+    public static native void nativeSetPlayerData(String playerName, boolean isOnOuya);
     public static native void onNativeResize(int x, int y, int format);
     public static native void onNativePadDown(int padId, int keycode);
     public static native void onNativePadUp(int padId, int keycode);
