@@ -79,6 +79,8 @@ static list_t race_list = NULL;
 static player_data_t *plyr = NULL;
 
 static widget_t* course_title_label=NULL;
+static widget_t* prev_course_btn=NULL;
+static widget_t* next_course_btn=NULL;
 static widget_t* play_button=NULL;
 static widget_t* back_button=NULL;
 
@@ -335,6 +337,20 @@ void back_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, inp
 	back();
 }
 
+void prev_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type, widget_t* widget)
+{
+	if (get_prev_list_elem(race_list, cur_elem))
+		cur_elem=get_prev_list_elem(race_list, cur_elem);
+	update_text();
+}
+
+void next_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type, widget_t* widget)
+{
+	if (get_next_list_elem(race_list, cur_elem))
+		cur_elem=get_next_list_elem(race_list, cur_elem);
+	update_text();
+}
+
 static void init_scoreboard()
 {
 	coord_t item_coord;
@@ -430,7 +446,18 @@ static void race_select_init(void)
 	button_coord.y_just=CENTER_JUST;
 
 	gui_add_widget(course_title_label=create_label(""), &button_coord);
+
+	button_coord.x=0.1;
+	button_coord.x_just=LEFT_JUST;
+	gui_add_widget(prev_course_btn=create_button("<", prev_cb), &button_coord);
+
+	button_coord.x=0.9;
+	button_coord.x_just=RIGHT_JUST;
+	gui_add_widget(next_course_btn=create_button(">", next_cb), &button_coord);
+
 	course_title_label->font_binding="race_selection_title";
+	prev_course_btn->font_binding="race_selection_title";
+	next_course_btn->font_binding="race_selection_title";
 
 	button_coord.x=0.30;
 	button_coord.y=0.13;
@@ -478,7 +505,10 @@ static void race_select_init(void)
         cup_complete = False;
         
         /* Initialize the race data */
-        cur_elem = get_list_head( race_list );
+		if (cur_elem==NULL)
+		{
+			cur_elem = get_list_head( race_list );
+		}
         
         if ( g_game.practicing ) {
             g_game.race.course = NULL;
