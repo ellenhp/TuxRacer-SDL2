@@ -166,7 +166,7 @@ widget_bounding_box_t GameMenu_get_bb(widget_t* widget)
 	return bb;
 }
 
-void GameMenu_draw_text(char* text, int active, coord_t coord, char* requested_font_binding)
+void GameMenu_draw_text(const char* text, int active, coord_t coord, char* requested_font_binding)
 {
     font_t *font;
 	char* font_binding;
