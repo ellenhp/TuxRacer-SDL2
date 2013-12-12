@@ -166,14 +166,24 @@ widget_bounding_box_t GameMenu_get_bb(widget_t* widget)
 	return bb;
 }
 
-void GameMenu_draw_text(char* text, int active, coord_t coord)
+void GameMenu_draw_text(char* text, int active, coord_t coord, char* requested_font_binding)
 {
     font_t *font;
+	char* font_binding;
     int w, asc, desc;
 	coord_t absolute_coord;
 	double x_render_pos, y_render_pos;
 
-    if (!get_font_binding( active ? "button_label_hilit" : "button_label" , &font )) {
+	if (requested_font_binding==0)
+	{
+		font_binding=active ? "button_label_hilit" : "button_label";
+	}
+	else
+	{
+		font_binding=requested_font_binding;
+	}
+
+    if (!get_font_binding( font_binding , &font )) {
         print_warning( IMPORTANT_WARNING, 
                         "Couldn't get font object for binding %s",
                         "button_label" );

@@ -335,6 +335,64 @@ void back_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, inp
 	back();
 }
 
+static void init_scoreboard()
+{
+	coord_t item_coord;
+	int row;
+	char* ranks[]={"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
+	char* names[]={"Nolan", "Nolan Poe", "nopoe", "Nolan \"nopoe\" Poe", "This guy is good", "Best Score", "Real good", "Really I'm just", "figuring out how", "big names can be"};
+	char* scores[]={"10000", "9000", "8000", "7000", "6500", "6000", "5500", "5000", "4500", "4000"};
+	double tab_stops[]={0.53, 0.6, 0.9};
+
+	item_coord.x_coord_type=NORMALIZED_COORD;
+
+	item_coord.y_coord_type=LINE_COORD;
+	item_coord.y_just=CENTER_JUST;
+
+	{
+		widget_t* label;
+
+		item_coord.x_just=LEFT_JUST;
+		item_coord.x=tab_stops[0];
+		item_coord.y=0;
+
+		gui_add_widget(label=create_label("Rank"), &item_coord);
+		label->font_binding="leaderboard_text";
+
+		item_coord.x=tab_stops[1];
+		gui_add_widget(label=create_label("Name"), &item_coord);
+		label->font_binding="leaderboard_text";
+
+		item_coord.x=tab_stops[2];
+		item_coord.x_just=RIGHT_JUST;
+		gui_add_widget(label=create_label("Score"), &item_coord);
+		label->font_binding="leaderboard_text";
+	}
+
+	for (row=0; row<10; row++)
+	{
+		widget_t* label;
+
+		item_coord.x_just=LEFT_JUST;
+		item_coord.x=tab_stops[0];
+		item_coord.y=row+1;
+
+		gui_add_widget(label=create_label(ranks[row]), &item_coord);
+		label->font_binding="leaderboard_text";
+
+		item_coord.x=tab_stops[1];
+		gui_add_widget(label=create_label(names[row]), &item_coord);
+		label->font_binding="leaderboard_text";
+
+		item_coord.x=tab_stops[2];
+		item_coord.x_just=RIGHT_JUST;
+		gui_add_widget(label=create_label(scores[row]), &item_coord);
+		label->font_binding="leaderboard_text";
+	}
+
+	gui_balance_lines(0);
+}
+
 /*---------------------------------------------------------------------------*/
 /*! 
  Mode initialization function
@@ -345,7 +403,7 @@ void back_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, inp
 static void race_select_init(void)
 {
     point2d_t dummy_pos = {0, 0};
-	coord_t course_title_coord;
+	coord_t button_coord;
     int i;
     
     winsys_set_display_func( main_loop );
@@ -362,18 +420,21 @@ static void race_select_init(void)
 	GameMenu_init();
 	setup_gui();
 
-	course_title_coord.x_coord_type=course_title_coord.y_coord_type=NORMALIZED_COORD;
-	course_title_coord.x=0.30;
-	course_title_coord.y=0.78;
-	course_title_coord.x_just=CENTER_JUST;
-	course_title_coord.y_just=CENTER_JUST;
-	gui_add_widget(course_title_label=create_label(""), &course_title_coord);
+	button_coord.x_coord_type=button_coord.y_coord_type=NORMALIZED_COORD;
+	button_coord.x=0.30;
+	button_coord.y=0.78;
+	button_coord.x_just=CENTER_JUST;
+	button_coord.y_just=CENTER_JUST;
 
-	course_title_coord.y=0.13;
-	gui_add_widget(play_button=create_button("O Race", play_cb), &course_title_coord);
+	gui_add_widget(course_title_label=create_label(""), &button_coord);
 
-	course_title_coord.x=0.70;
-	gui_add_widget(back_button=create_button("A Back", back_cb), &course_title_coord);
+	button_coord.y=0.13;
+	gui_add_widget(play_button=create_button("O Race", play_cb), &button_coord);
+
+	button_coord.x=0.70;
+	gui_add_widget(back_button=create_button("A Back", back_cb), &button_coord);
+
+	init_scoreboard();
 
     plyr = get_player_data( local_player() );
     
