@@ -163,5 +163,8 @@ android/assets/*
 android/gen
 android/bin
 android/obj
-android/libs
+android/libs/armeabi
+android/libs/armeabi-v7a
+android/libs/jni
+android/libs/obj
 android/local.properties
