@@ -46,11 +46,6 @@ static void goto_next_mode()
     int i;
     set_game_mode( GAME_TYPE_SELECT );
 
-    /* 
-     * Free textures
-     */
-	unbind_texture( logo_binding );
-    flush_textures();
     winsys_post_redisplay();
 }
 

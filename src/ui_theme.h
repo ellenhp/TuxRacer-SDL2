@@ -35,7 +35,7 @@ extern colour_t ui_disabled_colour;
 //in TRWC, we want condition button to appear like if it was enabled, but it is disabled
 extern colour_t ui_enabled_but_disabled_colour;
 #endif
-void ui_draw_menu_decorations();
+void ui_draw_menu_decorations(bool_t draw_logo);
 
 #endif /* UI_THEME_H */
 

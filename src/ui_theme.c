@@ -62,14 +62,14 @@ static void draw_quad(int x, int y, int w, int h)
     glPopMatrix();
 }
 
-void ui_draw_menu_decorations()
+void ui_draw_menu_decorations(bool_t draw_logo)
 {
     GLuint texobj;
     char *bl = "menu_bottom_left";
     char *br = "menu_bottom_right";
     char *tl = "menu_top_left";
     char *tr = "menu_top_right";
-    char *title = "menu_title";
+    char *title = "logo";
     int w = getparam_x_resolution();
     int h = getparam_y_resolution();
 
@@ -103,12 +103,14 @@ void ui_draw_menu_decorations()
         draw_quad( w-256, h-256, 256, 256 );
     }
 
-
-    /* title */
-    if ( get_texture_binding( title, &texobj ) ) {
-        glBindTexture( GL_TEXTURE_2D, texobj );
-        draw_quad( w/2-128, h*0.95-128, 256, 128 );
-    }
+	if (draw_logo)
+	{
+		/* title */
+		if ( get_texture_binding( title, &texobj ) ) {
+			glBindTexture( GL_TEXTURE_2D, texobj );
+			draw_quad( w/2-192, h*0.95-192, 384, 192 );
+		}
+	}
 
 }
 /* EOF */

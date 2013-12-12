@@ -292,12 +292,12 @@ static void draw_preview()
 		rect_t screen_rect;
 		open_course_data_t *data;
 
-		screen_rect.lower_left.x=0.15;
+		screen_rect.lower_left.x=0.105;
 		screen_rect.lower_left.y=0.45;
 		screen_rect.lower_left.x_coord_type=screen_rect.lower_left.y_coord_type=NORMALIZED_COORD;
 
-		screen_rect.upper_right.x=0.45;
-		screen_rect.upper_right.y=0.75;
+		screen_rect.upper_right.x=0.445;
+		screen_rect.upper_right.y=0.79;
 		screen_rect.upper_right.x_coord_type=screen_rect.upper_right.y_coord_type=NORMALIZED_COORD;
 
         data = (open_course_data_t*) get_list_elem_data( cur_elem );
@@ -342,7 +342,7 @@ static void init_scoreboard()
 	char* ranks[]={"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
 	char* names[]={"Nolan", "Nolan Poe", "nopoe", "Nolan \"nopoe\" Poe", "This guy is good", "Best Score", "Real good", "Really I'm just", "figuring out how", "big names can be"};
 	char* scores[]={"10000", "9000", "8000", "7000", "6500", "6000", "5500", "5000", "4500", "4000"};
-	double tab_stops[]={0.53, 0.6, 0.9};
+	double tab_stops[]={0.53, 0.61, 0.9};
 
 	item_coord.x_coord_type=NORMALIZED_COORD;
 
@@ -424,13 +424,15 @@ static void race_select_init(void)
 	setup_gui();
 
 	button_coord.x_coord_type=button_coord.y_coord_type=NORMALIZED_COORD;
-	button_coord.x=0.30;
-	button_coord.y=0.78;
+	button_coord.x=0.50;
+	button_coord.y=0.85;
 	button_coord.x_just=CENTER_JUST;
 	button_coord.y_just=CENTER_JUST;
 
 	gui_add_widget(course_title_label=create_label(""), &button_coord);
+	course_title_label->font_binding="race_selection_title";
 
+	button_coord.x=0.30;
 	button_coord.y=0.13;
 	gui_add_widget(play_button=create_button("O Race", play_cb), &button_coord);
 
@@ -559,7 +561,7 @@ static void race_select_loop( scalar_t time_step )
         draw_ui_snow();
     }
     
-    ui_draw_menu_decorations();
+    ui_draw_menu_decorations(False);
     
 	GameMenu_draw();
 

@@ -585,7 +585,7 @@ static void event_select_loop( scalar_t time_step )
         draw_ui_snow();
     }
     
-    ui_draw_menu_decorations();
+    ui_draw_menu_decorations(False);
     
     set_widget_positions_and_draw_decorations();
     
