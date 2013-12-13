@@ -30,6 +30,27 @@ JNIEXPORT jdouble JNICALL Java_com_moonlite_tuxracer_SDLActivity_nativeSetPlayer
 }
 #endif
 
+void submit_score(int course, int score)
+{
+#ifdef __ANDROID__
+	JNIEnv* env = Android_JNI_GetEnv();
+    if (!env) {
+        return;
+    }
+
+	jclass mActivityClass = (jclass)((*env)->NewGlobalRef(env, "com.moonlite.SDLActivity"));
+
+    jmethodID mid = (*env)->GetStaticMethodID(env, mActivityClass, "getJoystickName", "(IJ)V");
+    if (!mid) {
+        return ;
+    }
+    
+	(*env)->CallStaticBooleanMethod(mActivityClass, mid, course, score);
+#else
+
+#endif
+}
+
 int get_overscan_percent()
 {
 	return overscan_percent;
