@@ -420,6 +420,7 @@ static void race_select_init(void)
 {
     point2d_t dummy_pos = {0, 0};
 	coord_t button_coord;
+	list_elem_t tmp;
     int i;
     
     winsys_set_display_func( main_loop );
@@ -508,6 +509,19 @@ static void race_select_init(void)
 		if (cur_elem==NULL)
 		{
 			cur_elem = get_list_head( race_list );
+		}
+		else
+		{
+			bool_t needs_changing=False;
+			tmp=get_list_head(race_list);
+			while (tmp!=cur_elem && tmp!=NULL)
+			{
+				tmp=get_next_list_elem(race_list, tmp);
+			}
+			if (!tmp)
+			{
+				cur_elem = get_list_head( race_list );
+			}
 		}
         
         if ( g_game.practicing ) {
