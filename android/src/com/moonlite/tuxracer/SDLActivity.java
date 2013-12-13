@@ -9,6 +9,7 @@ import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsoluteLayout;
 import android.os.*;
 import android.util.Log;
 import android.graphics.*;
@@ -58,7 +59,7 @@ public class SDLActivity extends Activity {
     protected static AudioTrack mAudioTrack;
 	
 	    //reference to the agsClient
-    AmazonGamesClient agsClient;
+    static AmazonGamesClient agsClient;
 	
     private static SDLActivity myActivity;
 
@@ -128,7 +129,7 @@ public class SDLActivity extends Activity {
 
     }
 
-    public void PostScore(int course, long score)
+    public static void PostScore(int course, long score)
     {
         LeaderboardsClient lbClient = agsClient.getLeaderboardsClient();
         String scoreId = String.format("HI_SCORE_%02d", course);
