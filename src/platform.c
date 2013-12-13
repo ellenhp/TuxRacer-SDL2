@@ -1,4 +1,5 @@
 #include "platform.h"
+#include "tuxracer.h"
 
 #ifdef __ANDROID__
 #include <jni.h>
@@ -29,6 +30,52 @@ JNIEXPORT jdouble JNICALL Java_com_moonlite_tuxracer_SDLActivity_nativeSetPlayer
 	}
 }
 #endif
+
+void submit_score(char* course_name, int score)
+{
+	int course=-1, i;
+	char* course_names[]=
+	{
+		"bunny_hill",
+		"frozen_river",
+		"twisty_slope",
+		"bumpy_ride",
+		"penguins_cant_fly",
+		"slippy_slidey",
+		"chinese_wall",
+		"bobsled_ride",
+		"deadman",
+		"ski_jump",
+		"Half_Pipe",
+		"Off_Piste_Skiing",
+		"in_search_of_vodka",
+	};
+	for (i=0; i<sizeof(course_names)/sizeof(course_names[0]); i++)
+	{
+		if (strcmp(course_names[i], course_name)==0)
+		{
+			course=i;
+			break;
+		}
+	}
+#ifdef __ANDROID__
+	JNIEnv* env = Android_JNI_GetEnv();
+    if (!env) {
+        return;
+    }
+
+	jclass mActivityClass = (jclass)((*env)->NewGlobalRef(mEnv, cls));
+
+    jmethodID mid = (*env)->GetStaticMethodID(env, mActivityClass, "getJoystickName", "(IJ)V");
+    if (!mid) {
+        return ;
+    }
+    
+	(*mEnv)->CallStaticBooleanMethod(mActivityClass, mid, course, score);
+#else
+	print_debug(DEBUG_OTHER, "");
+#endif
+}
 
 int get_overscan_percent()
 {

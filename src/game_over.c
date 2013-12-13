@@ -46,6 +46,7 @@
 #include "game_over.h"
 #include "bonus.h"
 #include "gui_abstraction.h"
+#include "platform.h"
 
 #define NEXT_MODE RACE_SELECT
 #define GAME_OVER_DISPLAY_TICKS 1000
@@ -185,8 +186,9 @@ void game_over_init(void)
     
     aborted = g_game.race_aborted;
     
-    if ( !aborted ) {
+	if ( !aborted && g_game.practicing==True) {
         update_player_score( get_player_data( local_player() ) );
+		submit_score(g_game.race.course, get_player_data(local_player())->score);
     }
     
     if ( (!g_game.practicing &&!aborted) || (!g_game.practicing && aborted && !game_abort_is_for_tutorial())) {
