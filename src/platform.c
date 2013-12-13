@@ -63,15 +63,15 @@ void submit_score(char* course_name, int score)
     if (!env) {
         return;
     }
+    
+	jclass mActivityClass = (*env)->FindClass(env, "com/moonlite/tuxracer/SDLActivity");
 
-	jclass mActivityClass = (jclass)((*env)->NewGlobalRef(env, "com.moonlite.tuxracer.SDLActivity"));
-
-    jmethodID mid = (*env)->GetStaticMethodID(env, mActivityClass, "getJoystickName", "(IJ)V");
+    jmethodID mid = (*env)->GetStaticMethodID(env, mActivityClass, "PostScore", "(II)V");
     if (!mid) {
         return ;
     }
     
-	(*env)->CallStaticBooleanMethod(mActivityClass, mid, course, score);
+	(*env)->CallStaticVoidMethod(env, mActivityClass, mid, course+1, score);
 #else
 	print_debug(DEBUG_OTHER, "");
 #endif

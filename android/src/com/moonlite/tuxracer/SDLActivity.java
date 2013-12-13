@@ -129,7 +129,7 @@ public class SDLActivity extends Activity {
 
     }
 
-    public static void PostScore(int course, long score)
+    public static void PostScore(int course, int score)
     {
         LeaderboardsClient lbClient = agsClient.getLeaderboardsClient();
         String scoreId = String.format("HI_SCORE_%02d", course);
