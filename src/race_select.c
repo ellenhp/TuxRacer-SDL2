@@ -462,6 +462,7 @@ static void race_select_init(void)
 
 	button_coord.x=0.30;
 	button_coord.y=0.13;
+	button_coord.x_just=CENTER_JUST;
 	gui_add_widget(play_button=create_button("O Race", play_cb), &button_coord);
 
 	button_coord.x=0.70;
