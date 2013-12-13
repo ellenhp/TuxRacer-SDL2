@@ -9,7 +9,6 @@ import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AbsoluteLayout;
 import android.os.*;
 import android.util.Log;
 import android.graphics.*;
@@ -67,39 +66,39 @@ public class SDLActivity extends Activity {
         @Override
         public void onServiceNotReady(AmazonGamesStatus status) {
             //unable to use service
-            System.out.println("com.amazon.example.gamecircle2.MyActivity.onServiceNotReady");
+            Log.e(TAG, "onServiceNotReady");
         }
 
         @Override
         public void onServiceReady(AmazonGamesClient amazonGamesClient) {
-            System.out.println("MyActivity.onServiceReady");
+            Log.i(TAG, "onServiceReady");
             getPlayerAlias();
             agsClient = amazonGamesClient;
             //ready to use GameCircle
             AmazonGamesClient.getWhispersyncClient().setWhispersyncEventListener(new WhispersyncEventListener() {
                 public void onNewCloudData() {
                     // refresh visible game data
-                    System.out.println("MyActivity.onNewCloudData");
+                    Log.i(TAG, "onNewCloudData");
                     GameDataMap gameDataMap = AmazonGamesClient.getWhispersyncClient().getGameData();
                     SyncableNumber highScore = gameDataMap.getHighestNumber("highScore");
-                    System.out.println("highScore.isSet() = " + highScore.isSet());
+                    Log.i(TAG, "highScore.isSet() = " + highScore.isSet());
                     if (highScore.isSet()) {
-                        System.out.println("highScore.asLong() = " + highScore.asLong());
+                        Log.i(TAG, "highScore.asLong() = " + highScore.asLong());
                     }
                 }
 
                 // The following three methods are mainly useful for debugging purposes and don't have to be overridden
 
                 public void onDataUploadedToCloud() {
-                    System.out.println("MyActivity.onDataUploadedToCloud");
+                    Log.i(TAG, "onDataUploadedToCloud");
                 }
 
                 public void onThrottled() {
-                    System.out.println("MyActivity.onThrottled");
+                    Log.i(TAG, "onThrottled");
                 }
 
                 public void onDiskWriteComplete() {
-                    System.out.println("MyActivity.onDiskWriteComplete");
+                    Log.i(TAG, "onDiskWriteComplete");
                 }
             });
         }
@@ -128,6 +127,19 @@ public class SDLActivity extends Activity {
 
 
     }
+
+    public void PostScore(int course, long score)
+    {
+        LeaderboardsClient lbClient = agsClient.getLeaderboardsClient();
+        String scoreId = String.format("HI_SCORE_%02d", course);
+        AGResponseHandle<SubmitScoreResponse> handle = lbClient.submitScore(scoreId, score);
+        handle.setCallback(new AGResponseCallback<SubmitScoreResponse>() {
+            @Override
+            public void onComplete(SubmitScoreResponse result) {
+                Log.i(TAG, "getNewRank() = " + result.getNewRank());
+            }
+        });
+    }    
 
 
     //list of features your game uses (in this example, achievements and leaderboards)
