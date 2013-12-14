@@ -47,6 +47,9 @@ static void draw_quad(int x, int y, int w, int h)
 	};
 	GLubyte indices[]={0, 1, 2, 0, 2, 3};
 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
 	glPushMatrix();
     {
 		glTranslatef( x, y, 0 );
@@ -74,6 +77,7 @@ void ui_draw_menu_decorations(bool_t draw_logo)
     int h = getparam_y_resolution();
 
     glEnable( GL_TEXTURE_2D );
+	glBlendFunc( GL_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     glColor4f( 1., 1., 1., 1. );
 
     /* bottom left */
