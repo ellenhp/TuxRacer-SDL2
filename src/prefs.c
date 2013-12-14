@@ -156,7 +156,7 @@ static void prefs_init(void)
 	slider_set_value(fps_slider, getparam_display_fps());
 	gui_add_widget(fps_slider, NULL);
 
-	gui_balance_lines(0);
+	gui_balance_lines(1);
 	
 	display_fps=getparam_display_fps();
 

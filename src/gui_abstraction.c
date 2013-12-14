@@ -27,7 +27,7 @@ void GameMenu_mouse_func( int button, int state, int finger_index, int x, int y 
 
 void GameMenu_joystick_func( double x, double y )
 {
-	gui_process_axis(x, y);
+	if (winsys_is_controller_active())	{		gui_process_axis(x, y);	}
 }
 
 void GameMenu_joystick_button_func( int button )
