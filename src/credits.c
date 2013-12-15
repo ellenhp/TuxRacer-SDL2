@@ -66,7 +66,7 @@ static credit_line_t credit_lines[] =
     { "credits_text_small", "modify it under the terms of the" },
     { "credits_text_small", "GNU General Public License" },
     { "credits_text_small", "" },
-    { "credits_text", "Ported from" },
+    { "credits_text", "\x01\x02\x03\x04 Ported from" },
     { "credits_text", "the open source project" },
     { "credits_text", "Tux Racer 4iOS" },
     { "credits_text", "" },
