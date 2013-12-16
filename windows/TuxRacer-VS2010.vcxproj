@@ -149,6 +149,7 @@
     <ClCompile Include="..\src\render_util.c" />
     <ClCompile Include="..\src\reset.c" />
     <ClCompile Include="..\src\save.c" />
+    <ClCompile Include="..\src\scoreboard.c" />
     <ClCompile Include="..\src\screenshot.c" />
     <ClCompile Include="..\src\splash_screen.c" />
     <ClCompile Include="..\src\ssbutton.c" />
@@ -225,6 +226,7 @@
     <ClInclude Include="..\src\render_util.h" />
     <ClInclude Include="..\src\reset.h" />
     <ClInclude Include="..\src\save.h" />
+    <ClInclude Include="..\src\scoreboard.h" />
     <ClInclude Include="..\src\screenshot.h" />
     <ClInclude Include="..\src\splash_screen.h" />
     <ClInclude Include="..\src\ssbutton.h" />

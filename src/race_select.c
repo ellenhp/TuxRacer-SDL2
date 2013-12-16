@@ -43,6 +43,8 @@
 #include "gui_abstraction.h"
 #include "gui_label.h"
 #include "gui_button.h"
+#include "scoreboard.h"
+
 #ifdef TARGET_OS_IPHONE
 	#import "sharedGeneralFunctions.h"
 #endif
@@ -355,10 +357,9 @@ static void init_scoreboard()
 {
 	coord_t item_coord;
 	int row;
-	char* ranks[]={"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
-	char* names[]={"Nolan", "Nolan Poe", "nopoe", "Nolan \"nopoe\" Poe", "This guy is good", "Best Score", "Real good", "Really I'm just", "figuring out how", "big names can be"};
-	char* scores[]={"10000", "9000", "8000", "7000", "6500", "6000", "5500", "5000", "4500", "4000"};
 	double tab_stops[]={0.53, 0.61, 0.9};
+
+	init_scoreboard_labels();
 
 	item_coord.x_coord_type=NORMALIZED_COORD;
 
@@ -393,16 +394,16 @@ static void init_scoreboard()
 		item_coord.x=tab_stops[0];
 		item_coord.y=row+1;
 
-		gui_add_widget(label=create_label(ranks[row]), &item_coord);
+		gui_add_widget(label=get_rank_label(row+1), &item_coord);
 		label->font_binding="leaderboard_text";
 
 		item_coord.x=tab_stops[1];
-		gui_add_widget(label=create_label(names[row]), &item_coord);
+		gui_add_widget(label=get_name_label(row+1), &item_coord);
 		label->font_binding="leaderboard_text";
 
 		item_coord.x=tab_stops[2];
 		item_coord.x_just=RIGHT_JUST;
-		gui_add_widget(label=create_label(scores[row]), &item_coord);
+		gui_add_widget(label=get_score_label(row+1), &item_coord);
 		label->font_binding="leaderboard_text";
 	}
 

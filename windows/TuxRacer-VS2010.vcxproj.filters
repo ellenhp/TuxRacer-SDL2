@@ -240,6 +240,9 @@
     <ClCompile Include="..\src\platform.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\scoreboard.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\alglib.h">
@@ -468,6 +471,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\platform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\scoreboard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
