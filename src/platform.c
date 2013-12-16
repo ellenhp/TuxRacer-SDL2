@@ -7,6 +7,7 @@
 
 static int overscan_percent=0;
 static char* player_name=0;
+static bool_t is_on_ouya=False;
 
 #ifdef __ANDROID__
 JNIEXPORT jdouble JNICALL Java_com_moonlite_tuxracer_SDLActivity_nativeSetPlayerData
@@ -22,6 +23,7 @@ JNIEXPORT jdouble JNICALL Java_com_moonlite_tuxracer_SDLActivity_nativeSetPlayer
 	
 	if (on_ouya)
 	{
+		is_on_ouya=True;
 		overscan_percent=5;
 	}
 	else
@@ -82,3 +84,26 @@ int get_overscan_percent()
 	return overscan_percent;
 }
 
+char* get_race_text()
+{
+	if (is_on_ouya)
+	{
+		return "\x01 Race";
+	}
+	else
+	{
+		return "Race";
+	}
+}
+
+char* get_back_text()
+{
+	if (is_on_ouya)
+	{
+		return "\x04 Back";
+	}
+	else
+	{
+		return "Back";
+	}
+}

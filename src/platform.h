@@ -5,4 +5,7 @@ int get_overscan_percent();
 
 void submit_score(char* course_name, int score);
 
+char* get_race_text();
+char* get_back_text();
+
 #endif

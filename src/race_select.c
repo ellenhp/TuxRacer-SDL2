@@ -44,6 +44,7 @@
 #include "gui_label.h"
 #include "gui_button.h"
 #include "scoreboard.h"
+#include "platform.h"
 
 #ifdef TARGET_OS_IPHONE
 	#import "sharedGeneralFunctions.h"
@@ -464,10 +465,10 @@ static void race_select_init(void)
 	button_coord.x=0.30;
 	button_coord.y=0.13;
 	button_coord.x_just=CENTER_JUST;
-	gui_add_widget(back_button=create_button("A Back", back_cb), &button_coord);
+	gui_add_widget(back_button=create_button(get_back_text(), back_cb), &button_coord);
 
 	button_coord.x=0.70;
-	gui_add_widget(play_button=create_button("O Race", play_cb), &button_coord);
+	gui_add_widget(play_button=create_button(get_race_text(), play_cb), &button_coord);
 
 	init_scoreboard();
 
