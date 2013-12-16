@@ -373,6 +373,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\platform.c"
+				>
+			</File>
+			<File
 				RelativePath="..\src\prefs.c"
 				>
 			</File>
@@ -672,6 +676,10 @@
 			</File>
 			<File
 				RelativePath="..\src\pic.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\platform.h"
 				>
 			</File>
 			<File
