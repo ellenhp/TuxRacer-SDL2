@@ -413,6 +413,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\scoreboard.c"
+				>
+			</File>
+			<File
 				RelativePath="..\src\screenshot.c"
 				>
 			</File>
@@ -720,6 +724,10 @@
 			</File>
 			<File
 				RelativePath="..\src\save.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\scoreboard.h"
 				>
 			</File>
 			<File
