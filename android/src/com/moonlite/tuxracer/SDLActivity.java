@@ -81,6 +81,7 @@ public class SDLActivity extends Activity {
             Log.i(TAG, "onServiceReady");
             getPlayerAlias();
             agsClient = amazonGamesClient;
+        	SDLActivity.RequestScores(0);
             //ready to use GameCircle
             AmazonGamesClient.getWhispersyncClient().setWhispersyncEventListener(new WhispersyncEventListener() {
                 public void onNewCloudData() {
@@ -180,14 +181,19 @@ public class SDLActivity extends Activity {
     			{
     				return;
     			}
-    			String[] names=new String[10];
-    			int[] scores=new int[10];
+    			String[] names=new String[topScores.getNumScores()];
+    			int[] scores=new int[topScores.getNumScores()];
     			for (int i=0; i<topScores.getNumScores(); i++)
     			{
     				names[i]=topScores.getScores().get(i).getPlayer().getAlias();
     				scores[i]=(int)topScores.getScores().get(i).getScoreValue();
     			}
-    			nativeReceivedScores(0, names, scores);
+    			if (topScores.getLeaderboardId()==null)
+    			{
+    				return;
+    			}
+    	    	String courseId=topScores.getLeaderboardId().replaceAll("[^\\d.]", "");
+    			nativeReceivedScores(Integer.parseInt(courseId)-1, names, scores);
     		}
     	}
     	class RefreshAllLeaderboardsHandler implements AGResponseCallback<GetLeaderboardsResponse>
@@ -200,11 +206,11 @@ public class SDLActivity extends Activity {
 		        	arg0.getLeaderboards().get(i).getName();
 		        	ScoreResponseHandler responseHandler=new ScoreResponseHandler();
 		        	
-		            AGResponseHandle<GetScoresResponse> topHandle = lbClient.getScores(arg0.getLeaderboards().get(i).getName(),
+		            AGResponseHandle<GetScoresResponse> topHandle = lbClient.getScores(arg0.getLeaderboards().get(i).getId(),
 		            		LeaderboardFilter.GLOBAL_ALL_TIME, (Object[])null);
 		            topHandle.setCallback(responseHandler.topHandler);
 		            
-		            AGResponseHandle<GetPlayerScoreResponse> playerHandle = lbClient.getLocalPlayerScore(arg0.getLeaderboards().get(i).getName(),
+		            AGResponseHandle<GetPlayerScoreResponse> playerHandle = lbClient.getLocalPlayerScore(arg0.getLeaderboards().get(i).getId(),
 		            		LeaderboardFilter.GLOBAL_ALL_TIME, (Object[])null);
 		            playerHandle.setCallback(responseHandler.playerHandler);
 		        }

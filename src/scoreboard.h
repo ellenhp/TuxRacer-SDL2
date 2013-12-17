@@ -2,10 +2,13 @@
 #define SCOREBOARD_H
 
 #include "gui_mgr.h"
+#include "tuxracer.h"
 
 #define RANK_USER 0
 #define SCOREBOARD_SIZE 10
 #define MAX_COURSES 50
+
+extern bool_t scoreboard_open;
 
 void refresh_scores();
 void refresh_scores_for_course(char* course);
