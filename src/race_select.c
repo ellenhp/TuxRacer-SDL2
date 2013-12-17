@@ -418,6 +418,9 @@ static void init_scoreboard()
  \date    Created:  2000-09-24
  \date    Modified: 2000-09-24
  */
+#define LEFT_ARROW	"\x05"
+#define RIGHT_ARROW	"\x06"
+
 static void race_select_init(void)
 {
     point2d_t dummy_pos = {0, 0};
@@ -452,11 +455,11 @@ static void race_select_init(void)
 
 	button_coord.x=0.1;
 	button_coord.x_just=LEFT_JUST;
-	gui_add_widget(prev_course_btn=create_button("<", prev_cb), &button_coord);
+	gui_add_widget(prev_course_btn=create_button(LEFT_ARROW, prev_cb), &button_coord);
 
 	button_coord.x=0.9;
 	button_coord.x_just=RIGHT_JUST;
-	gui_add_widget(next_course_btn=create_button(">", next_cb), &button_coord);
+	gui_add_widget(next_course_btn=create_button(RIGHT_ARROW, next_cb), &button_coord);
 
 	course_title_label->font_binding="race_selection_title";
 	prev_course_btn->font_binding="race_selection_title";
