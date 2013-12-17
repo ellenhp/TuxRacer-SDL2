@@ -90,6 +90,13 @@ static widget_t* back_button=NULL;
 /* Forward declaration */
 static void race_select_loop( scalar_t time_step );
 
+int get_current_course_index()
+{
+    open_course_data_t *data;
+    data = (open_course_data_t*) get_list_elem_data( cur_elem );
+    return get_course_index(data->course);
+}
+
 /*---------------------------------------------------------------------------*/
 /*! 
  Function used by listbox to convert list element to a string to display
@@ -328,6 +335,7 @@ void update_text()
         textarea_set_text( desc_ta, data->description );
 		button_set_text(course_title_label, data->name);
     }
+    update_scoreboard_labels();
 }
 
 void play_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type, widget_t* widget)
@@ -359,8 +367,6 @@ static void init_scoreboard()
 	coord_t item_coord;
 	int row;
 	double tab_stops[]={0.53, 0.61, 0.9};
-
-	init_scoreboard_labels();
 
 	item_coord.x_coord_type=NORMALIZED_COORD;
 
@@ -395,19 +401,21 @@ static void init_scoreboard()
 		item_coord.x=tab_stops[0];
 		item_coord.y=row+1;
 
-		gui_add_widget(label=get_rank_label(row+1), &item_coord);
+		gui_add_widget(label=get_rank_label(row), &item_coord);
 		label->font_binding="leaderboard_text";
 
 		item_coord.x=tab_stops[1];
-		gui_add_widget(label=get_name_label(row+1), &item_coord);
+		gui_add_widget(label=get_name_label(row), &item_coord);
 		label->font_binding="leaderboard_text";
 
 		item_coord.x=tab_stops[2];
 		item_coord.x_just=RIGHT_JUST;
-		gui_add_widget(label=get_score_label(row+1), &item_coord);
+		gui_add_widget(label=get_score_label(row), &item_coord);
 		label->font_binding="leaderboard_text";
 	}
-
+    
+    update_text();
+    
 	gui_balance_lines(0);
 }
 
@@ -420,13 +428,14 @@ static void init_scoreboard()
  */
 #define LEFT_ARROW	"\x05"
 #define RIGHT_ARROW	"\x06"
-
 static void race_select_init(void)
 {
     point2d_t dummy_pos = {0, 0};
 	coord_t button_coord;
 	list_elem_t tmp;
     int i;
+    
+    scoreboard_open=True;
     
     winsys_set_display_func( main_loop );
     winsys_set_idle_func( main_loop );
@@ -444,36 +453,6 @@ static void race_select_init(void)
 
 	GameMenu_init();
 	setup_gui();
-
-	button_coord.x_coord_type=button_coord.y_coord_type=NORMALIZED_COORD;
-	button_coord.x=0.50;
-	button_coord.y=0.85;
-	button_coord.x_just=CENTER_JUST;
-	button_coord.y_just=CENTER_JUST;
-
-	gui_add_widget(course_title_label=create_label(""), &button_coord);
-
-	button_coord.x=0.1;
-	button_coord.x_just=LEFT_JUST;
-	gui_add_widget(prev_course_btn=create_button(LEFT_ARROW, prev_cb), &button_coord);
-
-	button_coord.x=0.9;
-	button_coord.x_just=RIGHT_JUST;
-	gui_add_widget(next_course_btn=create_button(RIGHT_ARROW, next_cb), &button_coord);
-
-	course_title_label->font_binding="race_selection_title";
-	prev_course_btn->font_binding="race_selection_title";
-	next_course_btn->font_binding="race_selection_title";
-
-	button_coord.x=0.30;
-	button_coord.y=0.13;
-	button_coord.x_just=CENTER_JUST;
-	gui_add_widget(back_button=create_button(get_back_text(), back_cb), &button_coord);
-
-	button_coord.x=0.70;
-	gui_add_widget(play_button=create_button(get_race_text(), play_cb), &button_coord);
-
-	init_scoreboard();
 
     plyr = get_player_data( local_player() );
     
@@ -577,13 +556,44 @@ static void race_select_init(void)
     desc_ta = textarea_create( make_point2d(
 		0.15*getparam_x_resolution(), 0.2*getparam_y_resolution()),
 		0.3*getparam_x_resolution(), 0.23*getparam_y_resolution(), "race_description", "" );
-
-	update_text();
     
     textarea_set_visible( desc_ta, True );
     
     update_race_data();
     
+	button_coord.x_coord_type=button_coord.y_coord_type=NORMALIZED_COORD;
+	button_coord.x=0.50;
+	button_coord.y=0.85;
+	button_coord.x_just=CENTER_JUST;
+	button_coord.y_just=CENTER_JUST;
+    
+	gui_add_widget(course_title_label=create_label(""), &button_coord);
+    
+	button_coord.x=0.1;
+	button_coord.x_just=LEFT_JUST;
+	gui_add_widget(prev_course_btn=create_button(LEFT_ARROW, prev_cb), &button_coord);
+    
+	button_coord.x=0.9;
+	button_coord.x_just=RIGHT_JUST;
+	gui_add_widget(next_course_btn=create_button(RIGHT_ARROW, next_cb), &button_coord);
+    
+	course_title_label->font_binding="race_selection_title";
+	prev_course_btn->font_binding="race_selection_title";
+	next_course_btn->font_binding="race_selection_title";
+    
+	button_coord.x=0.30;
+	button_coord.y=0.13;
+	button_coord.x_just=CENTER_JUST;
+	gui_add_widget(back_button=create_button(get_back_text(), back_cb), &button_coord);
+    
+	button_coord.x=0.70;
+	gui_add_widget(play_button=create_button(get_race_text(), play_cb), &button_coord);
+    
+	init_scoreboard_labels();
+	init_scoreboard();
+
+    update_text();
+
     play_music( "start_screen" );
 }
 
@@ -636,6 +646,7 @@ static void race_select_loop( scalar_t time_step )
  */
 static void race_select_term(void)
 {
+    scoreboard_open=False;
     textarea_delete( desc_ta );
     desc_ta = NULL;
 }
