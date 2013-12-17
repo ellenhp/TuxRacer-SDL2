@@ -16,6 +16,7 @@ widget_t* rank_labels[SCOREBOARD_SIZE+1]={NULL};
 widget_t* name_labels[SCOREBOARD_SIZE+1]={NULL};
 widget_t* score_labels[SCOREBOARD_SIZE+1]={NULL};
 
+bool_t scoreboard_open=False;
 bool_t arrays_initialized=False;
 
 #ifdef __ANDROID__
@@ -28,7 +29,7 @@ JNIEXPORT jdouble JNICALL Java_com_moonlite_tuxracer_SDLActivity_nativeReceivedS
 	jstring tmp_jstring;
 	char* name;
 	int loop_cutoff=SCOREBOARD_SIZE+1;
-	if (len>SCOREBOARD_SIZE+1)
+	if (len<SCOREBOARD_SIZE+1)
 	{
 		loop_cutoff=len;
 	}
@@ -56,7 +57,22 @@ JNIEXPORT jdouble JNICALL Java_com_moonlite_tuxracer_SDLActivity_nativeReceivedS
 
 void refresh_scores()
 {
+#ifdef __ANDROID__
+	JNIEnv* env = Android_JNI_GetEnv();
+    if (!env) {
+        return;
+    }
+    
+	jclass mActivityClass = (*env)->FindClass(env, "com/moonlite/tuxracer/SDLActivity");
+    
+    jmethodID mid = (*env)->GetStaticMethodID(env, mActivityClass, "RequestScores", "(I)V");
+    if (!mid) {
+        return ;
+    }
+    
+	(*env)->CallStaticVoidMethod(env, mActivityClass, mid, 0);
 
+#endif
 }
 
 void refresh_scores_for_course(char* course_name)
@@ -69,14 +85,23 @@ void init_scoreboard_labels()
 	int i;
 	char buf[5];
 	widget_t* tmp;
-	for (i=1; i<=SCOREBOARD_SIZE; i++)
+    int course, rank;
+	for (i=0; i<=SCOREBOARD_SIZE; i++)
 	{
-		sprintf(buf, "%d", i);
+		sprintf(buf, "%d", i+1);
 		rank_labels[i]=create_label(buf);
 
 		name_labels[i]=create_label("[No Name]");
 
 		score_labels[i]=create_label("0");
+	}
+	for (course=0; course<=get_num_courses(); course++)
+	{
+		for (rank=1; rank<=SCOREBOARD_SIZE; rank++)
+		{
+            scoreboard_names[course][rank]=0;
+            scoreboard_scores[course][rank]=0;
+		}
 	}
 }
 
@@ -84,17 +109,27 @@ void update_scoreboard_labels()
 {
 	char buf[10];
 	int course, rank;
-	for (course=1; course<=get_num_courses(); course++)
-	{
-		for (rank=1; rank<=SCOREBOARD_SIZE; rank++)
-		{
-			sprintf(buf, "%d", rank);
-			button_set_text(rank_labels[rank], buf);
-			button_set_text(name_labels[rank], scoreboard_names[course][rank]);
-			sprintf(buf, "%d", scoreboard_scores[course][rank]);
-			button_set_text(score_labels[rank], buf);
-		}
-	}
+    if (!scoreboard_open)
+    {
+        return;
+    }
+    course=get_current_course_index();
+    for (rank=0; rank<=SCOREBOARD_SIZE; rank++)
+    {
+        sprintf(buf, "%d", rank+1);
+        button_set_text(rank_labels[rank], buf);
+        if (scoreboard_names[course][rank])
+        {
+            button_set_text(name_labels[rank], scoreboard_names[course][rank]);
+            sprintf(buf, "%d", scoreboard_scores[course][rank]);
+            button_set_text(score_labels[rank], buf);
+        }
+        else
+        {
+            button_set_text(name_labels[rank], "----");
+            button_set_text(score_labels[rank], "0");
+        }
+    }
 }
 
 widget_t* get_name_label(int rank)
