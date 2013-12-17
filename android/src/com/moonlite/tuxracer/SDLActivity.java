@@ -24,12 +24,18 @@ import java.util.ArrayList;
 import com.amazon.ags.api.*;
 import com.amazon.ags.api.achievements.AchievementsClient;
 import com.amazon.ags.api.achievements.UpdateProgressResponse;
+import com.amazon.ags.api.leaderboards.GetLeaderboardsResponse;
+import com.amazon.ags.api.leaderboards.GetPlayerScoreResponse;
+import com.amazon.ags.api.leaderboards.GetScoresResponse;
 import com.amazon.ags.api.leaderboards.LeaderboardsClient;
+import com.amazon.ags.api.leaderboards.Score;
 import com.amazon.ags.api.leaderboards.SubmitScoreResponse;
 import com.amazon.ags.api.profiles.RequestPlayerProfileResponse;
 import com.amazon.ags.api.whispersync.GameDataMap;
 import com.amazon.ags.api.whispersync.WhispersyncEventListener;
 import com.amazon.ags.api.whispersync.model.SyncableNumber;
+import com.amazon.ags.constants.LeaderboardFilter;
+import com.amazon.ags.constants.ScoreFormat;
 
 import tv.ouya.console.api.*;
 
@@ -140,8 +146,87 @@ public class SDLActivity extends Activity {
                 Log.i(TAG, "getNewRank() = " + result.getNewRank());
             }
         });
-    }    
+    }
 
+    public static void RequestScores(int course)
+    {
+    	class ScoreResponseHandler  
+    	{
+    		class PlayerScoreResponseHandler implements AGResponseCallback<GetPlayerScoreResponse>
+    		{
+				public void onComplete(GetPlayerScoreResponse arg0)
+				{
+					playerScore=arg0;
+					gotScore();
+				}
+    		}
+    		class TopScoreResponseHandler implements AGResponseCallback<GetScoresResponse>
+    		{
+				public void onComplete(GetScoresResponse arg0)
+				{
+					topScores=arg0;
+					gotScore();
+				}
+    		}
+    		PlayerScoreResponseHandler playerHandler=new PlayerScoreResponseHandler();
+    		TopScoreResponseHandler topHandler=new TopScoreResponseHandler();
+    		
+    		GetPlayerScoreResponse playerScore=null;
+    		GetScoresResponse topScores=null;
+    	
+    		public void gotScore()
+    		{
+    			if (playerScore==null || topScores==null)
+    			{
+    				return;
+    			}
+    			String[] names=new String[10];
+    			int[] scores=new int[10];
+    			for (int i=0; i<topScores.getNumScores(); i++)
+    			{
+    				names[i]=topScores.getScores().get(i).getPlayer().getAlias();
+    				scores[i]=(int)topScores.getScores().get(i).getScoreValue();
+    			}
+    			nativeReceivedScores(0, names, scores);
+    		}
+    	}
+    	class RefreshAllLeaderboardsHandler implements AGResponseCallback<GetLeaderboardsResponse>
+    	{
+			public void onComplete(GetLeaderboardsResponse arg0)
+			{
+		        LeaderboardsClient lbClient = agsClient.getLeaderboardsClient();
+		        for (int i=0; i<arg0.getNumLeaderboards(); i++)
+		        {
+		        	arg0.getLeaderboards().get(i).getName();
+		        	ScoreResponseHandler responseHandler=new ScoreResponseHandler();
+		        	
+		            AGResponseHandle<GetScoresResponse> topHandle = lbClient.getScores(arg0.getLeaderboards().get(i).getName(),
+		            		LeaderboardFilter.GLOBAL_ALL_TIME, (Object[])null);
+		            topHandle.setCallback(responseHandler.topHandler);
+		            
+		            AGResponseHandle<GetPlayerScoreResponse> playerHandle = lbClient.getLocalPlayerScore(arg0.getLeaderboards().get(i).getName(),
+		            		LeaderboardFilter.GLOBAL_ALL_TIME, (Object[])null);
+		            playerHandle.setCallback(responseHandler.playerHandler);
+		        }
+			}
+    	}
+        LeaderboardsClient lbClient = agsClient.getLeaderboardsClient();
+        if (course==0)
+        {
+        	lbClient.getLeaderboards().setCallback(new RefreshAllLeaderboardsHandler());
+        }
+        else
+        {
+            String scoreId = String.format("HI_SCORE_%02d", course);
+        	ScoreResponseHandler responseHandler=new ScoreResponseHandler();
+        	
+            AGResponseHandle<GetScoresResponse> topHandle = lbClient.getScores(scoreId, LeaderboardFilter.GLOBAL_ALL_TIME, (Object[])null);
+            topHandle.setCallback(responseHandler.topHandler);
+            
+            AGResponseHandle<GetPlayerScoreResponse> playerHandle = lbClient.getLocalPlayerScore(scoreId, LeaderboardFilter.GLOBAL_ALL_TIME, (Object[])null);
+            playerHandle.setCallback(responseHandler.playerHandler);
+        }
+    }
 
     //list of features your game uses (in this example, achievements and leaderboards)
     EnumSet<AmazonGamesFeature> myGameFeatures = EnumSet.of(
@@ -193,7 +278,7 @@ public class SDLActivity extends Activity {
         if (agsClient != null) {
             AmazonGamesClient.release();
         }
-  }
+	}
 
     @Override
     protected void onResume() {
@@ -374,6 +459,7 @@ public class SDLActivity extends Activity {
     public static native void nativePause();
     public static native void nativeResume();
     public static native void nativeSetPlayerData(String playerName, boolean isOnOuya);
+    public static native void nativeReceivedScores(int course, String[] names, int[] scores);
     public static native void onNativeResize(int x, int y, int format);
     public static native void onNativePadDown(int padId, int keycode);
     public static native void onNativePadUp(int padId, int keycode);
@@ -902,7 +988,8 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
             return true;
         }
     }
-    
+
+
 }
 
 /* This is a fake invisible editor view that receives the input and defines the
