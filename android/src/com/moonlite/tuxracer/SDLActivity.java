@@ -81,7 +81,7 @@ public class SDLActivity extends Activity {
             Log.i(TAG, "onServiceReady");
             getPlayerAlias();
             agsClient = amazonGamesClient;
-        	SDLActivity.RequestScores(0);
+        	SDLActivity.RequestScores(-1);
             //ready to use GameCircle
             AmazonGamesClient.getWhispersyncClient().setWhispersyncEventListener(new WhispersyncEventListener() {
                 public void onNewCloudData() {
@@ -138,15 +138,23 @@ public class SDLActivity extends Activity {
 
     public static void PostScore(int course, int score)
     {
-        LeaderboardsClient lbClient = agsClient.getLeaderboardsClient();
-        String scoreId = String.format("HI_SCORE_%02d", course);
-        AGResponseHandle<SubmitScoreResponse> handle = lbClient.submitScore(scoreId, score);
-        handle.setCallback(new AGResponseCallback<SubmitScoreResponse>() {
-            @Override
+    	class PostScoreResponse implements AGResponseCallback<SubmitScoreResponse>
+		{
+    		int mCourse;
+        	public PostScoreResponse(int courseIndex)
+        	{
+        		mCourse=courseIndex;
+        	}
             public void onComplete(SubmitScoreResponse result) {
                 Log.i(TAG, "getNewRank() = " + result.getNewRank());
+                Log.i(TAG, "course index to refresh = " + mCourse);
+                RequestScores(mCourse);
             }
-        });
+        }
+        LeaderboardsClient lbClient = agsClient.getLeaderboardsClient();
+        String scoreId = String.format("HI_SCORE_%02d", course+1);
+        AGResponseHandle<SubmitScoreResponse> handle = lbClient.submitScore(scoreId, score);
+        handle.setCallback(new PostScoreResponse(course));
     }
 
     public static void RequestScores(int course)
@@ -217,13 +225,13 @@ public class SDLActivity extends Activity {
 			}
     	}
         LeaderboardsClient lbClient = agsClient.getLeaderboardsClient();
-        if (course==0)
+        if (course==-1)
         {
         	lbClient.getLeaderboards().setCallback(new RefreshAllLeaderboardsHandler());
         }
         else
         {
-            String scoreId = String.format("HI_SCORE_%02d", course);
+            String scoreId = String.format("HI_SCORE_%02d", course+1);
         	ScoreResponseHandler responseHandler=new ScoreResponseHandler();
         	
             AGResponseHandle<GetScoresResponse> topHandle = lbClient.getScores(scoreId, LeaderboardFilter.GLOBAL_ALL_TIME, (Object[])null);

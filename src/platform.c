@@ -84,7 +84,7 @@ void submit_score(char* course_name, int score)
         return ;
     }
     
-	(*env)->CallStaticVoidMethod(env, mActivityClass, mid, course+1, score);
+	(*env)->CallStaticVoidMethod(env, mActivityClass, mid, course, score);
 #else
 	print_debug(DEBUG_OTHER, "");
 #endif
