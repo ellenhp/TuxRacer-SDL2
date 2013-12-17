@@ -199,7 +199,10 @@ tux_bind_font -binding loading -font trebuchet_outline -size 30 \
 			  -colour { 1.00 0.89 0.01 1.0 }
 			  
 tux_bind_font -binding leaderboard_text -font trebuchet_white -size 20
-tux_bind_font -binding race_selection_title -font trebuchet_white -size 40
+tux_bind_font -binding race_selection_title -font trebuchet_white -size 40 \
+			  -colour { 1.00 0.89 0.01 1.0 }
+tux_bind_font -binding race_selection_arrows -font trebuchet_white -size 60 \
+			  -colour { 1.00 0.89 0.01 1.0 }
 
 # HUD
 tux_load_texture herring_icon textures/herringicon.png 0
