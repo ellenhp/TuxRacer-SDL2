@@ -5,6 +5,7 @@
 
 #define RANK_USER 0
 #define SCOREBOARD_SIZE 10
+#define MAX_COURSES 50
 
 void refresh_scores();
 void refresh_scores_for_course(char* course);
@@ -19,5 +20,7 @@ void update_scoreboard_labels();
 widget_t* get_name_label(int rank);
 widget_t* get_score_label(int rank);
 widget_t* get_rank_label(int rank);
+
+void insert_score(char* course_name, char* name, int score);
 
 #endif
