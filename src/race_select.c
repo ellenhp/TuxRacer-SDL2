@@ -557,8 +557,8 @@ static void race_select_init(void)
      * Create text area 
      */
     desc_ta = textarea_create( make_point2d(
-		0.15*getparam_x_resolution(), 0.2*getparam_y_resolution()),
-		0.3*getparam_x_resolution(), 0.23*getparam_y_resolution(), "race_description", "" );
+		0.1*getparam_x_resolution(), 0.2*getparam_y_resolution()),
+		0.4*getparam_x_resolution(), 0.23*getparam_y_resolution(), "race_description", "" );
     
     textarea_set_visible( desc_ta, True );
     
