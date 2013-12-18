@@ -327,11 +327,7 @@ void check_gl_error()
     error = glGetError();
     if ( error != GL_NO_ERROR ) {
 	print_warning( CRITICAL_WARNING, 
-# ifdef TARGET_OS_IPHONE
 		       "OpenGL Error: %d", error
-# else
-		       "OpenGL Error: %s", gluErrorString( error )
-# endif
                );
 	fflush( stderr );
     }
