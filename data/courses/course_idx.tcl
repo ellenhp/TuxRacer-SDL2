@@ -54,13 +54,13 @@ tux_open_courses [concat \
     { \
     { \
         -course bunny_hill -name "Bunny Hill" \
-            -description "Use clever turning to conquer the Bunny Hill." \
+            -description "Use clever turning to conquer Bunny Hill." \
                     -par_time 40.0 \
                     -conditions sunny -no_speed \
     } \
     { \
         -course frozen_river -name "Frozen River" \
-            -description "Don't get stuck in the Frozen River !" \
+            -description "Don't get stuck in the Frozen River!" \
                     -par_time 80.0 \
                     -conditions sunny \
     } \
@@ -71,58 +71,58 @@ tux_open_courses [concat \
     } \
     { \
         -course bumpy_ride -name "Bumpy Ride" \
-            -description "This hill has a series of ramps tackle.  Make sure to line yourself up before getting airborne." \
+            -description "This hill has a series of ramps to tackle.  Make sure to line yourself up before getting airborne." \
                     -par_time 40.0 \
                     -conditions sunny -no_speed \
     } \
     { \
         -course penguins_cant_fly -name "Flying Penguins" \
-            -description "Go fast, and try to keep a bit of control to catch herrings !" \
+            -description "Go fast, and try to keep a bit of control to catch herrings!" \
                     -par_time 120.0 \
     } \
     { \
         -course slippy_slidey -name "Slippy Slidey" \
-            -description "Choose your way to be the best !" \
+            -description "Choose your way to be the best!" \
                     -par_time 120.0 \
                     -conditions sunny \
     } \
     { \
         -course chinese_wall -name "Chinese Wall" \
-            -description "Choose your way to be the best !" \
+            -description "Choose your way to be the best!" \
                     -par_time 120.0 \
                     -conditions sunny \
     } \
     { \
         -course bobsled_ride -name "Bobsled Ride" \
-            -description "Just like a real bobsled ride, only more dangerous !" \
+            -description "Just like a real bobsled ride, only more dangerous!" \
                     -par_time 80.0 -conditions sunny \
     } \
     { \
-        -course deadman -name "Dead Mans Drop" \
-            -description "Pretty tough hill. It's fast, steep, lumpy, twisty, and full of trees. Don't forget the drop." \
+        -course deadman -name "Dead Man's Drop" \
+            -description "A pretty tough hill. Fast, steep, lumpy, twisty, and full of trees. Don't forget the drop." \
                     -par_time 60.0 -conditions sunny \
     } \
     { \
         -course ski_jump -name "Ski Jump" \
-            -description "Try to get the longest flying time, make tricks, and to catch as many fishes as possible..." \
+            -description "Try to get the longest flying time. Do tricks to increase your score. Make sure to pick up herring too!" \
                     -par_time 40.0 \
                     -conditions evening -no_speed \
     } \
     { \
         -course Half_Pipe -name "Half Pipe" \
-            -description "Make tricks shaking the iPhone while jumping to earn points. Be carefull of the time remaining..." \
+            -description "Do tricks on this course to get a higher score. Make sure to watch the time remaining." \
                     -par_time 80.0 \
                     -conditions sunny -no_speed \
     } \
     { \
-        -course Off_Piste_Skiing -name "Off piste skiing" \
-            -description "Free-ride in the mountain ! Be careful to trees and use jumps to take shorters ways... Don't forget that stop paddling when speedometers becomes yellow if you want to increase your speed." \
+        -course Off_Piste_Skiing -name "Off-Piste Skiing" \
+            -description "Free-ride in the mountain! Be careful of trees and use jumps to take short paths." \
                     -par_time 120.0 \
                     -conditions evening \
     } \
     { \
-        -course in_search_of_vodka -name "In search of vodka" \
-            -description "Tux needs some vodka to warm up is cold belly. Alas, his liquor cabinet has been pillaged. Join Tux on the quest for vodka. Pick up herring for dinner along the way !" \
+        -course in_search_of_vodka -name "In Search of Vodka" \
+            -description "Tux needs some vodka to warm up is cold belly. Join Tux on the quest for vodka. Pick up herring for dinner along the way!" \
                     -par_time 120.0 \
                     -conditions night \
     } \
