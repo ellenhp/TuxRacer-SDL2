@@ -450,6 +450,9 @@ static void race_select_init(void)
 	winsys_add_js_axis_bindings();
 	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_A, SDLK_RETURN);
 	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_B, SDLK_ESCAPE);
+    
+	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_DPAD_LEFT, SDLK_LEFT);
+	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_DPAD_RIGHT, SDLK_RIGHT);
 
 	GameMenu_init();
 	setup_gui();
