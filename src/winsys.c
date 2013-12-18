@@ -969,6 +969,7 @@ void winsys_exit( int code )
     if ( atexit_func ) {
 	(*atexit_func)();
     }
+    SDL_DestroyWindow(window);
     exit( code );
 }
 
