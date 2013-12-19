@@ -121,14 +121,13 @@ void update_scoreboard_labels()
         if (scoreboard_names[course][rank])
         {
             button_set_text(name_labels[rank], scoreboard_names[course][rank]);
-            sprintf(buf, "%d", scoreboard_scores[course][rank]);
-            button_set_text(score_labels[rank], buf);
         }
         else
         {
             button_set_text(name_labels[rank], "----");
-            button_set_text(score_labels[rank], "0");
         }
+        sprintf(buf, "%d", scoreboard_scores[course][rank]);
+        button_set_text(score_labels[rank], buf);
     }
 }
 
