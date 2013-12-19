@@ -163,6 +163,7 @@ android/assets/*
 android/gen
 android/bin
 android/obj
+android/libs/x86
 android/libs/armeabi
 android/libs/armeabi-v7a
 android/libs/jni

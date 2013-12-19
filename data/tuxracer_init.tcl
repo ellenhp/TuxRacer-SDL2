@@ -158,10 +158,6 @@ tux_bind_font -binding button_label_hilit -font trebuchet_white -size 30 \
               -colour { 1.00 0.89 0.01 1.0 }
 tux_bind_font -binding button_label_disabled -font trebuchet_white -size 30 \
               -colour { 1.0 1.0 1.0 0.5 }
-tux_bind_font -binding instructions -font trebuchet_white -size 20 \
-			              -colour { 1.00 0.0 0.0 1.0 }
-tux_bind_font -binding instructions_button_label -font trebuchet_white -size 22
-tux_bind_font -binding instructions_button_label_hilit -font trebuchet_white -size 22 -colour { 1.00 0.89 0.01 1.0 }
 
 tux_bind_font -binding menu_label -font trebuchet_white -size 30
 tux_bind_font -binding course_name_label -font trebuchet_white -size 24 \
@@ -203,6 +199,11 @@ tux_bind_font -binding race_selection_title -font trebuchet_white -size 40 \
 			  -colour { 1.00 0.89 0.01 1.0 }
 tux_bind_font -binding race_selection_arrows -font trebuchet_white -size 60 \
 			  -colour { 1.00 0.89 0.01 1.0 }
+
+tux_load_texture trebuchet_red fonts/trebuchet_red.png 0
+tux_load_font -name trebuchet_red -file fonts/trebuchet.tfm \
+              -texture trebuchet_red
+tux_bind_font -binding instructions -font trebuchet_red -size 20
 
 # HUD
 tux_load_texture herring_icon textures/herringicon.png 0
