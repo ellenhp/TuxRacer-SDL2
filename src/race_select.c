@@ -450,6 +450,9 @@ static void race_select_init(void)
 	winsys_add_js_axis_bindings();
 	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_A, SDLK_RETURN);
 	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_B, SDLK_ESCAPE);
+    
+	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_DPAD_LEFT, SDLK_LEFT);
+	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_DPAD_RIGHT, SDLK_RIGHT);
 
 	GameMenu_init();
 	setup_gui();
@@ -554,8 +557,8 @@ static void race_select_init(void)
      * Create text area 
      */
     desc_ta = textarea_create( make_point2d(
-		0.15*getparam_x_resolution(), 0.2*getparam_y_resolution()),
-		0.3*getparam_x_resolution(), 0.23*getparam_y_resolution(), "race_description", "" );
+		0.1*getparam_x_resolution(), 0.2*getparam_y_resolution()),
+		0.4*getparam_x_resolution(), 0.23*getparam_y_resolution(), "race_description", "" );
     
     textarea_set_visible( desc_ta, True );
     

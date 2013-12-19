@@ -73,7 +73,6 @@ static point_t   tux_view_pt;
 void set_view_mode( player_data_t *plyr, view_mode_t mode )
 {
     plyr->view.mode = mode;
-    print_debug( DEBUG_VIEW, "View mode: %d", plyr->view.mode );
 } 
 
 view_mode_t get_view_mode( player_data_t *plyr )

@@ -352,9 +352,6 @@ void postload_course( char *course )
 
 void load_course_core( char *course )
 {
-#ifdef TR_DEBUG_MODE
-    uint64_t start_time = udate();
-#endif
     char buf[BUFF_LEN];
     char pre_script[BUFF_LEN];
     char script_buf[SCRIPT_MAXSIZE];
@@ -393,42 +390,17 @@ void load_course_core( char *course )
     check_assertion( !Tcl_InterpDeleted( g_game.tcl_interp ),
 		     "Tcl interpreter deleted" );
 
-#ifdef TR_DEBUG_MODE
-    TRDebugLog("(loading) Importing tcl took %dms\n", (int32_t)(((int64_t)udate() - (int64_t)start_time) / 1000000));
-    start_time = udate();
-#endif
-
     calc_normals(course);
-    
-#ifdef TR_DEBUG_MODE
-    TRDebugLog("(loading) Computing normal took %dms\n", (int32_t)(((int64_t)udate() - (int64_t)start_time) / 1000000));
-    start_time = udate();
-#endif
 
     /* flush unused audio files */
     delete_unused_audio_data();
-
-#ifdef TR_DEBUG_MODE
-    TRDebugLog("(loading) Flushing audio took %dms\n", (int32_t)(((int64_t)udate() - (int64_t)start_time) / 1000000));
-    start_time = udate();
-#endif
 
     init_course_quadtree( course, elevation, nx, ny, course_width/(nx-1.), 
 			  -course_length/(ny-1),
 			  g_game.player[local_player()].view.pos, 
 			  getparam_course_detail_level() );
 
-#ifdef TR_DEBUG_MODE
-    TRDebugLog("(loading) Init quad tree took %dms\n", (int32_t)(((int64_t)udate() - (int64_t)start_time) / 1000000));
-    start_time = udate();
-#endif
-
     init_track_marks();
-
-#ifdef TR_DEBUG_MODE
-    TRDebugLog("(loading) Init track marks took %dms\n", (int32_t)(((int64_t)udate() - (int64_t)start_time) / 1000000));
-    start_time = udate();
-#endif
 
 }
 

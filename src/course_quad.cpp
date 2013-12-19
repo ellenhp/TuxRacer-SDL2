@@ -131,10 +131,6 @@ extern "C" void init_course_quadtree( const char * course, scalar_t *elevation, 
     print_debug( DEBUG_QUADTREE, "nodes = %d\n", root->CountNodes());
     print_debug( DEBUG_QUADTREE, "max error = %g\n", root->RecomputeError(root_corner_data));
     
-#ifdef TR_DEBUG_MODE
-    uint64_t start_time = udate();
-#endif
-    
     // Get rid of unnecessary nodes in flat-ish areas.
     print_debug( DEBUG_QUADTREE, "Culling unnecessary nodes (detail factor = %d)...\n", CULL_DETAIL_FACTOR);
     root->StaticCullData(root_corner_data, CULL_DETAIL_FACTOR);

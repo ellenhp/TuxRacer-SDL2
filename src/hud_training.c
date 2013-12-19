@@ -271,7 +271,7 @@ static void draw_instructions(player_data_t *plyr)
 			}
 			else
 			{
-	            print_instruction(Localize("Press the Y button", ""),1);
+	            print_instruction(Localize("Press the \x02 button", ""),1);
 			}
             if(g_game.race_paused==True) step++;
             break;
@@ -313,8 +313,8 @@ static void draw_instructions(player_data_t *plyr)
 			}
 			else
 			{
-				print_instruction(Localize("Hold down the O button to accumulate enough", ""),1);
-				print_instruction(Localize("energy to jump.", ""),2);
+				print_instruction(Localize("Hold down \x01 to accumulate enough energy", ""),1);
+				print_instruction(Localize("to jump.", ""),2);
 			}
 			check_condition_for_time(False,0);
             if (plyr->control.jump_charging) step++;
@@ -328,7 +328,7 @@ static void draw_instructions(player_data_t *plyr)
 			}
             break;
         case 13:
-            print_instruction(Localize("Release the jump button to jump!", ""),1);
+            print_instruction(Localize("Release \x01 to jump!", ""),1);
             if (plyr->control.jumping) step++;
             break;
         case 14:
@@ -355,7 +355,7 @@ static void draw_instructions(player_data_t *plyr)
             break;
         case 17:
             training_pause_for_tutorial_explanation();
-            print_instruction(Localize("Thera are two main things you can do while", ""),1);
+            print_instruction(Localize("There are two main things you can do while", ""),1);
             print_instruction(Localize("you're in the air. First, you can try and", ""),2);
             print_instruction(Localize("do a cool trick. Second, you can accelerate", ""),3);
             print_instruction(Localize("to fly longer and go faster.", ""),4);
@@ -379,7 +379,7 @@ static void draw_instructions(player_data_t *plyr)
 			}
 			else
 			{
-				print_instruction(Localize("press the A button.", ""),3);
+				print_instruction(Localize("press the \x03 button.", ""),3);
 			}
 			plyr->tricks=0;
             if(training_is_resumed()) step++;
@@ -413,11 +413,11 @@ static void draw_instructions(player_data_t *plyr)
             if (check_condition_for_time( (bool_t)(plyr->control.is_flying && plyr->control.is_accelerating),1000)) step = -2;
             break;
         case -2:
-            print_instruction(Localize("Congratulations, you finished this tutorial.", ""),1);
-            print_instruction(Localize("You can apply these skills to different", ""),2);
-            print_instruction(Localize("courses. Sometimes you should focus on speed", ""),3);
-            print_instruction(Localize("and picking up food. Sometimes you have to", ""),4);
-            print_instruction(Localize("do tricks to get a good score.", ""),5);
+            print_instruction(Localize("Congratulations, you finished this tutorial.", ""),0);
+            print_instruction(Localize("You can apply these skills to different", ""),1);
+            print_instruction(Localize("courses. Sometimes you should focus on speed", ""),2);
+            print_instruction(Localize("and picking up food. Sometimes you have to", ""),3);
+            print_instruction(Localize("do tricks to get a good score.", ""),4);
             set_game_mode( GAME_OVER );
             break;
             						/* Fin du second Tutorial */ 
