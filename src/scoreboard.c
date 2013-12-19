@@ -19,6 +19,23 @@ widget_t* score_labels[SCOREBOARD_SIZE+1]={NULL};
 bool_t scoreboard_open=False;
 bool_t arrays_initialized=False;
 
+void init_scoreboard_arrays()
+{
+    int course, rank;
+    if (!arrays_initialized)
+    {
+        for (course=0; course<=get_num_courses(); course++)
+        {
+            for (rank=0; rank<=SCOREBOARD_SIZE; rank++)
+            {
+                scoreboard_names[course][rank]=0;
+                scoreboard_scores[course][rank]=0;
+            }
+        }
+        arrays_initialized=True;
+    }
+}
+
 #ifdef __ANDROID__
 JNIEXPORT jdouble JNICALL Java_com_moonlite_tuxracer_SDLActivity_nativeReceivedScores
 (JNIEnv * env, jobject jobj, jint course, jobjectArray name_array, jintArray score_array)
@@ -33,6 +50,7 @@ JNIEXPORT jdouble JNICALL Java_com_moonlite_tuxracer_SDLActivity_nativeReceivedS
 	{
 		loop_cutoff=len;
 	}
+    init_scoreboard_arrays();
 	for (i=0; i<loop_cutoff; i++)
 	{
 		tmp_jstring=(jstring)((*env)->GetObjectArrayElement(env, name_array, i));
@@ -51,7 +69,7 @@ JNIEXPORT jdouble JNICALL Java_com_moonlite_tuxracer_SDLActivity_nativeReceivedS
 
 		scoreboard_scores[course][i]=scores[i];
 	}
-	update_scoreboard_labels();
+    update_scoreboard_labels();
 }
 #endif
 
@@ -95,14 +113,7 @@ void init_scoreboard_labels()
 
 		score_labels[i]=create_label("0");
 	}
-	for (course=0; course<=get_num_courses(); course++)
-	{
-		for (rank=1; rank<=SCOREBOARD_SIZE; rank++)
-		{
-            scoreboard_names[course][rank]=0;
-            scoreboard_scores[course][rank]=0;
-		}
-	}
+    init_scoreboard_arrays();
 }
 
 void update_scoreboard_labels()
