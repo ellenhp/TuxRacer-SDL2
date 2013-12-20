@@ -38,8 +38,8 @@
 #define TIME_LABEL_X_OFFSET 12.0
 #define TIME_LABEL_Y_OFFSET 12.0
 
-#define TIME_X_OFFSET 30.0
-#define TIME_Y_OFFSET 5.0
+#define TIME_X_OFFSET 12.0
+#define TIME_Y_OFFSET 12.0
 
 #define SCORE_X_OFFSET 12.0
 #define SCORE_Y_OFFSET 12.0
@@ -74,6 +74,9 @@
 #define FPS_X_OFFSET 12
 #define FPS_Y_OFFSET 12
 
+#define USE_TIME_ICON
+#define TIME_ICON_SIZE (0.1*getparam_y_resolution())
+
 static GLfloat energy_background_color[] = { 0.2, 0.2, 0.2, 0.5 };
 static GLfloat energy_foreground_color[] = { 0.54, 0.59, 1.00, 0.5 };
 static GLfloat speedbar_background_color[] = { 0.2, 0.2, 0.2, 0.5 };
@@ -88,6 +91,8 @@ static void draw_time(player_data_t* plyr)
     char *binding;
     char buff[BUFF_LEN];
     scalar_t time_y_refval;
+    GLuint texobj;
+	int x_org, y_org;
 	
 	scalar_t time;
     //depending of the calculation mode, we want to display either the time spendt or the time remaining
@@ -110,72 +115,47 @@ static void draw_time(player_data_t* plyr)
     
     get_time_components( time, &minutes, &seconds, &hundredths );
 
-#ifdef USE_TIME_ICON
     /* display Time logo */
-    x_org = TIME_LOGO_X_OFFSET;
-#ifdef TARGET_OS_IPHONE
-    y_org = TIME_LOGO_Y_OFFSET;    
-#else
-    y_org = getparam_y_resolution() - TIME_LOGO_Y_OFFSET;
-#endif
+    x_org = OVERSCAN_MARGIN_X + TIME_X_OFFSET;
+    y_org = getparam_y_resolution() - OVERSCAN_MARGIN_Y - TIME_Y_OFFSET - TIME_ICON_SIZE;
+
     if ( !get_texture_binding( "time_icon", &texobj ) ) {
         texobj = 0;
     }
     
     glBindTexture( GL_TEXTURE_2D, texobj );
     
-    glBegin( GL_QUADS );
-    {
-        point2d_t tll, tur;
-        point2d_t ll, ur;
-        
-        ll = make_point2d( x_org, y_org);
-        ur = make_point2d( x_org + LOGO_WIDTH, y_org + LOGO_HEIGHT );
-        tll = make_point2d( 0, 0 );
-        tur = make_point2d(1, 1 );
-        
-        glTexCoord2f( tll.x, tll.y );
-        glVertex2f( ll.x, ll.y );
-        
-        glTexCoord2f( tur.x, tll.y );
-        glVertex2f( ur.x, ll.y );
-        
-        glTexCoord2f( tur.x, tur.y );
-        glVertex2f( ur.x, ur.y );
-        
-        glTexCoord2f( tll.x, tur.y );
-        glVertex2f( ll.x, ur.y );
-    }
-    glEnd();
-#else
-    binding = "time_label";
-
-    if ( ! get_font_binding( binding, &font ) ) {
-	print_warning( IMPORTANT_WARNING,
-		       "Couldn't get font for binding %s", binding );
-	return;
-    }
-
-    bind_font_texture( font );
-    set_gl_options( TEXFONT );
-
     glColor4f( 1, 1, 1, 1 );
 
-    string = "Time";
-
-    get_font_metrics( font, string, &w, &asc, &desc );
-
-    glPushMatrix();
     {
-	glTranslatef( TIME_LABEL_X_OFFSET + OVERSCAN_MARGIN_X, 
-		      getparam_y_resolution() - TIME_LABEL_Y_OFFSET - OVERSCAN_MARGIN_Y - 
-		      asc, 
-		      0 );
-	draw_string( font, string );
+		GLfloat vertices[]={
+			x_org, y_org, 0,
+			x_org + TIME_ICON_SIZE, y_org, 0,
+			x_org + TIME_ICON_SIZE, y_org + TIME_ICON_SIZE, 0,
+			x_org, y_org + TIME_ICON_SIZE, 0
+		};
+		GLfloat texcoords[]={
+			0, 0,
+			1, 0,
+			1, 1,
+			0, 1
+		};
+        
+		GLubyte indices[]={0, 1, 2, 2, 3, 0};
+		
+        glEnableClientState (GL_VERTEX_ARRAY);
+        glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+
+        glVertexPointer(3, GL_FLOAT , 0, vertices);	
+        glTexCoordPointer(2, GL_FLOAT, 0, texcoords);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
+		
+		glDisableClientState (GL_VERTEX_ARRAY);
+        glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+
     }
-    glPopMatrix();
-#endif
-    time_y_refval = getparam_y_resolution() - TIME_LABEL_Y_OFFSET - asc;
+
+    time_y_refval = getparam_y_resolution() - TIME_LABEL_Y_OFFSET;
 
     binding = "time_value";
 
@@ -195,7 +175,7 @@ static void draw_time(player_data_t* plyr)
 
     glPushMatrix();
     {
-	glTranslatef( TIME_X_OFFSET + OVERSCAN_MARGIN_X, 
+	glTranslatef( TIME_X_OFFSET + OVERSCAN_MARGIN_X + TIME_ICON_SIZE, 
 		      time_y_refval - TIME_Y_OFFSET - OVERSCAN_MARGIN_Y - asc, 
 		      0 );
 	draw_string( font, string );
@@ -217,7 +197,7 @@ static void draw_time(player_data_t* plyr)
 
     glPushMatrix();
     {
-	glTranslatef( TIME_X_OFFSET + OVERSCAN_MARGIN_X + w + 5, 
+	glTranslatef( TIME_X_OFFSET + OVERSCAN_MARGIN_X + w + 5 + TIME_ICON_SIZE, 
 		      time_y_refval - TIME_Y_OFFSET - OVERSCAN_MARGIN_Y,  
 		      0 );
 	get_font_metrics( font, string, &w, &asc, &desc );
