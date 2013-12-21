@@ -21,8 +21,8 @@ static char* course_names[]=
 	"bobsled_ride",
 	"deadman",
 	"ski_jump",
-	"Half_Pipe",
-	"Off_Piste_Skiing",
+	"half_pipe",
+	"off_piste_skiing",
 	"in_search_of_vodka",
 };
 
