@@ -109,13 +109,13 @@ tux_open_courses [concat \
                     -conditions evening -no_speed \
     } \
     { \
-        -course Half_Pipe -name "Half Pipe" \
+        -course half_pipe -name "Half Pipe" \
             -description "Do tricks on this course to get a higher score. Make sure to watch the time remaining." \
                     -par_time 80.0 \
                     -conditions sunny -no_speed \
     } \
     { \
-        -course Off_Piste_Skiing -name "Off-Piste Skiing" \
+        -course off_piste_skiing -name "Off-Piste Skiing" \
             -description "Free-ride in the mountain! Be careful of trees and use jumps to take short paths." \
                     -par_time 120.0 \
                     -conditions evening \
