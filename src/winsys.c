@@ -380,8 +380,8 @@ void winsys_init( int *argc, char **argv, char *window_title,
 	handle_error( 1, "Couldn't initialize SDL: %s", SDL_GetError() );
     }
 
-	initResult=IMG_Init( IMG_INIT_PNG & IMG_INIT_JPG ) & (IMG_INIT_PNG & IMG_INIT_JPG);
-    if (initResult != IMG_INIT_PNG & IMG_INIT_JPG) {
+	initResult=IMG_Init( IMG_INIT_PNG ) & (IMG_INIT_PNG);
+    if (initResult != IMG_INIT_PNG) {
 	handle_error( 1, "Couldn't initialize SDL_image: %s", IMG_GetError() );
     }
 
