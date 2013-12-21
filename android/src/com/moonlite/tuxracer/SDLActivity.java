@@ -289,9 +289,9 @@ public class SDLActivity extends Activity {
         Log.v("SDL", "onPause()");
         super.onPause();
         SDLActivity.handlePause();
-        if (agsClient != null) {
-            AmazonGamesClient.release();
-        }
+//        if (agsClient != null) {
+//            AmazonGamesClient.release();
+//        }
 	}
 
     @Override
@@ -299,7 +299,7 @@ public class SDLActivity extends Activity {
         Log.v("SDL", "onResume()");
         super.onResume();
         SDLActivity.handleResume();
-        AmazonGamesClient.initialize(this, callback, myGameFeatures);
+//        AmazonGamesClient.initialize(this, callback, myGameFeatures);
      }
 
 
@@ -328,6 +328,11 @@ public class SDLActivity extends Activity {
         // Send a quit message to the application
         SDLActivity.nativeQuit();
 
+        // Release Amazon Games Client
+        if (agsClient != null) {
+    	    AmazonGamesClient.release();
+      	}
+        
         // Now wait for the SDL thread to quit
         if (mSDLThread != null) {
             try {
