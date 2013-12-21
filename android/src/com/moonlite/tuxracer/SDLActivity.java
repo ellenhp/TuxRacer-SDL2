@@ -287,9 +287,9 @@ public class SDLActivity extends Activity {
         Log.v("SDL", "onPause()");
         super.onPause();
         SDLActivity.handlePause();
-//        if (agsClient != null) {
-//            AmazonGamesClient.release();
-//        }
+        if (agsClient != null) {
+            AmazonGamesClient.release();
+        }
 	}
 
     @Override
@@ -297,7 +297,7 @@ public class SDLActivity extends Activity {
         Log.v("SDL", "onResume()");
         super.onResume();
         SDLActivity.handleResume();
-//        AmazonGamesClient.initialize(this, callback, myGameFeatures);
+        AmazonGamesClient.initialize(this, callback, myGameFeatures);
      }
 
 
