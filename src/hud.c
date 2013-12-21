@@ -30,16 +30,17 @@
 #include "course_load.h"
 #include "bonus.h"
 #include "hud.h"
+#include "platform.h"
 
 #define HUD_SCALE(x)		winsys_scale(x)
 
 #define SECONDS_IN_MINUTE 60
 
 #define TIME_LABEL_X_OFFSET 12.0
-#define TIME_LABEL_Y_OFFSET 12.0
+#define TIME_LABEL_Y_OFFSET 18.0
 
-#define TIME_X_OFFSET 12.0
-#define TIME_Y_OFFSET 12.0
+#define TIME_X_OFFSET 8.0
+#define TIME_Y_OFFSET 8.0
 
 #define SCORE_X_OFFSET 12.0
 #define SCORE_Y_OFFSET 12.0
@@ -48,8 +49,8 @@
 #define HERRING_ICON_WIDTH HUD_SCALE(48.0)
 #define HERRING_ICON_IMG_SIZE HUD_SCALE(64.0)
 #define HERRING_ICON_X_OFFSET HUD_SCALE(160.0)
-#define HERRING_ICON_Y_OFFSET 41.0
-#define HERRING_COUNT_Y_OFFSET 37.0
+#define HERRING_ICON_Y_OFFSET 25.0
+#define HERRING_COUNT_Y_OFFSET 25.0
 
 #define GAUGE_IMG_SIZE HUD_SCALE(128)
 
@@ -297,15 +298,35 @@ static void draw_score( player_data_t *plyr )
     char buff[BUFF_LEN];
     char *string;
     char *binding;
+	int asc, desc, w;
     font_t *font;
     
     /* score calculation */
     int score = calculate_player_score(plyr);
     
-    //Use the same font as for FPS
-    binding = "fps";
-    
-    if ( !get_font_binding( binding, &font ) ) {
+    if ( !get_font_binding( "fps", &font ) ) {
+        print_warning( IMPORTANT_WARNING,
+                      "Couldn't get font for binding %s", binding );
+        return;
+    }
+
+	string="Score: ";
+
+	get_font_metrics(font, string, &w, &asc, &desc);
+
+    bind_font_texture( font );
+    set_gl_options( TEXFONT );
+    glColor4f( 1, 1, 1, 1 );
+    glPushMatrix();
+    {
+        glTranslatef( SCORE_X_OFFSET + OVERSCAN_MARGIN_X,
+                     SCORE_Y_OFFSET + OVERSCAN_MARGIN_Y,
+                     0 );
+        draw_string( font, string );
+    }
+    glPopMatrix();
+
+    if ( !get_font_binding( "fps_big", &font ) ) {
         print_warning( IMPORTANT_WARNING,
                       "Couldn't get font for binding %s", binding );
         return;
@@ -315,12 +336,12 @@ static void draw_score( player_data_t *plyr )
     set_gl_options( TEXFONT );
     glColor4f( 1, 1, 1, 1 );
     
-    sprintf( buff, "Score: %d",score );
+    sprintf( buff, "%d",score );
     string = buff;
     
     glPushMatrix();
     {
-        glTranslatef( SCORE_X_OFFSET + OVERSCAN_MARGIN_X,
+        glTranslatef( SCORE_X_OFFSET + OVERSCAN_MARGIN_X + w,
                      SCORE_Y_OFFSET + OVERSCAN_MARGIN_Y,
                      0 );
         draw_string( font, string );
@@ -614,7 +635,8 @@ void print_fps()
     char buff[BUFF_LEN];
     char *string;
     char *binding;
-    font_t *font;
+    font_t *font, *font_big;
+	int x, y;
 	int w, asc, desc;
 
     /* This is needed since this can be called from outside */
@@ -624,32 +646,100 @@ void print_fps()
 	return;
     }
 
-    binding = "fps";
-    if ( !get_font_binding( binding, &font ) ) {
+    if ( !get_font_binding( "fps", &font ) ) {
 	print_warning( IMPORTANT_WARNING,
 		       "Couldn't get font for binding %s", binding );
 	return;
     }
 
+    if ( !get_font_binding( "fps_big", &font_big ) ) {
+	print_warning( IMPORTANT_WARNING,
+		       "Couldn't get font for binding %s", binding );
+	return;
+    }
 
-    bind_font_texture( font );
+    bind_font_texture( font_big );
     set_gl_options( TEXFONT );
-
     glColor4f( 1, 1, 1, 1 );
 
-    sprintf( buff, "FPS: %.1f", get_fps() );
-	get_font_metrics(font, buff, &w, &asc, &desc);
+    sprintf( buff, "%.1f", get_fps() );
+	get_font_metrics(font_big, buff, &w, &asc, &desc);
+	y=asc+desc;
+	get_font_metrics(font, "FPS: ", &w, &asc, &desc);
+	x=w;
     string = buff;
 
     glPushMatrix();
     {
 	glTranslatef( FPS_X_OFFSET+OVERSCAN_MARGIN_X,
-		      FPS_Y_OFFSET+OVERSCAN_MARGIN_Y+asc+desc,
+		      FPS_Y_OFFSET+OVERSCAN_MARGIN_Y+y,
 		      0 );
-	draw_string( font, string );
+	draw_string( font, "FPS: " );
     }
     glPopMatrix();
 
+    glPushMatrix();
+    {
+	glTranslatef( FPS_X_OFFSET+OVERSCAN_MARGIN_X+x,
+		      FPS_Y_OFFSET+OVERSCAN_MARGIN_Y+y,
+		      0 );
+	draw_string( font_big, string );
+    }
+    glPopMatrix();
+
+	/*
+	char buff[BUFF_LEN];
+    char *string;
+    char *binding;
+	int asc, desc, w;
+    font_t *font, font_big;
+    
+    int score = calculate_player_score(plyr);
+    
+    if ( !get_font_binding( "fps", &font ) ) {
+        print_warning( IMPORTANT_WARNING,
+                      "Couldn't get font for binding %s", binding );
+        return;
+    }
+
+	string="Score: ";
+
+	get_font_metrics(font, string, &w, &asc, &desc);
+
+    bind_font_texture( font );
+    set_gl_options( TEXFONT );
+    glColor4f( 1, 1, 1, 1 );
+    glPushMatrix();
+    {
+        glTranslatef( SCORE_X_OFFSET + OVERSCAN_MARGIN_X,
+                     SCORE_Y_OFFSET + OVERSCAN_MARGIN_Y,
+                     0 );
+        draw_string( font, string );
+    }
+    glPopMatrix();
+
+    if ( !get_font_binding( "fps_big", &font ) ) {
+        print_warning( IMPORTANT_WARNING,
+                      "Couldn't get font for binding %s", binding );
+        return;
+    }
+    
+    bind_font_texture( font );
+    set_gl_options( TEXFONT );
+    glColor4f( 1, 1, 1, 1 );
+    
+    sprintf( buff, "%d",score );
+    string = buff;
+    
+    glPushMatrix();
+    {
+        glTranslatef( SCORE_X_OFFSET + OVERSCAN_MARGIN_X + w,
+                     SCORE_Y_OFFSET + OVERSCAN_MARGIN_Y,
+                     0 );
+        draw_string( font, string );
+    }
+    glPopMatrix();
+	*/
 }
 
 void draw_hud( player_data_t *plyr )

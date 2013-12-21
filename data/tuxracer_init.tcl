@@ -145,7 +145,9 @@ tux_bind_font -binding speed_digits -font trebuchet_outline -size 35 \
 			  -colour { 1.00 0.89 0.01 1.0 }
 tux_bind_font -binding speed_units -font trebuchet_outline -size 20 \
 			  -colour { 1.00 0.89 0.01 1.0 }
-tux_bind_font -binding fps -font trebuchet_outline -size 20 \
+tux_bind_font -binding fps -font trebuchet_outline -size 25 \
+			  -colour { 1.00 0.89 0.01 1.0 }
+tux_bind_font -binding fps_big -font trebuchet_outline -size 30 \
 			  -colour { 1.00 0.89 0.01 1.0 }
 
 tux_load_texture trebuchet_white fonts/trebuchet_white.png 0
