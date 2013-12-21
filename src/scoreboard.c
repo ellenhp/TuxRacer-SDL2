@@ -1,4 +1,5 @@
 #include "scoreboard.h"
+#include "course_mgr.h"
 #include "tuxracer.h"
 #include "gui_label.h"
 #include "platform.h"
@@ -9,6 +10,7 @@
 #include <jni.h>
 #endif
 
+char* scoreboard_courses[MAX_COURSES]={NULL};
 char* scoreboard_names[MAX_COURSES][SCOREBOARD_SIZE+1]={NULL};
 int scoreboard_scores[MAX_COURSES][SCOREBOARD_SIZE+1]={NULL};
 
@@ -22,14 +24,26 @@ bool_t arrays_initialized=False;
 void init_scoreboard_arrays()
 {
     int course, rank;
+    list_t course_list=get_score_courses_list();
+    list_elem_t cur_elem=get_list_head(course_list);
     if (!arrays_initialized)
     {
-        for (course=0; course<=get_num_courses(); course++)
+        for (course=0; course<MAX_COURSES; course++)
         {
+            open_course_data_t *data;
+            data = (open_course_data_t*) get_list_elem_data(cur_elem);
+            scoreboard_courses[course]=(char*)malloc(strlen(data->course)+1);
+            strcpy(scoreboard_courses[course], data->course);
+            scoreboard_courses[course][strlen(data->course)]=0;
             for (rank=0; rank<=SCOREBOARD_SIZE; rank++)
             {
                 scoreboard_names[course][rank]=0;
                 scoreboard_scores[course][rank]=0;
+            }
+            cur_elem=(open_course_data_t*) get_next_list_elem(course_list, cur_elem);
+            if (!cur_elem)
+            {
+                break;
             }
         }
         arrays_initialized=True;
@@ -38,7 +52,7 @@ void init_scoreboard_arrays()
 
 #ifdef __ANDROID__
 JNIEXPORT jdouble JNICALL Java_com_moonlite_tuxracer_SDLActivity_nativeReceivedScores
-(JNIEnv * env, jobject jobj, jint course, jobjectArray name_array, jintArray score_array)
+(JNIEnv * env, jobject jobj, jstring course_name_jstring, jobjectArray name_array, jintArray score_array)
 {
 	jsize len = (*env)->GetArrayLength(env, score_array);
 	jint* scores = (*env)->GetIntArrayElements(env, score_array, 0);
@@ -46,6 +60,23 @@ JNIEXPORT jdouble JNICALL Java_com_moonlite_tuxracer_SDLActivity_nativeReceivedS
 	jstring tmp_jstring;
 	char* name;
 	int loop_cutoff=SCOREBOARD_SIZE+1;
+    int course;
+    char* course_name=(*env)->GetStringUTFChars(env, course_name_jstring, 0);
+    for (course=0; course<MAX_COURSES; course++)
+    {
+        if (!scoreboard_courses[course])
+        {
+            continue;
+        }
+        if (strcmp(scoreboard_courses[course], course_name)==0)
+        {
+            break;
+        }
+    }
+    if (course==MAX_COURSES)
+    {
+        return;
+    }
 	if (len<SCOREBOARD_SIZE+1)
 	{
 		loop_cutoff=len;
@@ -69,6 +100,7 @@ JNIEXPORT jdouble JNICALL Java_com_moonlite_tuxracer_SDLActivity_nativeReceivedS
 
 		scoreboard_scores[course][i]=scores[i];
 	}
+    (*env)->ReleaseStringUTFChars(env, course_name_jstring, course_name);
     update_scoreboard_labels();
 }
 #endif
@@ -120,11 +152,26 @@ void update_scoreboard_labels()
 {
 	char buf[10];
 	int course, rank;
+    int i;
     if (!scoreboard_open)
     {
         return;
     }
-    course=get_current_course_index();
+    for (i=0; i<MAX_COURSES; i++)
+    {
+        if (strcmp(scoreboard_courses[i], get_current_course_name())==0)
+        {
+            break;
+        }
+    }
+    if (i==MAX_COURSES)
+    {
+        return;
+    }
+    else
+    {
+        course=i;
+    }
     for (rank=0; rank<=SCOREBOARD_SIZE; rank++)
     {
         sprintf(buf, "%d", rank+1);

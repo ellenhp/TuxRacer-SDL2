@@ -27,7 +27,7 @@ extern "C"
 
 #include "tuxracer.h"
 
-int get_current_course_index();
+    char* get_current_course_name();
 
 void race_select_register();
 

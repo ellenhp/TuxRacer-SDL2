@@ -98,11 +98,6 @@ tux_open_courses [concat \
                     -par_time 80.0 -conditions sunny \
     } \
     { \
-        -course deadman -name "Dead Man's Drop" \
-            -description "A pretty tough hill. Fast, steep, lumpy, twisty, and full of trees. Don't forget the drop." \
-                    -par_time 60.0 -conditions sunny \
-    } \
-    { \
         -course ski_jump -name "Ski Jump" \
             -description "Try to get the longest flying time. Do tricks to increase your score. Make sure to pick up herring too!" \
                     -par_time 40.0 \

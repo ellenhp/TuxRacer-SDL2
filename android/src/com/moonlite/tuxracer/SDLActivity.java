@@ -81,7 +81,7 @@ public class SDLActivity extends Activity {
             Log.i(TAG, "onServiceReady");
             getPlayerAlias();
             agsClient = amazonGamesClient;
-        	SDLActivity.RequestScores(-1);
+        	SDLActivity.RequestScores("");
             //ready to use GameCircle
             AmazonGamesClient.getWhispersyncClient().setWhispersyncEventListener(new WhispersyncEventListener() {
                 public void onNewCloudData() {
@@ -136,14 +136,14 @@ public class SDLActivity extends Activity {
 
     }
 
-    public static void PostScore(int course, int score)
+    public static void PostScore(String course, int score)
     {
     	class PostScoreResponse implements AGResponseCallback<SubmitScoreResponse>
 		{
-    		int mCourse;
-        	public PostScoreResponse(int courseIndex)
+    		String mCourse;
+        	public PostScoreResponse(String courseId)
         	{
-        		mCourse=courseIndex;
+        		mCourse=courseId;
         	}
             public void onComplete(SubmitScoreResponse result) {
                 Log.i(TAG, "getNewRank() = " + result.getNewRank());
@@ -151,13 +151,13 @@ public class SDLActivity extends Activity {
                 RequestScores(mCourse);
             }
         }
+        Log.i(TAG, "submit score of "+score+" on course " + course);
         LeaderboardsClient lbClient = agsClient.getLeaderboardsClient();
-        String scoreId = String.format("HI_SCORE_%02d", course+1);
-        AGResponseHandle<SubmitScoreResponse> handle = lbClient.submitScore(scoreId, score);
+        AGResponseHandle<SubmitScoreResponse> handle = lbClient.submitScore(course, score);
         handle.setCallback(new PostScoreResponse(course));
     }
 
-    public static void RequestScores(int course)
+    public static void RequestScores(String course)
     {
     	class ScoreResponseHandler  
     	{
@@ -200,8 +200,7 @@ public class SDLActivity extends Activity {
     			{
     				return;
     			}
-    	    	String courseId=topScores.getLeaderboardId().replaceAll("[^\\d.]", "");
-    			nativeReceivedScores(Integer.parseInt(courseId)-1, names, scores);
+    			nativeReceivedScores(topScores.getLeaderboardId(), names, scores);
     		}
     	}
     	class RefreshAllLeaderboardsHandler implements AGResponseCallback<GetLeaderboardsResponse>
@@ -225,19 +224,18 @@ public class SDLActivity extends Activity {
 			}
     	}
         LeaderboardsClient lbClient = agsClient.getLeaderboardsClient();
-        if (course==-1)
+        if (course.equals(""))
         {
         	lbClient.getLeaderboards().setCallback(new RefreshAllLeaderboardsHandler());
         }
         else
         {
-            String scoreId = String.format("HI_SCORE_%02d", course+1);
         	ScoreResponseHandler responseHandler=new ScoreResponseHandler();
         	
-            AGResponseHandle<GetScoresResponse> topHandle = lbClient.getScores(scoreId, LeaderboardFilter.GLOBAL_ALL_TIME, (Object[])null);
+            AGResponseHandle<GetScoresResponse> topHandle = lbClient.getScores(course, LeaderboardFilter.GLOBAL_ALL_TIME, (Object[])null);
             topHandle.setCallback(responseHandler.topHandler);
             
-            AGResponseHandle<GetPlayerScoreResponse> playerHandle = lbClient.getLocalPlayerScore(scoreId, LeaderboardFilter.GLOBAL_ALL_TIME, (Object[])null);
+            AGResponseHandle<GetPlayerScoreResponse> playerHandle = lbClient.getLocalPlayerScore(course, LeaderboardFilter.GLOBAL_ALL_TIME, (Object[])null);
             playerHandle.setCallback(responseHandler.playerHandler);
         }
     }
@@ -478,7 +476,7 @@ public class SDLActivity extends Activity {
     public static native void nativePause();
     public static native void nativeResume();
     public static native void nativeSetPlayerData(String playerName, boolean isOnOuya);
-    public static native void nativeReceivedScores(int course, String[] names, int[] scores);
+    public static native void nativeReceivedScores(String course, String[] names, int[] scores);
     public static native void onNativeResize(int x, int y, int format);
     public static native void onNativePadDown(int padId, int keycode);
     public static native void onNativePadUp(int padId, int keycode);

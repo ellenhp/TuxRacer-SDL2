@@ -90,11 +90,11 @@ static widget_t* back_button=NULL;
 /* Forward declaration */
 static void race_select_loop( scalar_t time_step );
 
-int get_current_course_index()
+char* get_current_course_name()
 {
     open_course_data_t *data;
     data = (open_course_data_t*) get_list_elem_data( cur_elem );
-    return get_course_index(data->course);
+    return data->course;
 }
 
 /*---------------------------------------------------------------------------*/

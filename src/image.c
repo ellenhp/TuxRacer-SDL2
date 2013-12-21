@@ -47,6 +47,7 @@ SDL_Surface* ImageLoad(const char *filename)
 	if (!image) {
 		handle_error(1, "Error loading image: %s", filename);
 	}
+	print_debug(DEBUG_OTHER, "%d, %d", image->flags, image->format->format);
 	flipSurface(image);
 	return image;
 }

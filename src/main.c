@@ -333,6 +333,8 @@ int main( int argc, char **argv )
 
     init_keyboard();
     
+    init_scoreboard_arrays();
+    
 	/* Hide system cursor (arrow) we draw custom cursor */
     winsys_show_cursor( False );
 

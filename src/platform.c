@@ -9,23 +9,6 @@ static int overscan_percent=0;
 static char* player_name=0;
 static bool_t is_on_ouya=False;
 
-static char* course_names[]=
-{
-	"bunny_hill",
-	"frozen_river",
-	"twisty_slope",
-	"bumpy_ride",
-	"penguins_cant_fly",
-	"slippy_slidey",
-	"chinese_wall",
-	"bobsled_ride",
-	"deadman",
-	"ski_jump",
-	"half_pipe",
-	"off_piste_skiing",
-	"in_search_of_vodka",
-};
-
 #ifdef __ANDROID__
 JNIEXPORT jdouble JNICALL Java_com_moonlite_tuxracer_SDLActivity_nativeSetPlayerData
 (JNIEnv * env, jobject jobj, jstring path, jboolean on_ouya)
@@ -50,36 +33,19 @@ JNIEXPORT jdouble JNICALL Java_com_moonlite_tuxracer_SDLActivity_nativeSetPlayer
 }
 #endif
 
-int get_course_index(char* course_name)
-{
-	int i;
-	for (i=0; i<sizeof(course_names)/sizeof(course_names[0]); i++)
-	{
-		if (strcmp(course_names[i], course_name)==0)
-		{
-			return i;
-		}
-	}
-	return -1;
-}
-
-int get_num_courses()
-{
-	return sizeof(course_names)/sizeof(char*);
-}
-
 void submit_score(char* course_name, int score)
 {
-	int course=get_course_index(course_name);
 #ifdef __ANDROID__
 	JNIEnv* env = Android_JNI_GetEnv();
     if (!env) {
         return;
     }
+
+    jstring course=(*env)->NewStringUTF(env, course_name);
     
 	jclass mActivityClass = (*env)->FindClass(env, "com/moonlite/tuxracer/SDLActivity");
 
-    jmethodID mid = (*env)->GetStaticMethodID(env, mActivityClass, "PostScore", "(II)V");
+    jmethodID mid = (*env)->GetStaticMethodID(env, mActivityClass, "PostScore", "(Ljava/lang/String;I)V");
     if (!mid) {
         return ;
     }
