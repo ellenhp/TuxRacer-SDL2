@@ -287,9 +287,10 @@ public class SDLActivity extends Activity {
         Log.v("SDL", "onPause()");
         super.onPause();
         SDLActivity.handlePause();
-        if (agsClient != null) {
-            AmazonGamesClient.release();
-        }
+		// Don't do this here even though its recommended seems to cause problems on OUYA
+//        if (agsClient != null) {
+//            AmazonGamesClient.release();
+//        }
 	}
 
     @Override
@@ -297,7 +298,8 @@ public class SDLActivity extends Activity {
         Log.v("SDL", "onResume()");
         super.onResume();
         SDLActivity.handleResume();
-        AmazonGamesClient.initialize(this, callback, myGameFeatures);
+		// Don't do this here even though its recommended seems to cause problems on OUYA
+//        AmazonGamesClient.initialize(this, callback, myGameFeatures);
      }
 
 
