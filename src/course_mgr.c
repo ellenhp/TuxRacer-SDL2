@@ -638,9 +638,9 @@ static int open_courses_cb( ClientData cd, Tcl_Interp *ip,
         data = create_open_course_data( ip, list[i], &err_msg );
 
 #ifdef __ANDROID__
-		sprintf(preview_file, "courses/%s/preview.png", data->course);
+		sprintf(preview_file, "courses/%s/preview.jpg", data->course);
 #else
-		sprintf(preview_file, "%s/courses/%s/preview.png", getparam_data_dir(), data->course);
+		sprintf(preview_file, "%s/courses/%s/preview.jpg", getparam_data_dir(), data->course);
 #endif
 
 		load_texture(data->course, preview_file, 1);
