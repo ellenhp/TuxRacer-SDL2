@@ -54,7 +54,7 @@ tux_open_courses [concat \
     { \
     { \
         -course bunny_hill -name "Bunny Hill" \
-            -description "Use clever turning to conquer Bunny Hill." \
+            -description "Use clever turning to conquer Bunny Hill.  Eat all the herring to earn a higher score!" \
                     -par_time 40.0 \
                     -conditions sunny -no_speed \
     } \
