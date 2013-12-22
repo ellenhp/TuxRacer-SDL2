@@ -46,7 +46,6 @@
 #include "ui_mgr.h"
 #include "course_mgr.h"
 #include "game_type_select.h"
-#include "splash_screen.h"
 #ifdef SPEED_MODE
     #include "racing_mode_select.h"
 #endif
@@ -316,7 +315,6 @@ int main( int argc, char **argv )
     paused_register();
     reset_register();
     game_type_select_register();
-	splash_screen_register();
 #ifdef SPEED_MODE
     racing_mode_select_register();
 #endif
@@ -327,7 +325,7 @@ int main( int argc, char **argv )
     loading_register();
 
     g_game.mode = NO_MODE;
-    set_game_mode( SPLASH );
+    set_game_mode( GAME_TYPE_SELECT );
 
     g_game.difficulty = DIFFICULTY_LEVEL_NORMAL;
 

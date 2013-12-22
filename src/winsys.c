@@ -350,6 +350,7 @@ int winsys_event_filter(void* userdata, SDL_Event* event)
         mute_audio();
         return 0;
 	case SDL_APP_WILLENTERFOREGROUND:
+		init_ui_snow();
         unmute_audio();
 		return 0;
 	case SDL_APP_TERMINATING:
