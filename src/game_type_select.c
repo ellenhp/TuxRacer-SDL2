@@ -110,6 +110,8 @@ static void game_type_select_init(void)
 {
     point2d_t dummy_pos = {0, 0};
 
+    init_ui_snow();
+
     winsys_set_display_func( main_loop );
     winsys_set_idle_func( main_loop );
     winsys_set_reshape_func( reshape );
