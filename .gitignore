@@ -159,7 +159,12 @@ data/config/options.txt
 # DLL
 *.dll
 
-android/assets/*
+android/assets/config/*
+android/assets/courses/*
+android/assets/fonts/*
+android/assets/music/*
+android/assets/sounds/*
+android/assets/textures/*
 android/gen
 android/bin
 android/obj
