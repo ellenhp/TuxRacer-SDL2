@@ -29,7 +29,7 @@
 #define MIN_CAMERA_HEIGHT  1.5
 
 /* Absolute lower bound on camera height above terrain (m) */
-#define ABSOLUTE_MIN_CAMERA_HEIGHT  0.3
+#define ABSOLUTE_MIN_CAMERA_HEIGHT  1
 
 /* Distance of camera from player (m) */
 #define CAMERA_DISTANCE 4.0
