@@ -10,6 +10,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsoluteLayout;
+import android.widget.FrameLayout;
 import android.os.*;
 import android.util.Log;
 import android.graphics.*;
@@ -47,6 +48,8 @@ public class SDLActivity extends Activity {
 
     // Keep track of the paused state
     public static boolean mIsPaused = false, mIsSurfaceReady = false, mHasFocus = true;
+    
+    public static float scaleFactor=1;
 
     // Main components
     protected static SDLActivity mSingleton;
@@ -267,8 +270,13 @@ public class SDLActivity extends Activity {
 
         // Set up the surface
         mSurface = new SDLSurface(getApplication(), getWindowManager().getDefaultDisplay().getRotation());
+        Point size=new Point();
+        getWindowManager().getDefaultDisplay().getSize(size);
+        size.x*=scaleFactor;
+        size.y*=scaleFactor;
+        mSurface.getHolder().setFixedSize(size.x, size.y);
 
-        mLayout = new AbsoluteLayout(this);
+        mLayout = new FrameLayout(this);
         mLayout.addView(mSurface);
 
         setContentView(mLayout);
@@ -917,32 +925,37 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
     // Touch events
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-             final int touchDevId = event.getDeviceId();
-             final int pointerCount = event.getPointerCount();
-             // touchId, pointerId, action, x, y, pressure
-             int actionPointerIndex = (event.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT; /* API 8: event.getActionIndex(); */
-             int pointerFingerId = event.getPointerId(actionPointerIndex);
-             int action = (event.getAction() & MotionEvent.ACTION_MASK); /* API 8: event.getActionMasked(); */
-
-             float x = event.getX(actionPointerIndex) / mWidth;
-             float y = event.getY(actionPointerIndex) / mHeight;
-             float p = event.getPressure(actionPointerIndex);
-
-             if (action == MotionEvent.ACTION_MOVE && pointerCount > 1) {
-                // TODO send motion to every pointer if its position has
-                // changed since prev event.
-                for (int i = 0; i < pointerCount; i++) {
-                    pointerFingerId = event.getPointerId(i);
-                    x = event.getX(i) / mWidth;
-                    y = event.getY(i) / mHeight;
-                    p = event.getPressure(i);
-                    SDLActivity.onNativeTouch(touchDevId, pointerFingerId, action, x, y, p);
-                }
-             } else {
-                SDLActivity.onNativeTouch(touchDevId, pointerFingerId, action, x, y, p);
-             }
-      return true;
-   } 
+    	float screenWidth=mWidth/SDLActivity.scaleFactor, screenHeight=mHeight/SDLActivity.scaleFactor;
+		final int touchDevId = event.getDeviceId();
+		final int pointerCount = event.getPointerCount();
+		// touchId, pointerId, action, x, y, pressure
+		int actionPointerIndex = (event.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT; /* API 8: event.getActionIndex(); */
+		int pointerFingerId = event.getPointerId(actionPointerIndex);
+		int action = (event.getAction() & MotionEvent.ACTION_MASK); /* API 8: event.getActionMasked(); */
+		
+		float x = event.getX(actionPointerIndex) / screenWidth;
+		float y = event.getY(actionPointerIndex) / screenHeight;
+		float p = event.getPressure(actionPointerIndex);
+		
+		if (action == MotionEvent.ACTION_MOVE && pointerCount > 1)
+		{
+			// TODO send motion to every pointer if its position has
+			// changed since prev event.
+			for (int i = 0; i < pointerCount; i++)
+			{
+				pointerFingerId = event.getPointerId(i);
+				x = event.getX(i) / screenWidth;
+				y = event.getY(i) / screenHeight;
+				p = event.getPressure(i);
+				SDLActivity.onNativeTouch(touchDevId, pointerFingerId, action, x, y, p);
+			}
+		}
+		else
+		{
+			SDLActivity.onNativeTouch(touchDevId, pointerFingerId, action, x, y, p);
+		}
+		return true;
+	} 
 
     // Sensor events
     public void enableSensor(int sensortype, boolean enabled) {
