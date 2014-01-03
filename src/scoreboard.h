@@ -10,8 +10,9 @@
 
 extern bool_t scoreboard_open;
 
-void refresh_scores();
-void refresh_scores_for_course(char* course);
+void refresh_scores_for_course(const char* course);
+
+void submit_score(const char* course, int course_score);
 
 void init_scoreboard_labels();
 void update_scoreboard_labels();
@@ -24,6 +25,6 @@ widget_t* get_name_label(int rank);
 widget_t* get_score_label(int rank);
 widget_t* get_rank_label(int rank);
 
-void insert_score(char* course_name, char* name, int score);
+void insert_score(const char* course_name, char* name, int score);
 
 #endif

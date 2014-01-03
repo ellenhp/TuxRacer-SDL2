@@ -121,7 +121,7 @@ static char* get_name_from_race_data( list_elem_data_t elem )
  */
 void update_race_data( void )
 {
-    int i;
+    int i, course_index;
     
     if ( g_game.practicing ) {
         open_course_data_t *data;
@@ -324,18 +324,22 @@ static void draw_preview()
 
 void update_text()
 {
+	
     if ( g_game.practicing ) {
         open_course_data_t *data;
         data = (open_course_data_t*) get_list_elem_data( cur_elem );
         textarea_set_text( desc_ta, data->description );
 		button_set_text(course_title_label, data->name);
+		SDL_Log("update_text practice=%s", data->course);
+		refresh_scores_for_course(data->course);
     } else {
         race_data_t *data;
         data = (race_data_t*) get_list_elem_data( cur_elem );
         textarea_set_text( desc_ta, data->description );
 		button_set_text(course_title_label, data->name);
+		SDL_Log("update_text race=%s", data->course);
+		refresh_scores_for_course(data->course);
     }
-    update_scoreboard_labels();
 }
 
 void play_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type, widget_t* widget)

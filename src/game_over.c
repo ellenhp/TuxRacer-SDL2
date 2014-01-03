@@ -46,7 +46,7 @@
 #include "game_over.h"
 #include "bonus.h"
 #include "gui_abstraction.h"
-#include "platform.h"
+#include "scoreboard.h"
 
 #define NEXT_MODE RACE_SELECT
 #define GAME_OVER_DISPLAY_TICKS 1000

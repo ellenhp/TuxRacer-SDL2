@@ -22,22 +22,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.ArrayList;
 
-import com.amazon.ags.api.*;
-import com.amazon.ags.api.achievements.AchievementsClient;
-import com.amazon.ags.api.achievements.UpdateProgressResponse;
-import com.amazon.ags.api.leaderboards.GetLeaderboardsResponse;
-import com.amazon.ags.api.leaderboards.GetPlayerScoreResponse;
-import com.amazon.ags.api.leaderboards.GetScoresResponse;
-import com.amazon.ags.api.leaderboards.LeaderboardsClient;
-import com.amazon.ags.api.leaderboards.Score;
-import com.amazon.ags.api.leaderboards.SubmitScoreResponse;
-import com.amazon.ags.api.profiles.RequestPlayerProfileResponse;
-import com.amazon.ags.api.whispersync.GameDataMap;
-import com.amazon.ags.api.whispersync.WhispersyncEventListener;
-import com.amazon.ags.api.whispersync.model.SyncableNumber;
-import com.amazon.ags.constants.LeaderboardFilter;
-import com.amazon.ags.constants.ScoreFormat;
-
 import tv.ouya.console.api.*;
 
 /**
@@ -67,187 +51,8 @@ public class SDLActivity extends Activity {
     protected static Thread mAudioThread;
     protected static AudioTrack mAudioTrack;
 	
-	    //reference to the agsClient
-    static AmazonGamesClient agsClient;
-	
     private static SDLActivity myActivity;
 
-    AmazonGamesCallback callback = new AmazonGamesCallback() {
-        @Override
-        public void onServiceNotReady(AmazonGamesStatus status) {
-            //unable to use service
-            Log.e(TAG, "onServiceNotReady");
-        }
-
-        @Override
-        public void onServiceReady(AmazonGamesClient amazonGamesClient) {
-            Log.i(TAG, "onServiceReady");
-            getPlayerAlias();
-            agsClient = amazonGamesClient;
-        	SDLActivity.RequestScores("");
-            //ready to use GameCircle
-            AmazonGamesClient.getWhispersyncClient().setWhispersyncEventListener(new WhispersyncEventListener() {
-                public void onNewCloudData() {
-                    // refresh visible game data
-                    Log.i(TAG, "onNewCloudData");
-                    GameDataMap gameDataMap = AmazonGamesClient.getWhispersyncClient().getGameData();
-                    SyncableNumber highScore = gameDataMap.getHighestNumber("highScore");
-                    Log.i(TAG, "highScore.isSet() = " + highScore.isSet());
-                    if (highScore.isSet()) {
-                        Log.i(TAG, "highScore.asLong() = " + highScore.asLong());
-                    }
-                }
-
-                // The following three methods are mainly useful for debugging purposes and don't have to be overridden
-
-                public void onDataUploadedToCloud() {
-                    Log.i(TAG, "onDataUploadedToCloud");
-                }
-
-                public void onThrottled() {
-                    Log.i(TAG, "onThrottled");
-                }
-
-                public void onDiskWriteComplete() {
-                    Log.i(TAG, "onDiskWriteComplete");
-                }
-            });
-        }
-    };
-
-    public void getPlayerAlias() {
-        if (AmazonGamesClient.getInstance() == null) return;
-        AmazonGamesClient.getInstance().getProfilesClient()
-                .getLocalPlayerProfile(new Object[]{})
-                .setCallback(new AGResponseCallback<RequestPlayerProfileResponse>() {
-                                    @Override
-                                    public void onComplete(RequestPlayerProfileResponse result) {
-                                        if (result.isError()) {
-
-                                            Log.i(TAG, "GameCircleGetPlayerAlias ERROR: " + result.getError());
-                                        } else {
-                                            Log.i(TAG, "GameCircleGetPlayerAlias OK");
-
-                                            String alias = result.getPlayer().getAlias();
-                                            Log.i(TAG, "alias: " + alias);
-                                            Log.i(TAG, "playerid: " + result.getPlayer().getPlayerId());
-
-                                        }
-                                    }
-                                });
-
-
-    }
-
-    public static void PostScore(String course, int score)
-    {
-    	class PostScoreResponse implements AGResponseCallback<SubmitScoreResponse>
-		{
-    		String mCourse;
-        	public PostScoreResponse(String courseId)
-        	{
-        		mCourse=courseId;
-        	}
-            public void onComplete(SubmitScoreResponse result) {
-                Log.i(TAG, "getNewRank() = " + result.getNewRank());
-                Log.i(TAG, "course index to refresh = " + mCourse);
-                RequestScores(mCourse);
-            }
-        }
-        Log.i(TAG, "submit score of "+score+" on course " + course);
-        LeaderboardsClient lbClient = agsClient.getLeaderboardsClient();
-        AGResponseHandle<SubmitScoreResponse> handle = lbClient.submitScore(course, score);
-        handle.setCallback(new PostScoreResponse(course));
-    }
-
-    public static void RequestScores(String course)
-    {
-    	class ScoreResponseHandler  
-    	{
-    		class PlayerScoreResponseHandler implements AGResponseCallback<GetPlayerScoreResponse>
-    		{
-				public void onComplete(GetPlayerScoreResponse arg0)
-				{
-					playerScore=arg0;
-					gotScore();
-				}
-    		}
-    		class TopScoreResponseHandler implements AGResponseCallback<GetScoresResponse>
-    		{
-				public void onComplete(GetScoresResponse arg0)
-				{
-					topScores=arg0;
-					gotScore();
-				}
-    		}
-    		PlayerScoreResponseHandler playerHandler=new PlayerScoreResponseHandler();
-    		TopScoreResponseHandler topHandler=new TopScoreResponseHandler();
-    		
-    		GetPlayerScoreResponse playerScore=null;
-    		GetScoresResponse topScores=null;
-    	
-    		public void gotScore()
-    		{
-    			if (playerScore==null || topScores==null)
-    			{
-    				return;
-    			}
-    			String[] names=new String[topScores.getNumScores()];
-    			int[] scores=new int[topScores.getNumScores()];
-    			for (int i=0; i<topScores.getNumScores(); i++)
-    			{
-    				names[i]=topScores.getScores().get(i).getPlayer().getAlias();
-    				scores[i]=(int)topScores.getScores().get(i).getScoreValue();
-    			}
-    			if (topScores.getLeaderboardId()==null)
-    			{
-    				return;
-    			}
-    			nativeReceivedScores(topScores.getLeaderboardId(), names, scores);
-    		}
-    	}
-    	class RefreshAllLeaderboardsHandler implements AGResponseCallback<GetLeaderboardsResponse>
-    	{
-			public void onComplete(GetLeaderboardsResponse arg0)
-			{
-		        LeaderboardsClient lbClient = agsClient.getLeaderboardsClient();
-		        for (int i=0; i<arg0.getNumLeaderboards(); i++)
-		        {
-		        	arg0.getLeaderboards().get(i).getName();
-		        	ScoreResponseHandler responseHandler=new ScoreResponseHandler();
-		        	
-		            AGResponseHandle<GetScoresResponse> topHandle = lbClient.getScores(arg0.getLeaderboards().get(i).getId(),
-		            		LeaderboardFilter.GLOBAL_ALL_TIME, (Object[])null);
-		            topHandle.setCallback(responseHandler.topHandler);
-		            
-		            AGResponseHandle<GetPlayerScoreResponse> playerHandle = lbClient.getLocalPlayerScore(arg0.getLeaderboards().get(i).getId(),
-		            		LeaderboardFilter.GLOBAL_ALL_TIME, (Object[])null);
-		            playerHandle.setCallback(responseHandler.playerHandler);
-		        }
-			}
-    	}
-        LeaderboardsClient lbClient = agsClient.getLeaderboardsClient();
-        if (course.equals(""))
-        {
-        	lbClient.getLeaderboards().setCallback(new RefreshAllLeaderboardsHandler());
-        }
-        else
-        {
-        	ScoreResponseHandler responseHandler=new ScoreResponseHandler();
-        	
-            AGResponseHandle<GetScoresResponse> topHandle = lbClient.getScores(course, LeaderboardFilter.GLOBAL_ALL_TIME, (Object[])null);
-            topHandle.setCallback(responseHandler.topHandler);
-            
-            AGResponseHandle<GetPlayerScoreResponse> playerHandle = lbClient.getLocalPlayerScore(course, LeaderboardFilter.GLOBAL_ALL_TIME, (Object[])null);
-            playerHandle.setCallback(responseHandler.playerHandler);
-        }
-    }
-
-    //list of features your game uses (in this example, achievements and leaderboards)
-    EnumSet<AmazonGamesFeature> myGameFeatures = EnumSet.of(
-            AmazonGamesFeature.Achievements, AmazonGamesFeature.Leaderboards, AmazonGamesFeature.Whispersync);
-
-    
     // Load the .so
     static {
         System.loadLibrary("SDL2");
@@ -256,6 +61,8 @@ public class SDLActivity extends Activity {
         //System.loadLibrary("SDL2_net");
         //System.loadLibrary("SDL2_ttf");
         System.loadLibrary("tcl");
+		// Step 1 Load libscoreloopcore.so before loading your game's native library.
+        System.loadLibrary("scoreloopcore");
         System.loadLibrary("main");
     }
 
@@ -284,8 +91,8 @@ public class SDLActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		
         myActivity = this;
-        AmazonGamesClient.initialize(this, callback, myGameFeatures);
-        
+//        AmazonGamesClient.initialize(this, callback, myGameFeatures);
+        nativeScoreInit();
         nativeSetPlayerData("", OuyaFacade.getInstance().isRunningOnOUYAHardware());
     }
 
@@ -336,11 +143,6 @@ public class SDLActivity extends Activity {
         // Send a quit message to the application
         SDLActivity.nativeQuit();
 
-        // Release Amazon Games Client
-        if (agsClient != null) {
-    	    AmazonGamesClient.release();
-      	}
-        
         // Now wait for the SDL thread to quit
         if (mSDLThread != null) {
             try {
@@ -504,6 +306,8 @@ public class SDLActivity extends Activity {
     public static native void onNativeSurfaceChanged();
     public static native void onNativeSurfaceDestroyed();
     public static native void nativeFlipBuffers();
+	
+	public native void nativeScoreInit();
 
     public static void flipBuffers() {
         SDLActivity.nativeFlipBuffers();

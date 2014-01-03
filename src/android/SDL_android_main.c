@@ -15,16 +15,9 @@
 // Called before SDL_main() to initialize JNI bindings in SDL library
 extern void SDL_Android_Init(JNIEnv* env, jclass cls);
 
-#ifndef SDL_PREFIX
-	#define SDL_PREFIX org_libsdl_app
-#endif
-
-#define JNI(f)	Java_ ## SDL_PREFIX ## _ ## f
-
-// Start up the SDL app
-void JNI(SDLActivity_nativeInit)(JNIEnv* env, jclass cls, jobject obj)
+// Initialize ScoreLoop C SDK
+void com_moonlite_tuxracer_SDLActivity_nativeInit(JNIEnv* env, jclass cls, jobject obj)
 {
-    
     /* This interface could expand with ABI negotiation, calbacks, etc. */
     SDL_Android_Init(env, cls);
 
