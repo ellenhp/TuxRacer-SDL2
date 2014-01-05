@@ -54,7 +54,7 @@ public class SDLActivity extends Activity {
     // Keep track of the paused state
     public static boolean mIsPaused = false, mIsSurfaceReady = false, mHasFocus = true;
     
-    public static float scaleFactor=1;
+    public static float scaleFactor=(2f/3);
 
     // Main components
     protected static SDLActivity mSingleton;

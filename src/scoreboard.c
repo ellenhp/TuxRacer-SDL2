@@ -103,10 +103,12 @@ JNIEXPORT void JNICALL JNI(SDLActivity_nativeScoreloopGotScores)(JNIEnv *env, jc
         char score_string[100];
         char* first_tab, * second_tab;
         int i;
-        
+        char rank_buf[3];
         for (i=0; i<SCOREBOARD_SIZE; i++)
         {
             SCORE_ITEM* score = &scoreboard[i];
+            sprintf(rank_buf, "%d", i+1);
+            strcpy(score->rank, rank_buf);
             strcpy(score->name, "----");
             strcpy(score->score, "-");
         }
@@ -146,10 +148,11 @@ void loading_scoreboards()
         char buf[3];
         SCORE_ITEM* score = &scoreboard[u];
         sprintf(buf, "%d", u+1);
-        strcpy(score->rank, buf);
-        strcpy(score->name, "Loading...");
+        strcpy(score->rank, "");
+        strcpy(score->name, "");
         strcpy(score->score, "");
     }
+    strcpy(scoreboard[4].name, "     Loading...");
     update_scoreboard_labels();
 }
 
