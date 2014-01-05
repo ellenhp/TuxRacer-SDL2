@@ -368,6 +368,7 @@ void load_course_core( char *course )
 #endif
     
 
+    print_debug(DEBUG_OTHER, buf);
     print_debug(DEBUG_OTHER, pre_script);
     
 	file=SDL_RWFromFile(buf, "r");
@@ -379,6 +380,8 @@ void load_course_core( char *course )
 	bytes_read=SDL_RWread(file, script_buf, 1, SCRIPT_MAXSIZE-1);
 	script_buf[bytes_read]=0; //null terminate script
 	SDL_RWclose(file);
+
+    print_debug(DEBUG_OTHER, "Loaded course.tcl");
 
     if ( Tcl_Eval( g_game.tcl_interp, pre_script) == TCL_ERROR ) {
 		handle_error( 1, "Error evaluating %s pre_script: %s", buf, Tcl_GetStringResult( g_game.tcl_interp ) );

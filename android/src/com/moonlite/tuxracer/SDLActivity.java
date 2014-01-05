@@ -10,7 +10,10 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsoluteLayout;
+import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.os.*;
 import android.util.Log;
 import android.graphics.*;
@@ -18,9 +21,27 @@ import android.media.*;
 import android.hardware.*;
 
 import java.lang.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.TreeSet;
+
+import com.scoreloop.client.android.core.controller.RequestController;
+import com.scoreloop.client.android.core.controller.RequestControllerObserver;
+import com.scoreloop.client.android.core.controller.ScoreController;
+import com.scoreloop.client.android.core.controller.ScoresController;
+import com.scoreloop.client.android.core.controller.TermsOfServiceController;
+import com.scoreloop.client.android.core.controller.TermsOfServiceControllerObserver;
+import com.scoreloop.client.android.core.model.Client;
+import com.scoreloop.client.android.core.model.Score;
+import com.scoreloop.client.android.core.model.ScoreFormatter;
+import com.scoreloop.client.android.core.model.SearchList;
+import com.scoreloop.client.android.core.model.Session;
 
 import tv.ouya.console.api.*;
 
@@ -65,6 +86,19 @@ public class SDLActivity extends Activity {
         System.loadLibrary("scoreloopcore");
         System.loadLibrary("main");
     }
+    
+    private String xor_secret(String secret)
+    {
+    	int i;
+		char[] buf=new char[secret.length()];
+		char[] secretBuf=secret.toCharArray();
+		int len = secret.length();
+		for (i = 0; i < len; ++i)
+		{
+		        buf[i] = (char)(secretBuf[i] ^ (i & 15) + 1);
+		}
+		return new String(buf);
+    }
 
     // Setup
     @Override
@@ -91,9 +125,26 @@ public class SDLActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		
         myActivity = this;
-//        AmazonGamesClient.initialize(this, callback, myGameFeatures);
-        nativeScoreInit();
+
         nativeSetPlayerData("", OuyaFacade.getInstance().isRunningOnOUYAHardware());
+        
+        Client.init(this.getApplicationContext(), xor_secret("S)TEPoEmjI_]"+((char)127)+"Zf]1C(}INbRP:n>O\\7C1uo|okrl@=BjUXX#8M;bQG:5"), null);
+        
+        final TermsOfServiceController controller = new TermsOfServiceController(new TermsOfServiceControllerObserver() {
+        	 @Override
+        	 public void termsOfServiceControllerDidFinish(final TermsOfServiceController controller, final Boolean accepted) {
+        	    if(accepted != null) {
+        	        // we have conclusive result.
+        	        if(accepted) {
+        	            // user did accept
+        	        }
+        	        else {
+        	            // user did reject
+        	        }
+        	    }
+        	 }
+        });
+        controller.query(this);
     }
 
     // Events
@@ -288,7 +339,7 @@ public class SDLActivity extends Activity {
     public static native void nativePause();
     public static native void nativeResume();
     public static native void nativeSetPlayerData(String playerName, boolean isOnOuya);
-    public static native void nativeReceivedScores(String course, String[] names, int[] scores);
+    public static native void nativeScoreloopGotScores(int scoreMode, Object[] scoreStrings);
     public static native void onNativeResize(int x, int y, int format);
     public static native void onNativePadDown(int padId, int keycode);
     public static native void onNativePadUp(int padId, int keycode);
@@ -520,6 +571,107 @@ public class SDLActivity extends Activity {
             }
         }
         return Arrays.copyOf(filtered, used);
+    }
+    
+    public static void requestScores(int scoreMode) {
+    	Log.d("scores", "Starting score acquisition.");
+    	class ScoreRequester implements Runnable {
+			public int scoreMode;
+			
+			@Override
+			public void run() {
+		    	class ScoreboardObserver implements RequestControllerObserver
+		    	{
+		    		int scoreMode;
+		    		int expectedCallbacks;
+		    		int callbacks=0;
+		    		HashSet<Score> scores=new HashSet<Score>();
+		    		public ScoreboardObserver(int expectedCallbacks, int scoreMode)
+		    		{
+		    			this.expectedCallbacks=expectedCallbacks;
+		    			this.scoreMode=scoreMode;
+		    		}
+					@Override
+					public void requestControllerDidFail(RequestController controller, Exception ex) {
+						Log.d("scores", "failure callback");
+						ex.printStackTrace();
+						callbacks++;
+						if (callbacks==expectedCallbacks) {
+							process();
+						}
+					}
+					@Override
+					public void requestControllerDidReceiveResponse(RequestController controller) {
+						Log.d("scores", "success callback");
+						callbacks++;
+						scores.addAll(((ScoresController)controller).getScores());
+						if (callbacks==expectedCallbacks) {
+							process();
+						}
+					}
+					private void process() {
+						ArrayList<Score> scoreList=new ArrayList<Score>(scores);
+						Collections.sort(scoreList, new Comparator<Score>() {
+						    public int compare(Score a, Score b) {
+						        return a.getRank()-b.getRank();
+						    }
+						});
+						//if there are >10 unique elements, the user isn't in the top 10 so we remove the 10th element (index 9) and allow the user (previously position 11/index 10) to take his or her spot.
+						if (scoreList.size()>10)
+						{
+							scoreList.remove(9);
+						}
+						ArrayList<String> scoreStrings=new ArrayList<String>();
+						for (Score score : scoreList) {
+							scoreStrings.add(score.getRank().toString()+"\t"+score.getUser().getDisplayName()+"\t"+score.getResult().intValue());
+						}
+						nativeScoreloopGotScores(scoreMode, scoreStrings.toArray());
+					}
+		    	};
+		    	Log.d("scores", "Starting score acquisition.");
+		    	ScoreboardObserver observer=new ScoreboardObserver(2, scoreMode);
+				ScoresController scoresController = new ScoresController(Session.getCurrentSession(), observer);
+				scoresController.setMode(scoreMode);
+				scoresController.setRangeLength(10);
+				scoresController.loadRangeAtRank(1);
+				scoresController = new ScoresController(Session.getCurrentSession(), observer);
+				scoresController.setMode(scoreMode);
+				scoresController.setRangeLength(1);
+				scoresController.loadRangeForUser(Session.getCurrentSession().getUser());
+			}
+		};
+		ScoreRequester requester=new ScoreRequester();
+		requester.scoreMode=scoreMode;
+		mSingleton.runOnUiThread(requester);
+    }
+    
+    public static void submitScore(int scoreMode, int scoreValue) {
+    	class ScoreSubmitter implements Runnable
+    	{
+    		int mode;
+    		double scoreValue;
+			@Override
+			public void run() {
+		    	final Score score = new Score(scoreValue, null);
+		    	score.setMode(mode);
+		    	final ScoreController scoreController = new ScoreController(new RequestControllerObserver()
+		    	{
+					@Override
+					public void requestControllerDidFail(RequestController arg0, Exception arg1) {
+						Log.d("scores", "score submission failed");
+					}
+					@Override
+					public void requestControllerDidReceiveResponse(RequestController arg0) {
+						Log.d("scores", "score submission succeeded");
+					}
+		    	});
+		    	scoreController.submitScore(score);
+			}
+    	}
+    	ScoreSubmitter submitter=new ScoreSubmitter();
+    	submitter.mode=scoreMode;
+    	submitter.scoreValue=scoreValue;
+    	mSingleton.runOnUiThread(submitter);
     }
 }
 

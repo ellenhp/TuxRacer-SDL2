@@ -6,6 +6,6 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry kind="lib" path="libs/ouya-sdk.jar"/>
-	<classpathentry kind="lib" path="C:/dev/ScoreloopC/SDKs/Android/libraries/scoreloopcore.jar"/>
+	<classpathentry kind="lib" path="libs/scoreloop-core.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

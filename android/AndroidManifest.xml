@@ -18,8 +18,8 @@
          An example Java class can be found in README-android.txt
     -->
 	<uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="android.permission.ACCESS_PHONE_STATE" />
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+	<uses-permission android:name="android.permission.READ_PHONE_STATE" /><uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+	
 
     <application android:label="@string/app_name"
                  android:icon="@drawable/ic_launcher"
@@ -34,7 +34,8 @@
 				<category android:name="tv.ouya.intent.category.GAME"/>
             </intent-filter>
         </activity>
-		<activity android:name="com.scoreloop.pal.ui.WebViewActivity" />
+		<activity android:name="com.scoreloop.client.android.core.ui.ProxyActivity"
+         		android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize" />
     </application>
 
     <!-- Android 2.3.3 -->
