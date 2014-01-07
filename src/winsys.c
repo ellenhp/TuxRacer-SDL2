@@ -84,6 +84,8 @@ static Uint32 sdl_flags = SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE | SDL_INIT_JOYST
 
 bool_t bind_js_axes=False;
 
+static bool_t winsys_drawing_allowed=True;
+
 /*---------------------------------------------------------------------------*/
 /*! 
   Requests that the screen be redrawn
@@ -348,10 +350,12 @@ int winsys_event_filter(void* userdata, SDL_Event* event)
 	{
     case SDL_APP_WILLENTERBACKGROUND:
         mute_audio();
+        winsys_drawing_allowed=False;
         return 0;
 	case SDL_APP_WILLENTERFOREGROUND:
 		init_ui_snow();
         unmute_audio();
+        winsys_drawing_allowed=True;
 		return 0;
 	case SDL_APP_TERMINATING:
 		winsys_shutdown();
