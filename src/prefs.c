@@ -165,7 +165,7 @@ static void prefs_init(void)
 	slider_set_value(fps_slider, getparam_display_fps());
 	gui_add_widget(fps_slider, NULL);
 
-	gui_add_widget(scoreloop_btn=create_button("Scoreloop", scoreloop_click_cb), NULL);
+	gui_add_widget(scoreloop_btn=create_button("Scoreboard Settings", scoreloop_click_cb), NULL);
 
 	gui_balance_lines(1);
 	

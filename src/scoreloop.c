@@ -35,11 +35,8 @@
 
 widget_t* enter_nickname_btn=NULL;
 widget_t* enter_email_btn=NULL;
-widget_t* nickname_label=NULL;
-widget_t* email_label=NULL;
 
-char email_buf[300];
-char alias_buf[100];
+char alias_buf[100]="";
 bool_t update_info=False;
 
 typedef enum TEXT_ENTRY_MODE
@@ -127,44 +124,23 @@ JNIEXPORT void JNICALL JNI(SDLActivity_nativeTextCallback)(JNIEnv *env, jclass c
     text_entry=TEXT_ENTRY_NONE;
 }
 
-JNIEXPORT void JNICALL JNI(SDLActivity_nativeUpdateUserInfo)(JNIEnv *env, jclass cls, jstring alias, jstring email)
+JNIEXPORT void JNICALL JNI(SDLActivity_nativeUpdateUserInfo)(JNIEnv *env, jclass cls, jstring alias)
 {
     char* string_tmp;
     
     if (update_info)
         return;
     
-    strcpy(alias_buf, "Current Alias: ");
     if (alias)
     {
         string_tmp=(*env)->GetStringUTFChars(env, alias, 0);
-        strcat(alias_buf, string_tmp);
+        sprintf(alias_buf, "Change Alias (using: %s)", string_tmp);
         (*env)->ReleaseStringUTFChars(env, alias, string_tmp);
     }
     else
     {
-        strcat(alias_buf, "[not set]");
+        strcpy(alias_buf, "Set Alias");
     }
-    
-    strcpy(email_buf, "Curent Email: ");
-    if (email)
-    {
-        string_tmp=(*env)->GetStringUTFChars(env, email, 0);
-        if (string_tmp && strlen(string_tmp))
-        {
-            strcat(email_buf, string_tmp);
-        }
-        else
-        {
-            strcat(email_buf, "[not set]");
-        }
-        (*env)->ReleaseStringUTFChars(env, email, string_tmp);
-    }
-    else
-    {
-        strcat(email_buf, "[not set]");
-    }
-    
     update_info=True;
 }
 #endif
@@ -188,26 +164,16 @@ static void scoreloop_init(void)
     if (!update_info)
     {
         update_info=True;
-        gui_add_widget(nickname_label=create_label(alias_buf, NULL), NULL);
-        gui_add_widget(email_label=create_label(email_buf, NULL), NULL);
+        gui_add_widget(enter_nickname_btn=create_button(alias_buf, nickname_click_cb), NULL);
         update_info=False;
     }
     else
     {
-        gui_add_widget(nickname_label=create_label("Loading...", NULL), NULL);
-        gui_add_widget(email_label=create_label("Loading...", NULL), NULL);
+        gui_add_widget(enter_nickname_btn=create_button("Set Alias", nickname_click_cb), NULL);
     }
-    gui_add_widget(enter_nickname_btn=create_button("Enter Alias", nickname_click_cb), NULL);
-	gui_add_widget(enter_email_btn=create_button("Enter Email", email_click_cb), NULL);
+	gui_add_widget(enter_email_btn=create_button("Set Email", email_click_cb), NULL);
 
 	gui_balance_lines(0);
-    
-    if (update_info)
-    {
-        button_set_text(nickname_label, alias_buf);
-        button_set_text(email_label, email_buf);
-        update_info=False;
-    }
     
     play_music( "start_screen" );
 }
@@ -237,8 +203,7 @@ static void scoreloop_loop( scalar_t time_step )
     
     if (update_info)
     {
-        button_set_text(nickname_label, alias_buf);
-        button_set_text(email_label, email_buf);
+        button_set_text(enter_nickname_btn, alias_buf);
         update_info=False;
     }
     

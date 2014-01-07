@@ -154,12 +154,12 @@ public class SDLActivity extends Activity {
         UserController userController=new UserController(new RequestControllerObserver() {
 			@Override
 			public void requestControllerDidReceiveResponse(RequestController arg0) {
-				nativeUpdateUserInfo(((UserController)arg0).getUser().getLogin(), ((UserController)arg0).getUser().getEmailAddress());
+				nativeUpdateUserInfo(((UserController)arg0).getUser().getLogin());
 			}
 			@Override
 			public void requestControllerDidFail(RequestController arg0, Exception arg1) {
 				//something's up, not sure what to do.
-				nativeUpdateUserInfo("----", "----");
+				nativeUpdateUserInfo("[error]");
 			}
 		});
         userController.loadUser();
@@ -359,7 +359,7 @@ public class SDLActivity extends Activity {
     public static native void nativeSetPlayerData(String playerName, boolean isOnOuya);
     public static native void nativeScoreloopGotScores(int scoreMode, Object[] scoreStrings);
     public static native void nativeTextCallback(String string);
-    public static native void nativeUpdateUserInfo(String alias, String email);
+    public static native void nativeUpdateUserInfo(String alias);
     public static native void onNativeResize(int x, int y, int format);
     public static native void onNativePadDown(int padId, int keycode);
     public static native void onNativePadUp(int padId, int keycode);
