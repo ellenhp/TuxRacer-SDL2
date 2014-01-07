@@ -183,8 +183,7 @@ void racing_init(void)
 	winsys_reset_js_bindings();
 	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_A, getparam_jump_key()[0]);
 	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_Y, getparam_trick_modifier_key()[0]);
-	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_B, getparam_quit_key()[0]);
-	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_X, getparam_pause_key()[0]);
+	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_B, getparam_pause_key()[0]);
         
     /* Initialize view */
     if ( getparam_view_mode() < 0 || 

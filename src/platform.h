@@ -9,4 +9,7 @@ int get_num_courses();
 char* get_race_text();
 char* get_back_text();
 
+char* get_continue_text();
+char* get_abort_text();
+
 #endif

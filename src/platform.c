@@ -61,3 +61,27 @@ char* get_back_text()
 		return "Back";
 	}
 }
+
+char* get_continue_text()
+{
+	if (is_on_ouya)
+	{
+		return "\x01 Continue";
+	}
+	else
+	{
+		return "Continue";
+	}
+}
+
+char* get_abort_text()
+{
+	if (is_on_ouya)
+	{
+		return "\x04 Exit Race";
+	}
+	else
+	{
+		return "Exit Race";
+	}
+}

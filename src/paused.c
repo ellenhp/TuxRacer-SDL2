@@ -41,12 +41,36 @@
 #include "ui_mgr.h"
 #include "joystick.h"
 #include "button.h"
+#include "platform.h"
+#include "gui_abstraction.h"
+#include "gui_button.h"
 
 #define NEXT_MODE RACING
 
 unsigned int pause_start;
 unsigned int pause_min_ticks;
 
+static widget_t* play_button=NULL;
+static widget_t* back_button=NULL;
+
+void end_game()
+{
+    g_game.race_paused=False;
+    set_game_mode(GAME_OVER);
+}
+
+bool_t has_game_controller()
+{
+    int i;
+    for (i=0; i<SDL_NumJoysticks(); i++)
+    {
+        if (SDL_IsGameController(i))
+        {
+            return True;
+        }
+    }
+    return False;
+}
 
 void come_back_to_game(void) {
 	if (SDL_GetTicks()-pause_start<pause_min_ticks)
@@ -77,6 +101,16 @@ static void mouse_cb( int button, int state, int finger_index, int x, int y )
 void paused_joystick_button_func(int button)
 {
 	come_back_to_game();
+}
+
+void paused_continue_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type, widget_t* widget)
+{
+    come_back_to_game();
+}
+
+void paused_back_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type, widget_t* widget)
+{
+    end_game();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -125,17 +159,48 @@ void draw_paused_text( void )
 void paused_init(void) 
 {
     point2d_t dummy_pos = {0, 0};
+	coord_t button_coord;
 
     winsys_set_display_func( main_loop );
     winsys_set_idle_func( main_loop );
     winsys_set_reshape_func( reshape );
-    winsys_set_mouse_func( mouse_cb );
-
-    winsys_set_motion_func( ui_event_motion_func );
-    winsys_set_passive_motion_func( ui_event_motion_func );
+    winsys_set_mouse_func( GameMenu_mouse_func );
+    winsys_set_motion_func( GameMenu_motion_func );
+    winsys_set_passive_motion_func( GameMenu_motion_func );
+	winsys_set_joystick_func( NULL );
+	winsys_set_joystick_button_func( NULL );
     
-	winsys_set_joystick_button_func( paused_joystick_button_func );
+	winsys_reset_js_bindings();
+	winsys_add_js_axis_bindings();
+	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_A, SDLK_RETURN);
+	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_B, SDLK_ESCAPE);
+    
+    GameMenu_init();
+	setup_gui();
 
+    button_coord.x=0.37;
+	button_coord.y=0.13;
+	button_coord.x_just=button_coord.y_just=CENTER_JUST;
+    button_coord.x_coord_type=button_coord.y_coord_type=NORMALIZED_COORD;
+    if (has_game_controller())
+    {
+        gui_add_widget(back_button=create_label(get_abort_text(), paused_back_cb), &button_coord);
+    }
+    else
+    {
+        gui_add_widget(back_button=create_button(get_abort_text(), paused_back_cb), &button_coord);
+    }
+    
+	button_coord.x=0.63;
+    if (has_game_controller())
+    {
+        gui_add_widget(play_button=create_label(get_continue_text(), paused_continue_cb), &button_coord);
+    }
+    else
+    {
+        gui_add_widget(play_button=create_button(get_continue_text(), paused_continue_cb), &button_coord);
+    }
+    
 	g_game.race_paused=True;
 
 	pause_start=SDL_GetTicks();
@@ -195,6 +260,8 @@ void paused_loop( scalar_t time_step )
     
     draw_hud_training( plyr );
 
+	GameMenu_draw();
+
     reshape( width, height );
 
     winsys_swap_buffers();
@@ -202,9 +269,19 @@ void paused_loop( scalar_t time_step )
 
 START_KEYBOARD_CB( paused_cb )
 {
-    if (g_game.practicing || !pause_is_for_long_tutorial_explanation()) {
-        if ( release ) return;
-        come_back_to_game();
+    if ( release ) {
+        return;
+    }
+    switch (key) {
+        case SDLK_AC_BACK:
+        case 27: /* Esc */
+            end_game();
+            break;
+        case 13: /* Enter */
+            if (g_game.practicing || !pause_is_for_long_tutorial_explanation()) {
+                come_back_to_game();
+            }
+            break;
     }
 }
 END_KEYBOARD_CB

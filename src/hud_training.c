@@ -271,7 +271,7 @@ static void draw_instructions(player_data_t *plyr)
 			}
 			else
 			{
-	            print_instruction(Localize("Press the \x02 button", ""),1);
+	            print_instruction(Localize("Press the \x04 button", ""),1);
 			}
             if(g_game.race_paused==True) step++;
             break;
@@ -280,10 +280,6 @@ static void draw_instructions(player_data_t *plyr)
  			if (!winsys_is_controller_active())
 			{
 	            print_instruction(Localize("Tap anywhere on the screen.", ""),1);
-			}
-			else
-			{
-	            print_instruction(Localize("Press any button", ""),1);
 			}
             if(g_game.race_paused==False) step=-1;
             break;
