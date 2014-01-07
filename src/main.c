@@ -54,6 +54,7 @@
 #include "save.h"
 #include "credits.h"
 #include "prefs.h"
+#include "scoreloop.h"
 #include "joystick.h"
 #include "os_util.h"
 #include "loading.h"
@@ -322,9 +323,12 @@ int main( int argc, char **argv )
     race_select_register();
     credits_register();
 	prefs_register();
+    scoreloop_register();
     loading_register();
 
     g_game.mode = NO_MODE;
+    
+    init_ui_snow();
     set_game_mode( GAME_TYPE_SELECT );
 
     g_game.difficulty = DIFFICULTY_LEVEL_NORMAL;

@@ -11,9 +11,11 @@ import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsoluteLayout;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.net.Uri;
 import android.os.*;
 import android.util.Log;
 import android.graphics.*;
@@ -37,6 +39,7 @@ import com.scoreloop.client.android.core.controller.ScoreController;
 import com.scoreloop.client.android.core.controller.ScoresController;
 import com.scoreloop.client.android.core.controller.TermsOfServiceController;
 import com.scoreloop.client.android.core.controller.TermsOfServiceControllerObserver;
+import com.scoreloop.client.android.core.controller.UserController;
 import com.scoreloop.client.android.core.model.Client;
 import com.scoreloop.client.android.core.model.Score;
 import com.scoreloop.client.android.core.model.ScoreFormatter;
@@ -134,19 +137,34 @@ public class SDLActivity extends Activity {
         	 @Override
         	 public void termsOfServiceControllerDidFinish(final TermsOfServiceController controller, final Boolean accepted) {
         	    if(accepted != null) {
-        	        // we have conclusive result.
+        	        //TODO react to this
         	        if(accepted) {
-        	            // user did accept
+        	            updateUserInfo();
         	        }
         	        else {
-        	            // user did reject
         	        }
         	    }
         	 }
         });
         controller.query(this);
     }
-
+    
+    private static void updateUserInfo()
+    {
+        UserController userController=new UserController(new RequestControllerObserver() {
+			@Override
+			public void requestControllerDidReceiveResponse(RequestController arg0) {
+				nativeUpdateUserInfo(((UserController)arg0).getUser().getLogin(), ((UserController)arg0).getUser().getEmailAddress());
+			}
+			@Override
+			public void requestControllerDidFail(RequestController arg0, Exception arg1) {
+				//something's up, not sure what to do.
+				nativeUpdateUserInfo("----", "----");
+			}
+		});
+        userController.loadUser();
+    }
+    
     // Events
     @Override
     protected void onPause() {
@@ -340,6 +358,8 @@ public class SDLActivity extends Activity {
     public static native void nativeResume();
     public static native void nativeSetPlayerData(String playerName, boolean isOnOuya);
     public static native void nativeScoreloopGotScores(int scoreMode, Object[] scoreStrings);
+    public static native void nativeTextCallback(String string);
+    public static native void nativeUpdateUserInfo(String alias, String email);
     public static native void onNativeResize(int x, int y, int format);
     public static native void onNativePadDown(int padId, int keycode);
     public static native void onNativePadUp(int padId, int keycode);
@@ -571,6 +591,164 @@ public class SDLActivity extends Activity {
             }
         }
         return Arrays.copyOf(filtered, used);
+    }
+
+    public static void setUserEmail(String email)
+    {
+    	class EmailSetter implements Runnable
+    	{
+    		String email;
+    		public EmailSetter(String email)
+    		{
+    			this.email=email;
+    		}
+			@Override
+			public void run() {
+		    	UserController controller=new UserController(new RequestControllerObserver()
+		    	{
+					@Override
+					public void requestControllerDidFail(RequestController arg0, Exception arg1) {
+						AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mSingleton);
+						alertDialogBuilder
+							.setTitle("Email in use")
+							.setMessage("Check your email to confirm this email is yours. Look for a message from Scoreloop. Once you merge the devices, restart Tux Racer to use the alias associated with the new email. Open browser now?")
+							.setCancelable(false)
+							.setPositiveButton(android.R.string.yes,new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int id) {
+									Uri uri = Uri.parse("http://www.google.com");
+									Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+									mSingleton.startActivity(intent);
+								}
+							})
+							.setNegativeButton(android.R.string.no,new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int id) { }
+							})
+							.create().show();
+					}
+					@Override
+					public void requestControllerDidReceiveResponse(RequestController arg0) {
+						AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mSingleton);
+						alertDialogBuilder
+							.setTitle("Success")
+							.setMessage("Email address was set successfully. Now you can reuse your alias or use one you set previously on another device.")
+							.setCancelable(false)
+							.setPositiveButton(android.R.string.ok,new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int id) { }
+							})
+							.create().show();
+						updateUserInfo();
+					}
+		    	});
+		    	controller.setUser(Session.getCurrentSession().getUser());
+		    	controller.getUser().setEmailAddress(email);
+		    	controller.submitUser();
+			}
+    	}
+    	if (android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches())
+    	{
+    		EmailSetter setter=new EmailSetter(email);
+    		mSingleton.runOnUiThread(setter);
+    	}
+    	else
+    	{
+    		mSingleton.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mSingleton);
+
+					alertDialogBuilder
+						.setTitle("Invalid Email")
+						.setMessage("That email seems to be invalid.")
+						.setCancelable(false)
+						.setPositiveButton(android.R.string.ok,new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) { }
+						})
+						.create().show();
+				}
+    		});
+    	}
+    }
+    
+    public static void setUserAlias(String alias)
+    {
+    	class AliasSetter implements Runnable
+    	{
+    		String alias;
+    		public AliasSetter(String alias)
+    		{
+    			this.alias=alias;
+    		}
+			@Override
+			public void run() {
+		    	UserController controller=new UserController(new RequestControllerObserver()
+		    	{
+					@Override
+					public void requestControllerDidFail(RequestController arg0, Exception arg1) {
+						AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mSingleton);
+						alertDialogBuilder
+							.setTitle("Alias in use")
+							.setMessage("Try again or (if you are using this alias on another device) set your email here and then check for a message from Scoreloop asking if you want to merge the devices")
+							.setPositiveButton(android.R.string.ok,new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int id) { }
+							})
+							.create().show();
+					}
+					@Override
+					public void requestControllerDidReceiveResponse(RequestController arg0) {
+						AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mSingleton);
+						alertDialogBuilder
+							.setTitle("Success")
+							.setMessage("Now go set a high score!")
+							.setPositiveButton(android.R.string.ok,new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int id) { }
+							})
+							.create().show();
+						updateUserInfo();
+					}
+		    	});
+		    	controller.setUser(Session.getCurrentSession().getUser());
+		    	controller.getUser().setLogin(alias);
+		    	controller.submitUser();
+		    	Log.d("scoreloop", "setting username to "+alias);
+			}
+    	}
+    	AliasSetter aliasSetter=new AliasSetter(alias);
+    	mSingleton.runOnUiThread(aliasSetter);
+    }
+    
+    public static void displayTextInputDialog(String title, String message)
+    {
+		Log.d("dialog", "displaying dialog");
+		class DialogDisplayer implements Runnable {
+			String title, message;
+			public DialogDisplayer(String title, String message) {
+				this.title=title;
+				this.message=message;
+			}
+			
+			@Override
+			public void run() {
+				AlertDialog.Builder alert = new AlertDialog.Builder(mSingleton);
+				alert.setTitle(title);
+				alert.setMessage(message);
+				final EditText input = new EditText(mSingleton);
+				alert.setView(input);
+				
+				alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						nativeTextCallback(input.getText().toString());
+					}
+				});
+				
+				alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) { }
+				});
+				
+				alert.show();
+			}
+		}
+		DialogDisplayer displayer=new DialogDisplayer(title, message);
+		mSingleton.runOnUiThread(displayer);
     }
     
     public static void requestScores(int scoreMode) {

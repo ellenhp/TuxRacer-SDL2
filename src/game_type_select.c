@@ -34,6 +34,7 @@
 #include "winsys.h"
 #include "gui_abstraction.h"
 #include "gui_mgr.h"
+#include "gui_button.h"
 
 #ifdef TARGET_OS_IPHONE
     #include "sharedGeneralFunctions.h"
@@ -43,6 +44,7 @@ widget_t* enter_event_btn = NULL;
 widget_t* practice_btn = NULL;
 widget_t* credits_btn = NULL;
 widget_t* pref_btn = NULL;
+widget_t* scoreloop_btn = NULL;
 widget_t* quit_btn = NULL;
 
 //The training mode of Tux Racer World challenge has been binded to the event mode of tuxracer
@@ -97,7 +99,14 @@ void credits_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_
 void pref_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb)
 {
     set_game_mode( PREFS );
+    
+    ui_set_dirty();
+}
 
+void scoreloop_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb)
+{
+    set_game_mode( SCORELOOP );
+    
     ui_set_dirty();
 }
 
@@ -109,8 +118,6 @@ void quit_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t b
 static void game_type_select_init(void)
 {
     point2d_t dummy_pos = {0, 0};
-
-    init_ui_snow();
 
     winsys_set_display_func( main_loop );
     winsys_set_idle_func( main_loop );
@@ -126,6 +133,7 @@ static void game_type_select_init(void)
 	gui_add_widget(practice_btn=create_button("Play", practice_click_cb), NULL);
 	gui_add_widget(enter_event_btn=create_button("Tutorial", enter_event_click_cb), NULL);
 	gui_add_widget(pref_btn=create_button("Settings", pref_click_cb), NULL);
+	gui_add_widget(scoreloop_btn=create_button("Scoreloop", scoreloop_click_cb), NULL);
 	gui_add_widget(credits_btn=create_button("Credits", credits_click_cb), NULL);
 	gui_add_widget(quit_btn=create_button("Quit", quit_click_cb), NULL);
 

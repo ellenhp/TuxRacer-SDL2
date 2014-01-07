@@ -290,6 +290,7 @@ typedef enum {
     RESET,
     CREDITS,
 	PREFS,
+	SCORELOOP,
     NUM_GAME_MODES
 } game_mode_t;
 

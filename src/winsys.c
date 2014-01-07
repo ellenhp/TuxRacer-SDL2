@@ -535,6 +535,7 @@ bool_t winsys_is_controller_active()
 void winsys_shutdown()
 {
 	IMG_Quit();
+    Mix_Quit();
     SDL_QuitSubSystem(sdl_flags);
 }
 
