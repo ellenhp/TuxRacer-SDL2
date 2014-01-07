@@ -62,6 +62,8 @@ widget_t* view_slider=NULL;
 
 widget_t* fps_slider=NULL;
 
+widget_t* scoreloop_btn = NULL;
+
 int graphics_ticks=0;
 
 int view_mode=0;
@@ -120,6 +122,13 @@ void update_fps(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, 
 	write_config_file();
 }
 
+void scoreloop_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb)
+{
+    set_game_mode( SCORELOOP );
+    
+    ui_set_dirty();
+}
+
 static void prefs_init(void) 
 {
     winsys_set_display_func( main_loop );
@@ -155,6 +164,8 @@ static void prefs_init(void)
 	fps_slider=create_slider("Show FPS: ", 2, "No|Yes", update_fps);
 	slider_set_value(fps_slider, getparam_display_fps());
 	gui_add_widget(fps_slider, NULL);
+
+	gui_add_widget(scoreloop_btn=create_button("Scoreloop", scoreloop_click_cb), NULL);
 
 	gui_balance_lines(1);
 	
