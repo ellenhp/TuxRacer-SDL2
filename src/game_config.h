@@ -51,6 +51,8 @@ int get_config_dir_name( char *buff, int len );
     PROTO_PARAM( name, bool_t )
 
 
+PROTO_PARAM_BOOL( should_prompt_alias );
+
 PROTO_PARAM_STRING( data_dir );
 
 PROTO_PARAM_INT( graphics_slider_tick );

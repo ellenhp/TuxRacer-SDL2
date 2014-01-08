@@ -3,6 +3,7 @@
 #include "tuxracer.h"
 #include "gui_label.h"
 #include "platform.h"
+#include "scoreloop.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -29,6 +30,9 @@ bool_t scoreboard_open=False;
 bool_t arrays_initialized=False;
 
 unsigned int current_scoreboard=-1;
+
+int stored_score_mode=-1;
+int stored_score_value=0;
 
 /* Return 1-based index for a course_name or 0 if not found */
 unsigned int get_score_index(const char* course_name)
@@ -68,14 +72,43 @@ int scoreloop_submit_score(unsigned int scoreMode, unsigned int scoreValue)
         return;
     }
     jclass mActivityClass = (*env)->FindClass(env, "com/moonlite/tuxracer/SDLActivity");
-    jmethodID mid = (*env)->GetStaticMethodID(env, mActivityClass, "submitScore", "(II)V");
+    jmethodID mid = (*env)->GetStaticMethodID(env, mActivityClass, "submitScore", "(II)Z");
     if (!mid)
     {
         return ;
     }
-    (*env)->CallStaticVoidMethod(env, mActivityClass, mid, (int)scoreMode, (int)scoreValue);
+    if (!(*env)->CallStaticBooleanMethod(env, mActivityClass, mid, (int)scoreMode, (int)scoreValue))
+    {
+        jstring j_title=(*env)->NewStringUTF(env, ALIAS_PROMPT_TITLE);
+        jstring j_message=(*env)->NewStringUTF(env, ALIAS_PROMPT_MESSAGE);
+        if (!getparam_should_prompt_alias())
+        {
+            return;
+        }
+        stored_score_mode=(int)scoreMode;
+        stored_score_value=(int)scoreValue;
+        env = Android_JNI_GetEnv();
+        if (!env)
+        {
+            return;
+        }
+        mActivityClass = (*env)->FindClass(env, "com/moonlite/tuxracer/SDLActivity");
+        mid = (*env)->GetStaticMethodID(env, mActivityClass, "promptForAlias", "(II)V");
+        if (!mid)
+        {
+            return ;
+        }
+        (*env)->CallStaticVoidMethod(env, mActivityClass, mid, (int)scoreMode, (int)scoreValue);
+        (*env)->DeleteLocalRef(env, j_title);
+        (*env)->DeleteLocalRef(env, j_message);
+    }
 }
-	
+
+JNIEXPORT void JNICALL JNI(SDLActivity_nativeDisableAliasPrompt)(JNIEnv *env, jclass cls)
+{
+    setparam_should_prompt_alias(False);
+}
+
 int scoreloop_refresh_scores(unsigned int scoreMode)
 {
     JNIEnv* env = Android_JNI_GetEnv();
@@ -119,7 +152,7 @@ JNIEXPORT void JNICALL JNI(SDLActivity_nativeScoreloopGotScores)(JNIEnv *env, jc
             score_string_tmp=(*env)->GetStringUTFChars(env, tmp_jstring, 0);
             strcpy(score_string, score_string_tmp);
             (*env)->ReleaseStringUTFChars(env, tmp_jstring, score_string_tmp);
-
+            
             first_tab=strchr(score_string, '\t');
             second_tab=strchr(first_tab+1, '\t');
             

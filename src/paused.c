@@ -55,6 +55,7 @@ static widget_t* back_button=NULL;
 
 void end_game()
 {
+    g_game.race_aborted=True;
     g_game.race_paused=False;
     set_game_mode(GAME_OVER);
 }

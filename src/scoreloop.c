@@ -26,10 +26,10 @@
 #include "gui_button.h"
 #include "gui_abstraction.h"
 #include "joystick.h"
+#include "scoreloop.h"
 
 #ifdef __ANDROID__
 #include "jni.h"
-#define JNI_NULL_CHAR "\xC0\x80"
 #define JNI(f)	Java_com_moonlite_tuxracer_ ## f
 #endif
 
@@ -72,13 +72,13 @@ void start_dialog(char* title, char* message)
 
 void nickname_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb)
 {
-    start_dialog("Enter alias" JNI_NULL_CHAR, "Enter the alias you want to appear next to your scores. Note that you will not be able to reuse this on other devices unless you also enter an email." JNI_NULL_CHAR);
+    start_dialog(ALIAS_PROMPT_TITLE, ALIAS_PROMPT_MESSAGE);
     text_entry=TEXT_ENTRY_ALIAS;
 }
 
 void email_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb)
 {
-    start_dialog("Enter email" JNI_NULL_CHAR, "Enter an email address. This is entirely optional, but recommended if you like your alias and might want to use it again on another device." JNI_NULL_CHAR);
+    start_dialog("Enter Email" JNI_NULL_CHAR, "Enter an email address. This is entirely optional, but recommended if you like your alias and might want to use it again on another device." JNI_NULL_CHAR);
     text_entry=TEXT_ENTRY_EMAIL;
 }
 

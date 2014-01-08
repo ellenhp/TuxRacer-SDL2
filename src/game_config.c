@@ -339,6 +339,7 @@ void set_param_bool( struct param *p, bool_t new_val )
  * Main parameter struct
  */
 struct params {
+    struct param should_prompt_alias;
     struct param data_dir;
 	struct param graphics_slider_tick;
     struct param fullscreen;
@@ -429,6 +430,9 @@ static struct params Params;
 
 void init_game_configuration()
 {
+    INIT_PARAM_BOOL(
+    should_prompt_alias, True,
+    "# Should we ask the user for an alias to submit their score? \n" );
 #ifdef TARGET_OS_IPHONE
     INIT_PARAM_STRING( 
 	data_dir, strdup(getRessourcePath()), 
@@ -749,6 +753,7 @@ void init_game_configuration()
  * Create the set/get functions for parameters
  */
 
+FN_PARAM_BOOL( should_prompt_alias )
 FN_PARAM_STRING( data_dir )
 FN_PARAM_INT( graphics_slider_tick )
 FN_PARAM_BOOL( draw_tux_shadow )

@@ -76,6 +76,9 @@ public class SDLActivity extends Activity {
     protected static AudioTrack mAudioTrack;
 	
     private static SDLActivity myActivity;
+    
+    private static boolean mUserCanSubmitScores=false;
+    private static Runnable mScoreToSubmit=null;
 
     // Load the .so
     static {
@@ -154,7 +157,15 @@ public class SDLActivity extends Activity {
         UserController userController=new UserController(new RequestControllerObserver() {
 			@Override
 			public void requestControllerDidReceiveResponse(RequestController arg0) {
-				nativeUpdateUserInfo(((UserController)arg0).getUser().getLogin());
+				mUserCanSubmitScores=!((UserController)arg0).getUser().isAnonymous();
+				if (mUserCanSubmitScores)
+				{
+					nativeUpdateUserInfo(((UserController)arg0).getUser().getLogin());
+				}
+				else
+				{
+					nativeUpdateUserInfo(null);
+				}
 			}
 			@Override
 			public void requestControllerDidFail(RequestController arg0, Exception arg1) {
@@ -359,6 +370,7 @@ public class SDLActivity extends Activity {
     public static native void nativeSetPlayerData(String playerName, boolean isOnOuya);
     public static native void nativeScoreloopGotScores(int scoreMode, Object[] scoreStrings);
     public static native void nativeTextCallback(String string);
+    public static native void nativeDisableAliasPrompt();
     public static native void nativeUpdateUserInfo(String alias);
     public static native void onNativeResize(int x, int y, int format);
     public static native void onNativePadDown(int padId, int keycode);
@@ -823,7 +835,98 @@ public class SDLActivity extends Activity {
 		mSingleton.runOnUiThread(requester);
     }
     
-    public static void submitScore(int scoreMode, int scoreValue) {
+    //this is a really ugly method, but I need to chain several callbacks together and I don't see a way to do that without duplicating code
+    public static void promptForAlias(int scoreMode, int scoreValue) {
+    	class AliasPromptAndSubmit implements Runnable {
+    		int scoreMode;
+    		int scoreValue;
+    		String title;
+    		String message;
+    		public AliasPromptAndSubmit(int scoreMode, int scoreValue, String title, String message)
+    		{
+    			this.scoreMode=scoreMode;
+    			this.scoreValue=scoreValue;
+    			this.title=title;
+    			this.message=message;
+    		}
+			@Override
+			public void run() {
+				AlertDialog.Builder alert = new AlertDialog.Builder(mSingleton);
+				alert.setTitle("Submit Score?");
+				alert.setMessage("Would you like to submit your score? You will need to set your alias first, which will publicly appear next to your scores. You can do this at any time in the Settings menu.");
+				alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+					private void setAlias() {
+						AlertDialog.Builder alert = new AlertDialog.Builder(mSingleton);
+						alert.setTitle(title);
+						alert.setMessage(message);
+						final EditText input = new EditText(mSingleton);
+						alert.setView(input);
+						alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int whichButton) {
+						    	UserController controller=new UserController(new RequestControllerObserver()
+						    	{
+									@Override
+									public void requestControllerDidFail(RequestController arg0, Exception arg1) {
+										AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mSingleton);
+										alertDialogBuilder
+											.setTitle("Alias in use")
+											.setMessage("If you are using this alias on another device you will need to set your email address in the Settings menu. Otherwise, you can try again with a different alias.")
+											.setPositiveButton("Try Again",new DialogInterface.OnClickListener() {
+												public void onClick(DialogInterface dialog, int id) {
+													setAlias(); //do this recursively 
+												}
+											})
+											.setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
+												public void onClick(DialogInterface dialog, int id) { }
+											})
+											.create().show();
+									}
+									@Override
+									public void requestControllerDidReceiveResponse(RequestController arg0) {
+										AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mSingleton);
+										alertDialogBuilder
+											.setTitle("Success!")
+											.setMessage("Submitting your score.")
+											.setPositiveButton(android.R.string.ok,new DialogInterface.OnClickListener() {
+												public void onClick(DialogInterface dialog, int id) { }
+											})
+											.create().show();
+										updateUserInfo();
+										submitScore(scoreMode, scoreValue);
+									}
+						    	});
+						    	controller.setUser(Session.getCurrentSession().getUser());
+						    	controller.getUser().setLogin(input.getText().toString());
+						    	controller.submitUser();
+					    	}
+						});
+						
+						alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int whichButton) { }
+						});
+						alert.show();	
+					}
+					public void onClick(DialogInterface dialog, int whichButton) {
+						setAlias();
+					}
+				});
+				
+				alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) { }
+				});
+				
+				alert.setNeutralButton("Never Prompt", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						nativeDisableAliasPrompt();
+					}
+				}).create().show();
+			}
+    	}
+    	AliasPromptAndSubmit submitter=new AliasPromptAndSubmit(scoreMode, scoreValue, "Enter Alias", "Enter the alias you want to appear next to your scores. Note that you will not be able to reuse this on other devices unless you also enter an email in the Settings menu.");
+    	mSingleton.runOnUiThread(submitter);
+    }
+    	
+    public static boolean submitScore(int scoreMode, int scoreValue) {
     	class ScoreSubmitter implements Runnable
     	{
     		int mode;
@@ -849,7 +952,15 @@ public class SDLActivity extends Activity {
     	ScoreSubmitter submitter=new ScoreSubmitter();
     	submitter.mode=scoreMode;
     	submitter.scoreValue=scoreValue;
-    	mSingleton.runOnUiThread(submitter);
+    	if (mUserCanSubmitScores)
+    	{
+        	mSingleton.runOnUiThread(submitter);
+        	return true;
+    	}
+    	else
+    	{
+    		return false;
+    	}
     }
 }
 
