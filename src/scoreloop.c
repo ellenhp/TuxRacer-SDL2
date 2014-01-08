@@ -225,7 +225,7 @@ START_KEYBOARD_CB( scoreloop_key_cb )
 	case SDLK_ESCAPE:
 	case SDLK_q:
 	case SDLK_AC_BACK:
-        set_game_mode( GAME_TYPE_SELECT );
+        set_game_mode( PREFS );
 		break;
 	default:
 	    GameMenu_keypress(key);

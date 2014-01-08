@@ -625,14 +625,14 @@ public class SDLActivity extends Activity {
 							.setTitle("Email in use")
 							.setMessage("Check your email to confirm this email is yours. Look for a message from Scoreloop. Once you merge the devices, restart Tux Racer to use the alias associated with the new email. Open browser now?")
 							.setCancelable(false)
-							.setPositiveButton(android.R.string.yes,new DialogInterface.OnClickListener() {
+							.setPositiveButton("Yes",new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int id) {
 									Uri uri = Uri.parse("http://www.google.com");
 									Intent intent = new Intent(Intent.ACTION_VIEW, uri);
 									mSingleton.startActivity(intent);
 								}
 							})
-							.setNegativeButton(android.R.string.no,new DialogInterface.OnClickListener() {
+							.setNegativeButton("No",new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int id) { }
 							})
 							.create().show();
@@ -644,7 +644,7 @@ public class SDLActivity extends Activity {
 							.setTitle("Success")
 							.setMessage("Email address was set successfully. Now you can reuse your alias or use one you set previously on another device.")
 							.setCancelable(false)
-							.setPositiveButton(android.R.string.ok,new DialogInterface.OnClickListener() {
+							.setPositiveButton("OK",new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int id) { }
 							})
 							.create().show();
@@ -672,7 +672,7 @@ public class SDLActivity extends Activity {
 						.setTitle("Invalid Email")
 						.setMessage("That email seems to be invalid.")
 						.setCancelable(false)
-						.setPositiveButton(android.R.string.ok,new DialogInterface.OnClickListener() {
+						.setPositiveButton("OK",new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) { }
 						})
 						.create().show();
@@ -700,7 +700,7 @@ public class SDLActivity extends Activity {
 						alertDialogBuilder
 							.setTitle("Alias in use")
 							.setMessage("Try again or (if you are using this alias on another device) set your email here and then check for a message from Scoreloop asking if you want to merge the devices")
-							.setPositiveButton(android.R.string.ok,new DialogInterface.OnClickListener() {
+							.setPositiveButton("OK",new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int id) { }
 							})
 							.create().show();
@@ -711,7 +711,7 @@ public class SDLActivity extends Activity {
 						alertDialogBuilder
 							.setTitle("Success")
 							.setMessage("Now go set a high score!")
-							.setPositiveButton(android.R.string.ok,new DialogInterface.OnClickListener() {
+							.setPositiveButton("OK",new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int id) { }
 							})
 							.create().show();
@@ -746,7 +746,7 @@ public class SDLActivity extends Activity {
 				final EditText input = new EditText(mSingleton);
 				alert.setView(input);
 				
-				alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+				alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						nativeTextCallback(input.getText().toString());
 					}
@@ -854,14 +854,14 @@ public class SDLActivity extends Activity {
 				AlertDialog.Builder alert = new AlertDialog.Builder(mSingleton);
 				alert.setTitle("Submit Score?");
 				alert.setMessage("Would you like to submit your score? You will need to set your alias first, which will publicly appear next to your scores. You can do this at any time in the Settings menu.");
-				alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+				alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 					private void setAlias() {
 						AlertDialog.Builder alert = new AlertDialog.Builder(mSingleton);
 						alert.setTitle(title);
 						alert.setMessage(message);
 						final EditText input = new EditText(mSingleton);
 						alert.setView(input);
-						alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+						alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {
 						    	UserController controller=new UserController(new RequestControllerObserver()
 						    	{
@@ -887,7 +887,7 @@ public class SDLActivity extends Activity {
 										alertDialogBuilder
 											.setTitle("Success!")
 											.setMessage("Submitting your score.")
-											.setPositiveButton(android.R.string.ok,new DialogInterface.OnClickListener() {
+											.setPositiveButton("OK",new DialogInterface.OnClickListener() {
 												public void onClick(DialogInterface dialog, int id) { }
 											})
 											.create().show();
