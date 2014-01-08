@@ -48,7 +48,8 @@
 #include "gui_abstraction.h"
 #include "scoreboard.h"
 
-#define NEXT_MODE RACE_SELECT
+static int next_mode=RACE_SELECT;
+
 #define GAME_OVER_DISPLAY_TICKS 1000
 
 static bool_t aborted = False;
@@ -58,6 +59,12 @@ static char* countryRanking = NULL;
 static char* worldRanking = NULL;
 static scalar_t friendsPercent,countryPercent,worldPercent;
 static int game_over_start_ticks=0;
+
+static void goto_next_mode()
+{
+    set_game_mode( next_mode );
+    next_mode=RACE_SELECT;
+}
 
 static void mouse_cb( int button, int state, int finger_index, int x, int y )
 {
@@ -83,16 +90,21 @@ static void mouse_cb( int button, int state, int finger_index, int x, int y )
         //rotate screen
         turnScreenToPortrait();
         
-        set_game_mode( NEXT_MODE );
+        goto_next_mode();
         winsys_post_redisplay();
     }
 #else
 	if (SDL_GetTicks()-game_over_start_ticks>GAME_OVER_DISPLAY_TICKS)
 	{
-	    set_game_mode( NEXT_MODE );
+	    goto_next_mode();
 		winsys_post_redisplay();
 	}
 #endif
+}
+
+void game_over_set_next_mode(int mode)
+{
+    next_mode=mode;
 }
 
 
@@ -160,7 +172,7 @@ void saveAndDisplayRankings() {
 
 void game_over_js_func(int button)
 {
-    set_game_mode( NEXT_MODE );
+    goto_next_mode();
 	winsys_set_joystick_button_func(NULL);
     winsys_post_redisplay();
 }
@@ -281,11 +293,11 @@ START_KEYBOARD_CB( game_over_cb )
         //rotate screen
         turnScreenToPortrait();
         
-        set_game_mode( NEXT_MODE );
+        goto_next_mode();
         winsys_post_redisplay();
     }
 #else
-    set_game_mode( NEXT_MODE );
+    goto_next_mode();
     winsys_post_redisplay();
 #endif
     

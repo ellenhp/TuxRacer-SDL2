@@ -32,6 +32,7 @@
 #include "racing.h"
 #include "paused.h"
 #include "hud.h"
+#include "game_over.h"
 #ifdef TARGET_OS_IPHONE
     #include "sharedGeneralFunctions.h"
 #endif
@@ -468,5 +469,6 @@ void init_starting_tutorial_step(int i){
     training_abort=False;
     pause_for_long_tutorial_explanation=False;
     step = i;
+    game_over_set_next_mode( GAME_TYPE_SELECT );
 }
 

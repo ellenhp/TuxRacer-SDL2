@@ -25,6 +25,8 @@ extern "C"
 #ifndef _GAME_OVER_H_
 #define _GAME_OVER_H_
 
+void game_over_set_next_mode(int mode);
+
 void game_over_init();
 void game_over_loop( scalar_t time_step );
 void game_over_register();

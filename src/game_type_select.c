@@ -54,8 +54,11 @@ void enter_event_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_
     g_game.current_race = -1;
     g_game.practicing = False;
     
-    zappe_event_screen(NULL, NULL);
+    g_game.race.course="bunny_hill";
+    init_starting_tutorial_step(0);
     
+    set_game_mode( LOADING );
+
     ui_set_dirty();
 }
 
