@@ -891,6 +891,7 @@ public class SDLActivity extends Activity {
 												public void onClick(DialogInterface dialog, int id) { }
 											})
 											.create().show();
+										mUserCanSubmitScores=true;
 										updateUserInfo();
 										submitScore(scoreMode, scoreValue);
 									}
