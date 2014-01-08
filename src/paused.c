@@ -255,13 +255,12 @@ void paused_loop( scalar_t time_step )
     if (!pause_is_for_long_tutorial_explanation())
 	{
         draw_paused_text();
+        GameMenu_draw();
     }
     
     draw_hud( plyr );
     
     draw_hud_training( plyr );
-
-	GameMenu_draw();
 
     reshape( width, height );
 
@@ -279,9 +278,7 @@ START_KEYBOARD_CB( paused_cb )
             end_game();
             break;
         case 13: /* Enter */
-            if (g_game.practicing || !pause_is_for_long_tutorial_explanation()) {
-                come_back_to_game();
-            }
+            come_back_to_game();
             break;
     }
 }

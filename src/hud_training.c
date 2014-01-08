@@ -281,13 +281,21 @@ static void draw_instructions(player_data_t *plyr)
 			{
 	            print_instruction(Localize("Tap anywhere on the screen.", ""),1);
 			}
+
             if(g_game.race_paused==False) step=-1;
             break;
         case -1:
-            print_instruction(Localize("Good job. Now you know the basics of racing", ""),1);
-            print_instruction(Localize("The next tutorial will teach you how to jump", ""),2);
-            print_instruction(Localize("and do tricks!", ""),3);
-            set_game_mode( GAME_OVER );
+            training_pause_for_tutorial_explanation();
+            print_instruction(Localize("Good job. Now you know the basics of racing", ""),0);
+            print_instruction(Localize("The next tutorial will teach you how to jump", ""),1);
+            print_instruction(Localize("and do tricks!", ""),2);
+            
+            if(training_is_resumed())
+            {
+                g_game.race.course="frozen_river";
+                init_starting_tutorial_step(10);
+                set_game_mode( LOADING );
+            }
             break;
             					/* Fin du premier Tutorial */
                                 
@@ -351,10 +359,10 @@ static void draw_instructions(player_data_t *plyr)
             break;
         case 17:
             training_pause_for_tutorial_explanation();
-            print_instruction(Localize("There are two main things you can do while", ""),1);
-            print_instruction(Localize("you're in the air. First, you can try and", ""),2);
-            print_instruction(Localize("do a cool trick. Second, you can accelerate", ""),3);
-            print_instruction(Localize("to fly longer and go faster.", ""),4);
+            print_instruction(Localize("There are two main things you can do while", ""),0);
+            print_instruction(Localize("you're in the air. First, you can try and", ""),1);
+            print_instruction(Localize("do a cool trick. Second, you can accelerate", ""),2);
+            print_instruction(Localize("to fly longer and go faster.", ""),3);
             if(training_is_resumed())
 			{
 				step++;
@@ -391,7 +399,7 @@ static void draw_instructions(player_data_t *plyr)
             break;
         case 21:
             training_pause_for_tutorial_explanation();
-            print_instruction(Localize("Now, to finish, try to do a big jump", ""),1);
+            print_instruction(Localize("Now, to finish, try to do a long jump", ""),1);
             print_instruction(Localize("while flapping your wings to go faster.", ""),2);
             if(training_is_resumed()) {
                 step++;
@@ -406,14 +414,22 @@ static void draw_instructions(player_data_t *plyr)
             break;
         case 22:
             print_instruction(Localize("Try to do a long flying jump (>1sec).", ""),-3);
+ 			if (winsys_is_controller_active())
+            {
+                print_instruction(Localize("Make sure you're pushing the analog stick.", ""),-2);
+            }
+            else
+            {
+                print_instruction(Localize("Make sure you're tapping the lower right.", ""),-2);
+            }
             if (check_condition_for_time( (bool_t)(plyr->control.is_flying && plyr->control.is_accelerating),1000)) step = -2;
             break;
         case -2:
-            print_instruction(Localize("Congratulations, you finished this tutorial.", ""),0);
-            print_instruction(Localize("You can apply these skills to different", ""),1);
-            print_instruction(Localize("courses. Sometimes you should focus on speed", ""),2);
-            print_instruction(Localize("and picking up food. Sometimes you have to", ""),3);
-            print_instruction(Localize("do tricks to get a good score.", ""),4);
+            print_instruction(Localize("Congratulations, you finished this tutorial.", ""),-1);
+            print_instruction(Localize("You can apply these skills to different", ""),0);
+            print_instruction(Localize("courses. Sometimes you should focus on speed", ""),1);
+            print_instruction(Localize("and picking up food. Sometimes you have to", ""),2);
+            print_instruction(Localize("do tricks to get a good score.", ""),3);
             set_game_mode( GAME_OVER );
             break;
             						/* Fin du second Tutorial */ 
