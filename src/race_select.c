@@ -324,7 +324,6 @@ static void draw_preview()
 
 void update_text()
 {
-	
     if ( g_game.practicing ) {
         open_course_data_t *data;
         data = (open_course_data_t*) get_list_elem_data( cur_elem );
@@ -599,8 +598,6 @@ static void race_select_init(void)
 	init_scoreboard_labels();
 	init_scoreboard();
 
-    update_text();
-
     play_music( "start_screen" );
 }
 
@@ -670,17 +667,18 @@ START_KEYBOARD_CB( race_select_key_cb )
             case WSK_LEFT:
 				if (get_prev_list_elem(race_list, cur_elem))
 					cur_elem=get_prev_list_elem(race_list, cur_elem);
+                update_text();
                 break;
             case WSK_RIGHT:
             case WSK_DOWN:
 				if (get_next_list_elem(race_list, cur_elem))
 					cur_elem=get_next_list_elem(race_list, cur_elem);
+                update_text();
                 break;
             case SDLK_AC_BACK:
 				back();
 				break;
         }
-		update_text();
     } else {
         key = (int) tolower( (char) key );
         

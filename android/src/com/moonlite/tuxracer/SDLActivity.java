@@ -764,7 +764,6 @@ public class SDLActivity extends Activity {
     }
     
     public static void requestScores(int scoreMode) {
-    	Log.d("scores", "Starting score acquisition.");
     	class ScoreRequester implements Runnable {
 			public int scoreMode;
 			
@@ -783,7 +782,6 @@ public class SDLActivity extends Activity {
 		    		}
 					@Override
 					public void requestControllerDidFail(RequestController controller, Exception ex) {
-						Log.d("scores", "failure callback");
 						ex.printStackTrace();
 						callbacks++;
 						if (callbacks==expectedCallbacks) {
@@ -792,7 +790,6 @@ public class SDLActivity extends Activity {
 					}
 					@Override
 					public void requestControllerDidReceiveResponse(RequestController controller) {
-						Log.d("scores", "success callback");
 						callbacks++;
 						scores.addAll(((ScoresController)controller).getScores());
 						if (callbacks==expectedCallbacks) {
