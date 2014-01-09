@@ -57,7 +57,7 @@ public class SDLActivity extends Activity {
     // Keep track of the paused state
     public static boolean mIsPaused = false, mIsSurfaceReady = false, mHasFocus = true;
     
-    public static float scaleFactor=(2f/3);
+    public static float scaleFactor=0;
 
     // Main components
     protected static SDLActivity mSingleton;
@@ -79,6 +79,8 @@ public class SDLActivity extends Activity {
     
     private static boolean mUserCanSubmitScores=false;
     private static Runnable mScoreToSubmit=null;
+    
+    private static String mOuyaUsername=null;
 
     // Load the .so
     static {
@@ -119,8 +121,18 @@ public class SDLActivity extends Activity {
         mSurface = new SDLSurface(getApplication(), getWindowManager().getDefaultDisplay().getRotation());
         Point size=new Point();
         getWindowManager().getDefaultDisplay().getSize(size);
+        
+        if (size.y<720)
+        {
+        	scaleFactor=1;
+        }
+        else
+        {
+        	scaleFactor=720.0f/size.y;
+        }
         size.x*=scaleFactor;
         size.y*=scaleFactor;
+        
         mSurface.getHolder().setFixedSize(size.x, size.y);
 
         mLayout = new FrameLayout(this);
