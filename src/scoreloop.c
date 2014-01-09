@@ -34,7 +34,7 @@
 widget_t* enter_nickname_btn=NULL;
 widget_t* enter_email_btn=NULL;
 
-char alias_buf[100]="";
+char alias_buf[100]="Set Alias";
 bool_t update_info=False;
 
 typedef enum TEXT_ENTRY_MODE

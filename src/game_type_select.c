@@ -44,7 +44,10 @@ widget_t* enter_event_btn = NULL;
 widget_t* practice_btn = NULL;
 widget_t* credits_btn = NULL;
 widget_t* pref_btn = NULL;
-widget_t* quit_btn = NULL;
+widget_t* buy_btn = NULL;
+
+widget_t* main_select_button=NULL;
+widget_t* main_quit_button=NULL;
 
 //The training mode of Tux Racer World challenge has been binded to the event mode of tuxracer
 void enter_event_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb)
@@ -105,7 +108,17 @@ void pref_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t b
     ui_set_dirty();
 }
 
-void quit_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb)
+void buy_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb)
+{
+    //TODO
+}
+
+void main_select_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type, widget_t* widget)
+{
+    GameMenu_keypress(SDLK_RETURN);
+}
+
+void main_quit_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type, widget_t* widget)
 {
     winsys_exit( 0 );
 }
@@ -113,6 +126,7 @@ void quit_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t b
 static void game_type_select_init(void)
 {
     point2d_t dummy_pos = {0, 0};
+    coord_t button_coord;
 
     winsys_set_display_func( main_loop );
     winsys_set_idle_func( main_loop );
@@ -128,8 +142,30 @@ static void game_type_select_init(void)
 	gui_add_widget(practice_btn=create_button("Play", practice_click_cb), NULL);
 	gui_add_widget(enter_event_btn=create_button("Tutorial", enter_event_click_cb), NULL);
 	gui_add_widget(pref_btn=create_button("Settings", pref_click_cb), NULL);
+	gui_add_widget(buy_btn=create_button("Upgrade", buy_click_cb), NULL);
 	gui_add_widget(credits_btn=create_button("Credits", credits_click_cb), NULL);
-	gui_add_widget(quit_btn=create_button("Quit", quit_click_cb), NULL);
+
+    if (is_on_ouya())
+    {
+        button_coord.x=0.30;
+        button_coord.y=0.09;
+        button_coord.x_just=button_coord.y_just=CENTER_JUST;
+        button_coord.x_coord_type=button_coord.y_coord_type=NORMALIZED_COORD;
+        gui_add_widget(main_quit_button=create_label(get_quit_text(), main_quit_cb), &button_coord);
+    }
+    else
+    {
+        gui_add_widget(main_quit_button=create_button(get_quit_text(), main_quit_cb), NULL);
+    }
+
+    if (is_on_ouya())
+    {
+        button_coord.x=0.70;
+        button_coord.y=0.09;
+        button_coord.x_just=button_coord.y_just=CENTER_JUST;
+        button_coord.x_coord_type=button_coord.y_coord_type=NORMALIZED_COORD;
+        gui_add_widget(main_select_button=create_label(get_select_text(), main_select_cb), &button_coord);
+    }
 
 	gui_balance_lines(1);
     

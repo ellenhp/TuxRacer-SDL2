@@ -588,7 +588,7 @@ static void race_select_init(void)
 	next_course_btn->font_binding="race_selection_title";
     
 	button_coord.x=0.30;
-	button_coord.y=0.13;
+	button_coord.y=0.09;
 	button_coord.x_just=CENTER_JUST;
 	gui_add_widget(back_button=create_button(get_back_text(), back_cb), &button_coord);
     

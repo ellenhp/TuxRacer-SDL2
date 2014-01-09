@@ -7,7 +7,7 @@
 
 static int overscan_percent=0;
 static char* player_name=0;
-static bool_t is_on_ouya=False;
+static bool_t is_on_ouya_val=False;
 
 #ifdef __ANDROID__
 JNIEXPORT jdouble JNICALL Java_com_moonlite_tuxracer_SDLActivity_nativeSetPlayerData
@@ -23,7 +23,7 @@ JNIEXPORT jdouble JNICALL Java_com_moonlite_tuxracer_SDLActivity_nativeSetPlayer
 	
 	if (on_ouya)
 	{
-		is_on_ouya=True;
+		is_on_ouya_val=True;
 		overscan_percent=5;
 	}
 	else
@@ -33,6 +33,11 @@ JNIEXPORT jdouble JNICALL Java_com_moonlite_tuxracer_SDLActivity_nativeSetPlayer
 }
 #endif
 
+bool_t is_on_ouya()
+{
+    return is_on_ouya_val;
+}
+
 int get_overscan_percent()
 {
 	return overscan_percent;
@@ -40,7 +45,7 @@ int get_overscan_percent()
 
 char* get_race_text()
 {
-	if (is_on_ouya)
+	if (is_on_ouya_val)
 	{
 		return "\x01 Race";
 	}
@@ -52,7 +57,7 @@ char* get_race_text()
 
 char* get_back_text()
 {
-	if (is_on_ouya)
+	if (is_on_ouya_val)
 	{
 		return "\x04 Back";
 	}
@@ -64,7 +69,7 @@ char* get_back_text()
 
 char* get_continue_text()
 {
-	if (is_on_ouya)
+	if (is_on_ouya_val)
 	{
 		return "\x01 Continue";
 	}
@@ -76,12 +81,36 @@ char* get_continue_text()
 
 char* get_abort_text()
 {
-	if (is_on_ouya)
+	if (is_on_ouya_val)
 	{
 		return "\x04 Exit Race";
 	}
 	else
 	{
 		return "Exit Race";
+	}
+}
+
+char* get_select_text()
+{
+	if (is_on_ouya_val)
+	{
+		return "\x01 Select";
+	}
+	else
+	{
+		return "Select";
+	}
+}
+
+char* get_quit_text()
+{
+	if (is_on_ouya_val)
+	{
+		return "\x04 Quit";
+	}
+	else
+	{
+		return "Quit";
 	}
 }

@@ -59,20 +59,6 @@ void end_game()
     g_game.race_paused=False;
     set_game_mode(RACE_SELECT);
 }
-
-bool_t has_game_controller()
-{
-    int i;
-    for (i=0; i<SDL_NumJoysticks(); i++)
-    {
-        if (SDL_IsGameController(i))
-        {
-            return True;
-        }
-    }
-    return False;
-}
-
 void come_back_to_game(void) {
 	if (SDL_GetTicks()-pause_start<pause_min_ticks)
 		return;
@@ -183,7 +169,7 @@ void paused_init(void)
 	button_coord.y=0.13;
 	button_coord.x_just=button_coord.y_just=CENTER_JUST;
     button_coord.x_coord_type=button_coord.y_coord_type=NORMALIZED_COORD;
-    if (has_game_controller())
+    if (winsys_is_controller_active())
     {
         gui_add_widget(back_button=create_label(get_abort_text(), paused_back_cb), &button_coord);
     }
@@ -193,7 +179,7 @@ void paused_init(void)
     }
     
 	button_coord.x=0.63;
-    if (has_game_controller())
+    if (winsys_is_controller_active())
     {
         gui_add_widget(play_button=create_label(get_continue_text(), paused_continue_cb), &button_coord);
     }

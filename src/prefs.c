@@ -62,7 +62,8 @@ widget_t* view_slider=NULL;
 
 widget_t* fps_slider=NULL;
 
-widget_t* scoreloop_btn = NULL;
+widget_t* prefs_select_button=NULL;
+widget_t* prefs_back_button=NULL;
 
 int graphics_ticks=0;
 
@@ -122,8 +123,20 @@ void update_fps(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, 
 	write_config_file();
 }
 
-static void prefs_init(void) 
+void prefs_select_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type, widget_t* widget)
 {
+    GameMenu_keypress(SDLK_RETURN);
+}
+
+void prefs_back_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type, widget_t* widget)
+{
+    set_game_mode( GAME_TYPE_SELECT );
+}
+
+static void prefs_init(void)
+{
+    coord_t button_coord;
+
     winsys_set_display_func( main_loop );
     winsys_set_idle_func( main_loop );
     winsys_set_reshape_func( reshape );
@@ -164,7 +177,29 @@ static void prefs_init(void)
     scoreloop_add_widgets();
     
     gui_balance_lines(0);
-	
+    
+    if (is_on_ouya())
+    {
+        button_coord.x=0.30;
+        button_coord.y=0.19;
+        button_coord.x_just=button_coord.y_just=CENTER_JUST;
+        button_coord.x_coord_type=button_coord.y_coord_type=NORMALIZED_COORD;
+        gui_add_widget(prefs_back_button=create_label(get_back_text(), prefs_back_cb), &button_coord);
+    }
+    else
+    {
+        gui_add_widget(prefs_back_button=create_button(get_back_text(), prefs_back_cb), NULL);
+    }
+    
+    if (is_on_ouya())
+    {
+        button_coord.x=0.70;
+        button_coord.y=0.19;
+        button_coord.x_just=button_coord.y_just=CENTER_JUST;
+        button_coord.x_coord_type=button_coord.y_coord_type=NORMALIZED_COORD;
+        gui_add_widget(prefs_select_button=create_label(get_select_text(), prefs_select_cb), &button_coord);
+    }
+
     play_music( "start_screen" );
 }
 
