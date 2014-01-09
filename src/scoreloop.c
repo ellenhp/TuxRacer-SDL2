@@ -1,5 +1,3 @@
-
-
 #include "tuxracer.h"
 #include "audio.h"
 #include "game_config.h"
@@ -82,6 +80,30 @@ void email_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t 
     text_entry=TEXT_ENTRY_EMAIL;
 }
 
+void scoreloop_add_widgets()
+{
+    if (!update_info)
+    {
+        update_info=True;
+        gui_add_widget(enter_nickname_btn=create_button(alias_buf, nickname_click_cb), NULL);
+        update_info=False;
+    }
+    else
+    {
+        gui_add_widget(enter_nickname_btn=create_button("Set Alias", nickname_click_cb), NULL);
+    }
+    gui_add_widget(enter_email_btn=create_button("Set Email", email_click_cb), NULL);
+}
+
+void scoreloop_update_widgets()
+{
+    if (update_info)
+    {
+        button_set_text(enter_nickname_btn, alias_buf);
+        update_info=False;
+    }
+}
+
 #ifdef __ANDROID__
 JNIEXPORT void JNICALL JNI(SDLActivity_nativeTextCallback)(JNIEnv *env, jclass cls, jstring str)
 {
@@ -144,107 +166,3 @@ JNIEXPORT void JNICALL JNI(SDLActivity_nativeUpdateUserInfo)(JNIEnv *env, jclass
     update_info=True;
 }
 #endif
-
-static void scoreloop_init(void)
-{
-    winsys_set_display_func( main_loop );
-    winsys_set_idle_func( main_loop );
-    winsys_set_reshape_func( reshape );
-    winsys_set_mouse_func( GameMenu_mouse_func );
-    winsys_set_motion_func( GameMenu_motion_func );
-    winsys_set_passive_motion_func( GameMenu_motion_func );
-	winsys_set_joystick_func( GameMenu_joystick_func );
-	winsys_set_joystick_button_func( GameMenu_joystick_button_func );
-
-	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_B, SDLK_ESCAPE);
-
-	GameMenu_init();
-	setup_gui();
-    
-    if (!update_info)
-    {
-        update_info=True;
-        gui_add_widget(enter_nickname_btn=create_button(alias_buf, nickname_click_cb), NULL);
-        update_info=False;
-    }
-    else
-    {
-        gui_add_widget(enter_nickname_btn=create_button("Set Alias", nickname_click_cb), NULL);
-    }
-	gui_add_widget(enter_email_btn=create_button("Set Email", email_click_cb), NULL);
-
-	gui_balance_lines(0);
-    
-    play_music( "start_screen" );
-}
-
-static void scoreloop_loop( scalar_t time_step )
-{
-    int width, height;
-    width = getparam_x_resolution();
-    height = getparam_y_resolution();
-    
-    check_gl_error();
-    
-    update_audio();
-    
-    clear_rendering_context();
-    
-    set_gl_options( GUI );
-    
-    ui_setup_display();
-    
-    if (getparam_ui_snow()) {
-        update_ui_snow( time_step, False );
-        draw_ui_snow();
-    }
-
-	ui_draw_menu_decorations(True);
-    
-    if (update_info)
-    {
-        button_set_text(enter_nickname_btn, alias_buf);
-        update_info=False;
-    }
-    
-	GameMenu_draw();
-
-    ui_draw_cursor();
-    
-    reshape( width, height );
-    
-    winsys_swap_buffers();
-} 
-
-START_KEYBOARD_CB( scoreloop_key_cb )
-{
-	if (release) return;
-
-	switch (key)
-	{
-	case SDLK_ESCAPE:
-	case SDLK_q:
-	case SDLK_AC_BACK:
-        set_game_mode( PREFS );
-		break;
-	default:
-	    GameMenu_keypress(key);
-	}
-
-}
-END_KEYBOARD_CB
-
-void scoreloop_register()
-{
-    int status = 0;
-    
-    status |= add_keymap_entry( SCORELOOP, 
-                               DEFAULT_CALLBACK, 
-                               NULL, NULL, scoreloop_key_cb );
-    
-    check_assertion( status == 0, "out of keymap entries" );
-    
-    register_loop_funcs( SCORELOOP, scoreloop_init, scoreloop_loop, NULL );
-}
-
-

@@ -8,6 +8,8 @@
 
 font_t* menu_font;
 
+double y_offset=0;
+
 /*
  * This is here to allow ui_mgr to know about the position of the cursor so it can render it on top of the menus
  */
@@ -52,6 +54,7 @@ void GameMenu_simulate_click(widget_t* widget)
 
 void GameMenu_init()
 {
+    y_offset=0;
 	gui_set_select_button(getparam_joystick_continue_button());
 }
 
@@ -59,6 +62,11 @@ void GameMenu_draw()
 {
 	gui_update();
 	gui_draw();
+}
+
+void GameMenu_set_y_offset(double offset)
+{
+    y_offset=offset;
 }
 
 coord_t get_absolute(coord_t coord, int asc, int desc)
@@ -104,6 +112,7 @@ coord_t get_absolute(coord_t coord, int asc, int desc)
 		absolute.y=(int)(h/2-coord.y*(asc+desc));
 		break;
 	}
+    absolute.y+=y_offset*h;
 	return absolute;
 }
 

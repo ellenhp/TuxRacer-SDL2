@@ -112,7 +112,7 @@ void ui_draw_menu_decorations(bool_t draw_logo)
 		/* title */
 		if ( get_texture_binding( title, &texobj ) ) {
 			glBindTexture( GL_TEXTURE_2D, texobj );
-			draw_quad( w/2-h/3, h*0.95-h/3, h/3*2, h/3 );
+			draw_quad( w/2-h*0.3, h*0.965-h*0.3, h*0.3*2, h*0.3 );
 		}
 	}
 

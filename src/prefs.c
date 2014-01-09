@@ -122,13 +122,6 @@ void update_fps(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, 
 	write_config_file();
 }
 
-void scoreloop_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb)
-{
-    set_game_mode( SCORELOOP );
-    
-    ui_set_dirty();
-}
-
 static void prefs_init(void) 
 {
     winsys_set_display_func( main_loop );
@@ -144,6 +137,7 @@ static void prefs_init(void)
 
 	GameMenu_init();
 	setup_gui();
+    GameMenu_set_y_offset(-0.1);
 
 	music_volume_slider=create_slider("Music Volume: ", 11, NULL, update_music_volume);
 	slider_set_value(music_volume_slider, getparam_music_volume());
@@ -164,13 +158,13 @@ static void prefs_init(void)
 	fps_slider=create_slider("Show FPS: ", 2, "No|Yes", update_fps);
 	slider_set_value(fps_slider, getparam_display_fps());
 	gui_add_widget(fps_slider, NULL);
-
-	gui_add_widget(scoreloop_btn=create_button("Scoreboard Settings", scoreloop_click_cb), NULL);
-
-	gui_balance_lines(1);
-	
+    
 	display_fps=getparam_display_fps();
 
+    scoreloop_add_widgets();
+    
+    gui_balance_lines(0);
+	
     play_music( "start_screen" );
 }
 
@@ -196,6 +190,8 @@ static void prefs_loop( scalar_t time_step )
     }
 
 	ui_draw_menu_decorations(True);
+    
+    scoreloop_update_widgets();
 
 	GameMenu_draw();
 

@@ -132,6 +132,8 @@ static void game_type_select_init(void)
 	gui_add_widget(quit_btn=create_button("Quit", quit_click_cb), NULL);
 
 	gui_balance_lines(1);
+    
+    GameMenu_set_y_offset(0);
 
 	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_B, SDLK_ESCAPE);
 
