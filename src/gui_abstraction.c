@@ -116,6 +116,9 @@ coord_t get_absolute(coord_t coord, int asc, int desc)
 	return absolute;
 }
 
+#define LEFT_ARROW	"\x05"
+#define RIGHT_ARROW	"\x06"
+
 widget_bounding_box_t GameMenu_get_bb(widget_t* widget)
 {
 	widget_bounding_box_t bb;
@@ -123,6 +126,7 @@ widget_bounding_box_t GameMenu_get_bb(widget_t* widget)
     font_t *font;
     int w, asc, desc;
 	coord_t absolute_coord;
+    char text[100];
 
     if (!get_font_binding( "button_label", &font ))
 	{
@@ -134,7 +138,15 @@ widget_bounding_box_t GameMenu_get_bb(widget_t* widget)
 	else
 	{
 		bind_font_texture( font );
-		get_font_metrics( font, widget->text, &w, &asc, &desc );
+        if (widget->active)
+        {
+            sprintf(text, LEFT_ARROW " %s " RIGHT_ARROW, widget->text);
+        }
+        else
+        {
+            strcpy(text, widget->text);
+        }
+		get_font_metrics( font, text, &w, &asc, &desc );
 	}
 	
 	absolute_coord=get_absolute(widget->layout_info, asc, desc);
