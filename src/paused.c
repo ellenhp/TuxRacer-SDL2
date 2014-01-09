@@ -57,7 +57,7 @@ void end_game()
 {
     g_game.race_aborted=True;
     g_game.race_paused=False;
-    set_game_mode(GAME_OVER);
+    set_game_mode(RACE_SELECT);
 }
 
 bool_t has_game_controller()
