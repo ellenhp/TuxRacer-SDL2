@@ -5,7 +5,6 @@
 
 int get_overscan_percent();
 
-int get_course_index(char* course_name);
 int get_num_courses();
 
 bool_t is_on_ouya();

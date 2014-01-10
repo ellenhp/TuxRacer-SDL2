@@ -1,4 +1,5 @@
 #include "platform.h"
+#include "course_load.h"
 #include "tuxracer.h"
 
 #ifdef __ANDROID__
@@ -43,16 +44,33 @@ int get_overscan_percent()
 	return overscan_percent;
 }
 
+float course_price = 2.99;
+char race_button_text[20];
+
 char* get_race_text()
 {
-	if (is_on_ouya_val)
+	const char* button_format;
+	const char* course_name = get_current_course_name();
+
+	if (!is_course_free(course_name) && (course_price != 0.0))
 	{
-		return "\x01 Race";
+		button_format = "Buy $%0.2f";
 	}
 	else
 	{
-		return "Race";
+		button_format = "Race";
 	}
+
+	if (is_on_ouya_val)
+	{
+		strcpy(race_button_text, "'\x01 ");
+		sprintf(race_button_text+2, button_format, course_price);
+	}
+	else
+	{
+		sprintf(race_button_text, button_format, course_price);
+	}
+	return race_button_text;
 }
 
 char* get_back_text()

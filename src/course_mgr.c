@@ -98,6 +98,37 @@ list_t get_score_courses_list( )
     return score_course_list;
 }
 
+/* Return 1-based index for a course_name or 0 if not found */
+unsigned int get_course_index(const char* course_name)
+{
+	int course_index = 0;
+    list_t course_list=get_score_courses_list();
+    list_elem_t cur_elem=get_list_head(course_list);
+	while (cur_elem != NULL)
+	{
+	    open_course_data_t *data = (open_course_data_t*) get_list_elem_data(cur_elem);
+
+		if (strcmp(data->course, course_name) == 0)
+		{
+			return course_index + 1;
+		}
+		++course_index;
+		cur_elem=(open_course_data_t*) get_next_list_elem(course_list, cur_elem);
+	}
+	return 0U;
+}
+
+#define BUNNY_HILL_MASK		0x0001U
+#define FROZEN_RIVER_MASK	0x0002U
+#define SKI_JUMP_MASK		0x0100U
+#define COURSE_FREE_MASK	(BUNNY_HILL_MASK | FROZEN_RIVER_MASK | SKI_JUMP_MASK)
+
+bool_t is_course_free(const char* course_name)
+{
+	unsigned int course_index = get_course_index(course_name);
+	return (course_index > 0) && ((COURSE_FREE_MASK >> (course_index - 1)) & 0x1U) != 0;
+}
+
 
 /*---------------------------------------------------------------------------*/
 /*! 

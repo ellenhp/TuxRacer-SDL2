@@ -34,26 +34,6 @@ unsigned int current_scoreboard=-1;
 int stored_score_mode=-1;
 int stored_score_value=0;
 
-/* Return 1-based index for a course_name or 0 if not found */
-unsigned int get_score_index(const char* course_name)
-{
-	int course_index = 0;
-    list_t course_list=get_score_courses_list();
-    list_elem_t cur_elem=get_list_head(course_list);
-	while (cur_elem != NULL)
-	{
-	    open_course_data_t *data = (open_course_data_t*) get_list_elem_data(cur_elem);
-
-		if (strcmp(data->course, course_name) == 0)
-		{
-			return course_index + 1;
-		}
-		++course_index;
-		cur_elem=(open_course_data_t*) get_next_list_elem(course_list, cur_elem);
-	}
-	return 0U;
-}
-
 #ifdef __ANDROID__
 
 #include <jni.h>
@@ -211,7 +191,7 @@ void init_scoreboard_arrays()
 void refresh_scores_for_course(const char* course_name)
 {
 #ifdef __ANDROID__
-	current_scoreboard = get_score_index(course_name);
+	current_scoreboard = get_course_index(course_name);
 	scoreloop_refresh_scores(current_scoreboard);
 #else
 #endif
@@ -271,7 +251,7 @@ widget_t* get_rank_label(int rank)
 void submit_score(const char* course_name, int course_score)
 {
 #ifdef __ANDROID__
-	unsigned int courseID = get_score_index(course_name);
+	unsigned int courseID = get_course_index(course_name);
 	scoreloop_submit_score(courseID, course_score);
 #else
 	print_debug(DEBUG_OTHER, "");

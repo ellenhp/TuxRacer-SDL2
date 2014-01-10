@@ -44,6 +44,8 @@ void init_course_manager();
 list_t get_open_courses_list( );
 list_t get_speed_courses_list( );
 list_t get_score_courses_list( );
+unsigned int get_course_index(const char* course_name);
+bool_t is_course_free(const char* course_name);
 
 list_t get_events_list(  );
 list_elem_t get_event_by_name( char *event_name );

@@ -90,7 +90,7 @@ static widget_t* back_button=NULL;
 /* Forward declaration */
 static void race_select_loop( scalar_t time_step );
 
-char* get_current_course_name()
+const char* get_current_course_name()
 {
     open_course_data_t *data;
     data = (open_course_data_t*) get_list_elem_data( cur_elem );
@@ -330,13 +330,16 @@ void update_text()
         textarea_set_text( desc_ta, data->description );
 		button_set_text(course_title_label, data->name);
 		SDL_Log("update_text practice=%s", data->course);
+		button_set_text(play_button, get_race_text());
 		refresh_scores_for_course(data->course);
     } else {
         race_data_t *data;
+
         data = (race_data_t*) get_list_elem_data( cur_elem );
         textarea_set_text( desc_ta, data->description );
 		button_set_text(course_title_label, data->name);
 		SDL_Log("update_text race=%s", data->course);
+		button_set_text(play_button, get_race_text());
 		refresh_scores_for_course(data->course);
     }
 }

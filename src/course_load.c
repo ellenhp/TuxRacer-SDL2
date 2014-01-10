@@ -101,6 +101,7 @@ point2d_t     get_start_pt()            { return start_pt; }
 void          set_start_pt( point2d_t p ) { start_pt = p; }
 char         *get_course_author()       { return course_author; }
 char         *get_course_name()         { return course_name; }
+
 char		 *get_calculation_mode()    { if (calculation_mode != NULL) return calculation_mode; else return "default"; }
 
 item_t       *get_item_locs()           { return item_locs; }

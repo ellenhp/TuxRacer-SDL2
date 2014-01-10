@@ -31,8 +31,15 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeSet;
 
+import com.amazon.inapp.purchasing.Item;
+import com.amazon.inapp.purchasing.PurchasingManager;
+import com.moonlite.tuxracer.AppPurchasingObserver.PurchaseData;
+import com.moonlite.tuxracer.AppPurchasingObserver.PurchaseDataStorage;
 import com.scoreloop.client.android.core.controller.RequestController;
 import com.scoreloop.client.android.core.controller.RequestControllerObserver;
 import com.scoreloop.client.android.core.controller.ScoreController;
@@ -51,8 +58,9 @@ import tv.ouya.console.api.*;
 /**
     SDL Activity
 */
-public class SDLActivity extends Activity {
-    private static final String TAG = "SDL";
+public class SDLActivity extends Activity implements
+AppPurchasingObserverListener {
+    private static final String TAG = "Tuxracer";
 
     // Keep track of the paused state
     public static boolean mIsPaused = false, mIsSurfaceReady = false, mHasFocus = true;
@@ -108,6 +116,302 @@ public class SDLActivity extends Activity {
 		return new String(buf);
     }
 
+	/************************************************************************/
+	/*																		*/
+	/*				A M A Z O N   I N   A P P   P U R C H A S E				*/
+	/*																		*/
+	/************************************************************************/
+
+    private PurchaseDataStorage purchaseDataStorage;
+    
+    void AmazonInitIAP()
+    {
+    	/**
+    	 * Setup for IAP SDK called from onCreate. Sets up
+    	 * {@link PurchaseDataStorage} for storing purchase receipt data,
+    	 * {@link AppPurchasingObserver} for listening to IAP API callbacks and sets
+    	 * up this activity as a {@link AppPurchasingObserverListener} to listen for
+    	 * callbacks from the {@link AppPurchasingObserver}.
+    	 */
+        purchaseDataStorage = new PurchaseDataStorage(this);
+
+		AppPurchasingObserver purchasingObserver = new AppPurchasingObserver(
+				this, purchaseDataStorage);
+		purchasingObserver.setListener(this);
+		
+		Log.i(TAG, "onCreate: registering AppPurchasingObserver");
+		PurchasingManager.registerObserver(purchasingObserver);
+    }
+    
+	/**
+	 * Callback for a successful get user id response
+	 * {@link GetUserIdResponseStatus#SUCCESSFUL}.
+	 * 
+	 * In this sample app, if the user changed from the previously stored user,
+	 * this method updates the display based on purchase data stored for the
+	 * user in SharedPreferences.  The entitlement is fulfilled
+	 * if a stored purchase token was found to NOT be fulfilled or if the SKU
+	 * should be fulfilled.
+	 * 
+	 * @param userId
+	 *            returned from {@link GetUserIdResponse#getUserId()}.
+	 * @param userChanged
+	 *            - whether user changed from previously stored user.
+	 */
+	@Override
+	public void onGetUserIdResponseSuccessful(String userId, boolean userChanged) {
+		Log.i(TAG, "onGetUserIdResponseSuccessful: update display if userId ("
+				+ userId + ") user changed from previous stored user ("
+				+ userChanged + ")");
+
+		if (!userChanged)
+			return;
+
+		// Reset to original setting where level2 is disabled
+//		disableEntitlementInView();
+
+		Set<String> requestIds = purchaseDataStorage.getAllRequestIds();
+		Log.i(TAG, "onGetUserIdResponseSuccessful: (" + requestIds.size()
+				+ ") saved requestIds");
+		for (String requestId : requestIds) {
+			PurchaseData purchaseData = purchaseDataStorage
+					.getPurchaseData(requestId);
+			if (purchaseData == null) {
+				Log.i(TAG,
+						"onGetUserIdResponseSuccessful: could NOT find purchaseData for requestId ("
+								+ requestId + "), skipping");
+				continue;
+			}
+			if (purchaseDataStorage.isRequestStateSent(requestId)) {
+				Log.i(TAG,
+						"onGetUserIdResponseSuccessful: have not received purchase response for requestId still in SENT status: requestId ("
+								+ requestId + "), skipping");
+				continue;
+			}
+
+			Log.d(TAG, "onGetUserIdResponseSuccessful: requestId (" + requestId
+					+ ") " + purchaseData);
+
+			String purchaseToken = purchaseData.getPurchaseToken();
+			String sku = purchaseData.getSKU();
+			if (!purchaseData.isPurchaseTokenFulfilled()) {
+				Log.i(TAG, "onGetUserIdResponseSuccess: requestId ("
+						+ requestId + ") userId (" + userId + ") sku (" + sku
+						+ ") purchaseToken (" + purchaseToken
+						+ ") was NOT fulfilled, fulfilling purchase now");
+				onPurchaseResponseSuccess(userId, sku, purchaseToken);
+
+				purchaseDataStorage.setPurchaseTokenFulfilled(purchaseToken);
+				purchaseDataStorage.setRequestStateFulfilled(requestId);
+			} else {
+				boolean shouldFulfillSKU = purchaseDataStorage
+						.shouldFulfillSKU(sku);
+				if (shouldFulfillSKU) {
+					Log.i(TAG, "onGetUserIdResponseSuccess: should fulfill sku ("
+							+ sku + ") is true, so fulfilling purchasing now");
+					onPurchaseUpdatesResponseSuccess(userId, sku, purchaseToken);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Callback for a failed get user id response
+	 * {@link GetUserIdRequestStatus#FAILED}
+	 * 
+	 * @param requestId
+	 *            returned from {@link GetUserIdResponsee#getRequestId()} that
+	 *            can be used to correlate with original request sent with
+	 *            {@link PurchasingManager#initiateGetUserIdRequest()}.
+	 */
+	@Override
+	public void onGetUserIdResponseFailed(String requestId) {
+		Log.i(TAG, "onGetUserIdResponseFailed for requestId (" + requestId
+				+ ")");
+	}
+
+	/**
+	 * Callback for successful item data response with unavailable SKUs
+	 * {@link ItemDataRequestStatus#SUCCESSFUL_WITH_UNAVAILABLE_SKUS}. This
+	 * means that these unavailable SKUs are NOT accessible in developer portal.
+	 * 
+	 * In this sample app, we disable the buy button for these SKUs.
+	 * 
+	 * @param unavailableSkus
+	 *            - skus that are not valid in developer portal
+	 */
+	@Override
+	public void onItemDataResponseSuccessfulWithUnavailableSkus(
+			Set<String> unavailableSkus) {
+		Log.i(TAG, "onItemDataResponseSuccessfulWithUnavailableSkus: for ("
+				+ unavailableSkus.size() + ") unavailableSkus");
+//		disableButtonsForUnavailableSkus(unavailableSkus);
+	}
+
+	/**
+	 * Callback for successful item data response
+	 * {@link ItemDataRequestStatus#SUCCESSFUL} with item data
+	 * 
+	 * @param itemData
+	 *            - map of valid SKU->Items
+	 */
+	@Override
+	public void onItemDataResponseSuccessful(Map<String, Item> itemData) {
+		for (Entry<String, Item> entry : itemData.entrySet()) {
+			String sku = entry.getKey();
+			Item item = entry.getValue();
+			Log.i(TAG, "onItemDataResponseSuccessful: sku (" + sku + ") item ("
+					+ item + ")");
+			if (MySKU.COURSE_PACK.getSku().equals(sku)) {
+//			    enableBuyEntitlementButton();
+			}
+		}
+	}
+
+	/**
+	 * Callback for failed item data response
+	 * {@link ItemDataRequestStatus#FAILED}.
+	 * 
+	 * @param requestId
+	 */
+	public void onItemDataResponseFailed(String requestId) {
+		Log.i(TAG, "onItemDataResponseFailed: for requestId (" + requestId
+				+ ")");
+	}
+
+	/**
+	 * Callback on successful purchase response
+	 * {@link PurchaseRequestStatus#SUCCESSFUL}. In this sample app, we show
+	 * level 2 as enabled
+	 * 
+	 * @param sku
+	 */
+	@Override
+	public void onPurchaseResponseSuccess(String userId, String sku,
+			String purchaseToken) {
+		Log.i(TAG, "onPurchaseResponseSuccess: for userId (" + userId
+				+ ") sku (" + sku + ") purchaseToken (" + purchaseToken + ")");
+//	  enableEntitlementForSKU(sku);
+	}
+
+	/**
+	 * Callback when user is already entitled
+	 * {@link PurchaseRequestStatus#ALREADY_ENTITLED} to sku passed into
+	 * initiatePurchaseRequest.
+	 * 
+	 * @param userId
+	 */
+	@Override
+	public void onPurchaseResponseAlreadyEntitled(String userId, String sku) {
+		Log.i(TAG, "onPurchaseResponseAlreadyEntitled: for userId (" + userId
+				+ ") sku ("+sku+")");
+		// For entitlements, even if already entitled, make sure to enable.
+//	  enableEntitlementForSKU(sku);
+	}
+
+	/**
+	 * Callback when sku passed into
+	 * {@link PurchasingManager#initiatePurchaseRequest} is not valid
+	 * {@link PurchaseRequestStatus#INVALID_SKU}.
+	 * 
+	 * @param userId
+	 * @param sku
+	 */
+	@Override
+	public void onPurchaseResponseInvalidSKU(String userId, String sku) {
+		Log.i(TAG, "onPurchaseResponseInvalidSKU: for userId (" + userId + ") sku ("+sku+")");
+	}
+
+	/**
+	 * Callback on failed purchase response {@link PurchaseRequestStatus#FAILED}
+	 * .
+	 * 
+	 * @param requestId
+	 * @param sku
+	 */
+	@Override
+	public void onPurchaseResponseFailed(String requestId, String sku) {
+		Log.i(TAG, "onPurchaseResponseFailed: for requestId (" + requestId
+				+ ") sku ("+sku+")");
+	}
+
+	/**
+	 * Callback on successful purchase updates response
+	 * {@link PurchaseUpdatesRequestStatus#SUCCESSFUL} for each receipt.
+	 * 
+	 * In this sample app, we show level 2 as enabled.
+	 * 
+	 * @param userId
+	 * @param sku
+	 * @param purchaseToken
+	 */
+	@Override
+	public void onPurchaseUpdatesResponseSuccess(String userId, String sku,
+			String purchaseToken) {
+		Log.i(TAG, "onPurchaseUpdatesResponseSuccess: for userId (" + userId
+				+ ") sku (" + sku + ") purchaseToken (" + purchaseToken + ")");
+//	  enableEntitlementForSKU(sku);
+	}
+
+	/**
+	 * Callback on successful purchase updates response
+	 * {@link PurchaseUpdatesRequestStatus#SUCCESSFUL} for revoked SKU.
+	 * 
+	 * In this sample app, we revoke fulfillment if level 2 sku has been revoked
+	 * by showing level 2 as disabled
+	 * 
+	 * @param userId
+	 * @param revokedSKU
+	 */
+	@Override
+	public void onPurchaseUpdatesResponseSuccessRevokedSku(String userId,
+			String revokedSku) {
+		Log.i(TAG, "onPurchaseUpdatesResponseSuccessRevokedSku: for userId ("
+				+ userId + ") revokedSku (" + revokedSku + ")");
+		if (!MySKU.COURSE_PACK.getSku().equals(revokedSku))
+			return;
+
+		Log.i(TAG,
+				"onPurchaseUpdatesResponseSuccessRevokedSku: disabling play level 2 button");
+//		disableEntitlementInView();
+
+		Log.i(TAG,
+				"onPurchaseUpdatesResponseSuccessRevokedSku: fulfilledCountDown for revokedSKU ("
+						+ revokedSku + ")");
+	}
+
+	/**
+	 * Callback on failed purchase updates response
+	 * {@link PurchaseUpdatesRequestStatus#FAILED}
+	 * 
+	 * @param requestId
+	 */
+	public void onPurchaseUpdatesResponseFailed(String requestId) {
+		Log.i(TAG, "onPurchaseUpdatesResponseFailed: for requestId ("
+				+ requestId + ")");
+	}
+
+    void AmazonRequestIAP()
+    {
+		Log.i(TAG, "onResume: call initiateGetUserIdRequest");
+		PurchasingManager.initiateGetUserIdRequest();
+
+		Log.i(TAG, "onResume: call initiateItemDataRequest for skus: " + MySKU.getAll());
+		PurchasingManager.initiateItemDataRequest(MySKU.getAll());
+    }
+
+	/**
+	 * JNI Callback called when user clicks button to buy the course_pack
+	 * entitlement. This method calls
+	 * {@link PurchasingManager#initiatePurchaseRequest(String)} with the SKU
+	 * for the course_pack entitlement.
+	 */
+	public void AmazonBuyCoursePack(View view) {
+		String requestId = PurchasingManager.initiatePurchaseRequest(MySKU.COURSE_PACK.getSku());
+		PurchaseData purchaseData = purchaseDataStorage.newPurchaseData(requestId);
+		Log.i(TAG, "AmazonBuyCoursePack: requestId (" + requestId + ") requestState (" + purchaseData.getRequestState() + ")");
+	}
+    
     // Setup
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -162,6 +466,7 @@ public class SDLActivity extends Activity {
         	 }
         });
         controller.query(this);
+        AmazonInitIAP();
     }
     
     private static void updateUserInfo()
@@ -194,10 +499,6 @@ public class SDLActivity extends Activity {
         Log.v("SDL", "onPause()");
         super.onPause();
         SDLActivity.handlePause();
-		// Don't do this here even though its recommended seems to cause problems on OUYA
-//        if (agsClient != null) {
-//            AmazonGamesClient.release();
-//        }
 	}
 
     @Override
@@ -205,8 +506,7 @@ public class SDLActivity extends Activity {
         Log.v("SDL", "onResume()");
         super.onResume();
         SDLActivity.handleResume();
-		// Don't do this here even though its recommended seems to cause problems on OUYA
-//        AmazonGamesClient.initialize(this, callback, myGameFeatures);
+        AmazonRequestIAP();
      }
 
 
@@ -617,6 +917,12 @@ public class SDLActivity extends Activity {
         return Arrays.copyOf(filtered, used);
     }
 
+	/************************************************************************/
+	/*																		*/
+	/*				S C O R E L O O P   A C H E I V E M E N T				*/
+	/*																		*/
+	/************************************************************************/
+
     public static void setUserEmail(String email)
     {
     	class EmailSetter implements Runnable
@@ -972,6 +1278,7 @@ public class SDLActivity extends Activity {
     		return false;
     	}
     }
+
 }
 
 /**

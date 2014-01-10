@@ -32,6 +32,7 @@
 #include "racing.h"
 #include "paused.h"
 #include "hud.h"
+#include "hud_training.h"
 #include "game_over.h"
 #ifdef TARGET_OS_IPHONE
     #include "sharedGeneralFunctions.h"

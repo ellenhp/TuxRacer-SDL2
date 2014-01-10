@@ -7,5 +7,6 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry kind="lib" path="libs/ouya-sdk.jar"/>
 	<classpathentry kind="lib" path="libs/scoreloop-core.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/dev/InAppPurchasing/lib/in-app-purchasing-1.0.3.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
