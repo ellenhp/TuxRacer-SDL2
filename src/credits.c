@@ -44,7 +44,7 @@
 #define CREDITS_MAX_Y -140
 #define CREDITS_MIN_Y 64
 
-#define CREDITS_SPEED 35
+#define CREDITS_SPEED 40
 #define CREDITS_JOYSTICK_SPEED 150
 
 double joystick_y;
@@ -57,25 +57,23 @@ typedef struct {
 static credit_line_t credit_lines[] = 
 {
     { "credits_text", "" },
-    { "credits_text", "" },
-    { "credits_text", "" },
-    { "credits_h1", "Tux Racer SDL2" }, //a real name will come later
+    { "credits_h1", "Tux Racer" }, //a real name will come later
     { "credits_text_small", "" },
     { "credits_text_small", "This program is free software;" },
     { "credits_text_small", "you can redistribute it and/or" },
     { "credits_text_small", "modify it under the terms of the" },
     { "credits_text_small", "GNU General Public License" },
     { "credits_text_small", "" },
-    { "credits_text", "\x01\x02\x03\x04 Ported from" },
+    { "credits_text", "Ported from" },
     { "credits_text", "the open source project" },
     { "credits_text", "Tux Racer 4iOS" },
     { "credits_text", "" },
-    { "credits_h2", "Tux Racer SDL2" },
     { "credits_h2", "Development Team:" },
+    { "credits_text_small", "(Alphabetical Order)" },
     { "credits_text", "Lennie Araki" },
     { "credits_text", "Nolan Poe" },
     { "credits_text", "" },
-    { "credits_h2", "Tux Racer" },
+    { "credits_h2", "Original Tux Racer" },
     { "credits_h2", "Core Development Team:" },
     { "credits_text_small", "(Alphabetical Order)" },
     { "credits_text", "Patrick \"Pog\" Gilhuly" },
@@ -91,8 +89,7 @@ static credit_line_t credit_lines[] =
     { "credits_text", "Emmanuel de Roux" },
     { "credits_text", "Felix Jankowski" },  
     { "credits_text", "" },
-    { "credits_text", "" },
-    { "credits_text", "Source available at:" },
+    { "credits_h2", "Source available at:" },
     { "credits_text", "https://github.com/nopoe/TuxRacer-SDL2" },
 };
 
