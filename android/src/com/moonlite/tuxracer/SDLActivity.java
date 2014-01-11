@@ -122,7 +122,7 @@ AppPurchasingObserverListener {
 	/*																		*/
 	/************************************************************************/
 
-    private PurchaseDataStorage purchaseDataStorage;
+    private static PurchaseDataStorage purchaseDataStorage;
     
     void AmazonInitIAP()
     {
@@ -167,12 +167,11 @@ AppPurchasingObserverListener {
 		if (!userChanged)
 			return;
 
-		// Reset to original setting where level2 is disabled
+		// Reset to original setting where entitlement is disabled
 //		disableEntitlementInView();
 
 		Set<String> requestIds = purchaseDataStorage.getAllRequestIds();
-		Log.i(TAG, "onGetUserIdResponseSuccessful: (" + requestIds.size()
-				+ ") saved requestIds");
+		Log.i(TAG, "onGetUserIdResponseSuccessful: (" + requestIds.size() + ") saved requestIds");
 		for (String requestId : requestIds) {
 			PurchaseData purchaseData = purchaseDataStorage
 					.getPurchaseData(requestId);
@@ -189,8 +188,7 @@ AppPurchasingObserverListener {
 				continue;
 			}
 
-			Log.d(TAG, "onGetUserIdResponseSuccessful: requestId (" + requestId
-					+ ") " + purchaseData);
+			Log.d(TAG, "onGetUserIdResponseSuccessful: requestId (" + requestId + ") " + purchaseData);
 
 			String purchaseToken = purchaseData.getPurchaseToken();
 			String sku = purchaseData.getSKU();
@@ -226,8 +224,7 @@ AppPurchasingObserverListener {
 	 */
 	@Override
 	public void onGetUserIdResponseFailed(String requestId) {
-		Log.i(TAG, "onGetUserIdResponseFailed for requestId (" + requestId
-				+ ")");
+		Log.i(TAG, "onGetUserIdResponseFailed for requestId (" + requestId + ")");
 	}
 
 	/**
@@ -235,20 +232,16 @@ AppPurchasingObserverListener {
 	 * {@link ItemDataRequestStatus#SUCCESSFUL_WITH_UNAVAILABLE_SKUS}. This
 	 * means that these unavailable SKUs are NOT accessible in developer portal.
 	 * 
-	 * In this sample app, we disable the buy button for these SKUs.
-	 * 
 	 * @param unavailableSkus
 	 *            - skus that are not valid in developer portal
 	 */
 	@Override
 	public void onItemDataResponseSuccessfulWithUnavailableSkus(
 			Set<String> unavailableSkus) {
-		Log.i(TAG, "onItemDataResponseSuccessfulWithUnavailableSkus: for ("
-				+ unavailableSkus.size() + ") unavailableSkus");
-//		disableButtonsForUnavailableSkus(unavailableSkus);
+		Log.i(TAG, "onItemDataResponseSuccessfulWithUnavailableSkus: for (" + unavailableSkus.size() + ") unavailableSkus");
 	}
 
-	/**
+	/**	
 	 * Callback for successful item data response
 	 * {@link ItemDataRequestStatus#SUCCESSFUL} with item data
 	 * 
@@ -260,10 +253,9 @@ AppPurchasingObserverListener {
 		for (Entry<String, Item> entry : itemData.entrySet()) {
 			String sku = entry.getKey();
 			Item item = entry.getValue();
-			Log.i(TAG, "onItemDataResponseSuccessful: sku (" + sku + ") item ("
-					+ item + ")");
+			Log.i(TAG, "onItemDataResponseSuccessful: sku (" + sku + ") item (" + item + ")");
 			if (MySKU.COURSE_PACK.getSku().equals(sku)) {
-//			    enableBuyEntitlementButton();
+
 			}
 		}
 	}
@@ -275,23 +267,20 @@ AppPurchasingObserverListener {
 	 * @param requestId
 	 */
 	public void onItemDataResponseFailed(String requestId) {
-		Log.i(TAG, "onItemDataResponseFailed: for requestId (" + requestId
-				+ ")");
+		Log.i(TAG, "onItemDataResponseFailed: for requestId (" + requestId + ")");
 	}
 
 	/**
 	 * Callback on successful purchase response
-	 * {@link PurchaseRequestStatus#SUCCESSFUL}. In this sample app, we show
-	 * level 2 as enabled
+	 * {@link PurchaseRequestStatus#SUCCESSFUL}.
 	 * 
 	 * @param sku
 	 */
 	@Override
 	public void onPurchaseResponseSuccess(String userId, String sku,
 			String purchaseToken) {
-		Log.i(TAG, "onPurchaseResponseSuccess: for userId (" + userId
-				+ ") sku (" + sku + ") purchaseToken (" + purchaseToken + ")");
-//	  enableEntitlementForSKU(sku);
+		Log.i(TAG, "onPurchaseResponseSuccess: for userId (" + userId + ") sku (" + sku + ") purchaseToken (" + purchaseToken + ")");
+		nativeCoursePrice(0);
 	}
 
 	/**
@@ -303,10 +292,9 @@ AppPurchasingObserverListener {
 	 */
 	@Override
 	public void onPurchaseResponseAlreadyEntitled(String userId, String sku) {
-		Log.i(TAG, "onPurchaseResponseAlreadyEntitled: for userId (" + userId
-				+ ") sku ("+sku+")");
+		Log.i(TAG, "onPurchaseResponseAlreadyEntitled: for userId (" + userId + ") sku ("+sku+")");
 		// For entitlements, even if already entitled, make sure to enable.
-//	  enableEntitlementForSKU(sku);
+		nativeCoursePrice(0);
 	}
 
 	/**
@@ -331,15 +319,12 @@ AppPurchasingObserverListener {
 	 */
 	@Override
 	public void onPurchaseResponseFailed(String requestId, String sku) {
-		Log.i(TAG, "onPurchaseResponseFailed: for requestId (" + requestId
-				+ ") sku ("+sku+")");
+		Log.i(TAG, "onPurchaseResponseFailed: for requestId (" + requestId + ") sku ("+sku+")");
 	}
 
 	/**
 	 * Callback on successful purchase updates response
 	 * {@link PurchaseUpdatesRequestStatus#SUCCESSFUL} for each receipt.
-	 * 
-	 * In this sample app, we show level 2 as enabled.
 	 * 
 	 * @param userId
 	 * @param sku
@@ -348,17 +333,13 @@ AppPurchasingObserverListener {
 	@Override
 	public void onPurchaseUpdatesResponseSuccess(String userId, String sku,
 			String purchaseToken) {
-		Log.i(TAG, "onPurchaseUpdatesResponseSuccess: for userId (" + userId
-				+ ") sku (" + sku + ") purchaseToken (" + purchaseToken + ")");
+		Log.i(TAG, "onPurchaseUpdatesResponseSuccess: for userId (" + userId + ") sku (" + sku + ") purchaseToken (" + purchaseToken + ")");
 //	  enableEntitlementForSKU(sku);
 	}
 
 	/**
 	 * Callback on successful purchase updates response
 	 * {@link PurchaseUpdatesRequestStatus#SUCCESSFUL} for revoked SKU.
-	 * 
-	 * In this sample app, we revoke fulfillment if level 2 sku has been revoked
-	 * by showing level 2 as disabled
 	 * 
 	 * @param userId
 	 * @param revokedSKU
@@ -371,13 +352,8 @@ AppPurchasingObserverListener {
 		if (!MySKU.COURSE_PACK.getSku().equals(revokedSku))
 			return;
 
-		Log.i(TAG,
-				"onPurchaseUpdatesResponseSuccessRevokedSku: disabling play level 2 button");
+		Log.i(TAG, "onPurchaseUpdatesResponseSuccessRevokedSku: disabling entitlement");
 //		disableEntitlementInView();
-
-		Log.i(TAG,
-				"onPurchaseUpdatesResponseSuccessRevokedSku: fulfilledCountDown for revokedSKU ("
-						+ revokedSku + ")");
 	}
 
 	/**
@@ -391,7 +367,7 @@ AppPurchasingObserverListener {
 				+ requestId + ")");
 	}
 
-    void AmazonRequestIAP()
+    protected void AmazonRequestIAP()
     {
 		Log.i(TAG, "onResume: call initiateGetUserIdRequest");
 		PurchasingManager.initiateGetUserIdRequest();
@@ -406,10 +382,10 @@ AppPurchasingObserverListener {
 	 * {@link PurchasingManager#initiatePurchaseRequest(String)} with the SKU
 	 * for the course_pack entitlement.
 	 */
-	public void AmazonBuyCoursePack(View view) {
+	static public void AmazonBuyItem(int id) {
 		String requestId = PurchasingManager.initiatePurchaseRequest(MySKU.COURSE_PACK.getSku());
 		PurchaseData purchaseData = purchaseDataStorage.newPurchaseData(requestId);
-		Log.i(TAG, "AmazonBuyCoursePack: requestId (" + requestId + ") requestState (" + purchaseData.getRequestState() + ")");
+		Log.i(TAG, "AmazonBuyItem: requestId (" + requestId + ") requestState (" + purchaseData.getRequestState() + ")");
 	}
     
     // Setup
@@ -687,13 +663,12 @@ AppPurchasingObserverListener {
     public static native void onNativeResize(int x, int y, int format);
     public static native void onNativePadDown(int padId, int keycode);
     public static native void onNativePadUp(int padId, int keycode);
-    public static native void onNativeJoy(int joyId, int axis,
-            double value);
+    public static native void onNativeJoy(int joyId, int axis, double value);
     public static native void onNativeJoyAttached(int joyId);
     public static native void onNativeJoyRemoved(int joyId);
     public static native void onNativeKeyDown(int keycode);
     public static native void onNativeKeyUp(int keycode);
-    public static native void onNativeKeyboardFocusLost();
+    public static native void onNativeKenativeCoursePriceyboardFocusLost();
     public static native void onNativeTouch(int touchDevId, int pointerFingerId,
                                             int action, float x, 
                                             float y, float p);
@@ -702,7 +677,7 @@ AppPurchasingObserverListener {
     public static native void onNativeSurfaceDestroyed();
     public static native void nativeFlipBuffers();
 	
-	public native void nativeScoreInit();
+	public static native void nativeCoursePrice(float price);
 
     public static void flipBuffers() {
         SDLActivity.nativeFlipBuffers();
@@ -1278,6 +1253,11 @@ AppPurchasingObserverListener {
     		return false;
     	}
     }
+
+	public static void onNativeKeyboardFocusLost() {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
 

@@ -23,6 +23,7 @@
 #include "textures.h"
 #include "fps.h"
 #include "phys_sim.h"
+#include "platform.h"
 #include "multiplayer.h"
 #include "ui_mgr.h"
 #include "game_logic_util.h"
@@ -385,7 +386,7 @@ static void draw_instructions(player_data_t *plyr)
 			}
 			else
 			{
-				print_instruction(Localize("press the \x03 button.", ""),3);
+				print_instruction(Localize("press the " OUYA_Y_BUTTON "button.", ""),3);
 			}
 			plyr->tricks=0;
             if(training_is_resumed()) step++;

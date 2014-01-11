@@ -89,12 +89,22 @@ static widget_t* back_button=NULL;
 
 /* Forward declaration */
 static void race_select_loop( scalar_t time_step );
+static void buy_course_pack(void);
 
 const char* get_current_course_name()
 {
     open_course_data_t *data;
     data = (open_course_data_t*) get_list_elem_data( cur_elem );
     return data->course;
+}
+
+float course_price = 2.99;
+
+bool_t buy_or_play_course(void)
+{
+	const char* course_name = get_current_course_name();
+
+	return !is_course_free(course_name) && (course_price != 0.0);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -275,17 +285,28 @@ static void back()
 
 static void start_race()
 {
-    race_select_loop( 0 );
-    
-    update_race_data();
-    
-    //Select the starting step
-    if (!strcmp(g_game.race.name,"Basic tutorial")) init_starting_tutorial_step(0);
-    if (!strcmp(g_game.race.name,"Jump tutorial")) init_starting_tutorial_step(10);
-    
-	winsys_reset_js_bindings();
+	if (buy_or_play_course())
+	{
+#ifdef __ANDROID__
+		buy_course_pack();
+#else
+		// TODO: Implement In-App-Purchase here
+#endif
+	}
+	else
+	{
+		race_select_loop( 0 );
+		
+		update_race_data();
+		
+		//Select the starting step
+		if (!strcmp(g_game.race.name,"Basic tutorial")) init_starting_tutorial_step(0);
+		if (!strcmp(g_game.race.name,"Jump tutorial")) init_starting_tutorial_step(10);
+		
+		winsys_reset_js_bindings();
 
-    set_game_mode( LOADING );
+		set_game_mode( LOADING );
+	}
 }
 
 
@@ -343,6 +364,43 @@ void update_text()
 		refresh_scores_for_course(data->course);
     }
 }
+
+#ifdef __ANDROID__
+
+#include <jni.h>
+
+#define JNI(f)	Java_com_moonlite_tuxracer_SDLActivity_ ## f
+
+JNIEXPORT void JNICALL JNI(nativeCoursePrice)(JNIEnv * env, jobject obj, jfloat price)
+{
+	SDL_Log("IAP PRICE=$%0.2f", price);
+	course_price = price;
+}
+
+static void buy_course_pack(void)
+{
+	const char* method_name;
+    JNIEnv* env = Android_JNI_GetEnv();
+    if (env == NULL)
+    {
+        return;
+    }
+    jclass clazz = (*env)->FindClass(env, "com/moonlite/tuxracer/SDLActivity");
+	if (clazz == NULL)
+	{
+		return;
+	}
+	method_name = is_on_ouya() ? "OUYABuyItem" : "AmazonBuyItem";
+    jmethodID mid = (*env)->GetStaticMethodID(env, clazz, method_name, "(I)V");
+    if (mid == 0)
+    {
+        return;
+    }
+	/* Java callback to request In-App-Purchase */
+    (*env)->CallStaticVoidMethod(env, clazz, mid, 1);
+}
+
+#endif
 
 void play_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type, widget_t* widget)
 {

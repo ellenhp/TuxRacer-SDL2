@@ -1,5 +1,6 @@
 #include "platform.h"
 #include "course_load.h"
+#include "race_select.h"		// for course_price
 #include "tuxracer.h"
 
 #ifdef __ANDROID__
@@ -11,7 +12,10 @@ static char* player_name=0;
 static bool_t is_on_ouya_val=False;
 
 #ifdef __ANDROID__
-JNIEXPORT jdouble JNICALL Java_com_moonlite_tuxracer_SDLActivity_nativeSetPlayerData
+
+#define JNI(f)	Java_com_moonlite_tuxracer_SDLActivity_ ## f
+
+JNIEXPORT jdouble JNICALL JNI(nativeSetPlayerData)
 (JNIEnv * env, jobject jobj, jstring path, jboolean on_ouya)
 {
 	const char* name = (*env)->GetStringUTFChars(env, path , 0);
@@ -34,25 +38,23 @@ JNIEXPORT jdouble JNICALL Java_com_moonlite_tuxracer_SDLActivity_nativeSetPlayer
 }
 #endif
 
-bool_t is_on_ouya()
+bool_t is_on_ouya(void)
 {
     return is_on_ouya_val;
 }
 
-int get_overscan_percent()
+int get_overscan_percent(void)
 {
 	return overscan_percent;
 }
 
-float course_price = 2.99;
 char race_button_text[20];
 
-char* get_race_text()
+char* get_race_text(void)
 {
 	const char* button_format;
-	const char* course_name = get_current_course_name();
 
-	if (!is_course_free(course_name) && (course_price != 0.0))
+	if (buy_or_play_course())
 	{
 		button_format = "Buy $%0.2f";
 	}
@@ -63,7 +65,7 @@ char* get_race_text()
 
 	if (is_on_ouya_val)
 	{
-		strcpy(race_button_text, "'\x01 ");
+		strcpy(race_button_text, OUYA_O_BUTTON);
 		sprintf(race_button_text+2, button_format, course_price);
 	}
 	else
@@ -73,11 +75,11 @@ char* get_race_text()
 	return race_button_text;
 }
 
-char* get_back_text()
+char* get_back_text(void)
 {
 	if (is_on_ouya_val)
 	{
-		return "\x04 Back";
+		return OUYA_A_BUTTON "Back";
 	}
 	else
 	{
@@ -85,11 +87,11 @@ char* get_back_text()
 	}
 }
 
-char* get_continue_text()
+char* get_continue_text(void)
 {
 	if (is_on_ouya_val)
 	{
-		return "\x01 Continue";
+		return OUYA_O_BUTTON "Continue";
 	}
 	else
 	{
@@ -97,11 +99,11 @@ char* get_continue_text()
 	}
 }
 
-char* get_abort_text()
+char* get_abort_text(void)
 {
 	if (is_on_ouya_val)
 	{
-		return "\x04 Exit Race";
+		return OUYA_A_BUTTON "Exit Race";
 	}
 	else
 	{
@@ -109,11 +111,11 @@ char* get_abort_text()
 	}
 }
 
-char* get_select_text()
+char* get_select_text(void)
 {
 	if (is_on_ouya_val)
 	{
-		return "\x01 Select";
+		return OUYA_O_BUTTON "Select";
 	}
 	else
 	{
@@ -121,11 +123,11 @@ char* get_select_text()
 	}
 }
 
-char* get_quit_text()
+char* get_quit_text(void)
 {
 	if (is_on_ouya_val)
 	{
-		return "\x04 Quit";
+		return OUYA_A_BUTTON "Quit";
 	}
 	else
 	{

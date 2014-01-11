@@ -27,9 +27,12 @@ extern "C"
 
 #include "tuxracer.h"
 
-const char* get_current_course_name();
+extern float course_price;
+const char* get_current_course_name(void);
 
-void race_select_register();
+bool_t buy_or_play_course(void);
+
+void race_select_register(void);
 
 #endif /* RACE_SELECT_H */
 

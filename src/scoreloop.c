@@ -28,7 +28,7 @@
 
 #ifdef __ANDROID__
 #include "jni.h"
-#define JNI(f)	Java_com_moonlite_tuxracer_ ## f
+#define JNI(f)	Java_com_moonlite_tuxracer_SDLActivity_ ## f
 #endif
 
 widget_t* enter_nickname_btn=NULL;
@@ -105,7 +105,7 @@ void scoreloop_update_widgets()
 }
 
 #ifdef __ANDROID__
-JNIEXPORT void JNICALL JNI(SDLActivity_nativeTextCallback)(JNIEnv *env, jclass cls, jstring str)
+JNIEXPORT void JNICALL JNI(nativeTextCallback)(JNIEnv *env, jclass cls, jstring str)
 {
     char buf[255]; //fun fact: an email can't be more than 254 characters long. Allow for a null character.
     char* string_tmp;
@@ -146,7 +146,7 @@ JNIEXPORT void JNICALL JNI(SDLActivity_nativeTextCallback)(JNIEnv *env, jclass c
     text_entry=TEXT_ENTRY_NONE;
 }
 
-JNIEXPORT void JNICALL JNI(SDLActivity_nativeUpdateUserInfo)(JNIEnv *env, jclass cls, jstring alias)
+JNIEXPORT void JNICALL JNI(nativeUpdateUserInfo)(JNIEnv *env, jclass cls, jstring alias)
 {
     char* string_tmp;
     
