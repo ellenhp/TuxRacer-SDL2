@@ -31,7 +31,6 @@
 #include "tux_shadow.h"
 #include "keyboard.h"
 #include "loop.h"
-#include "fog.h"
 #include "viewfrustum.h"
 #include "hud.h"
 #include "game_logic_util.h"
@@ -40,6 +39,7 @@
 #include "ui_theme.h"
 #include "ui_snow.h"
 #include "joystick.h"
+#include "gui_abstraction.h"
 
 #define CREDITS_MAX_Y -140
 #define CREDITS_MIN_Y 64
@@ -160,135 +160,42 @@ static void draw_credits_text( scalar_t time_step )
 {
     int w = getparam_x_resolution();
     int h = getparam_y_resolution();
-    font_t *font;
-    int i;
+    font_t* font;
+    coord_t text_coord;
+    int i, string_w, asc, desc;
     scalar_t y;
-    int string_w, asc, desc;
-
-    const GLfloat vertices []=
-    {
-        0, 0,
-        w, 0 ,
-        w , CREDITS_MIN_Y,
-        0, CREDITS_MIN_Y
-    };
-
-    const GLfloat vertices1 []=
-    {
-        0, CREDITS_MIN_Y,
-        w, CREDITS_MIN_Y,
-        w, CREDITS_MIN_Y + 30,
-        0, CREDITS_MIN_Y + 30
-    };
     
-    const GLfloat colors1 []=
-    {
-        ui_background_colour.r, ui_background_colour.g, ui_background_colour.b, ui_background_colour.a,
-        ui_background_colour.r, ui_background_colour.g, ui_background_colour.b, ui_background_colour.a,
-        ui_background_colour.r, ui_background_colour.g, ui_background_colour.b, 0.0,
-        ui_background_colour.r, ui_background_colour.g, ui_background_colour.b, 0.0,
-    };
-    
-    const GLfloat vertices2 []=
-    {
-        0, h+CREDITS_MAX_Y,
-        w, h+CREDITS_MAX_Y ,
-        w , h,
-        0, h
-    };
-
-	const GLfloat vertices3 []=
-    {
-        w, h+CREDITS_MAX_Y,
-        0, h+CREDITS_MAX_Y,
-        0, h+CREDITS_MAX_Y - 30,
-        w, h+CREDITS_MAX_Y - 30
-    };
-    
-    const GLfloat colors3 []=
-    {
-        ui_background_colour.r, ui_background_colour.g, ui_background_colour.b, ui_background_colour.a,
-        ui_background_colour.r, ui_background_colour.g, ui_background_colour.b, ui_background_colour.a,
-        ui_background_colour.r, ui_background_colour.g, ui_background_colour.b, 0.0,
-        ui_background_colour.r, ui_background_colour.g, ui_background_colour.b, 0.0,
-    };
-
-	y_offset += time_step * CREDITS_SPEED + time_step*joystick_y*CREDITS_JOYSTICK_SPEED;
+    y_offset += time_step * CREDITS_SPEED + time_step*joystick_y*CREDITS_JOYSTICK_SPEED;
 	if (y_offset<0)
 	{
 		y_offset=0;
 	}
     y = CREDITS_MIN_Y+y_offset;
     
-    glPushMatrix();
-    {
-        glTranslatef( w/2, y, 0 );
+    text_coord.x=0;
+    text_coord.x_coord_type=NORMALIZED_COORD;
+    text_coord.y_coord_type=ABSOLUTE_COORD;
+    text_coord.x_just=text_coord.y_just=CENTER_JUST;
+    
+    for (i=0; i<sizeof( credit_lines ) / sizeof( credit_lines[0] ); i++) {
+        credit_line_t line = credit_lines[i];
         
-        for (i=0; i<sizeof( credit_lines ) / sizeof( credit_lines[0] ); i++) {
-            credit_line_t line = credit_lines[i];
+        if ( !get_font_binding( line.binding, &font ) ) {
+            print_warning( IMPORTANT_WARNING,
+                          "Couldn't get font for binding %s",
+                          line.binding );
+        } else {
+            get_font_metrics( font, line.text, &string_w, &asc, &desc );
             
-            if ( !get_font_binding( line.binding, &font ) ) {
-                print_warning( IMPORTANT_WARNING,
-                              "Couldn't get font for binding %s", 
-                              line.binding );
-            } else {
-                get_font_metrics( font, line.text, &string_w, &asc, &desc );
-                
-                glTranslatef( 0, -asc, 0 );
-                y += -asc;
-                
-                glPushMatrix();
-                {
-                    bind_font_texture( font );
-                    glTranslatef( -string_w/2, 0, 0 );
-                    draw_string( font, line.text );
-                }
-                glPopMatrix();
-                
-                glTranslatef( 0, -desc, 0 );
-                y += -desc;
-            }
+            GameMenu_draw_text( line.text, 0, text_coord, line.binding );
+            
+            text_coord.y -= asc+desc;
         }
-        
     }
-    glPopMatrix();
     
     if ( y > h+CREDITS_MAX_Y ) {
         go_back();
     }
-    
-    /* Draw strips at the top and bottom to clip out text */
-    //glDisable( GL_TEXTURE_2D );
-    
-	glColor4f( ui_background_colour.r, ui_background_colour.g, ui_background_colour.b, ui_background_colour.a );
-    
-    //draws rect a la place de glRectf
-    
-    glEnableClientState (GL_VERTEX_ARRAY);
-    glVertexPointer (2, GL_FLOAT , 0, vertices);	
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	    
-    glEnableClientState (GL_VERTEX_ARRAY);
-    glVertexPointer (2, GL_FLOAT , 0, vertices);	
-    glColorPointer(4, GL_FLOAT, 0, colors1);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    
-    glColor4f( ui_background_colour.r,  ui_background_colour.g, ui_background_colour.b, ui_background_colour.a );
-    
-    //draws rect a la place de glRectf( 0, h+CREDITS_MAX_Y, w, h );
-    
-    glEnableClientState (GL_VERTEX_ARRAY);
-    glVertexPointer (2, GL_FLOAT , 0, vertices2);	
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    
-    glEnableClientState (GL_VERTEX_ARRAY);
-    glVertexPointer (2, GL_FLOAT , 0, vertices3);	
-    glColorPointer(4, GL_FLOAT, 0, colors3);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    
-    glColor4f( 1, 1, 1, 1 );
-    
-    glEnable( GL_TEXTURE_2D );
 }
 
 static void credits_init(void) 

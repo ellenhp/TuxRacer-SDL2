@@ -234,6 +234,7 @@ bool_t listbox_goto_prev_item( listbox_t *listbox )
 */
 void listbox_draw( listbox_t *listbox )
 {
+    /*
     font_t *font;
 	GLfloat vertices_box[]={
 		listbox->pos.x, 
@@ -308,6 +309,7 @@ void listbox_draw( listbox_t *listbox )
 
     button_draw( listbox->up_button );
     button_draw( listbox->down_button );
+     */
 }
 
 

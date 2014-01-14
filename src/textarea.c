@@ -270,6 +270,7 @@ static void draw_text_lines( textarea_t *ta, font_t *font )
 */
 void textarea_draw( textarea_t *ta )
 {
+    /*
     font_t *font;
 
 	GLfloat border_vertices[]={
@@ -324,6 +325,7 @@ void textarea_draw( textarea_t *ta )
     if ( ta->down_button != NULL && button_is_enabled(ta->down_button) ) {
 	button_draw( ta->down_button ); 
     }
+     */
 }
 
 

@@ -60,29 +60,18 @@ void set_gl_options( RenderMode mode )
         glEnable( GL_TEXTURE_2D );
         glDisable( GL_DEPTH_TEST );
         glDisable( GL_CULL_FACE );
-	glDisable( GL_LIGHTING );
-	glDisable( GL_NORMALIZE );
-	glDisable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
-	glShadeModel( GL_SMOOTH );
 	glDepthFunc( GL_LESS );
-	glDisable( GL_FOG );
         break;
     case GAUGE_BARS:
         glEnable( GL_TEXTURE_2D );
         glDisable( GL_DEPTH_TEST );
         glDisable( GL_CULL_FACE );
-	glDisable( GL_LIGHTING );
-	glDisable( GL_NORMALIZE );
-	glDisable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
-	glShadeModel( GL_SMOOTH );
 	glDepthFunc( GL_LESS );
 
         break;
@@ -91,14 +80,9 @@ void set_gl_options( RenderMode mode )
         glEnable( GL_TEXTURE_2D );
         glDisable( GL_DEPTH_TEST );
         glDisable( GL_CULL_FACE );
-	glDisable( GL_LIGHTING );
-	glDisable( GL_NORMALIZE );
-	glDisable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
-	glShadeModel( GL_SMOOTH );
 	glDepthFunc( GL_LESS );
         break;
 
@@ -106,14 +90,9 @@ void set_gl_options( RenderMode mode )
         glDisable( GL_TEXTURE_2D );
         glDisable( GL_DEPTH_TEST );
         glDisable( GL_CULL_FACE );
-	glDisable( GL_LIGHTING );
-	glDisable( GL_NORMALIZE );
-	glDisable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
-	glShadeModel( GL_SMOOTH );
 	glDepthFunc( GL_LESS );
         break;
 
@@ -121,14 +100,9 @@ void set_gl_options( RenderMode mode )
         glDisable( GL_TEXTURE_2D );
         glDisable( GL_DEPTH_TEST );
         glDisable( GL_CULL_FACE );
-	glDisable( GL_LIGHTING );
-	glDisable( GL_NORMALIZE );
-	glDisable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
-	glShadeModel( GL_SMOOTH );
 	glDepthFunc( GL_LESS );
         break;
 
@@ -136,14 +110,9 @@ void set_gl_options( RenderMode mode )
 	glEnable( GL_TEXTURE_2D );
 	glEnable( GL_DEPTH_TEST );
 	glEnable( GL_CULL_FACE );
-	glEnable( GL_LIGHTING );
-	glDisable( GL_NORMALIZE );
-	glDisable( GL_ALPHA_TEST );
 	glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-	glEnable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
-	glShadeModel( GL_SMOOTH );
 	glDepthFunc( GL_LEQUAL );
 
 	break;
@@ -152,14 +121,9 @@ void set_gl_options( RenderMode mode )
 	glEnable( GL_TEXTURE_2D );
 	glEnable( GL_DEPTH_TEST );
         glDisable( GL_CULL_FACE );
-	glEnable( GL_LIGHTING );
-	glDisable( GL_NORMALIZE );
-        glEnable( GL_ALPHA_TEST );
 	glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
-	glShadeModel( GL_SMOOTH );
 	glDepthFunc( GL_LESS );
 
         glAlphaFunc( GL_GEQUAL, 0.5 );
@@ -169,14 +133,9 @@ void set_gl_options( RenderMode mode )
         glEnable( GL_TEXTURE_2D );
 	glEnable( GL_DEPTH_TEST );
         glDisable( GL_CULL_FACE );
-	glDisable( GL_LIGHTING );
-	glDisable( GL_NORMALIZE );
-	glEnable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
-	glShadeModel( GL_SMOOTH );
 	glDepthFunc( GL_LESS );
 
         glAlphaFunc( GL_GEQUAL, 0.5 );
@@ -186,14 +145,9 @@ void set_gl_options( RenderMode mode )
         glDisable( GL_TEXTURE_2D );
 	glEnable( GL_DEPTH_TEST );
         glDisable( GL_CULL_FACE );
-	glDisable( GL_LIGHTING );
-	glDisable( GL_NORMALIZE );
-	glDisable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
-	glShadeModel( GL_SMOOTH );
 	glDepthFunc( GL_LESS );
 
         break;
@@ -201,30 +155,20 @@ void set_gl_options( RenderMode mode )
     case SKY:
 	glEnable( GL_TEXTURE_2D );
 	glDisable( GL_DEPTH_TEST );
-	glDisable( GL_CULL_FACE ); 
-	glDisable( GL_LIGHTING );
-	glDisable( GL_NORMALIZE );
-	glDisable( GL_ALPHA_TEST );
+	glDisable( GL_CULL_FACE );
 	glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_FALSE );
-	glShadeModel( GL_SMOOTH );
 	glDepthFunc( GL_LESS );
 	break;
  	
     case FOG_PLANE:
 	glDisable( GL_TEXTURE_2D );
 	glEnable( GL_DEPTH_TEST );
-	glDisable( GL_CULL_FACE ); 
-	glDisable( GL_LIGHTING );
-	glDisable( GL_NORMALIZE );
-	glDisable( GL_ALPHA_TEST );
+	glDisable( GL_CULL_FACE );
 	glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
-	glShadeModel( GL_SMOOTH );
 	glDepthFunc( GL_LESS );
 	break;
 
@@ -232,14 +176,9 @@ void set_gl_options( RenderMode mode )
         glDisable( GL_TEXTURE_2D );
 	glEnable( GL_DEPTH_TEST );
 	glEnable( GL_CULL_FACE );
-        glEnable( GL_LIGHTING );
-	glEnable( GL_NORMALIZE );
-	glDisable( GL_ALPHA_TEST );
 	glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
-	glShadeModel( GL_SMOOTH );
 	glDepthFunc( GL_LESS );
 
         break;
@@ -249,14 +188,9 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_TEXTURE_2D );
 	glEnable( GL_DEPTH_TEST );
 	glDisable( GL_CULL_FACE );
-	glDisable( GL_LIGHTING );
-	glDisable( GL_NORMALIZE );
-	glDisable( GL_ALPHA_TEST );
 	glEnable( GL_BLEND );
 	glEnable( GL_STENCIL_TEST );
-	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_FALSE );
-	glShadeModel( GL_SMOOTH );
 	glDepthFunc( GL_LESS );
 
 	glStencilFunc( GL_EQUAL, 0, ~0 );
@@ -265,14 +199,9 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_TEXTURE_2D );
 	glEnable( GL_DEPTH_TEST );
 	glEnable( GL_CULL_FACE );
-	glDisable( GL_LIGHTING );
-	glDisable( GL_NORMALIZE );
-	glDisable( GL_ALPHA_TEST );
 	glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
-	glShadeModel( GL_SMOOTH );
 	glDepthFunc( GL_LESS );
 #endif
 	break;
@@ -281,14 +210,9 @@ void set_gl_options( RenderMode mode )
 	glEnable( GL_TEXTURE_2D );
 	glEnable( GL_DEPTH_TEST );
 	glDisable( GL_CULL_FACE );
-	glEnable( GL_LIGHTING );
-	glDisable( GL_NORMALIZE );
-	glDisable( GL_ALPHA_TEST );
 	glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_FALSE );
-	glShadeModel( GL_SMOOTH );
 	glDepthFunc( GL_LEQUAL );
 	break;
 
@@ -296,14 +220,9 @@ void set_gl_options( RenderMode mode )
         glEnable( GL_TEXTURE_2D );
         glDisable( GL_DEPTH_TEST );
         glDisable( GL_CULL_FACE );
-	glDisable( GL_LIGHTING );
-	glDisable( GL_NORMALIZE );
-	glEnable( GL_ALPHA_TEST );
         glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );
-	glDisable( GL_COLOR_MATERIAL );
 	glDepthMask( GL_TRUE );
-	glShadeModel( GL_SMOOTH );
 	glDepthFunc( GL_LESS );
 
         glAlphaFunc( GL_GEQUAL, 0.5 );
@@ -391,9 +310,6 @@ typedef struct {
 
 /* Add more things here as needed */
 gl_value_t gl_values[] = {
-    { "maximum lights", GL_MAX_LIGHTS, GL_INT },
-    { "modelview stack depth", GL_MAX_MODELVIEW_STACK_DEPTH, GL_INT },
-    { "projection stack depth", GL_MAX_PROJECTION_STACK_DEPTH, GL_INT },
     { "max texture size", GL_MAX_TEXTURE_SIZE, GL_INT },
     { "red bits", GL_RED_BITS, GL_INT },
     { "green bits", GL_GREEN_BITS, GL_INT },

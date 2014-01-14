@@ -77,12 +77,12 @@ static void print_instruction(const char* string, int line) {
 
 	GLubyte indices[] = {0, 1, 2, 2, 3, 0};
 
-	glEnableClientState(GL_VERTEX_ARRAY);
+	/*glEnableClientState(GL_VERTEX_ARRAY);
 
 	glVertexPointer(3, GL_FLOAT, 0, vertices);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
 		
-	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);*/
 
     glEnable(GL_TEXTURE_2D);
     glPushMatrix();
@@ -132,7 +132,7 @@ static void drawRedCircle(GLint x, GLint y, GLint diameter) {
 
     glEnable(GL_TEXTURE_2D);
 
-	glEnableClientState(GL_VERTEX_ARRAY);
+	/*glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	glTexCoordPointer(2, GL_FLOAT, 0, texcoords);
@@ -140,7 +140,7 @@ static void drawRedCircle(GLint x, GLint y, GLint diameter) {
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
 		
 	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);*/
 
 	}
 }  

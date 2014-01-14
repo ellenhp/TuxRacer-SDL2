@@ -268,6 +268,7 @@ void get_tex_font_string_bbox( tex_font_metrics_t *tfm,
 
 void draw_tex_font_char( tfm_char_data_t* cd, char c )
 {
+    /*
     GLfloat texcoords[]={
 		cd->tex_ll.x, cd->tex_ll.y,
 		cd->tex_lr.x, cd->tex_lr.y,
@@ -292,6 +293,7 @@ void draw_tex_font_char( tfm_char_data_t* cd, char c )
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	glTranslatef( cd->kern_width, 0., 0. );
+     */
 }
 
 

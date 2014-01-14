@@ -31,7 +31,6 @@
 #include "tux_shadow.h"
 #include "keyboard.h"
 #include "loop.h"
-#include "fog.h"
 #include "viewfrustum.h"
 #include "hud.h"
 #include "hud_training.h"
@@ -228,8 +227,6 @@ void game_over_loop( scalar_t time_step )
     
     clear_rendering_context();
     
-    setup_fog();
-    
     update_player_pos( plyr, 0 );
     update_view( plyr, 0 );
     
@@ -238,11 +235,8 @@ void game_over_loop( scalar_t time_step )
     
     draw_sky(plyr->view.pos);
     
-    draw_fog_plane();
-    
     set_course_clipping( True );
     set_course_eye_point( plyr->view.pos );
-    setup_course_lighting();
     render_course();
     draw_trees();
     

@@ -144,7 +144,7 @@ static void draw_time(player_data_t* plyr)
         
 		GLubyte indices[]={0, 1, 2, 2, 3, 0};
 		
-        glEnableClientState (GL_VERTEX_ARRAY);
+        /*glEnableClientState (GL_VERTEX_ARRAY);
         glEnableClientState (GL_TEXTURE_COORD_ARRAY);
 
         glVertexPointer(3, GL_FLOAT , 0, vertices);	
@@ -152,7 +152,7 @@ static void draw_time(player_data_t* plyr)
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
 		
 		glDisableClientState (GL_VERTEX_ARRAY);
-        glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+        glDisableClientState (GL_TEXTURE_COORD_ARRAY);*/
 
     }
 
@@ -272,7 +272,7 @@ static void draw_herring_count( int herring_count )
                      getparam_y_resolution() - HERRING_ICON_Y_OFFSET - OVERSCAN_MARGIN_Y - asc, 
                      0 );
         
-        glEnableClientState (GL_VERTEX_ARRAY);
+        /*glEnableClientState (GL_VERTEX_ARRAY);
         glEnableClientState (GL_TEXTURE_COORD_ARRAY);
 
         glVertexPointer(3, GL_FLOAT , 0, verticesItem);	
@@ -280,7 +280,7 @@ static void draw_herring_count( int herring_count )
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
 		
 		glDisableClientState (GL_VERTEX_ARRAY);
-        glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+        glDisableClientState (GL_TEXTURE_COORD_ARRAY);*/
 
 		bind_font_texture( font );
 
@@ -526,7 +526,7 @@ void draw_gauge( scalar_t speed, scalar_t energy )
                      OVERSCAN_MARGIN_Y,
                      0 );
 
-		glEnableClientState (GL_VERTEX_ARRAY);
+		/*glEnableClientState (GL_VERTEX_ARRAY);
         glEnableClientState (GL_TEXTURE_COORD_ARRAY);
         
         glBindTexture( GL_TEXTURE_2D, energymask_texobj );
@@ -543,8 +543,7 @@ void draw_gauge( scalar_t speed, scalar_t energy )
         glVertexPointer (3, GL_FLOAT , 0, verticesItem+18);
         glTexCoordPointer (2, GL_FLOAT , 0, texcoordItem+12);
         glDrawArrays(GL_TRIANGLES, 0, 6);
-        
-        /* Calculate the fraction of the speed bar to fill */
+    
         speedbar_frac = 0.0;
         
         if ( speed > SPEEDBAR_GREEN_MAX_SPEED ) {
@@ -623,12 +622,13 @@ void draw_gauge( scalar_t speed, scalar_t energy )
             
         }
         glPopMatrix();
+         */
         
     }
     glPopMatrix();
 
-	glDisableClientState (GL_VERTEX_ARRAY);
-    glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+	//glDisableClientState (GL_VERTEX_ARRAY);
+    //glDisableClientState (GL_TEXTURE_COORD_ARRAY);
 }
 void print_fps()
 {
@@ -686,60 +686,6 @@ void print_fps()
 	draw_string( font_big, string );
     }
     glPopMatrix();
-
-	/*
-	char buff[BUFF_LEN];
-    char *string;
-    char *binding;
-	int asc, desc, w;
-    font_t *font, font_big;
-    
-    int score = calculate_player_score(plyr);
-    
-    if ( !get_font_binding( "fps", &font ) ) {
-        print_warning( IMPORTANT_WARNING,
-                      "Couldn't get font for binding %s", binding );
-        return;
-    }
-
-	string="Score: ";
-
-	get_font_metrics(font, string, &w, &asc, &desc);
-
-    bind_font_texture( font );
-    set_gl_options( TEXFONT );
-    glColor4f( 1, 1, 1, 1 );
-    glPushMatrix();
-    {
-        glTranslatef( SCORE_X_OFFSET + OVERSCAN_MARGIN_X,
-                     SCORE_Y_OFFSET + OVERSCAN_MARGIN_Y,
-                     0 );
-        draw_string( font, string );
-    }
-    glPopMatrix();
-
-    if ( !get_font_binding( "fps_big", &font ) ) {
-        print_warning( IMPORTANT_WARNING,
-                      "Couldn't get font for binding %s", binding );
-        return;
-    }
-    
-    bind_font_texture( font );
-    set_gl_options( TEXFONT );
-    glColor4f( 1, 1, 1, 1 );
-    
-    sprintf( buff, "%d",score );
-    string = buff;
-    
-    glPushMatrix();
-    {
-        glTranslatef( SCORE_X_OFFSET + OVERSCAN_MARGIN_X + w,
-                     SCORE_Y_OFFSET + OVERSCAN_MARGIN_Y,
-                     0 );
-        draw_string( font, string );
-    }
-    glPopMatrix();
-	*/
 }
 
 void draw_hud( player_data_t *plyr )

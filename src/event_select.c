@@ -273,6 +273,7 @@ static void set_widget_positions_and_draw_decorations()
      */
     
     /* Event & cup icons */
+    /*
     if ( !get_texture_binding( get_event_icon_texture_binding( event_data ),
                               &texobj ) ) {
         texobj = 0;
@@ -473,6 +474,7 @@ static void set_widget_positions_and_draw_decorations()
     }
 	}
 #endif
+     */
 }
 
 static void event_select_init(void)

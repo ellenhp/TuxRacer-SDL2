@@ -168,8 +168,8 @@ static inline uint64_t udate(void)
 #include "iphonegl.h"
 #elif defined(__ANDROID__)
 #define HAVE_OPENGLES
-#include <GLES/gl.h>
-#include <GLES/glext.h>
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
 #else
 #include <GL/gl.h>
 #include <GL/glu.h>

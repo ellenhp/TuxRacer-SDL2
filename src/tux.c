@@ -17,7 +17,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#include "lights.h"
 #include "tuxracer.h"
 #include "hier_cb.h"
 #include "hier.h"
@@ -138,16 +137,7 @@ void draw_tux()
 
     if(get_player_data(local_player())->view.mode == TUXEYE) return;
 
-    /* XXX: For some reason, inserting this call here makes Tux render
-     * with correct lighting under Mesa 3.1. I'm guessing it's a Mesa bug.
-     */
-    glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, dummy_colour );
-
     set_gl_options( TUX );
-
-    /* Turn on lights
-     */
-    setup_course_lighting_for_tux(True);
 
     draw_scene_graph( tuxRootNode );
 } 

@@ -215,6 +215,7 @@ void update_ui_snow( scalar_t time_step, bool_t windy )
 
 void draw_ui_snow( void )
 {
+    /*
     GLuint   texture_id;
     char *binding;
     point2d_t *pt, *tex_min, *tex_max;
@@ -284,6 +285,7 @@ void draw_ui_snow( void )
 	} 
     }
     glPopMatrix();
+     */
 
 } 
 

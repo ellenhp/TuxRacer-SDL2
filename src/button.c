@@ -22,6 +22,7 @@
 #include "fonts.h"
 #include "textures.h"
 #include "ui_mgr.h"
+#include "gui_abstraction.h"
 
 typedef struct {
     char *binding;   /* name of texture binding */
@@ -238,6 +239,11 @@ void button_draw( button_t *button )
     point2d_t pos;
     scalar_t w, h;
     char *font_binding;
+    coord_t button_coord;
+    
+    button_coord.x_coord_type=button_coord.y_coord_type=ABSOLUTE_COORD;
+    button_coord.x_just=LEFT_JUST;
+    button_coord.y_just=TOP_JUST;
     
     check_assertion( button != NULL, "button is NULL" );
     
@@ -286,67 +292,9 @@ void button_draw( button_t *button )
         }
     }
     
-    if ( tex != NULL ) {
-        if ( !get_texture_binding( tex->binding, &texobj ) ) {
-            print_warning( IMPORTANT_WARNING,
-                          "Couldnt get texture object for binding %s",
-                          tex->binding );
-            texobj = 0;
-        } 
-		{
-		GLfloat texcoords[]={
-			tex->ll.x, tex->ll.y,
-			tex->ll.x, tex->ur.y,
-			tex->ur.x, tex->ur.y,
-			tex->ur.x, tex->ll.y};
-
-		GLfloat vertices[]={
-			pos.x, pos.y, 0,
-			pos.x, pos.y + h, 0,
-			pos.x + w, pos.y + h, 0,
-			pos.x + w, pos.y, 0};
-
-		GLubyte indices[] = {0, 1, 2, 2, 3, 0};
-
-		glBindTexture( GL_TEXTURE_2D, texobj );
-		glColor4f( tex->colour.r, tex->colour.g, tex->colour.b, tex->colour.a );
-
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-		glTexCoordPointer(2, GL_FLOAT, 0, texcoords);
-		glVertexPointer(3, GL_FLOAT, 0, vertices);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
-		
-		glDisableClientState(GL_VERTEX_ARRAY);
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-		}
-    }
-    if ( font_binding && button->label != NULL ) {
-        font_t *font;
-        int w, asc, desc;
-        
-        if (!get_font_binding( font_binding, &font )) {
-            print_warning( IMPORTANT_WARNING, 
-                          "Couldn't get font object for binding %s",
-                          font_binding );
-            font = NULL;
-        } else {
-            bind_font_texture( font );
-            
-            get_font_metrics( font, button->label, &w, &asc, &desc );
-            
-            glPushMatrix();
-            {
-                glTranslatef( button->pos.x + button->w/2.0 - w/2.0,
-                             button->pos.y + button->h/2.0 - asc/2.0 + desc/2.0,
-                             0.0 );
-                
-                draw_string( font, button->label );
-                
-            }
-            glPopMatrix();
-        }
+    if ( font_binding && button->label != NULL )
+    {
+        GameMenu_draw_text(button->label, 0, button_coord, font_binding);
     }
     
 }

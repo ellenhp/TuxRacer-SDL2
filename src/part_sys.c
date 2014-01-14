@@ -152,6 +152,7 @@ void update_particles( scalar_t time_step )
 
 void draw_particles( player_data_t *plyr )
 {
+    /*
     Particle *p;
     GLuint   texture_id;
     char *binding;
@@ -199,7 +200,7 @@ void draw_particles( player_data_t *plyr )
 	draw_billboard( plyr, p->pt, p->cur_size, p->cur_size,
 			False, min_tex_coord, max_tex_coord );
     } 
-
+*/
 } 
 
 void clear_particles()

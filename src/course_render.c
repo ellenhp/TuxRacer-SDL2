@@ -25,7 +25,6 @@
 #include "hier_util.h"
 #include "gl_util.h"
 #include "render_util.h"
-#include "fog.h"
 #include "course_quad.h"
 #include "viewfrustum.h"
 #include "track_marks.h"
@@ -104,70 +103,6 @@ void calc_normals(const char *course)
 
     get_course_dimensions( &courseWidth, &courseLength );
     get_course_divisions( &nx, &ny );
-#ifdef TARGET_OS_IPHONE
-    if(nmls != (void*)-1 && nmls_fd != -1) 
-    {
-        munmap(nmls, nmls_len);
-        close(nmls_fd);
-    }
-  //FJFJ
-  
-  /*  else
-        free(nmls);
-
-   */
-  
-  
-    exists = (stat(buff, &buf) == 0);
-
-    if(exists) {
-        nmls_fd = open(buff, O_RDONLY);
-        if ( nmls_fd == -1) {
-            handle_system_error( 1, "can't open file failed" );
-        }
-
-        TRDebugLog("mapping to memory normal.data\n");
-        nmls_len = sizeof(vector_t)*nx*ny;
-        nmls = mmap(NULL, nmls_len, PROT_READ, MAP_SHARED,nmls_fd, 0);
-        if ( nmls == (void *)-1 ) {
-            handle_system_error( 1, "read mmap failed" );
-        }
-    }
-    else {
-        nmls_len = sizeof(vector_t)*nx*ny;
-
-#if TARGET_IPHONE_SIMULATOR
-        nmls_fd = open(buff, O_RDWR | O_CREAT | O_TRUNC, 0644);
-        if ( nmls_fd == -1) {
-            handle_system_error( 1, "can't open file failed" );
-        }
-
-
-        int result = lseek(nmls_fd, nmls_len-1, SEEK_SET);
-        if (result == -1) {
-            handle_system_error( 1, "can't write file failed" );
-        }
-        
-        result = write(nmls_fd, "", 1);
-        if (result != 1) {
-            handle_system_error( 1, "can't write file failed" );
-        }
-
-        nmls = mmap(NULL, nmls_len, PROT_READ | PROT_WRITE, MAP_SHARED, nmls_fd, 0);
-        if ( nmls == (void *)-1 ) {
-            handle_system_error( 1, "write mmap failed" );
-        }
-
-        TRDebugLog("Writing to normal.data\n");
-#else
-# ifdef TR_DEBUG_MODE
-        abort(); // This shouldn't be reached on simulator. Crash to indicate.
-# endif
-        nmls = malloc(nmls_len);
-#endif
-        elevation = get_course_elev_data();
-
-#else
     elevation = get_course_elev_data();
     get_course_dimensions( &courseWidth, &courseLength );
     get_course_divisions( &nx, &ny );
@@ -180,9 +115,6 @@ void calc_normals(const char *course)
     if ( nmls == NULL ) {
 	handle_system_error( 1, "malloc failed" );
     }
-
- 
-#endif // TARGET_OS_IPHONE
 
                 
         for ( y=0; y<ny; y++) {
@@ -399,9 +331,6 @@ void render_course()
     
     setup_course_tex_gen();
     
-    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-    set_material( white, black, 1.0 );
-    
     update_course_quadtree( eye_pt, getparam_course_detail_level() );
     
     render_course_quadtree( );
@@ -411,6 +340,7 @@ void render_course()
 
 void draw_sky(point_t pos)
 {
+    /*
     GLuint texture_id[6];
     
     static const GLfloat vertices []=
@@ -546,6 +476,7 @@ void draw_sky(point_t pos)
     glDisableClientState (GL_TEXTURE_COORD_ARRAY);
 
     glPopMatrix();
+     */
     
 }
 
@@ -584,6 +515,7 @@ int order_trees_by_z (tree_t* treeLocs,int num_trees)
 
 void draw_trees() 
 {
+    /*
     tree_t    *treeLocs;
     int       numTrees;
     scalar_t  treeRadius;
@@ -670,7 +602,6 @@ void draw_trees()
     
     set_gl_options( TREES );
     
-    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
     set_material( white, black, 1.0 );
     
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -691,7 +622,6 @@ void draw_trees()
             //printf("condition 1 : eye_pt.z - treeLocs[i].ray.pt.z = %f > fwd_clip_limit = %f\n",eye_pt.z - treeLocs[i].ray.pt.z,fwd_clip_limit);
            // printf("condition 2 : treeLocs[i].ray.pt.z - eye_pt.z = %f > bwd_clip_limit = %f\n",treeLocs[i].ray.pt.z - eye_pt.z,bwd_clip_limit);
         }
-        /* verify that the correct texture is bound */
         if (treeLocs[i].tree_type != tree_type) {
             tree_type = treeLocs[i].tree_type;
             tree_name = get_tree_name(tree_type);
@@ -734,12 +664,10 @@ void draw_trees()
     for (i = 0; i< numItems; i++ ) {
         if (!game_has_herring()) {
             if ( itemLocs[i].collectable == 1) {
-                /* In speed mode or in tutorial we don't want to draw fishes*/
                 continue;
             }
         }
         if ( itemLocs[i].collectable == 0 || itemLocs[i].drawable == False) {
-            /* already collected or not to be drawn*/
             continue;
         }
             
@@ -750,8 +678,7 @@ void draw_trees()
             if ( itemLocs[i].ray.pt.z - eye_pt.z > bwd_clip_limit )
                 continue;
         }
-            
-        /* verify that the correct texture is bound */
+     
         if (itemLocs[i].item_type != item_type) {
             item_type = itemLocs[i].item_type;
             item_name = get_item_name(item_type);
@@ -793,6 +720,7 @@ void draw_trees()
 
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     glDisableClientState(GL_VERTEX_ARRAY);
+     */
 } 
 
 /*! 
@@ -805,6 +733,7 @@ void draw_trees()
  */
 void draw_fog_plane()
 {
+    /*
     plane_t left_edge_plane, right_edge_plane;
     plane_t left_clip_plane, right_clip_plane;
     plane_t far_clip_plane;
@@ -843,20 +772,11 @@ void draw_fog_plane()
     right_clip_plane = get_right_clip_plane();
     bottom_clip_plane = get_bottom_clip_plane();
     
-    
-    /* Find the bottom plane */
     bottom_plane.nml = make_vector( 0.0, 1, -slope );
     height = get_terrain_base_height( 0 );
     
-    /* Unoptimized version
-     pt = make_point( 0, height, 0 );
-     bottom_plane.d = -( pt.x * bottom_plane.nml.x +
-     pt.y * bottom_plane.nml.y +
-     pt.z * bottom_plane.nml.z );
-     */
     bottom_plane.d = -height * bottom_plane.nml.y;
     
-    /* Find the top plane */
     top_plane.nml = bottom_plane.nml;
     height = get_terrain_max_height( 0 );
     top_plane.d = -height * top_plane.nml.y;
@@ -869,7 +789,6 @@ void draw_fog_plane()
         bottom_clip_plane.d = -height * bottom_clip_plane.nml.y;
     }
 
-    /* Now find the bottom left and right points of the fog plane */
     if ( !intersect_planes( bottom_plane, far_clip_plane, left_clip_plane, &left_pt ) )
         return;
     
@@ -890,9 +809,6 @@ void draw_fog_plane()
 
     left_vec = subtract_points( top_left_pt, left_pt );
     right_vec = subtract_points( top_right_pt, right_pt );
-    
-    
-    /* Now draw the fog plane */
     
     set_gl_options( FOG_PLANE );
     
@@ -946,6 +862,7 @@ void draw_fog_plane()
     glDisableClientState(GL_COLOR_ARRAY);
     glDisableClientState (GL_VERTEX_ARRAY);
 	}
+     */
 }
 
 void course_render_init() {

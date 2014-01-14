@@ -34,7 +34,6 @@
 #include "phys_sim.h"
 #include "part_sys.h"
 #include "screenshot.h"
-#include "fog.h"
 #include "viewfrustum.h"
 #include "track_marks.h"
 #include "hud.h"
@@ -276,8 +275,6 @@ void racing_loop( scalar_t time_step )
     update_audio();
     
     clear_rendering_context();
-    
-    setup_fog();
     
 #ifndef TARGET_OS_IPHONE
     /*
@@ -607,11 +604,8 @@ void racing_loop( scalar_t time_step )
     
     draw_sky(plyr->view.pos);
     
-    draw_fog_plane();
-    
     set_course_clipping( True );
     set_course_eye_point( plyr->view.pos );
-    setup_course_lighting();
     render_course();
     draw_trees();
     

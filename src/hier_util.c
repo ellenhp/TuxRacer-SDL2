@@ -105,6 +105,7 @@ void PlotSpherePoints(GLfloat radius, GLint stacks, GLint slices, GLfloat* v, GL
 void
 glutSolidSphere(GLfloat radius, GLint slices, GLint stacks) 
 {
+    /*
 	GLint i, triangles; 
 	static GLfloat* v, *n;
 	static GLfloat parms[3];
@@ -148,7 +149,7 @@ glutSolidSphere(GLfloat radius, GLint slices, GLint stacks)
 
 //	glDisableClientState(GL_VERTEX_ARRAY);
 //	glDisableClientState(GL_NORMAL_ARRAY);
-
+*/
 }
 
 void draw_sphere( int num_divisions )
@@ -184,8 +185,6 @@ void traverse_dag( scene_node_t *node, material_t *mat )
     } 
     
     if ( node->geom == Sphere ) {
-        set_material( mat->diffuse, mat->specular_colour, 
-                     mat->specular_exp );
         
         //FIXME
         draw_sphere(

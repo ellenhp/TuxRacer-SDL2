@@ -31,6 +31,7 @@ colour_t ui_enabled_but_disabled_colour = { 1.0, 1.0, 1.0, 1.0 };
 
 static void draw_quad(int x, int y, int w, int h)
 {
+    /*
 	GLfloat vertices []=
 	{
     	0, 0, 0,
@@ -63,6 +64,7 @@ static void draw_quad(int x, int y, int w, int h)
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     }
     glPopMatrix();
+     */
 }
 
 void ui_draw_menu_decorations(bool_t draw_logo)

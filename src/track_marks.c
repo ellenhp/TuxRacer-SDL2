@@ -369,6 +369,7 @@ void init_track_marks(void)
 
 void draw_track_marks(void)
 {
+    /*
 #ifdef TRACK_TRIANGLES
     draw_tri_tracks();
 #else
@@ -497,7 +498,7 @@ void draw_track_marks(void)
 
     }
 #endif
-
+*/
 }
 
 void break_track_marks( void )

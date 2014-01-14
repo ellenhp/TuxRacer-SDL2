@@ -54,7 +54,7 @@ extern "C"
 #if defined(TARGET_OS_IPHONE)
 #import <OpenGLES/ES1/glext.h>
 #elif defined(__ANDROID__)
-#include <GLES/glext.h>
+#include <GLES2/gl2ext.h>
 #else
 #include <GL/glext.h>
 #endif

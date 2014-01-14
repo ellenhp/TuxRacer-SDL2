@@ -77,6 +77,7 @@ void init_ui_manager()
 */
 void ui_setup_display()
 {
+    /*
     scalar_t offset = OFFSET_AMT;
 
     glMatrixMode( GL_PROJECTION );
@@ -88,6 +89,7 @@ void ui_setup_display()
     glTranslatef( offset, offset, -1.0 );
 
     glColor4f( 1.0, 1.0, 1.0, 1.0 );
+     */
 }
 
 
@@ -520,6 +522,7 @@ void ui_event_motion_func( int x, int y )
 */
 void ui_draw_cursor( void )
 {
+    /*
     GLuint texobj;
     char *binding;
 
@@ -557,6 +560,7 @@ void ui_draw_cursor( void )
 
 	glEnableClientState (GL_VERTEX_ARRAY);
 	glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+     */
 }
 
 

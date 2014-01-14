@@ -70,34 +70,14 @@ void glesPerspective(GLfloat fovy, GLfloat aspect, GLfloat zNear, GLfloat zFar)
 
 void reshape( int w, int h )
 {
-    scalar_t far_clip_dist;
-
-    setparam_x_resolution( w );
-    setparam_y_resolution( h );
-    glViewport( 0, 0, (GLint) w, (GLint) h );
-    glMatrixMode( GL_PROJECTION );
-    glLoadIdentity();
-
-    far_clip_dist = getparam_forward_clip_distance() + FAR_CLIP_FUDGE_AMOUNT;
-
-    glesPerspective( getparam_fov(), (scalar_t)w/h, NEAR_CLIP_DIST, 
-		    far_clip_dist );
-
-    glMatrixMode( GL_MODELVIEW );
 } 
 
 void flat_mode()
 {
-    set_gl_options( TEXT );
-
-    glMatrixMode( GL_PROJECTION );
-    glLoadIdentity();
-    glOrthof( -0.5, 639.5, -0.5, 479.5, -1.0, 1.0 );
-    glMatrixMode( GL_MODELVIEW );
-    glLoadIdentity();
 }
 
 void draw_overlay() {
+    /*
     const GLfloat vertices []=
     {
        0, 0,
@@ -110,6 +90,7 @@ void draw_overlay() {
     glEnableClientState (GL_VERTEX_ARRAY);
     glVertexPointer (2, GL_FLOAT , 0, vertices);	
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+     */
 } 
 
 void clear_rendering_context()
@@ -125,41 +106,13 @@ void clear_rendering_context()
 	     | GL_STENCIL_BUFFER_BIT );
 }
 
-/* 
- * Sets the material properties
- */
-void set_material( colour_t diffuse_colour, colour_t specular_colour,
-			 scalar_t specular_exp )
-{
-  GLfloat mat_amb_diff[4];
-  GLfloat mat_specular[4];
-
-  /* Set material colour (used when lighting is on) */
-  mat_amb_diff[0] = diffuse_colour.r;
-  mat_amb_diff[1] = diffuse_colour.g;
-  mat_amb_diff[2] = diffuse_colour.b;
-  mat_amb_diff[3] = diffuse_colour.a; 
-  glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, mat_amb_diff );
-
-  mat_specular[0] = specular_colour.r;
-  mat_specular[1] = specular_colour.g;
-  mat_specular[2] = specular_colour.b;
-  mat_specular[3] = specular_colour.a;
-  glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular );
-
-  glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, specular_exp );
-
-  /* Set standard colour */
-  glColor4f( diffuse_colour.r, diffuse_colour.g, diffuse_colour.b, 
-	     diffuse_colour.a);
-} 
-
 
 void draw_billboard( player_data_t *plyr, 
 		     point_t center_pt, scalar_t width, scalar_t height, 
 		     bool_t use_world_y_axis, 
 		     point2d_t min_tex_coord, point2d_t max_tex_coord )
 {
+    /*
     point_t pt, pt2, pt3, pt4;
     vector_t x_vec;
     vector_t y_vec;
@@ -218,4 +171,5 @@ void draw_billboard( player_data_t *plyr,
     glDisableClientState (GL_VERTEX_ARRAY);
     glDisableClientState (GL_TEXTURE_COORD_ARRAY);
 	}
+     */
 }

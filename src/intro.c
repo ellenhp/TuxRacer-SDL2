@@ -29,7 +29,6 @@
 #include "view.h"
 #include "tux.h"
 #include "tux_shadow.h"
-#include "fog.h"
 #include "viewfrustum.h"
 #include "keyboard.h"
 #include "hud.h"
@@ -148,8 +147,6 @@ void intro_loop( scalar_t time_step )
 
     clear_rendering_context();
 
-    setup_fog();
-
     update_view( plyr, time_step );
 
     setup_view_frustum( plyr, NEAR_CLIP_DIST, 
@@ -157,11 +154,8 @@ void intro_loop( scalar_t time_step )
 
     draw_sky( plyr->view.pos );
 
-    draw_fog_plane();
-
     set_course_clipping( True );
     set_course_eye_point( plyr->view.pos );
-    setup_course_lighting();
     render_course();
     draw_trees();
 

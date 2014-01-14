@@ -28,8 +28,6 @@
 #include "tcl_util.h"
 #include "keyframe.h"
 #include "gl_util.h"
-#include "lights.h"
-#include "fog.h"
 #include "part_sys.h"
 #include "multiplayer.h"
 #include "audio_data.h"
@@ -204,8 +202,6 @@ static void reset_course()
 
     set_course_mirroring( False );
 
-    reset_lights();
-    reset_fog();
     reset_particles();
 
     if ( course_author != NULL ) {

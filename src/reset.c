@@ -30,7 +30,6 @@
 #include "tux.h"
 #include "tux_shadow.h"
 #include "loop.h"
-#include "fog.h"
 #include "viewfrustum.h"
 #include "hud.h"
 #include "course_load.h"
@@ -82,8 +81,6 @@ void reset_loop( scalar_t time_step )
 
     clear_rendering_context();
 
-    setup_fog();
-
     update_player_pos( plyr, EPS );
 	
     update_view( plyr, EPS );
@@ -93,11 +90,8 @@ void reset_loop( scalar_t time_step )
 
     draw_sky(plyr->view.pos);
 
-    draw_fog_plane();
-
     set_course_clipping( True );
     set_course_eye_point( plyr->view.pos );
-    setup_course_lighting();
     render_course();
     draw_trees();
 

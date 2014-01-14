@@ -38,8 +38,6 @@
 #include "paused.h"
 #include "reset.h"
 #include "keyboard.h"
-#include "fog.h"
-#include "lights.h"
 #include "multiplayer.h"
 #include "audio_data.h"
 #include "audio.h"
@@ -266,8 +264,6 @@ int main( int argc, char **argv )
     register_game_config_callbacks( g_game.tcl_interp );
     register_course_load_tcl_callbacks( g_game.tcl_interp );
     register_key_frame_callbacks( g_game.tcl_interp );
-    register_fog_callbacks( g_game.tcl_interp );
-    register_course_light_callbacks( g_game.tcl_interp );
     register_particle_callbacks( g_game.tcl_interp );
     register_texture_callbacks( g_game.tcl_interp );
     register_font_callbacks( g_game.tcl_interp );
