@@ -19,6 +19,7 @@
 
 #include "tuxracer.h"
 #include "tex_font_metrics.h"
+#include "primitive_draw.h"z
 
 #define MAX_TEX_FONT_CHARS 256
 
@@ -266,38 +267,23 @@ void get_tex_font_string_bbox( tex_font_metrics_t *tfm,
     *max_descent = tfm->max_descent;
 }
 
-void draw_tex_font_char( tfm_char_data_t* cd, char c )
+float draw_tex_font_char( tfm_char_data_t* cd, char c, float x, float y, float scale )
 {
-    /*
     GLfloat texcoords[]={
 		cd->tex_ll.x, cd->tex_ll.y,
-		cd->tex_lr.x, cd->tex_lr.y,
+		cd->tex_ul.x, cd->tex_ul.y,
 		cd->tex_ur.x, cd->tex_ur.y,
-		cd->tex_ul.x, cd->tex_ul.y};
-	GLfloat vertices[]={
-		cd->ll.x, cd->ll.y, 0,
-		cd->lr.x, cd->lr.y, 0,
-		cd->ur.x, cd->ur.y, 0,
-		cd->ul.x, cd->ul.y, 0};
+		cd->tex_lr.x, cd->tex_lr.y};
 
 	GLubyte indices[]={0, 1, 2, 2, 3, 0};
 
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	draw_textured_quad_texcoords(scale*cd->ll.x+x, scale*cd->ll.y+y, scale*(cd->ur.x-cd->ll.x), scale*(cd->ur.y-cd->ll.y), texcoords);
 
-	glVertexPointer(3, GL_FLOAT, 0, vertices);
-	glTexCoordPointer(2, GL_FLOAT, 0, texcoords);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
-    
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-
-	glTranslatef( cd->kern_width, 0., 0. );
-     */
+	return scale*cd->kern_width;
 }
 
 
-void draw_tex_font_string( tex_font_metrics_t *tfm, const char *string )
+void draw_tex_font_string( tex_font_metrics_t *tfm, const char *string, float x, float y, float scale )
 {
     int i;
     int len;
@@ -307,7 +293,7 @@ void draw_tex_font_string( tex_font_metrics_t *tfm, const char *string )
 
     for (i=0; i<len; i++) {
     cd = find_char_data( tfm, string[i] );
-	draw_tex_font_char( cd, string[i] );
+	x+=draw_tex_font_char( cd, string[i], x, y, scale );
     }
 }
 

@@ -228,58 +228,17 @@ static scalar_t get_scale_factor( font_t *font )
     return winsys_scale(font->size) / max_ascent;
 }
 
-static void start_font_draw( font_t *font )
-{
-    /*
-    scalar_t scale_fact = get_scale_factor( font );
-    glPushMatrix();
-    glScalef( scale_fact,
-	      scale_fact,
-	      scale_fact );
-
-	glColor4f( (float)font->colour.r, (float)font->colour.g, (float)font->colour.b, (float)font->colour.a );
-     */
-}
-
-static void end_font_draw( font_t *font )
-{
-    //glPopMatrix();
-}
-
 void bind_font_texture( font_t *font )
 {
     glBindTexture( GL_TEXTURE_2D, font->node->tex->texture_id );
 }
 
-static void advance( font_t *font, const char *string )
+void draw_string( font_t *font, const char *string, float x, float y )
 {
-    int w, a, d;
-    get_font_metrics( font, string, &w, &a, &d );
-    //glTranslatef( w, 0, 0 );
-}
-
-// unused
-//void draw_character( font_t *font, char c)
-//{
-//    char buff[2];
-//
-//    start_font_draw( font );
-//    draw_tex_font_char( font->node->tfm, c );
-//    end_font_draw( font );
-//
-//    buff[0] = c;
-//    buff[1] = '\0';
-//
-//    advance( font, buff );
-//}
-
-void draw_string( font_t *font, const char *string )
-{
-    start_font_draw( font );
-    draw_tex_font_string( font->node->tfm, string );
-    end_font_draw( font );
-
-    advance( font, string );
+    float argb[]={(float)font->colour.r, (float)font->colour.g, (float)font->colour.b, (float)font->colour.a};
+    shader_set_color(argb);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    draw_tex_font_string( font->node->tfm, string, x, y, get_scale_factor(font) );
 }
 
 void get_font_metrics( font_t *font, const char *string,

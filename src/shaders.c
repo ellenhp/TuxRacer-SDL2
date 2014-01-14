@@ -72,8 +72,6 @@ void init_programs()
     }
     
     programs_initialized=True;
-    
-    print_debug(DEBUG_OTHER, "init gl error: %d", glGetError());
 }
 
 void use_terrain_program()
@@ -87,7 +85,6 @@ void use_generic_program()
         glUseProgram(generic_program);
         active_program=generic_program;
     }
-    print_debug(DEBUG_OTHER, "use program gl error: %d", glGetError());
 }
 
 GLuint shader_get_attrib_location(char* name)
@@ -98,5 +95,10 @@ GLuint shader_get_attrib_location(char* name)
 void shader_set_texture(GLuint texture)
 {
     glUniform1i(glGetUniformLocation(active_program, "texture"), texture);
+}
+
+void shader_set_color(GLfloat* argb)
+{
+    glUniform4fv(glGetUniformLocation(active_program, "uniform_color"), 1, argb);
 }
 

@@ -185,24 +185,24 @@ static void game_type_select_loop( scalar_t time_step )
 
     update_audio();
 
-    //set_gl_options( GUI );
+    set_gl_options( GUI );
 
     ui_setup_display();
 
     clear_rendering_context();
     
     if (getparam_ui_snow()) {
-	//update_ui_snow( time_step, False );
-	//draw_ui_snow();
+	update_ui_snow( time_step, False );
+	draw_ui_snow();
     }
 
     ui_draw_menu_decorations(True);
 
-	//GameMenu_draw();
+	GameMenu_draw();
 
-	//ui_draw_cursor();
+	ui_draw_cursor();
 
-    //reshape( getparam_x_resolution(), getparam_y_resolution() );
+    reshape( getparam_x_resolution(), getparam_y_resolution() );
 
     winsys_swap_buffers();
 }

@@ -41,7 +41,10 @@ void ui_draw_menu_decorations(bool_t draw_logo)
     char *title = "logo";
     float w = getparam_x_resolution();
     float h = getparam_y_resolution();
-
+    
+    float colors[]={1, 1, 1, 1};
+    shader_set_color(colors);
+    
     glEnable( GL_TEXTURE_2D );
     
     shader_set_texture(0);

@@ -39,8 +39,8 @@ void delete_tex_font_metrics( tex_font_metrics_t *tfm );
 void get_tex_font_string_bbox( tex_font_metrics_t *tfm, 
 			       const char *string, 
 			       int *width, int *max_ascent, int *max_descent );
-void draw_tex_font_char( tfm_char_data_t* cd, char c );
-void draw_tex_font_string( tex_font_metrics_t *tfm, const char *string );
+float draw_tex_font_char( tfm_char_data_t* cd, char c, float x, float y, float scale );
+void draw_tex_font_string( tex_font_metrics_t *tfm, const char *string, float x, float y, float scale );
 bool_t is_character_in_tex_font( tex_font_metrics_t *tfm, char c );
 
 #endif /* TEX_FONT_METRICS_H */

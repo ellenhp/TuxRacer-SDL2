@@ -47,8 +47,8 @@ bool_t flush_fonts(void);
 
 void bind_font_texture( font_t *font );
 //void draw_character( font_t *font, char c);
-void draw_string( font_t *font, const char *string);
-void draw_string_with_markup( font_t *font, const char *string);
+void draw_string( font_t *font, const char *string, float x, float y);
+//void draw_string_with_markup( font_t *font, const char *string);
 void get_font_metrics( font_t *font, const char *string,
 		       int *width, int *max_ascent, int *max_descent);
 void get_font_metrics_scalar( font_t *font, const char *string,

@@ -27,6 +27,7 @@
 #include "textures.h"
 #include "ui_mgr.h"
 #include "loop.h"
+#include "primitive_draw.h"
 
 #define MAX_NUM_PARTICLES 10000
 #define PARTICLE_DENSITY 0.0005
@@ -215,7 +216,6 @@ void update_ui_snow( scalar_t time_step, bool_t windy )
 
 void draw_ui_snow( void )
 {
-    /*
     GLuint   texture_id;
     char *binding;
     point2d_t *pt, *tex_min, *tex_max;
@@ -234,35 +234,19 @@ void draw_ui_snow( void )
 		       "Couldn't get texture for binding %s", 
 		       binding );
 	texture_id = 0;
-    } 
-
-    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+    }
 
     glBindTexture( GL_TEXTURE_2D, texture_id );
+    
+    shader_set_color(particle_colour);
 
-    glColor4f( particle_colour[0], 
-	       particle_colour[1], 
-	       particle_colour[2],
-	       particle_colour[3] );
-
-    glPushMatrix();
-    {
 	for ( i=0; i<num_particles; i++) {
 	    pt = &particles[i].pt;
 	    size = particles[i].size;
 	    tex_min = &particles[i].tex_min;
 	    tex_max = &particles[i].tex_max;
-	    glPushMatrix();
-	    {
-    	const GLfloat vertices []=
-    	{
-    	    0, 0,
-    	    size, 0,
-    	    size, size,
-    	    0, size
-    	};
 
-    	const GLfloat texCoords []=
+    	GLfloat texCoords []=
     	{
     	    tex_min->x, tex_min->y,
     	    tex_max->x, tex_min->y,
@@ -270,22 +254,8 @@ void draw_ui_snow( void )
     	    tex_min->x, tex_max->y
     	};
 
-		glTranslatef( pt->x*xres, pt->y*yres, 0 );
-		
-    	glEnableClientState (GL_VERTEX_ARRAY);
-    	glEnableClientState (GL_TEXTURE_COORD_ARRAY);
-    	glVertexPointer (2, GL_FLOAT , 0, vertices);	
-    	glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
-    	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    	glDisableClientState (GL_VERTEX_ARRAY);
-    	glDisableClientState (GL_TEXTURE_COORD_ARRAY);
-
-	    }
-	    glPopMatrix();
-	} 
-    }
-    glPopMatrix();
-     */
+        draw_textured_quad_texcoords(pt->x*xres, pt->y*yres, size, size, texCoords);
+	}
 
 } 
 

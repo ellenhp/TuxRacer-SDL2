@@ -255,15 +255,7 @@ void GameMenu_draw_text(const char* text, int active, coord_t coord, char* reque
 			break;
 		}
 		
-        /*
-        glPushMatrix();
-        {
-			glTranslatef( x_render_pos, y_render_pos, 0.0 );
-
-            draw_string( font, text );
-        }
-        glPopMatrix();
-         */
+        draw_string(font, text, x_render_pos, y_render_pos);
     }
 }
 
@@ -296,49 +288,26 @@ void GameMenu_draw_image(GLuint binding, rect_t image_rect, rect_t screen_rect)
 	glBindTexture( GL_TEXTURE_2D, binding );
 
 	rect_to_absolute(&screen_rect);
-
-    /*
     
-	glPushMatrix();
+    GLfloat texCoords []=
     {
-		GLfloat vertices []=
-		{
-    		screen_rect.upper_right.x, screen_rect.lower_left.y, 0,
-			screen_rect.upper_right.x, screen_rect.upper_right.y, 0,
-    		screen_rect.lower_left.x, screen_rect.upper_right.y, 0,
-    		screen_rect.lower_left.x, screen_rect.lower_left.y, 0
-		};
-		GLfloat texCoords []=
-		{
-			image_rect.upper_right.x,image_rect.lower_left.y,
-    		image_rect.upper_right.x,image_rect.upper_right.y,
-    		image_rect.lower_left.x,image_rect.upper_right.y,
-    		image_rect.lower_left.x,image_rect.lower_left.y
-		};
-		GLubyte indices[]={0, 1, 2, 0, 2, 3};
-    	
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glVertexPointer(3, GL_FLOAT , 0, vertices);	
-		glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
-		glDisableClientState(GL_VERTEX_ARRAY);
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    }
-    glPopMatrix();
-     */
+        image_rect.upper_right.x,image_rect.lower_left.y,
+        image_rect.upper_right.x,image_rect.upper_right.y,
+        image_rect.lower_left.x,image_rect.upper_right.y,
+        image_rect.lower_left.x,image_rect.lower_left.y
+    };
+    GLubyte indices[]={0, 1, 2, 0, 2, 3};
+    
+	draw_textured_quad_texcoords(screen_rect.lower_left.x, screen_rect.lower_left.y, screen_rect.upper_right.x-screen_rect.lower_left.x, screen_rect.upper_right.y-screen_rect.lower_left.y, texCoords);
 }
 
 void GameMenu_draw_image_full(GLuint binding, rect_t screen_rect)
 {
-	rect_t image_rect;
+	glBindTexture( GL_TEXTURE_2D, binding );
+    
+	rect_to_absolute(&screen_rect);
 
-	image_rect.lower_left.x=image_rect.lower_left.y=0;
-	image_rect.upper_right.x=image_rect.upper_right.y=1;
-
-	image_rect.lower_left.x_coord_type=image_rect.lower_left.y_coord_type=image_rect.upper_right.x_coord_type=image_rect.upper_right.y_coord_type=NORMALIZED_COORD;
-
-	GameMenu_draw_image(binding, image_rect, screen_rect);
+	draw_textured_quad(screen_rect.lower_left.x, screen_rect.lower_left.y, screen_rect.upper_right.x-screen_rect.lower_left.x, screen_rect.upper_right.y-screen_rect.lower_left.y);
 }
 
 int GameMenu_get_window_height()

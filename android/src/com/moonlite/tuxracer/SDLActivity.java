@@ -65,7 +65,7 @@ AppPurchasingObserverListener {
     // Keep track of the paused state
     public static boolean mIsPaused = false, mIsSurfaceReady = false, mHasFocus = true;
     
-    public static float scaleFactor=0;
+    public static float scaleFactor=1;
 
     // Main components
     protected static SDLActivity mSingleton;
@@ -402,14 +402,6 @@ AppPurchasingObserverListener {
         Point size=new Point();
         getWindowManager().getDefaultDisplay().getSize(size);
         
-        if (size.y<720)
-        {
-        	scaleFactor=1;
-        }
-        else
-        {
-        	scaleFactor=720.0f/size.y;
-        }
         size.x*=scaleFactor;
         size.y*=scaleFactor;
         

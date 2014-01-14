@@ -11,6 +11,8 @@ void load_terrain_program();
 void load_generic_program();
 
 void shader_set_texture(GLuint texture);
+void shader_set_color(GLfloat* argb);
+
 GLuint shader_get_attrib_location(char* name);
 
 #endif

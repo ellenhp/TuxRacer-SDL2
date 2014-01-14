@@ -221,7 +221,7 @@ static void draw_text_lines( textarea_t *ta, font_t *font )
     check_assertion( line != NULL, "line is NULL in line_list" );
 
     get_font_metrics( font, line, &w, &asc, &desc );
-
+/*
     glPushMatrix();
     {
 	cur_y = ta->pos.y + ta->h - ta->border_width - ta->text_pad - asc;
@@ -258,6 +258,7 @@ static void draw_text_lines( textarea_t *ta, font_t *font )
 	}
     }
     glPopMatrix();
+ */
 }
 
 

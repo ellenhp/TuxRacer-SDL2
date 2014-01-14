@@ -45,6 +45,7 @@
 #include "gui_button.h"
 #include "scoreboard.h"
 #include "platform.h"
+#include "primitive_draw.h"
 
 #ifdef TARGET_OS_IPHONE
 	#import "sharedGeneralFunctions.h"
@@ -324,14 +325,10 @@ static void draw_preview()
 	{
 		rect_t screen_rect;
 		open_course_data_t *data;
-
-		screen_rect.lower_left.x=0.105;
-		screen_rect.lower_left.y=0.45;
-		screen_rect.lower_left.x_coord_type=screen_rect.lower_left.y_coord_type=NORMALIZED_COORD;
-
-		screen_rect.upper_right.x=0.445;
-		screen_rect.upper_right.y=0.79;
-		screen_rect.upper_right.x_coord_type=screen_rect.upper_right.y_coord_type=NORMALIZED_COORD;
+        int w=getparam_x_resolution();
+        int h=getparam_y_resolution();
+        float colors[]={1, 1, 1, 1};
+        shader_set_color(colors);
 
         data = (open_course_data_t*) get_list_elem_data( cur_elem );
 		if ( !get_texture_binding( data->course, &texobj ) ) {
@@ -339,7 +336,10 @@ static void draw_preview()
 				texobj = 0;
 			}
 		}
-		GameMenu_draw_image_full(texobj, screen_rect);
+        
+        glBindTexture( GL_TEXTURE_2D, texobj );
+
+        draw_textured_quad(0.105*w, 0.45*h, 0.34*w, 0.34*h);
 	}
 }
 
