@@ -47,6 +47,9 @@ void ui_draw_menu_decorations(bool_t draw_logo)
     
     glEnable( GL_TEXTURE_2D );
     
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    
     shader_set_texture(0);
 
     /* bottom left */

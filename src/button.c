@@ -23,6 +23,7 @@
 #include "textures.h"
 #include "ui_mgr.h"
 #include "gui_abstraction.h"
+#include "primitive_draw.h"
 
 typedef struct {
     char *binding;   /* name of texture binding */
@@ -289,6 +290,26 @@ void button_draw( button_t *button )
         /*Si le bouton est du texte, on ajuste sa largeur à la largeur du texte, pour pouvoir le placer plus precisement*/
         if ( button->font_binding ) {
             font_binding = button->font_binding;
+        }
+    }
+    if ( tex != NULL ) {
+        if ( !get_texture_binding( tex->binding, &texobj ) )
+        {
+            print_warning(IMPORTANT_WARNING, "Couldnt get texture object for binding %s", tex->binding);
+            texobj = 0;
+        }
+        {
+            GLfloat texcoords[]={
+                tex->ll.x, tex->ll.y,
+                tex->ll.x, tex->ur.y,
+                tex->ur.x, tex->ur.y,
+                tex->ur.x, tex->ll.y};
+            
+            glBindTexture(GL_TEXTURE_2D, texobj);
+            
+            draw_textured_quad(pos.x, pos.y, w, h);
+            
+            print_debug(DEBUG_UI, "drawing %s", tex->binding);
         }
     }
     

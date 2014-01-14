@@ -172,8 +172,9 @@ static void draw_credits_text( scalar_t time_step )
 	}
     y = CREDITS_MIN_Y+y_offset;
     
-    text_coord.x=0;
-    text_coord.x_coord_type=NORMALIZED_COORD;
+    text_coord.x=w/2;
+    text_coord.y=y;
+    text_coord.x_coord_type=ABSOLUTE_COORD;
     text_coord.y_coord_type=ABSOLUTE_COORD;
     text_coord.x_just=text_coord.y_just=CENTER_JUST;
     
@@ -193,7 +194,7 @@ static void draw_credits_text( scalar_t time_step )
         }
     }
     
-    if ( y > h+CREDITS_MAX_Y ) {
+    if ( text_coord.y > h+CREDITS_MAX_Y ) {
         go_back();
     }
 }

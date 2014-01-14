@@ -221,13 +221,8 @@ static void draw_text_lines( textarea_t *ta, font_t *font )
     check_assertion( line != NULL, "line is NULL in line_list" );
 
     get_font_metrics( font, line, &w, &asc, &desc );
-/*
-    glPushMatrix();
-    {
+    
 	cur_y = ta->pos.y + ta->h - ta->border_width - ta->text_pad - asc;
-	glTranslatef( ta->pos.x + ta->border_width + ta->text_pad ,
-		      cur_y,
-		      0 );
 	height_used = asc + desc;
 	    
 	while (True) {
@@ -239,7 +234,8 @@ static void draw_text_lines( textarea_t *ta, font_t *font )
 	    }
 
 	    get_font_metrics( font, line, &w, &asc, &desc );
-	    draw_string( font, line );
+
+	    draw_string( font, line, ta->pos.x + ta->border_width + ta->text_pad, cur_y );
 
 	    cur_line = get_next_list_elem( ta->line_list, cur_line );
 
@@ -252,13 +248,9 @@ static void draw_text_lines( textarea_t *ta, font_t *font )
 
 	    line = (char*) get_list_elem_data( cur_line );
 
-	    glTranslatef( -w, -(asc+desc), 0 );
-
 	    height_used += asc + desc;
+        cur_y -= asc + desc;
 	}
-    }
-    glPopMatrix();
- */
 }
 
 
@@ -271,7 +263,6 @@ static void draw_text_lines( textarea_t *ta, font_t *font )
 */
 void textarea_draw( textarea_t *ta )
 {
-    /*
     font_t *font;
 
 	GLfloat border_vertices[]={
@@ -286,30 +277,9 @@ void textarea_draw( textarea_t *ta )
         ta->pos.x + ta->w - ta->border_width, ta->pos.y + ta->h - ta->border_width,
 		ta->pos.x + ta->border_width, ta->pos.y + ta->h - ta->border_width };
 
-	
 	GLubyte indices[]={0, 1, 2, 2, 3, 0};
 
     check_assertion( ta != NULL, "ta is NULL" );
-
-    glDisable( GL_TEXTURE_2D );
-
-    if(ta->background_colour.a != 0.) {
-        glColor4f( ta->border_colour.r, ta->border_colour.g, ta->border_colour.b, 1 );
-
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer (3, GL_FLOAT , 0, border_vertices);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
-
-		glColor4f( ta->background_colour.r, ta->background_colour.g, ta->background_colour.b, 1 );
-
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer (3, GL_FLOAT , 0, background_vertices);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
-
-		glDisableClientState(GL_VERTEX_ARRAY);
-    }
-
-    glEnable( GL_TEXTURE_2D );
 
     if ( !get_font_binding( ta->font_binding, &font ) ) {
 	print_warning( IMPORTANT_WARNING,
@@ -326,7 +296,6 @@ void textarea_draw( textarea_t *ta )
     if ( ta->down_button != NULL && button_is_enabled(ta->down_button) ) {
 	button_draw( ta->down_button ); 
     }
-     */
 }
 
 
