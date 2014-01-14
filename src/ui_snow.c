@@ -28,6 +28,7 @@
 #include "ui_mgr.h"
 #include "loop.h"
 #include "primitive_draw.h"
+#include "shaders.h"
 
 #define MAX_NUM_PARTICLES 10000
 #define PARTICLE_DENSITY 0.0005
@@ -212,7 +213,47 @@ void update_ui_snow( scalar_t time_step, bool_t windy )
 	push_vector.x = 0.0;
 	push_vector.y = 0.0;
     }
-} 
+}
+
+void init_arrays_for_particle(particle_t particle, GLfloat* vertices, GLfloat* tex_coords)
+{
+    point2d_t pt = particle.pt;
+    scalar_t size = particle.size;
+    point2d_t* tex_min = &particle.tex_min;
+    point2d_t* tex_max = &particle.tex_max;
+    scalar_t xres, yres;
+
+#define TO_RELATIVE(screen, val) (((val)/screen*2.0)-1.0)
+
+    xres=getparam_x_resolution();
+    yres=getparam_y_resolution();
+    
+    vertices[0]=TO_RELATIVE(xres, pt.x*xres);
+    vertices[1]=TO_RELATIVE(yres, pt.y*yres);
+    
+    vertices[2]=TO_RELATIVE(xres, pt.x*xres);
+    vertices[3]=TO_RELATIVE(yres, pt.y*yres+size);
+    
+    vertices[4]=TO_RELATIVE(xres, pt.x*xres+size);
+    vertices[5]=TO_RELATIVE(yres, pt.y*yres+size);
+    
+    vertices[6]=TO_RELATIVE(xres, pt.x*xres+size);
+    vertices[7]=TO_RELATIVE(yres, pt.y*yres);
+    
+#undef TO_RELATIVE
+    
+    tex_coords[0]=tex_min->x;
+    tex_coords[1]=tex_min->y;
+    
+    tex_coords[2]=tex_min->x;
+    tex_coords[3]=tex_max->y;
+    
+    tex_coords[4]=tex_max->x;
+    tex_coords[5]=tex_max->y;
+    
+    tex_coords[6]=tex_max->x;
+    tex_coords[7]=tex_min->y;
+}
 
 void draw_ui_snow( void )
 {
@@ -239,24 +280,48 @@ void draw_ui_snow( void )
     glBindTexture( GL_TEXTURE_2D, texture_id );
     
     shader_set_color(particle_colour);
+    
+    {
+        GLfloat* vertices=(GLfloat*)malloc(8*num_particles*sizeof(GLfloat));
+        GLfloat* tex_coords=(GLfloat*)malloc(8*num_particles*sizeof(GLfloat));
+        GLushort* indices=(GLushort*)malloc(6*num_particles*sizeof(GLushort));
+        
+        for ( i=0; i<num_particles; i++) {
+            init_arrays_for_particle(particles[i], vertices+i*8, tex_coords+i*8);
+            int firstvert=i*4;
+            int firstindex=i*6;
+            indices[0+firstindex]=0+firstvert;
+            indices[1+firstindex]=1+firstvert;
+            indices[2+firstindex]=2+firstvert;
+            indices[3+firstindex]=2+firstvert;
+            indices[4+firstindex]=3+firstvert;
+            indices[5+firstindex]=0+firstvert;
 
-	for ( i=0; i<num_particles; i++) {
-	    pt = &particles[i].pt;
-	    size = particles[i].size;
-	    tex_min = &particles[i].tex_min;
-	    tex_max = &particles[i].tex_max;
+        }
+        
+        //print_debug(DEBUG_OTHER, "indices %d %d %d %d %d %d %d %d %d %d %d %d", indices[0], indices[1], indices[2], indices[3], indices[4], indices[5], indices[6], indices[7], indices[8], indices[9], indices[10], indices[11]);
+        //print_debug(DEBUG_OTHER, "vertices %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f", vertices[0], vertices[1], vertices[2], vertices[3], vertices[4], vertices[5], vertices[6], vertices[7], vertices[8], vertices[9], vertices[10], vertices[11], vertices[12], vertices[13], vertices[14], vertices[15]);
+        
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        
+        glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 2, GL_FLOAT, GL_FALSE, 0, vertices);
+        glEnableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
+        
+        glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, 0, tex_coords);
+        glEnableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
+        
+        glDrawElements(GL_TRIANGLES, num_particles*6, GL_UNSIGNED_SHORT, indices);
+        
+        glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 2, GL_FLOAT, GL_FALSE, 0, 0);
+        glDisableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
+        
+        glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, 0, 0);
+        glDisableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
 
-    	GLfloat texCoords []=
-    	{
-    	    tex_min->x, tex_min->y,
-    	    tex_max->x, tex_min->y,
-    	    tex_max->x, tex_max->y,
-    	    tex_min->x, tex_max->y
-    	};
-
-        draw_textured_quad_texcoords(pt->x*xres, pt->y*yres, size, size, texCoords);
-	}
-
+        free(vertices);
+        free(tex_coords);
+    }
 } 
 
 void

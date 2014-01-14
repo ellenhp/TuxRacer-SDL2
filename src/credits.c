@@ -188,9 +188,9 @@ static void draw_credits_text( scalar_t time_step )
         } else {
             get_font_metrics( font, line.text, &string_w, &asc, &desc );
             
-            GameMenu_draw_text( line.text, 0, text_coord, line.binding );
-            
             text_coord.y -= asc+desc;
+
+            GameMenu_draw_text( line.text, 0, text_coord, line.binding );
         }
     }
     
