@@ -245,6 +245,7 @@ void draw_bonus(player_data_t *plyr) {
             bind_font_texture( font );
             set_gl_options( TEXFONT );
             
+            /*
             glPushMatrix();
             {
                 glTranslatef( 800 * (1 - position_from_time_delta(anim_time)) - width/2 - 140, 200.0 + i*18.0, 0 );
@@ -252,6 +253,7 @@ void draw_bonus(player_data_t *plyr) {
                 draw_string( font, string );
             }
             glPopMatrix();
+             */
         } else {
             remove_bonus(bonus);
         }

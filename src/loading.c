@@ -79,6 +79,7 @@ void draw_loading_text( void )
         string = Localize("Loading, Please Wait...","");
         get_font_metrics( font, string, &string_w, &asc, &desc );
         
+        /*
         glPushMatrix();
         {
             glTranslatef( w/2.0 - string_w/2.0,
@@ -87,7 +88,9 @@ void draw_loading_text( void )
             bind_font_texture( font );
             draw_string( font, string );
         }
+         
         glPopMatrix();
+         */
     }
 }
 

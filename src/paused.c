@@ -130,6 +130,7 @@ void draw_paused_text( void )
 
 	get_font_metrics( font, string, &string_w, &asc, &desc );
 	
+        /*
 	glPushMatrix();
 	{
 	    glTranslatef( x_org + box_width/2.0 - string_w/2.0,
@@ -139,6 +140,7 @@ void draw_paused_text( void )
 	    draw_string( font, string );
 	}
 	glPopMatrix();
+         */
     }
 }
 

@@ -166,6 +166,7 @@ void draw_sphere( int num_divisions )
  */
 void traverse_dag( scene_node_t *node, material_t *mat )
 {
+    /*
     scene_node_t *child;
     GLfloat matrix[4][4];
     int i,j;
@@ -200,6 +201,7 @@ void traverse_dag( scene_node_t *node, material_t *mat )
     } 
     
     glPopMatrix();
+     */
 } 
 
 /*--------------------------------------------------------------------------*/

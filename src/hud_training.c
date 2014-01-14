@@ -66,7 +66,6 @@ static void print_instruction(const char* string, int line) {
     
     get_font_metrics( font, (char*)string, &w, &asc, &desc );
     glDisable(GL_TEXTURE_2D);
-    glColor4f(1.0,1.0,1.0,0.4);
     
 	{
     GLfloat vertices[]={
@@ -85,6 +84,7 @@ static void print_instruction(const char* string, int line) {
 	glDisableClientState(GL_VERTEX_ARRAY);*/
 
     glEnable(GL_TEXTURE_2D);
+    /*
     glPushMatrix();
     {
         glTranslatef( width / 2 - (float)w / 2.0,
@@ -93,6 +93,7 @@ static void print_instruction(const char* string, int line) {
         draw_string( font, (char*)string );
     }
     glPopMatrix();
+     */
 	}
 }
 
@@ -105,7 +106,6 @@ static void drawRedCircle(GLint x, GLint y, GLint diameter) {
     if ( !get_texture_binding( "red_circle", &texobj ) ) {
         texobj = 0;
     }
-    glColor4f(1.0,0.0,0.0,0.5);
     
     glBindTexture( GL_TEXTURE_2D, texobj );
 

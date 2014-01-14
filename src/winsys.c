@@ -21,6 +21,7 @@
 #include "winsys.h"
 #include "audio.h"
 #include "SDL_image.h"
+#include "shaders.h"
 
 /* Windowing System Abstraction Layer */
 /* Abstracts creation of windows, handling of events, etc. */
@@ -384,6 +385,9 @@ void winsys_init( int *argc, char **argv, char *window_title,
     if ( SDL_Init( sdl_flags ) < 0 ) {
 	handle_error( 1, "Couldn't initialize SDL: %s", SDL_GetError() );
     }
+    
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 
 	initResult=IMG_Init( IMG_INIT_PNG | IMG_INIT_JPG );
     if (!(initResult & IMG_INIT_PNG) || !(initResult & IMG_INIT_JPG)) {
@@ -402,6 +406,8 @@ void winsys_init( int *argc, char **argv, char *window_title,
 #endif
 
     setup_sdl_video_mode();
+    
+    init_programs();
 
 #if SDL_MAJOR_VERSION==2
 	SDL_SetWindowTitle(window, window_title);

@@ -85,6 +85,7 @@ static GLfloat white[] = { 1.0, 1.0, 1.0, 1.0 };
 
 static void draw_time(player_data_t* plyr)
 {
+    /*
     font_t *font;
     int minutes, seconds, hundredths;
     char *string;
@@ -100,7 +101,6 @@ static void draw_time(player_data_t* plyr)
     //Half_Pipe mode
     if (!strcmp(get_calculation_mode(),"Half_Pipe")) 
     {
-		/* use easy time as par score */
 		scalar_t par_time = g_game.race.time_req[DIFFICULTY_LEVEL_EASY];
         time = (par_time-g_game.time);
     }
@@ -116,7 +116,6 @@ static void draw_time(player_data_t* plyr)
     
     get_time_components( time, &minutes, &seconds, &hundredths );
 
-    /* display Time logo */
     x_org = OVERSCAN_MARGIN_X + TIME_X_OFFSET;
     y_org = getparam_y_resolution() - OVERSCAN_MARGIN_Y - TIME_Y_OFFSET - TIME_ICON_SIZE;
 
@@ -125,8 +124,6 @@ static void draw_time(player_data_t* plyr)
     }
     
     glBindTexture( GL_TEXTURE_2D, texobj );
-    
-    glColor4f( 1, 1, 1, 1 );
 
     {
 		GLfloat vertices[]={
@@ -152,7 +149,7 @@ static void draw_time(player_data_t* plyr)
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
 		
 		glDisableClientState (GL_VERTEX_ARRAY);
-        glDisableClientState (GL_TEXTURE_COORD_ARRAY);*/
+        glDisableClientState (GL_TEXTURE_COORD_ARRAY);
 
     }
 
@@ -206,6 +203,7 @@ static void draw_time(player_data_t* plyr)
 	draw_string( font, string );
     }
     glPopMatrix();
+     */
 }
 
 static void draw_herring_count( int herring_count )
@@ -240,7 +238,6 @@ static void draw_herring_count( int herring_count )
 	GLubyte indices[]={0, 1, 2, 2, 3, 0};
 
     set_gl_options( TEXFONT );
-    glColor4f( 1.0, 1.0, 1.0, 1.0);
 
     binding = "herring_icon";
 
@@ -266,13 +263,14 @@ static void draw_herring_count( int herring_count )
 
     glBindTexture( GL_TEXTURE_2D, texobj );
 
+    /*
     glPushMatrix();
 	{        
         glTranslatef( getparam_x_resolution() - HERRING_ICON_X_OFFSET - OVERSCAN_MARGIN_X,
                      getparam_y_resolution() - HERRING_ICON_Y_OFFSET - OVERSCAN_MARGIN_Y - asc, 
                      0 );
         
-        /*glEnableClientState (GL_VERTEX_ARRAY);
+        glEnableClientState (GL_VERTEX_ARRAY);
         glEnableClientState (GL_TEXTURE_COORD_ARRAY);
 
         glVertexPointer(3, GL_FLOAT , 0, verticesItem);	
@@ -280,7 +278,7 @@ static void draw_herring_count( int herring_count )
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
 		
 		glDisableClientState (GL_VERTEX_ARRAY);
-        glDisableClientState (GL_TEXTURE_COORD_ARRAY);*/
+        glDisableClientState (GL_TEXTURE_COORD_ARRAY);
 
 		bind_font_texture( font );
 
@@ -291,6 +289,7 @@ static void draw_herring_count( int herring_count )
 	}
 
     glPopMatrix();    
+     */
 }
 
 static void draw_score( player_data_t *plyr )
@@ -316,7 +315,7 @@ static void draw_score( player_data_t *plyr )
 
     bind_font_texture( font );
     set_gl_options( TEXFONT );
-    glColor4f( 1, 1, 1, 1 );
+    /*
     glPushMatrix();
     {
         glTranslatef( SCORE_X_OFFSET + OVERSCAN_MARGIN_X,
@@ -325,6 +324,7 @@ static void draw_score( player_data_t *plyr )
         draw_string( font, string );
     }
     glPopMatrix();
+     */
 
     if ( !get_font_binding( "fps_big", &font ) ) {
         print_warning( IMPORTANT_WARNING,
@@ -334,11 +334,11 @@ static void draw_score( player_data_t *plyr )
     
     bind_font_texture( font );
     set_gl_options( TEXFONT );
-    glColor4f( 1, 1, 1, 1 );
     
     sprintf( buff, "%d",score );
     string = buff;
     
+    /*
     glPushMatrix();
     {
         glTranslatef( SCORE_X_OFFSET + OVERSCAN_MARGIN_X + w,
@@ -347,6 +347,7 @@ static void draw_score( player_data_t *plyr )
         draw_string( font, string );
     }
     glPopMatrix();
+     */
 }
 
 #define CIRCLE_DIVISIONS 20
@@ -373,6 +374,7 @@ point2d_t calc_new_fan_tex_pt( scalar_t angle )
 
 void draw_partial_tri_fan( scalar_t fraction )
 {
+    /*
 #define DIVS (CIRCLE_DIVISIONS+2)
     scalar_t angle, angle_incr, cur_angle;
     int i;
@@ -422,6 +424,7 @@ void draw_partial_tri_fan( scalar_t fraction )
     glDrawArrays(GL_TRIANGLE_FAN, 0, DIVS);
 
 	return;
+     */
 }
 
 void draw_gauge( scalar_t speed, scalar_t energy )
@@ -479,6 +482,7 @@ void draw_gauge( scalar_t speed, scalar_t energy )
     
     y = ENERGY_GAUGE_BOTTOM + energy * ENERGY_GAUGE_HEIGHT;
 
+    /*
     glPushMatrix();
     {
         const GLfloat verticesItem []=
@@ -622,16 +626,17 @@ void draw_gauge( scalar_t speed, scalar_t energy )
             
         }
         glPopMatrix();
-         */
         
     }
     glPopMatrix();
+     */
 
 	//glDisableClientState (GL_VERTEX_ARRAY);
     //glDisableClientState (GL_TEXTURE_COORD_ARRAY);
 }
 void print_fps()
 {
+    /*
     char buff[BUFF_LEN];
     char *string;
     char *binding;
@@ -639,7 +644,6 @@ void print_fps()
 	int x, y;
 	int w, asc, desc;
 
-    /* This is needed since this can be called from outside */
     ui_setup_display();
 
     if ( ! getparam_display_fps() ) {
@@ -686,6 +690,7 @@ void print_fps()
 	draw_string( font_big, string );
     }
     glPopMatrix();
+     */
 }
 
 void draw_hud( player_data_t *plyr )

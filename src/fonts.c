@@ -230,6 +230,7 @@ static scalar_t get_scale_factor( font_t *font )
 
 static void start_font_draw( font_t *font )
 {
+    /*
     scalar_t scale_fact = get_scale_factor( font );
     glPushMatrix();
     glScalef( scale_fact,
@@ -237,11 +238,12 @@ static void start_font_draw( font_t *font )
 	      scale_fact );
 
 	glColor4f( (float)font->colour.r, (float)font->colour.g, (float)font->colour.b, (float)font->colour.a );
+     */
 }
 
 static void end_font_draw( font_t *font )
 {
-    glPopMatrix();
+    //glPopMatrix();
 }
 
 void bind_font_texture( font_t *font )
@@ -253,7 +255,7 @@ static void advance( font_t *font, const char *string )
 {
     int w, a, d;
     get_font_metrics( font, string, &w, &a, &d );
-    glTranslatef( w, 0, 0 );
+    //glTranslatef( w, 0, 0 );
 }
 
 // unused

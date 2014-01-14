@@ -49,10 +49,9 @@ void draw_tux_shadow()
     if ( ! getparam_draw_tux_shadow() ) 
 	return;
 
-    set_gl_options( TUX_SHADOW ); 
+    set_gl_options( TUX_SHADOW );
 
-    glColor4f( shadow_colour.r, shadow_colour.g, shadow_colour.b,
-	       shadow_colour.a );
+    //glColor4f( shadow_colour.r, shadow_colour.g, shadow_colour.b, w_colour.a );
 
     make_identity_matrix( model_matrix );
 

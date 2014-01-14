@@ -25,6 +25,6 @@ LOCAL_SHARED_LIBRARIES += SDL2_image
 LOCAL_SHARED_LIBRARIES += scoreloopcore
 LOCAL_SHARED_LIBRARIES += tcl
 
-LOCAL_LDLIBS := -llog -ldl -lc -lm -lGLESv1_CM
+LOCAL_LDLIBS := -llog -ldl -lc -lm -lGLESv2
 
 include $(BUILD_SHARED_LIBRARY)

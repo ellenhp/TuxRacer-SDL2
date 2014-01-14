@@ -255,6 +255,7 @@ void GameMenu_draw_text(const char* text, int active, coord_t coord, char* reque
 			break;
 		}
 		
+        /*
         glPushMatrix();
         {
 			glTranslatef( x_render_pos, y_render_pos, 0.0 );
@@ -262,6 +263,7 @@ void GameMenu_draw_text(const char* text, int active, coord_t coord, char* reque
             draw_string( font, text );
         }
         glPopMatrix();
+         */
     }
 }
 
@@ -295,8 +297,8 @@ void GameMenu_draw_image(GLuint binding, rect_t image_rect, rect_t screen_rect)
 
 	rect_to_absolute(&screen_rect);
 
-	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-
+    /*
+    
 	glPushMatrix();
     {
 		GLfloat vertices []=
@@ -324,6 +326,7 @@ void GameMenu_draw_image(GLuint binding, rect_t image_rect, rect_t screen_rect)
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     }
     glPopMatrix();
+     */
 }
 
 void GameMenu_draw_image_full(GLuint binding, rect_t screen_rect)

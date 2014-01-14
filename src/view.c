@@ -317,14 +317,14 @@ void setup_view_matrix( player_data_t *plyr )
     view_mat[3][1] = -viewpt_in_view_frame.y;
     view_mat[3][2] = -viewpt_in_view_frame.z;
     
-    glLoadIdentity();
+    //glLoadIdentity();
 
 	for( i = 0; i < 4; i++ )
     {
         for( j = 0; j < 4; j++ )
             matrix[i][j] = view_mat[i][j];
     }
-    glMultMatrixf( (GLfloat *) matrix );
+    //glMultMatrixf( (GLfloat *) matrix );
 
 }
 

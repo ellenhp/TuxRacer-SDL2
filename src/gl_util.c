@@ -126,7 +126,6 @@ void set_gl_options( RenderMode mode )
 	glDepthMask( GL_TRUE );
 	glDepthFunc( GL_LESS );
 
-        glAlphaFunc( GL_GEQUAL, 0.5 );
         break;
         
     case PARTICLES:
@@ -138,7 +137,6 @@ void set_gl_options( RenderMode mode )
 	glDepthMask( GL_TRUE );
 	glDepthFunc( GL_LESS );
 
-        glAlphaFunc( GL_GEQUAL, 0.5 );
         break;
         
     case PARTICLE_SHADOWS:
@@ -224,8 +222,7 @@ void set_gl_options( RenderMode mode )
 	glDisable( GL_STENCIL_TEST );
 	glDepthMask( GL_TRUE );
 	glDepthFunc( GL_LESS );
-
-        glAlphaFunc( GL_GEQUAL, 0.5 );
+ 
         break;
 
     default:
