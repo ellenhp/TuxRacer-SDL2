@@ -34,12 +34,12 @@
 #include "phys_sim.h"
 #include "part_sys.h"
 #include "screenshot.h"
-#include "viewfrustum.h"
 #include "track_marks.h"
 #include "hud.h"
 #include "hud_training.h"
 #include "joystick.h"
 #include "bonus.h"
+#include "shaders.h"
 #ifdef TARGET_OS_IPHONE
     #import "sharedGeneralFunctions.h"
 #endif
@@ -596,11 +596,11 @@ void racing_loop( scalar_t time_step )
      */
     add_track_mark( plyr );
     
+    use_terrain_program();
     
     update_view( plyr, time_step );
     
-    setup_view_frustum( plyr, NEAR_CLIP_DIST, 
-                       getparam_forward_clip_distance() );
+    util_setup_projection(NEAR_CLIP_DIST, getparam_forward_clip_distance());
     
     draw_sky(plyr->view.pos);
     
@@ -616,6 +616,8 @@ void racing_loop( scalar_t time_step )
     
     draw_tux();
     
+    use_generic_program();
+
     draw_hud( plyr );
     
     draw_hud_training(plyr);

@@ -31,7 +31,6 @@
 #include "tux_shadow.h"
 #include "keyboard.h"
 #include "loop.h"
-#include "viewfrustum.h"
 #include "hud.h"
 #include "hud_training.h"
 #include "part_sys.h"
@@ -211,12 +210,13 @@ void paused_loop( scalar_t time_step )
 
     clear_rendering_context();
 
+    use_terrain_program();
+    
     update_player_pos( plyr, 0 );
     update_view( plyr, 0 );
 
-    setup_view_frustum( plyr, NEAR_CLIP_DIST, 
-			getparam_forward_clip_distance() );
-
+    util_setup_projection(NEAR_CLIP_DIST, getparam_forward_clip_distance());
+    
     draw_sky( plyr->view.pos );
 
     set_course_clipping( True );
@@ -239,6 +239,8 @@ void paused_loop( scalar_t time_step )
         draw_paused_text();
         GameMenu_draw();
     }
+    
+    use_generic_program();
     
     draw_hud( plyr );
     

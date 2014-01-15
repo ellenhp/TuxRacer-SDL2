@@ -31,7 +31,6 @@
 #include "tux_shadow.h"
 #include "keyboard.h"
 #include "loop.h"
-#include "viewfrustum.h"
 #include "hud.h"
 #include "game_logic_util.h"
 #include "fonts.h"
@@ -212,8 +211,6 @@ void loading_loop( scalar_t time_step )
 
             loaded_course = g_game.race.course;
             loaded_conditions = g_game.race.conditions;
-            
-            set_course_mirroring( g_game.race.mirrored );
     
             winsys_set_high_framerate(True);
 
@@ -226,8 +223,6 @@ void loading_loop( scalar_t time_step )
         }
     } else {
         winsys_set_high_framerate(True);
-
-        set_course_mirroring( g_game.race.mirrored );
 
         set_game_mode(INTRO);
     }
@@ -242,8 +237,6 @@ void loading_loop( scalar_t time_step )
 	loaded_course = g_game.race.course;
 	loaded_conditions = g_game.race.conditions;
     }
-
-    set_course_mirroring( g_game.race.mirrored );
 
     /* We're done here, enter INTRO mode */
     set_game_mode( INTRO );

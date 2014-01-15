@@ -28,6 +28,12 @@
 #endif /* defined( HAVE_GL_GLX_H ) */
 
 #include "gl_util.h"
+#include "shaders.h"
+
+#define GLM_FORCE_RADIANS
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 void set_gl_options( RenderMode mode ) 
 {
@@ -228,7 +234,32 @@ void set_gl_options( RenderMode mode )
     default:
 	code_not_reached();
     } 
-} 
+}
+
+void util_setup_view(GLfloat x, GLfloat y, GLfloat z, GLfloat dirx, GLfloat diry, GLfloat dirz)
+{
+    glm::vec3 eye(x, y, z);
+    glm::vec3 dir(x+dirx, y+diry, z+dirz);
+    glm::vec3 up(0.0f, 1.0f, 0.0f);
+    
+    glm::mat4 view=glm::lookAt(eye, dir, up);
+    
+    glUniformMatrix4fv(shader_get_uniform_location("view"), 1, GL_FALSE, glm::value_ptr(view));
+}
+
+void util_setup_projection(float near, float far)
+{
+    glm::mat4 projection=glm::perspective(getparam_fov() * 3.14159f / 180.0f, (float)getparam_x_resolution()/getparam_y_resolution(), near, far);
+    
+    glUniformMatrix4fv(shader_get_uniform_location("projection"), 1, GL_FALSE, glm::value_ptr(projection));
+}
+
+void util_set_translation(float x, float y, float z)
+{
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z));
+    
+    glUniformMatrix4fv(shader_get_uniform_location("model"), 1, GL_FALSE, glm::value_ptr(model));
+}
 
 /* Checking for GL errors is really just another type of assertion, so we
    turn off the check if TUXRACER_NO_ASSERT is defined */

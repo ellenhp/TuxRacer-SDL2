@@ -87,6 +87,10 @@ typedef enum {
 } RenderMode;
 
 void set_gl_options( RenderMode mode );
+    
+void util_setup_view(GLfloat x, GLfloat y, GLfloat z, GLfloat dirx, GLfloat diry, GLfloat dirz);
+void util_setup_projection(float near, float far);
+void util_set_translation(float x, float y, float z);
 
 void check_gl_error();
 

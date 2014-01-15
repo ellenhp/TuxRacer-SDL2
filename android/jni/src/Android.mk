@@ -9,6 +9,7 @@ LOCAL_C_INCLUDES += $(SDL2_HOME)/include
 LOCAL_C_INCLUDES += $(SDL2_MIXER_HOME)
 LOCAL_C_INCLUDES += $(GAMEMENU_HOME)/src
 LOCAL_C_INCLUDES += $(TCL_HOME)/generic
+LOCAL_C_INCLUDES += $(GLM_HOME)
 
 # Add your application source files here...
 LOCAL_SRC_FILES := $(SDL2_HOME)/src/main/android/SDL_android_main.c

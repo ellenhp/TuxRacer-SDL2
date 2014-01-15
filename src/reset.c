@@ -30,7 +30,6 @@
 #include "tux.h"
 #include "tux_shadow.h"
 #include "loop.h"
-#include "viewfrustum.h"
 #include "hud.h"
 #include "course_load.h"
 
@@ -85,8 +84,7 @@ void reset_loop( scalar_t time_step )
 	
     update_view( plyr, EPS );
 
-    setup_view_frustum( plyr, NEAR_CLIP_DIST, 
-			getparam_forward_clip_distance() );
+    util_setup_projection(NEAR_CLIP_DIST, getparam_forward_clip_distance());
 
     draw_sky(plyr->view.pos);
 

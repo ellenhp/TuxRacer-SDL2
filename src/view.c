@@ -324,8 +324,7 @@ void setup_view_matrix( player_data_t *plyr )
         for( j = 0; j < 4; j++ )
             matrix[i][j] = view_mat[i][j];
     }
-    //glMultMatrixf( (GLfloat *) matrix );
-
+    glUniformMatrix4fv(shader_get_uniform_location("view"), 1, GL_FALSE, matrix);
 }
 
 /*! 

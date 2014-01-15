@@ -31,7 +31,6 @@
 #include "tux_shadow.h"
 #include "keyboard.h"
 #include "loop.h"
-#include "viewfrustum.h"
 #include "hud.h"
 #include "game_logic_util.h"
 #include "fonts.h"

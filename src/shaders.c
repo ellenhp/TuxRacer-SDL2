@@ -58,7 +58,7 @@ void init_programs()
     }
     
     generic_program=glCreateProgram();
-
+    
     glAttachShader(generic_program, load_shader(GL_VERTEX_SHADER, "shaders/generic.vert"));
     glAttachShader(generic_program, load_shader(GL_FRAGMENT_SHADER, "shaders/generic.frag"));
     
@@ -67,7 +67,21 @@ void init_programs()
     glGetProgramiv(generic_program, GL_LINK_STATUS, &linked);
     if (linked==GL_FALSE)
     {
-        print_debug(DEBUG_OTHER, "shader failed to link");
+        print_debug(DEBUG_OTHER, "generic shader failed to link");
+        winsys_exit(1);
+    }
+    
+    terrain_program=glCreateProgram();
+    
+    glAttachShader(terrain_program, load_shader(GL_VERTEX_SHADER, "shaders/terrain.vert"));
+    glAttachShader(terrain_program, load_shader(GL_FRAGMENT_SHADER, "shaders/terrain.frag"));
+    
+    glLinkProgram(terrain_program);
+    
+    glGetProgramiv(terrain_program, GL_LINK_STATUS, &linked);
+    if (linked==GL_FALSE)
+    {
+        print_debug(DEBUG_OTHER, "terrain shader failed to link");
         winsys_exit(1);
     }
     
@@ -76,6 +90,11 @@ void init_programs()
 
 void use_terrain_program()
 {
+    if (programs_initialized)
+    {
+        glUseProgram(terrain_program);
+        active_program=terrain_program;
+    }
 }
 
 void use_generic_program()
@@ -90,6 +109,11 @@ void use_generic_program()
 GLuint shader_get_attrib_location(char* name)
 {
     return glGetAttribLocation(active_program, name);
+}
+
+GLuint shader_get_uniform_location(char* name)
+{
+    return glGetUniformLocation(active_program, name);
 }
 
 void shader_set_texture(GLuint texture)

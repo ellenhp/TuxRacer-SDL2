@@ -21,7 +21,6 @@
 #include "tuxracer.h"
 #include "course_load.h"
 #include "course_render.h"
-#include "course_quad.h"
 #include "image.h"
 #include "textures.h"
 #include "phys_sim.h"
@@ -200,8 +199,6 @@ static void reset_course()
     start_pt.y = 0;
     base_height_value = 127; /* 50% grey */
 
-    set_course_mirroring( False );
-
     reset_particles();
 
     if ( course_author != NULL ) {
@@ -220,8 +217,6 @@ static void reset_course()
     calculation_mode = NULL;
 
 	if ( course_loaded == False ) return;
-
-    reset_course_quadtree();
 
     free( elevation ); elevation = NULL;
     free( terrain ); terrain = NULL;
@@ -395,10 +390,10 @@ void load_course_core( char *course )
     /* flush unused audio files */
     delete_unused_audio_data();
 
-    init_course_quadtree( course, elevation, nx, ny, course_width/(nx-1.), 
+    /*init_course_quadtree( course, elevation, nx, ny, course_width/(nx-1.),
 			  -course_length/(ny-1),
 			  g_game.player[local_player()].view.pos, 
-			  getparam_course_detail_level() );
+			  getparam_course_detail_level() );*/
 
     init_track_marks();
 

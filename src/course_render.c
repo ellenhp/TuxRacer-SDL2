@@ -25,9 +25,8 @@
 #include "hier_util.h"
 #include "gl_util.h"
 #include "render_util.h"
-#include "course_quad.h"
-#include "viewfrustum.h"
 #include "track_marks.h"
+#include "shaders.h"
 #ifdef TARGET_OS_IPHONE
     #include "sharedGeneralFunctions.h"
     #include <sys/mman.h>
@@ -331,16 +330,15 @@ void render_course()
     
     setup_course_tex_gen();
     
-    update_course_quadtree( eye_pt, getparam_course_detail_level() );
+    //update_course_quadtree( eye_pt, getparam_course_detail_level() );
     
-    render_course_quadtree( );
+    //render_course_quadtree( );
     
     draw_track_marks();
 }
 
 void draw_sky(point_t pos)
 {
-    /*
     GLuint texture_id[6];
     
     static const GLfloat vertices []=
@@ -452,32 +450,28 @@ void draw_sky(point_t pos)
           get_texture_binding( "sky_right", &texture_id[4] ) && 
           get_texture_binding( "sky_back", &texture_id[5] ) ) ) {
         return;
-    } 
+    }
     
-    glColor4f( 1.0, 1.0, 1.0, 1.0 );
-    
-    glPushMatrix();
-    
-    glTranslatef(pos.x, pos.y, pos.z);
-    
-    glEnableClientState (GL_VERTEX_ARRAY);
-    glEnableClientState (GL_TEXTURE_COORD_ARRAY);
-    glDisableClientState(GL_NORMAL_ARRAY);
-    glVertexPointer (3, GL_FLOAT , 0, vertices);	
-    glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
+    util_set_translation(pos.x, pos.y, pos.z);
         
+    glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, 0, vertices);
+    glEnableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
+    
+    glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, 0, texCoords);
+    glEnableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
+
     for(i =0; i < 6; i++) {
         glBindTexture( GL_TEXTURE_2D, texture_id[i] );
-        glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL );
+        
         glDrawArrays(GL_TRIANGLES, i*6, 6);
+        
     }
-
-    glDisableClientState (GL_VERTEX_ARRAY);
-    glDisableClientState (GL_TEXTURE_COORD_ARRAY);
-
-    glPopMatrix();
-     */
     
+    glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glDisableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
+    
+    glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glDisableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
 }
 
 /* fonction utilisateur de comparaison fournie a qsort() */

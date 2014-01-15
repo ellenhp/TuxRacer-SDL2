@@ -29,7 +29,6 @@
 #include "view.h"
 #include "tux.h"
 #include "tux_shadow.h"
-#include "viewfrustum.h"
 #include "keyboard.h"
 #include "hud.h"
 #include "hud_training.h"
@@ -146,11 +145,12 @@ void intro_loop( scalar_t time_step )
     update_key_frame( plyr, time_step );
 
     clear_rendering_context();
+    
+    use_terrain_program();
 
     update_view( plyr, time_step );
 
-    setup_view_frustum( plyr, NEAR_CLIP_DIST, 
-			getparam_forward_clip_distance() );
+    util_setup_projection(NEAR_CLIP_DIST, getparam_forward_clip_distance());
 
     draw_sky( plyr->view.pos );
 
@@ -160,6 +160,8 @@ void intro_loop( scalar_t time_step )
     draw_trees();
 
     draw_tux();
+
+    use_generic_program();
 
     draw_hud( plyr );
     draw_hud_training(plyr);

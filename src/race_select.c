@@ -671,6 +671,8 @@ static void race_select_init(void)
  */
 static void race_select_loop( scalar_t time_step )
 {
+    use_generic_program();
+    
     check_gl_error();
     
     update_audio();
