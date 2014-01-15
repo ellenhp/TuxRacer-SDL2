@@ -11,5 +11,5 @@ void main()
     {
         discard;
     }
-    gl_FragColor=uniform_color*texture2D(texture, dest_tex_coord);
+	gl_FragColor=uniform_color*texture2D(texture, dest_tex_coord);
 }

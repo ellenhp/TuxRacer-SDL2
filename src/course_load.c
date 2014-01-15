@@ -94,6 +94,7 @@ tree_t       *get_tree_locs()           { return tree_locs; }
 int           get_num_trees()           { return num_trees; }
 polyhedron_t  get_tree_polyhedron(int type) { return tree_types[type].poly; }
 char         *get_tree_name(int type)       { return tree_types[type].name; }
+int           get_tree_index(int type)      { return tree_types[type].atlas_index; }
 point2d_t     get_start_pt()            { return start_pt; }
 void          set_start_pt( point2d_t p ) { start_pt = p; }
 char         *get_course_author()       { return course_author; }
@@ -1378,6 +1379,7 @@ static int tree_props_cb( ClientData cd, Tcl_Interp *ip,
     tree_types[num_tree_types].poly.num_polygons = 0;
     tree_types[num_tree_types].poly.polygons = NULL;
     tree_types[num_tree_types].texture = NULL;
+    tree_types[num_tree_types].atlas_index=0;
     tree_types[num_tree_types].num_trees = 0;
     tree_types[num_tree_types].red = 255;
     tree_types[num_tree_types].green = 255;
@@ -1412,6 +1414,9 @@ static int tree_props_cb( ClientData cd, Tcl_Interp *ip,
 		Tcl_AppendResult(ip, argv[0], ": specify only one texture",
 				(char *)0 );
 	    }
+
+    } else if ( strcmp( "-index", argv[i] ) == 0 ) {
+	    Tcl_GetInt(ip, argv[i+1], &tree_types[num_tree_types].atlas_index);
 
 	} else if ( strcmp( "-colour", argv[i] ) == 0 ) {
 	    rtn = Tcl_SplitList(ip, argv[i+1], &num_col, &indices);

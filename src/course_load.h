@@ -56,6 +56,7 @@ void          set_start_pt( point2d_t p );
 point2d_t     get_start_pt();
 polyhedron_t  get_tree_polyhedron( int type );
 char         *get_tree_name(int type);
+int           get_tree_index(int type);
 char         *get_course_author();
 char         *get_course_name(); 
 light_t      *get_course_lights();
@@ -78,6 +79,7 @@ typedef struct {
     scalar_t vary;
     polyhedron_t poly;
     char * texture;
+    int atlas_index;
     int  num_trees;
     unsigned char red, green, blue;
     list_t pos;

@@ -9,18 +9,18 @@ varying vec3 transparencies;
 
 void main()
 {
-    bool is_terrain=true;
+    bool is_terrain=false;
     float cutoff=0.1;
-    if (transparencies[0]<cutoff && transparencies[1]<cutoff && transparencies[2]<cutoff)
+    if (transparencies[0]>cutoff || transparencies[1]<cutoff || transparencies[2]<cutoff)
     {
-        is_terrain=false;
+        is_terrain=true;
     }
     if (is_terrain)
     {
-        /*vec4 color0=texture2D(terrains[0], dest_tex_coord);
+        vec4 color0=texture2D(terrains[0], dest_tex_coord);
         vec4 color1=texture2D(terrains[1], dest_tex_coord);
         vec4 color2=texture2D(terrains[2], dest_tex_coord);
-        vec4 terrain_color=color0*transparencies[0]+color1*transparencies[1]+color2*transparencies[2];*/
+        vec4 terrain_color=color0*transparencies[0]+color1*transparencies[1]+color2*transparencies[2];
         gl_FragColor=vec4(1.0, 0.0, 0.0, 1.0);
     }
     else

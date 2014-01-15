@@ -9,19 +9,19 @@ tux_load_texture fish courses/textures/items/herring_standard.png 0
 tux_item_spec -name herring -diameter 1.0 -height 1.0 \
       -texture fish -colour {28 185 204} -above_ground 0.2
 
-tux_load_texture shrub courses/textures/models/shrub.png 0
+tux_load_texture trees courses/textures/models/trees.png 0
+tux_bind_texture trees trees
+
 tux_tree_props -name tree3 -diameter 1.4 -height 1.0 \
-      -texture shrub -colour {0 255 48} -polyhedron $tree_poly \
+      -texture trees -index 2 -colour {0 255 48} -polyhedron $tree_poly \
       -size_varies 0.5 
 
-tux_load_texture tree courses/textures/models/tree.png 0
 tux_tree_props -name tree1 -diameter 1.4 -height 2.5 \
-      -texture tree -colour {255 255 255} -polyhedron $tree_poly \
+      -texture trees -index 1 -colour {255 255 255} -polyhedron $tree_poly \
       -size_varies 0.5 
 
-tux_load_texture tree_barren courses/textures/models/tree_barren.png 0
 tux_tree_props -name tree2 -diameter 1.4 -height 2.5 \
-      -texture tree_barren -colour {255 96 0} -polyhedron $tree_poly \
+      -texture trees -index 0 -colour {255 96 0} -polyhedron $tree_poly \
       -size_varies 0.5 
 
 tux_load_texture flag1 courses/textures/items/flag.png 0

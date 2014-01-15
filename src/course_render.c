@@ -61,7 +61,10 @@ static bool_t clip_course = False;
 static point_t eye_pt;
 
 static tree_t* treeLocsOrderedByZ=NULL;
-static int first_tree_to_check=0;
+
+// VVV NNN TT
+// aligned on 32-byte intervals
+static GLuint trees_vbo=0;
 
 /* Macros for converting indices in height map to world coordinates */
 #define XCD(x) (  (scalar_t)(x) / (nx-1.) * courseWidth )
@@ -306,6 +309,7 @@ void calc_normals(const char *course)
             handle_system_error( 1, "remount mmap failed" );
         }
 #endif
+#undef NORMAL
 } 
 
 void setup_course_tex_gen()
@@ -475,6 +479,8 @@ void draw_sky(point_t pos)
     
     glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, 0, 0);
     glDisableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
+
+    util_set_translation(0, 0, 0);
 }
 
 /* fonction utilisateur de comparaison fournie a qsort() */
@@ -512,146 +518,37 @@ int order_trees_by_z (tree_t* treeLocs,int num_trees)
 
 void draw_trees() 
 {
+    float white[]={1, 1, 1, 1};
+    GLuint texobj;
+    
+    shader_set_color(white);
+    
+    if (!get_texture_binding("trees", &texobj) ) {
+        return;
+    }
+    glBindTexture(GL_TEXTURE_2D, texobj);
+    
+    set_gl_options(TREES);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, trees_vbo);
+    
+    glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, 32, (GLvoid*)0);
+    glEnableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
+    
+    glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, 32, (GLvoid*)(6*sizeof(GLfloat)));
+    glEnableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
+    
+    glDrawArrays(GL_TRIANGLES, 0, 12*get_num_trees());
+    
+    glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glDisableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
+    
+    glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glDisableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
+    
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
     /*
-    tree_t    *treeLocs;
-    int       numTrees;
-    scalar_t  treeRadius;
-    scalar_t  treeHeight;
-    int       i;
-    GLuint    texture_id;
-    vector_t  normal;
-    scalar_t  fwd_clip_limit, bwd_clip_limit, fwd_tree_detail_limit;
-    
-    int tree_type = -1;
-    char *tree_name = 0;
-    
-    item_t    *itemLocs;
-    int       numItems;
-    scalar_t  itemRadius;
-    scalar_t  itemHeight;
-    int       item_type = -1;
-    char *    item_name = 0;
-    item_type_t *item_types;
-	bool_t drawTwoPlanes;
-
-    static const GLfloat verticesTree []=
-    {
-        -1, 0, 0,
-        -1, 1, 0,
-        1, 1, 0,
-        1, 1, 0,
-        1, 0, 0,
-        -1, 0, 0,
-        
-        0, 0, -1,
-        0, 1, -1,
-        0, 1, 1,
-        0, 1, 1,
-        0, 0, 1,
-        0, 0, -1,
-        
-    };
-    static const GLfloat texCoordsTree []=
-    {
-        0, 0,
-		0, 1,
-		1, 1,
-		1, 1,
-		1, 0,
-		0, 0,
-        
-        0, 0,
-		0, 1,
-		1, 1,
-		1, 1,
-		1, 0,
-		0, 0,
-        
-    };
-    
-    static const GLfloat verticesItem []=
-    {
-        -1.0, 0.0,  1.0,
-        1.0, 0.0, -1.0,
-        1.0, 1.0, -1.0,
-        -1.0, 1.0,  1.0,
-        -1.0, 0.0,  1.0,
-        1.0, 1.0, -1.0,
-    };
-        
-    static const GLfloat texCoordsItem []=
-    {
-        0.0, 0.0 ,
-        1.0, 0.0 ,
-        1.0, 1.0 ,
-        0.0, 1.0 ,
-        0.0, 0.0 ,
-        1.0, 1.0 ,
-    };
-
-	treeLocs = treeLocsOrderedByZ;
-    numTrees = get_num_trees();
-    item_types = get_item_types();
-    
-    fwd_clip_limit = getparam_forward_clip_distance();
-    bwd_clip_limit = getparam_backward_clip_distance();
-    fwd_tree_detail_limit = getparam_tree_detail_distance();
-    
-    set_gl_options( TREES );
-    
-    set_material( white, black, 1.0 );
-    
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer (3, GL_FLOAT , 0, verticesTree);
-    glTexCoordPointer(2, GL_FLOAT, 0, texCoordsTree);
-    
-    for (i = first_tree_to_check; i< numTrees; i++ ) {
-        if ( clip_course ) {
-            if ( eye_pt.z - treeLocs[i].ray.pt.z > fwd_clip_limit ) 
-                //printf("break :  eye_pt.z - treeLocs[i].ray.pt.z = %f > fwd_clip_limit = %f\n",eye_pt.z - treeLocs[i].ray.pt.z,fwd_clip_limit);
-                break;
-            if ( treeLocs[i].ray.pt.z - eye_pt.z > bwd_clip_limit ){
-                first_tree_to_check = i;
-                //printf("continue : treeLocs[i].ray.pt.z - eye_pt.z = %f > bwd_clip_limit = %f\n",treeLocs[i].ray.pt.z - eye_pt.z,bwd_clip_limit);
-                continue;
-            }
-            //printf("condition 1 : eye_pt.z - treeLocs[i].ray.pt.z = %f > fwd_clip_limit = %f\n",eye_pt.z - treeLocs[i].ray.pt.z,fwd_clip_limit);
-           // printf("condition 2 : treeLocs[i].ray.pt.z - eye_pt.z = %f > bwd_clip_limit = %f\n",treeLocs[i].ray.pt.z - eye_pt.z,bwd_clip_limit);
-        }
-        if (treeLocs[i].tree_type != tree_type) {
-            tree_type = treeLocs[i].tree_type;
-            tree_name = get_tree_name(tree_type);
-            if (!get_texture_binding( tree_name, &texture_id ) ) {
-                texture_id = 0;
-            }
-            glBindTexture( GL_TEXTURE_2D, texture_id );
-        }
-        
-        glPushMatrix();
-        glTranslatef( treeLocs[i].ray.pt.x, treeLocs[i].ray.pt.y, 
-                     treeLocs[i].ray.pt.z );
-        
-        treeRadius = treeLocs[i].diam/2.;
-        treeHeight = treeLocs[i].height;
-        
-        normal = subtract_points( eye_pt, treeLocs[i].ray.pt );
-        normalize_vector( &normal );
-        
-        glNormal3f( normal.x, normal.y, normal.z );
-        
-        glScalef(treeRadius, treeHeight, treeRadius);
-        
-        drawTwoPlanes = False;
-        if ( !clip_course ||
-            eye_pt.z - treeLocs[i].ray.pt.z < fwd_tree_detail_limit )
-            drawTwoPlanes = True;
-        
-        glDrawArrays(GL_TRIANGLES, 0, 6 + (drawTwoPlanes ? 6 : 0));
-        
-        glPopMatrix();
-    } 
-    
     itemLocs = get_item_locs();
     numItems = get_num_items();
         
@@ -862,15 +759,122 @@ void draw_fog_plane()
      */
 }
 
+void init_trees_vbo()
+{
+    tree_t *treeLocs;
+    int numTrees;
+    scalar_t treeRadius;
+    scalar_t treeHeight;
+    vector_t  normal;
+    
+    int i, vertex;
+    GLfloat* treeBuffer;
+    
+    static const GLfloat verticesTemplateTree []=
+    {
+        -1, 0, 0,
+        -1, 1, 0,
+        1, 1, 0,
+        1, 1, 0,
+        1, 0, 0,
+        -1, 0, 0,
+        
+        0, 0, -1,
+        0, 1, -1,
+        0, 1, 1,
+        0, 1, 1,
+        0, 0, 1,
+        0, 0, -1,
+        
+    };
+    static const GLfloat texCoordsTree []=
+    {
+        0, 0,
+		0, 1,
+		1, 1,
+		1, 1,
+		1, 0,
+		0, 0,
+        
+        0, 0,
+		0, 1,
+		1, 1,
+		1, 1,
+		1, 0,
+		0, 0,
+        
+    };
+    
+    if (trees_vbo)
+    {
+        glDeleteBuffers(1, &trees_vbo);
+        trees_vbo=0;
+    }
+    
+    treeLocs = treeLocsOrderedByZ;
+    numTrees = get_num_trees();
+    
+    glGenBuffers(1, &trees_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, trees_vbo);
+    
+    //12 vertices per tree * 8 values per vertex
+    //96 total floats per tree
+    treeBuffer=(GLfloat*)malloc(numTrees*12*8*sizeof(GLfloat));
+    
+    for (i = 0; i < numTrees; i++)
+    {
+        float xOffset=treeLocs[i].ray.pt.x;
+        float yOffset=treeLocs[i].ray.pt.y;
+        float zOffset=treeLocs[i].ray.pt.z;
+        
+        treeRadius = treeLocs[i].diam/2.;
+        treeHeight = treeLocs[i].height;
+        
+        normal = subtract_points( eye_pt, treeLocs[i].ray.pt );
+        normalize_vector( &normal );
+        
+        for (vertex=0; vertex<12; vertex++)
+        {
+#define COMPONENT(value) (treeBuffer[(value)+i*96+vertex*8])
+#define POSITION(value) COMPONENT(value)
+#define NORMAL(value) COMPONENT((value)+3)
+#define TEXCOORD(value) COMPONENT((value)+6)
+            
+            POSITION(0)=xOffset+verticesTemplateTree[vertex*3]*treeRadius;
+            POSITION(1)=yOffset+verticesTemplateTree[1+vertex*3]*treeHeight;
+            POSITION(2)=zOffset+verticesTemplateTree[2+vertex*3]*treeRadius;
+            
+            NORMAL(0)=normal.x;
+            NORMAL(1)=normal.y;
+            NORMAL(2)=normal.z;
+            
+            TEXCOORD(0)=((float)get_tree_index(treeLocs[i].tree_type))/3.0f+texCoordsTree[vertex*2]/3.0f;
+            TEXCOORD(1)=texCoordsTree[1+vertex*2];
+            
+#undef COMPONENT
+#undef POSITION
+#undef NORMAL
+#undef TEXCOORD
+        }
+    }
+    
+    glBufferData(GL_ARRAY_BUFFER, numTrees*12*8*sizeof(GLfloat), treeBuffer, GL_STATIC_DRAW);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    
+    free(treeBuffer);
+}
+
 void course_render_init() {
     int numTrees;
     tree_t* treeLocs;
     free(treeLocsOrderedByZ);
-        
+    
     treeLocs = get_tree_locs();
     numTrees = get_num_trees();
     treeLocsOrderedByZ = (tree_t*)malloc(sizeof(tree_t)*numTrees);
     memcpy(treeLocsOrderedByZ,treeLocs,sizeof(tree_t)*numTrees);
     order_trees_by_z(treeLocsOrderedByZ,numTrees);
-    first_tree_to_check=0;
+    
+    init_trees_vbo();
 }
