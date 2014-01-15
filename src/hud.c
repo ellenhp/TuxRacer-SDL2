@@ -31,6 +31,8 @@
 #include "bonus.h"
 #include "hud.h"
 #include "platform.h"
+#include "shaders.h"
+#include "primitive_draw.h"
 
 #define HUD_SCALE(x)		winsys_scale(x)
 
@@ -50,7 +52,7 @@
 #define HERRING_ICON_IMG_SIZE HUD_SCALE(64.0)
 #define HERRING_ICON_X_OFFSET HUD_SCALE(160.0)
 #define HERRING_ICON_Y_OFFSET 25.0
-#define HERRING_COUNT_Y_OFFSET 25.0
+#define HERRING_COUNT_Y_OFFSET HUD_SCALE(0)
 
 #define GAUGE_IMG_SIZE HUD_SCALE(128)
 
@@ -85,7 +87,6 @@ static GLfloat white[] = { 1.0, 1.0, 1.0, 1.0 };
 
 static void draw_time(player_data_t* plyr)
 {
-    /*
     font_t *font;
     int minutes, seconds, hundredths;
     char *string;
@@ -95,6 +96,8 @@ static void draw_time(player_data_t* plyr)
     scalar_t time_y_refval;
     GLuint texobj;
 	int x_org, y_org;
+    int big_w;
+    int i;
 	
 	scalar_t time;
     //depending of the calculation mode, we want to display either the time spendt or the time remaining
@@ -119,6 +122,8 @@ static void draw_time(player_data_t* plyr)
     x_org = OVERSCAN_MARGIN_X + TIME_X_OFFSET;
     y_org = getparam_y_resolution() - OVERSCAN_MARGIN_Y - TIME_Y_OFFSET - TIME_ICON_SIZE;
 
+    shader_set_color(white);
+
     if ( !get_texture_binding( "time_icon", &texobj ) ) {
         texobj = 0;
     }
@@ -126,6 +131,9 @@ static void draw_time(player_data_t* plyr)
     glBindTexture( GL_TEXTURE_2D, texobj );
 
     {
+#define TO_RELATIVE(screen, val) (((val)/screen*2.0)-1.0)
+        float screen_w = getparam_x_resolution();
+        float screen_h = getparam_y_resolution();
 		GLfloat vertices[]={
 			x_org, y_org, 0,
 			x_org + TIME_ICON_SIZE, y_org, 0,
@@ -140,17 +148,16 @@ static void draw_time(player_data_t* plyr)
 		};
         
 		GLubyte indices[]={0, 1, 2, 2, 3, 0};
+        
+        for (i=0; i<sizeof(vertices)/sizeof(vertices[0]); i+=3)
+        {
+            vertices[i]=TO_RELATIVE(screen_w, vertices[i] + getparam_x_resolution() - HERRING_ICON_X_OFFSET - OVERSCAN_MARGIN_X);
+            vertices[i+1]=TO_RELATIVE(screen_h, vertices[i+1] + getparam_y_resolution() - HERRING_ICON_Y_OFFSET - OVERSCAN_MARGIN_Y - asc);
+        }
 		
-        /*glEnableClientState (GL_VERTEX_ARRAY);
-        glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+        draw_textured_quad(x_org, y_org, TIME_ICON_SIZE, TIME_ICON_SIZE);
 
-        glVertexPointer(3, GL_FLOAT , 0, vertices);	
-        glTexCoordPointer(2, GL_FLOAT, 0, texcoords);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
-		
-		glDisableClientState (GL_VERTEX_ARRAY);
-        glDisableClientState (GL_TEXTURE_COORD_ARRAY);
-
+#undef TO_RELATIVE
     }
 
     time_y_refval = getparam_y_resolution() - TIME_LABEL_Y_OFFSET;
@@ -170,15 +177,8 @@ static void draw_time(player_data_t* plyr)
     string = buff;
 
     get_font_metrics( font, string, &w, &asc, &desc );
-
-    glPushMatrix();
-    {
-	glTranslatef( TIME_X_OFFSET + OVERSCAN_MARGIN_X + TIME_ICON_SIZE, 
-		      time_y_refval - TIME_Y_OFFSET - OVERSCAN_MARGIN_Y - asc, 
-		      0 );
-	draw_string( font, string );
-    }
-    glPopMatrix();
+    big_w=w;
+	draw_string( font, string, TIME_X_OFFSET + OVERSCAN_MARGIN_X + TIME_ICON_SIZE, time_y_refval - TIME_Y_OFFSET - OVERSCAN_MARGIN_Y - asc );
 
     binding = "time_hundredths";
 
@@ -193,21 +193,15 @@ static void draw_time(player_data_t* plyr)
     sprintf( buff, "%02d", hundredths );
     string = buff;
 
-    glPushMatrix();
-    {
-	glTranslatef( TIME_X_OFFSET + OVERSCAN_MARGIN_X + w + 5 + TIME_ICON_SIZE, 
-		      time_y_refval - TIME_Y_OFFSET - OVERSCAN_MARGIN_Y,  
-		      0 );
 	get_font_metrics( font, string, &w, &asc, &desc );
-	glTranslatef( 0, -asc-2, 0 );
-	draw_string( font, string );
-    }
-    glPopMatrix();
-     */
+	draw_string( font, string, TIME_X_OFFSET + OVERSCAN_MARGIN_X + big_w + 5 + TIME_ICON_SIZE, time_y_refval - TIME_Y_OFFSET - OVERSCAN_MARGIN_Y -asc-2 );
 }
 
 static void draw_herring_count( int herring_count )
 {
+#define TO_RELATIVE(screen, val) (((val)/screen*2.0)-1.0)
+    float screen_w = getparam_x_resolution();
+    float screen_h = getparam_y_resolution();
     char *string;
     char buff[BUFF_LEN];
     GLuint texobj;
@@ -215,27 +209,7 @@ static void draw_herring_count( int herring_count )
     char *binding;
     int w, asc, desc;
 
-	GLfloat verticesItem []=
-    {
-        0, 0, 0,
-        HERRING_ICON_WIDTH, 0, 0,
-        HERRING_ICON_WIDTH, HERRING_ICON_HEIGHT, 0,
-        0, HERRING_ICON_HEIGHT, 0,
-        0, 0, 0,
-        HERRING_ICON_WIDTH, HERRING_ICON_HEIGHT, 0
-    };
-        
-    GLfloat texCoordsItem []=
-    {
-        0.0, 0.0 ,
-        (GLfloat) HERRING_ICON_WIDTH / HERRING_ICON_IMG_SIZE, 0,
-        (GLfloat)HERRING_ICON_WIDTH / HERRING_ICON_IMG_SIZE, (GLfloat)HERRING_ICON_HEIGHT / HERRING_ICON_IMG_SIZE ,
-        0, (GLfloat)HERRING_ICON_HEIGHT / HERRING_ICON_IMG_SIZE,
-        0.0, 0.0,
-        (GLfloat)HERRING_ICON_WIDTH / HERRING_ICON_IMG_SIZE, (GLfloat)HERRING_ICON_HEIGHT / HERRING_ICON_IMG_SIZE ,
-    };
-
-	GLubyte indices[]={0, 1, 2, 2, 3, 0};
+    shader_set_color(white);
 
     set_gl_options( TEXFONT );
 
@@ -263,33 +237,57 @@ static void draw_herring_count( int herring_count )
 
     glBindTexture( GL_TEXTURE_2D, texobj );
 
-    /*
-    glPushMatrix();
-	{        
-        glTranslatef( getparam_x_resolution() - HERRING_ICON_X_OFFSET - OVERSCAN_MARGIN_X,
-                     getparam_y_resolution() - HERRING_ICON_Y_OFFSET - OVERSCAN_MARGIN_Y - asc, 
-                     0 );
+    {
+        GLfloat verticesItem []=
+        {
+            0, 0, 0,
+            HERRING_ICON_WIDTH, 0, 0,
+            HERRING_ICON_WIDTH, HERRING_ICON_HEIGHT, 0,
+            0, HERRING_ICON_HEIGHT, 0,
+            0, 0, 0,
+            HERRING_ICON_WIDTH, HERRING_ICON_HEIGHT, 0
+        };
         
-        glEnableClientState (GL_VERTEX_ARRAY);
-        glEnableClientState (GL_TEXTURE_COORD_ARRAY);
-
-        glVertexPointer(3, GL_FLOAT , 0, verticesItem);	
-        glTexCoordPointer(2, GL_FLOAT, 0, texCoordsItem);
+        GLfloat texCoordsItem[]=
+        {
+            0.0, 0.0 ,
+            (GLfloat) HERRING_ICON_WIDTH / HERRING_ICON_IMG_SIZE, 0,
+            (GLfloat)HERRING_ICON_WIDTH / HERRING_ICON_IMG_SIZE, (GLfloat)HERRING_ICON_HEIGHT / HERRING_ICON_IMG_SIZE ,
+            0, (GLfloat)HERRING_ICON_HEIGHT / HERRING_ICON_IMG_SIZE,
+            0.0, 0.0,
+            (GLfloat)HERRING_ICON_WIDTH / HERRING_ICON_IMG_SIZE, (GLfloat)HERRING_ICON_HEIGHT / HERRING_ICON_IMG_SIZE ,
+        };
+        
+        GLubyte indices[]={0, 1, 2, 2, 3, 0};
+        
+        int i;
+        
+        for (i=0; i<sizeof(verticesItem)/sizeof(verticesItem[0]); i+=3)
+        {
+            verticesItem[i]=TO_RELATIVE(screen_w, verticesItem[i] + getparam_x_resolution() - HERRING_ICON_X_OFFSET - OVERSCAN_MARGIN_X);
+            verticesItem[i+1]=TO_RELATIVE(screen_h, verticesItem[i+1] + getparam_y_resolution() - HERRING_ICON_Y_OFFSET - OVERSCAN_MARGIN_Y - asc);
+        }
+        
+        glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, 0, verticesItem);
+        glEnableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
+        
+        glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, 0, texCoordsItem);
+        glEnableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
+        
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
-		
-		glDisableClientState (GL_VERTEX_ARRAY);
-        glDisableClientState (GL_TEXTURE_COORD_ARRAY);
-
-		bind_font_texture( font );
-
-		glTranslatef( HERRING_ICON_WIDTH, HERRING_ICON_Y_OFFSET -  HERRING_COUNT_Y_OFFSET, 0 );
-
-		draw_string( font, string );
-
-	}
-
-    glPopMatrix();    
-     */
+        
+        glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glDisableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
+        
+        glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, 0, 0);
+        glDisableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
+    }
+    
+    bind_font_texture( font );
+    
+    draw_string( font, string, getparam_x_resolution() - HERRING_ICON_X_OFFSET - OVERSCAN_MARGIN_X + HERRING_ICON_WIDTH, getparam_y_resolution() - HERRING_ICON_Y_OFFSET - OVERSCAN_MARGIN_Y - asc + HERRING_COUNT_Y_OFFSET );
+    
+#undef TO_RELATIVE
 }
 
 static void draw_score( player_data_t *plyr )
@@ -315,16 +313,8 @@ static void draw_score( player_data_t *plyr )
 
     bind_font_texture( font );
     set_gl_options( TEXFONT );
-    /*
-    glPushMatrix();
-    {
-        glTranslatef( SCORE_X_OFFSET + OVERSCAN_MARGIN_X,
-                     SCORE_Y_OFFSET + OVERSCAN_MARGIN_Y,
-                     0 );
-        draw_string( font, string );
-    }
-    glPopMatrix();
-     */
+    
+    draw_string( font, string, SCORE_X_OFFSET + OVERSCAN_MARGIN_X, SCORE_Y_OFFSET + OVERSCAN_MARGIN_Y );
 
     if ( !get_font_binding( "fps_big", &font ) ) {
         print_warning( IMPORTANT_WARNING,
@@ -335,19 +325,11 @@ static void draw_score( player_data_t *plyr )
     bind_font_texture( font );
     set_gl_options( TEXFONT );
     
+    
     sprintf( buff, "%d",score );
     string = buff;
     
-    /*
-    glPushMatrix();
-    {
-        glTranslatef( SCORE_X_OFFSET + OVERSCAN_MARGIN_X + w,
-                     SCORE_Y_OFFSET + OVERSCAN_MARGIN_Y,
-                     0 );
-        draw_string( font, string );
-    }
-    glPopMatrix();
-     */
+    draw_string( font, string, SCORE_X_OFFSET + OVERSCAN_MARGIN_X + w, SCORE_Y_OFFSET + OVERSCAN_MARGIN_Y );
 }
 
 #define CIRCLE_DIVISIONS 20
@@ -372,10 +354,12 @@ point2d_t calc_new_fan_tex_pt( scalar_t angle )
     return pt;
 }
 
-void draw_partial_tri_fan( scalar_t fraction )
+void draw_partial_tri_fan( scalar_t fraction, scalar_t center_x, scalar_t center_y )
 {
-    /*
 #define DIVS (CIRCLE_DIVISIONS+2)
+#define TO_RELATIVE(screen, val) (((val)/screen*2.0)-1.0)
+    float screen_w = getparam_x_resolution();
+    float screen_h = getparam_y_resolution();
     scalar_t angle, angle_incr, cur_angle;
     int i;
     point2d_t pt;
@@ -388,8 +372,8 @@ void draw_partial_tri_fan( scalar_t fraction )
     
     angle_incr = fraction * ( SPEEDBAR_BASE_ANGLE - SPEEDBAR_MAX_ANGLE ) / CIRCLE_DIVISIONS;
     
-    vertices[0]=ENERGY_GAUGE_CENTER_X;
-    vertices[1]=ENERGY_GAUGE_CENTER_Y;
+    vertices[0]=TO_RELATIVE(screen_w, ENERGY_GAUGE_CENTER_X+center_x);
+    vertices[1]=TO_RELATIVE(screen_h, ENERGY_GAUGE_CENTER_Y+center_y);
     vertices[2]=0;
 
 	texcoords[0]=ENERGY_GAUGE_CENTER_X/GAUGE_IMG_SIZE;
@@ -398,8 +382,8 @@ void draw_partial_tri_fan( scalar_t fraction )
     for (i=1; i<DIVS-1; i++) {
         pt = calc_new_fan_pt( cur_angle );
         
-        vertices[i*3]=pt.x;
-		vertices[i*3+1]=pt.y;
+        vertices[i*3]=TO_RELATIVE(screen_w, pt.x+center_x);
+		vertices[i*3+1]=TO_RELATIVE(screen_h, pt.y+center_y);
 		vertices[i*3+2]=0;
 
         pt = calc_new_fan_tex_pt( cur_angle );
@@ -411,24 +395,27 @@ void draw_partial_tri_fan( scalar_t fraction )
     }
 
     pt = calc_new_fan_pt( angle );
-    vertices[sizeof(vertices)/sizeof(GLfloat)-3]=pt.x;
-	vertices[sizeof(vertices)/sizeof(GLfloat)-2]=pt.y;
+    vertices[sizeof(vertices)/sizeof(GLfloat)-3]=TO_RELATIVE(screen_w, pt.x+center_x);
+	vertices[sizeof(vertices)/sizeof(GLfloat)-2]=TO_RELATIVE(screen_h, pt.y+center_y);
 	vertices[sizeof(vertices)/sizeof(GLfloat)-1]=0;
 
     pt = calc_new_fan_tex_pt( angle );
     texcoords[sizeof(texcoords)/sizeof(GLfloat)-2]=pt.x;
 	texcoords[sizeof(texcoords)/sizeof(GLfloat)-1]=pt.y;
         
-    glVertexPointer(3, GL_FLOAT , 0, vertices);
-    glTexCoordPointer(2, GL_FLOAT , 0, texcoords);
+    glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, 0, vertices);
+    glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, 0, texcoords);
     glDrawArrays(GL_TRIANGLE_FAN, 0, DIVS);
-
 	return;
-     */
+    
+#undef TO_RELATIVE
 }
 
 void draw_gauge( scalar_t speed, scalar_t energy )
 {
+#define TO_RELATIVE(screen, val) (((val)/screen*2.0)-1.0)
+    float screen_w = getparam_x_resolution();
+    float screen_h = getparam_y_resolution();
     char *binding;
     GLfloat xplane[4] = { 1.0/GAUGE_IMG_SIZE, 0.0, 0.0, 0.0 };
     GLfloat yplane[4] = { 0.0, 1.0/GAUGE_IMG_SIZE, 0.0, 0.0 };
@@ -482,10 +469,8 @@ void draw_gauge( scalar_t speed, scalar_t energy )
     
     y = ENERGY_GAUGE_BOTTOM + energy * ENERGY_GAUGE_HEIGHT;
 
-    /*
-    glPushMatrix();
     {
-        const GLfloat verticesItem []=
+        GLfloat verticesItem []=
         {
             0.0, y, 0,
             0.0, GAUGE_IMG_SIZE, 0,
@@ -509,7 +494,7 @@ void draw_gauge( scalar_t speed, scalar_t energy )
             0.0, 0.0, 0,
         };
 
-        const GLfloat texcoordItem []=
+        GLfloat texcoordItem []=
         {
             0, 0,
             0, 1,
@@ -526,26 +511,31 @@ void draw_gauge( scalar_t speed, scalar_t energy )
 			0, 0
         };
 
-        glTranslatef( getparam_x_resolution() - GAUGE_WIDTH - OVERSCAN_MARGIN_X,
-                     OVERSCAN_MARGIN_Y,
-                     0 );
+        int i;
+        for (i=0; i<sizeof(verticesItem)/sizeof(verticesItem[0]); i+=3)
+        {
+            verticesItem[i]=TO_RELATIVE(screen_w, verticesItem[i] + getparam_x_resolution() - GAUGE_WIDTH - OVERSCAN_MARGIN_X);
+            verticesItem[i+1]=TO_RELATIVE(screen_h, verticesItem[i+1] + OVERSCAN_MARGIN_Y);
+        }
+        
+        //glTranslatef( getparam_x_resolution() - GAUGE_WIDTH - OVERSCAN_MARGIN_X, OVERSCAN_MARGIN_Y, 0 );
 
-		/*glEnableClientState (GL_VERTEX_ARRAY);
-        glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+        glEnableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
+        glEnableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
         
         glBindTexture( GL_TEXTURE_2D, energymask_texobj );
 
-        glColor4f(energy_background_color[0], energy_background_color[1], energy_background_color[2], energy_background_color[3]);
+        shader_set_color(energy_background_color);
 
-        glVertexPointer (3, GL_FLOAT , 0, verticesItem+36);
-        glTexCoordPointer (2, GL_FLOAT , 0, texcoordItem);
+        glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, 0, verticesItem+36);
+        glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, 0, texcoordItem);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         
         glBindTexture( GL_TEXTURE_2D, energymask_texobj );
-        glColor4f(energy_foreground_color[0], energy_foreground_color[1], energy_foreground_color[2], energy_foreground_color[3]);
+        shader_set_color(energy_foreground_color);
         
-        glVertexPointer (3, GL_FLOAT , 0, verticesItem+18);
-        glTexCoordPointer (2, GL_FLOAT , 0, texcoordItem+12);
+        glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, 0, verticesItem+18);
+        glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, 0, texcoordItem+12);
         glDrawArrays(GL_TRIANGLES, 0, 6);
     
         speedbar_frac = 0.0;
@@ -580,15 +570,14 @@ void draw_gauge( scalar_t speed, scalar_t energy )
         
         glBindTexture( GL_TEXTURE_2D, speedmask_texobj );
 
-
-		glColor4f(speedbar_background_color[0], speedbar_background_color[1], speedbar_background_color[2], speedbar_background_color[3]);
-        draw_partial_tri_fan( 1.0 );
-        glColor4f(white[0], white[1], white[2], white[3]);
-        draw_partial_tri_fan( min( 1.0, speedbar_frac ) );
+		shader_set_color(speedbar_background_color);
+        draw_partial_tri_fan( 1.0, getparam_x_resolution() - GAUGE_WIDTH - OVERSCAN_MARGIN_X, OVERSCAN_MARGIN_Y );
+        shader_set_color(white);
+        draw_partial_tri_fan( min( 1.0, speedbar_frac ), getparam_x_resolution() - GAUGE_WIDTH - OVERSCAN_MARGIN_X, OVERSCAN_MARGIN_Y );
         
         glBindTexture( GL_TEXTURE_2D, outline_texobj );
-        glVertexPointer(3, GL_FLOAT , 0, verticesItem+36);
-        glTexCoordPointer(2, GL_FLOAT , 0, texcoordItem);
+        glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, 0, verticesItem+36);
+        glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, 0, texcoordItem);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         
         sprintf( buff, "%d", (int)speed );
@@ -598,45 +587,22 @@ void draw_gauge( scalar_t speed, scalar_t energy )
         
         bind_font_texture( speed_font);
         set_gl_options( TEXFONT );
-        glColor4f( 1, 1, 1, 1 );
-        
-        glPushMatrix();
-        {
-            glTranslatef( ENERGY_GAUGE_CENTER_X - w/2.0,
-                         ENERGY_GAUGE_BOTTOM + ENERGY_GAUGE_HEIGHT / 2.0,
-                         0 );
-            draw_string( speed_font, string );
-            
-        }
-        glPopMatrix();
+     
+        draw_string(speed_font, string, getparam_x_resolution() - GAUGE_WIDTH - OVERSCAN_MARGIN_X + ENERGY_GAUGE_CENTER_X - w/2.0, ENERGY_GAUGE_BOTTOM + ENERGY_GAUGE_HEIGHT / 2.0 + OVERSCAN_MARGIN_Y);
         
         string = "km/h";
         
         get_font_metrics( units_font, string, &w, &asc, &desc );
         
         bind_font_texture( units_font );
-        
-        glPushMatrix();
-        {
-            glTranslatef( ENERGY_GAUGE_CENTER_X - w/2.0,
-                         ENERGY_GAUGE_BOTTOM + ENERGY_GAUGE_HEIGHT / 2.0
-                         - asc - SPEED_UNITS_Y_OFFSET,
-                         0 );
-            draw_string( units_font, string );
-            
-        }
-        glPopMatrix();
+     
+        draw_string(units_font, string, getparam_x_resolution() - GAUGE_WIDTH - OVERSCAN_MARGIN_X + ENERGY_GAUGE_CENTER_X - w/2.0, ENERGY_GAUGE_BOTTOM + ENERGY_GAUGE_HEIGHT / 2.0 - asc - SPEED_UNITS_Y_OFFSET + OVERSCAN_MARGIN_Y);
         
     }
-    glPopMatrix();
-     */
-
-	//glDisableClientState (GL_VERTEX_ARRAY);
-    //glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+#undef TO_RELATIVE
 }
 void print_fps()
 {
-    /*
     char buff[BUFF_LEN];
     char *string;
     char *binding;
@@ -664,7 +630,6 @@ void print_fps()
 
     bind_font_texture( font_big );
     set_gl_options( TEXFONT );
-    glColor4f( 1, 1, 1, 1 );
 
     sprintf( buff, "%.1f", get_fps() );
 	get_font_metrics(font_big, buff, &w, &asc, &desc);
@@ -673,24 +638,9 @@ void print_fps()
 	x=w;
     string = buff;
 
-    glPushMatrix();
-    {
-	glTranslatef( FPS_X_OFFSET+OVERSCAN_MARGIN_X,
-		      FPS_Y_OFFSET+OVERSCAN_MARGIN_Y+y,
-		      0 );
-	draw_string( font, "FPS: " );
-    }
-    glPopMatrix();
+	draw_string( font, "FPS: ", FPS_X_OFFSET+OVERSCAN_MARGIN_X, FPS_Y_OFFSET+OVERSCAN_MARGIN_Y+y );
 
-    glPushMatrix();
-    {
-	glTranslatef( FPS_X_OFFSET+OVERSCAN_MARGIN_X+x,
-		      FPS_Y_OFFSET+OVERSCAN_MARGIN_Y+y,
-		      0 );
-	draw_string( font_big, string );
-    }
-    glPopMatrix();
-     */
+	draw_string( font_big, string, FPS_X_OFFSET+OVERSCAN_MARGIN_X+x, FPS_Y_OFFSET+OVERSCAN_MARGIN_Y+y );
 }
 
 void draw_hud( player_data_t *plyr )

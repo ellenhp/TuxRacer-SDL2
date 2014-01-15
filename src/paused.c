@@ -210,7 +210,7 @@ void paused_loop( scalar_t time_step )
 
     clear_rendering_context();
 
-    use_terrain_program();
+    use_generic_program();
     
     update_player_pos( plyr, 0 );
     update_view( plyr, 0 );
@@ -240,7 +240,7 @@ void paused_loop( scalar_t time_step )
         GameMenu_draw();
     }
     
-    use_generic_program();
+    use_hud_program();
     
     draw_hud( plyr );
     

@@ -146,7 +146,7 @@ void intro_loop( scalar_t time_step )
 
     clear_rendering_context();
     
-    use_terrain_program();
+    use_generic_program();
 
     update_view( plyr, time_step );
 
@@ -161,7 +161,7 @@ void intro_loop( scalar_t time_step )
 
     draw_tux();
 
-    use_generic_program();
+    use_hud_program();
 
     draw_hud( plyr );
     draw_hud_training(plyr);

@@ -6,6 +6,7 @@
 #define MAX_SHADER_SIZE 10000
 
 static GLuint generic_program;
+static GLuint hud_program;
 static GLuint terrain_program;
 
 static GLuint active_program;
@@ -70,7 +71,21 @@ void init_programs()
         print_debug(DEBUG_OTHER, "generic shader failed to link");
         winsys_exit(1);
     }
+
+    hud_program=glCreateProgram();
     
+    glAttachShader(hud_program, load_shader(GL_VERTEX_SHADER, "shaders/hud.vert"));
+    glAttachShader(hud_program, load_shader(GL_FRAGMENT_SHADER, "shaders/hud.frag"));
+    
+    glLinkProgram(hud_program);
+    
+    glGetProgramiv(hud_program, GL_LINK_STATUS, &linked);
+    if (linked==GL_FALSE)
+    {
+        print_debug(DEBUG_OTHER, "hud shader failed to link");
+        winsys_exit(1);
+    }
+
     terrain_program=glCreateProgram();
     
     glAttachShader(terrain_program, load_shader(GL_VERTEX_SHADER, "shaders/terrain.vert"));
@@ -90,7 +105,7 @@ void init_programs()
 
 void use_terrain_program()
 {
-    if (programs_initialized)
+    if (programs_initialized && active_program!=terrain_program)
     {
         glUseProgram(terrain_program);
         active_program=terrain_program;
@@ -99,10 +114,19 @@ void use_terrain_program()
 
 void use_generic_program()
 {
-    if (programs_initialized)
+    if (programs_initialized && active_program!=generic_program)
     {
         glUseProgram(generic_program);
         active_program=generic_program;
+    }
+}
+
+void use_hud_program()
+{
+    if (programs_initialized && active_program!=hud_program)
+    {
+        glUseProgram(hud_program);
+        active_program=hud_program;
     }
 }
 

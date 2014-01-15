@@ -77,7 +77,7 @@ void init_ui_manager()
 */
 void ui_setup_display()
 {
-    use_generic_program();
+    use_hud_program();
     glViewport(0, 0, getparam_x_resolution(), getparam_y_resolution());
     
     /*

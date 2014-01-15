@@ -226,7 +226,7 @@ void game_over_loop( scalar_t time_step )
     
     clear_rendering_context();
     
-    use_terrain_program();
+    use_generic_program();
     
     update_player_pos( plyr, 0 );
     update_view( plyr, 0 );
@@ -246,7 +246,7 @@ void game_over_loop( scalar_t time_step )
     
     draw_tux();
     
-    use_generic_program();
+    use_hud_program();
     
     set_gl_options( GUI );
     

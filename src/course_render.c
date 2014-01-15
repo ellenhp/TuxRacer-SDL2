@@ -440,6 +440,8 @@ void draw_sky(point_t pos)
     };
 
     int i = 0;
+    
+    float white[]={1, 1, 1, 1};
 
 	set_gl_options( SKY );
     
@@ -453,6 +455,7 @@ void draw_sky(point_t pos)
     }
     
     util_set_translation(pos.x, pos.y, pos.z);
+    shader_set_color(white);
         
     glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, 0, vertices);
     glEnableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));

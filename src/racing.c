@@ -596,7 +596,7 @@ void racing_loop( scalar_t time_step )
      */
     add_track_mark( plyr );
     
-    use_terrain_program();
+    use_generic_program();
     
     update_view( plyr, time_step );
     
@@ -616,7 +616,7 @@ void racing_loop( scalar_t time_step )
     
     draw_tux();
     
-    use_generic_program();
+    use_hud_program();
 
     draw_hud( plyr );
     
