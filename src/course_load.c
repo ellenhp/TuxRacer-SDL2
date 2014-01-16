@@ -32,6 +32,7 @@
 #include "audio_data.h"
 #include "track_marks.h"
 #include "bonus.h"
+#include "course_vbo.h"
 
 #define MAX_TREES 8192
 #define MAX_TREE_TYPES 32
@@ -391,10 +392,7 @@ void load_course_core( char *course )
     /* flush unused audio files */
     delete_unused_audio_data();
 
-    /*init_course_quadtree( course, elevation, nx, ny, course_width/(nx-1.),
-			  -course_length/(ny-1),
-			  g_game.player[local_player()].view.pos, 
-			  getparam_course_detail_level() );*/
+    init_course_vbo(elevation, terrain, nx, ny, course_width/(nx-1.), -course_length/(ny-1));
 
     init_track_marks();
 

@@ -310,15 +310,6 @@ void calc_normals(const char *course)
         }
 #endif
 #undef NORMAL
-} 
-
-void setup_course_tex_gen()
-{
-    static GLfloat xplane[4] = { 1.0 / TEX_SCALE, 0.0, 0.0, 0.0 };
-    static GLfloat zplane[4] = { 0.0, 0.0, 1.0 / TEX_SCALE, 0.0 };
-    //glTexGenfv( GL_S, GL_OBJECT_PLANE, xplane );
-    //glTexGenfv( GL_T, GL_OBJECT_PLANE, zplane );
-	//TODO do something here
 }
 
 #define DRAW_POINT \
@@ -327,16 +318,9 @@ glVertex3f( pt.x, pt.y, pt.z );
 
 void render_course()
 {
-    int nx, ny;
-    
-    get_course_divisions(&nx, &ny);
     set_gl_options( COURSE );
     
-    setup_course_tex_gen();
-    
-    //update_course_quadtree( eye_pt, getparam_course_detail_level() );
-    
-    //render_course_quadtree( );
+    draw_course_vbo();
     
     draw_track_marks();
 }

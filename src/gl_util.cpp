@@ -35,6 +35,8 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
+static glm::mat4 model, view, projection;
+
 void set_gl_options( RenderMode mode ) 
 {
     /* Must set the following options:
@@ -236,29 +238,36 @@ void set_gl_options( RenderMode mode )
     } 
 }
 
-void util_setup_view(GLfloat x, GLfloat y, GLfloat z, GLfloat dirx, GLfloat diry, GLfloat dirz)
+void set_MVP()
 {
-    glm::vec3 eye(x, y, z);
-    glm::vec3 dir(x+dirx, y+diry, z+dirz);
-    glm::vec3 up(0.0f, 1.0f, 0.0f);
-    
-    glm::mat4 view=glm::lookAt(eye, dir, up);
-    
-    glUniformMatrix4fv(shader_get_uniform_location("view"), 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(shader_get_uniform_location("MVP_mat"), 1, GL_FALSE, glm::value_ptr(projection*view*model));
+}
+
+void util_set_view(float* mat)
+{
+    int x, y;
+    for (x=0; x<4; x++)
+    {
+        for (y=0; y<4; y++)
+        {
+            view[x][y]=mat[x*4+y];
+        }
+    }
+    set_MVP();
 }
 
 void util_setup_projection(float near, float far)
 {
-    glm::mat4 projection=glm::perspective(getparam_fov() * 3.14159f / 180.0f, (float)getparam_x_resolution()/getparam_y_resolution(), near, far);
+    projection=glm::perspective(getparam_fov() * 3.14159f / 180.0f, (float)getparam_x_resolution()/getparam_y_resolution(), near, far);
     
-    glUniformMatrix4fv(shader_get_uniform_location("projection"), 1, GL_FALSE, glm::value_ptr(projection));
+    set_MVP();
 }
 
 void util_set_translation(float x, float y, float z)
 {
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z));
+    model = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z));
     
-    glUniformMatrix4fv(shader_get_uniform_location("model"), 1, GL_FALSE, glm::value_ptr(model));
+    set_MVP();
 }
 
 /* Checking for GL errors is really just another type of assertion, so we
