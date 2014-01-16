@@ -606,7 +606,13 @@ void racing_loop( scalar_t time_step )
     
     set_course_clipping( True );
     set_course_eye_point( plyr->view.pos );
+    
+    use_terrain_program();
+    
     render_course();
+    
+    use_generic_program();
+    
     draw_trees();
     
     if ( getparam_draw_particles() ) {

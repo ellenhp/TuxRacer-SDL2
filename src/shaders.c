@@ -1,6 +1,7 @@
 #include "tuxracer.h"
 #include "shaders.h"
 #include "winsys.h"
+#include "gl_util.h"
 #include "SDL.h"
 
 #define MAX_SHADER_SIZE 10000
@@ -109,6 +110,7 @@ void use_terrain_program()
     {
         glUseProgram(terrain_program);
         active_program=terrain_program;
+        set_MVP();
     }
 }
 
@@ -118,6 +120,7 @@ void use_generic_program()
     {
         glUseProgram(generic_program);
         active_program=generic_program;
+        set_MVP();
     }
 }
 
@@ -127,6 +130,7 @@ void use_hud_program()
     {
         glUseProgram(hud_program);
         active_program=hud_program;
+        set_MVP();
     }
 }
 

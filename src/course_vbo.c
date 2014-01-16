@@ -82,6 +82,7 @@ void init_course_vbo(scalar_t* elevation, terrain_t* terrain, int nx, int nz, sc
 #define VERTEX_AT_COORD DATA_AT_COORD
 #define NORMAL_AT_COORD (DATA_AT_COORD+3)
 #define TEXCOORD_AT_COORD (DATA_AT_COORD+6)
+#define TERRAIN_AT_COORD (DATA_AT_COORD+8)
             
             VERTEX_AT_COORD[0]=(GLfloat)x / (nx-1.) * course_width;
             VERTEX_AT_COORD[1]=elevation[absolute_index];
@@ -94,6 +95,11 @@ void init_course_vbo(scalar_t* elevation, terrain_t* terrain, int nx, int nz, sc
             
             TEXCOORD_AT_COORD[0]=(GLfloat)x / (nx-1.) * course_width/10;
             TEXCOORD_AT_COORD[1]=(GLfloat)z / (nz-1.) * course_length/10;
+            
+            TERRAIN_AT_COORD[0]=0;
+            TERRAIN_AT_COORD[1]=0;
+            TERRAIN_AT_COORD[2]=0;
+            TERRAIN_AT_COORD[terrain[absolute_index]]=1;
         }
     }
     
@@ -153,6 +159,49 @@ int get_num_vertices(int startZ)
     return indices;
 }
 
+void bind_textures()
+{
+    GLuint texobj[3];
+    
+    glActiveTexture(GL_TEXTURE0+Ice);
+    if (!get_texture_binding("ice", texobj+Ice) ) {
+        return;
+    }
+    glBindTexture(GL_TEXTURE_2D, texobj[Ice]);
+
+    glActiveTexture(GL_TEXTURE0+Rock);
+    if (!get_texture_binding("rock", texobj+Rock) ) {
+        return;
+    }
+    glBindTexture(GL_TEXTURE_2D, texobj[Rock]);
+
+    glActiveTexture(GL_TEXTURE0+Snow);
+    if (!get_texture_binding("snow", texobj+Snow) ) {
+        return;
+    }
+    glBindTexture(GL_TEXTURE_2D, texobj[Snow]);
+    
+    glUniform1i(shader_get_uniform_location(SHADER_TERRAIN_TEXTURES_NAME "0"), 0);
+    glUniform1i(shader_get_uniform_location(SHADER_TERRAIN_TEXTURES_NAME "1"), 1);
+    glUniform1i(shader_get_uniform_location(SHADER_TERRAIN_TEXTURES_NAME "2"), 2);
+
+    glActiveTexture(GL_TEXTURE0);
+}
+
+void unbind_textures()
+{
+    glActiveTexture(GL_TEXTURE0+Ice);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    
+    glActiveTexture(GL_TEXTURE0+Rock);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    
+    glActiveTexture(GL_TEXTURE0+Snow);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glActiveTexture(GL_TEXTURE0);
+}
+
 void draw_course_vbo()
 {
     int startZ=get_start_z();
@@ -161,15 +210,20 @@ void draw_course_vbo()
         return;
     }
     
+    bind_textures();
+    
     glBindBuffer(GL_ARRAY_BUFFER, data_vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_vbo);
     
     glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, STRIDE_BYTES, startZ*course_x_size*STRIDE_BYTES);
     glEnableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
     
-    glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 3, GL_FLOAT, GL_FALSE, STRIDE_BYTES, startZ*course_x_size*STRIDE_BYTES+6*sizeof(GLfloat));
+    glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, STRIDE_BYTES, startZ*course_x_size*STRIDE_BYTES+6*sizeof(GLfloat));
     glEnableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
-
+    
+    glVertexAttribPointer(shader_get_attrib_location(SHADER_TERRAINS_NAME), 3, GL_FLOAT, GL_FALSE, STRIDE_BYTES, startZ*course_x_size*STRIDE_BYTES+8*sizeof(GLfloat));
+    glEnableVertexAttribArray(shader_get_attrib_location(SHADER_TERRAINS_NAME));
+   
     glDrawElements(GL_TRIANGLES, get_num_vertices(startZ), GL_UNSIGNED_SHORT, 0);
     
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -177,4 +231,7 @@ void draw_course_vbo()
     
     glDisableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
     glDisableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
+    glDisableVertexAttribArray(shader_get_attrib_location(SHADER_TERRAINS_NAME));
+    
+    unbind_textures();
 }

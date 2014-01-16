@@ -10,6 +10,8 @@ extern "C"
 
 #define SHADER_VERTEX_NAME "vert_pos"
 #define SHADER_TEXTURE_COORD_NAME "source_tex_coord"
+#define SHADER_TERRAINS_NAME "source_terrain"
+#define SHADER_TERRAIN_TEXTURES_NAME "terrain"
 
 void init_programs();
 void use_terrain_program();

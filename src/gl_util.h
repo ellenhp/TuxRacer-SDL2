@@ -88,6 +88,8 @@ typedef enum {
 
 void set_gl_options( RenderMode mode );
     
+void set_MVP();
+    
 void util_set_view(float* mat);
 void util_setup_projection(float near, float far);
 void util_set_translation(float x, float y, float z);
