@@ -519,7 +519,36 @@ int order_trees_by_z (tree_t* treeLocs,int num_trees)
 void draw_trees() 
 {
     float white[]={1, 1, 1, 1};
-    GLuint texobj;
+    GLuint texobj, item_type;
+    int numItems, vertex, i;
+    item_t* itemLocs;
+    char* item_name;
+    GLfloat itemRadius, itemHeight;
+    vector_t normal;
+    item_type_t* item_types;
+    
+    const GLfloat verticesTemplateItem[]=
+    {
+        -1.0, 0.0,  1.0,
+        1.0, 0.0, -1.0,
+        1.0, 1.0, -1.0,
+        -1.0, 1.0,  1.0,
+        -1.0, 0.0,  1.0,
+        1.0, 1.0, -1.0,
+    };
+    
+    GLfloat verticesItem[18];
+    
+    const GLfloat texCoordsItem[]=
+    {
+        0.0, 0.0 ,
+        1.0, 0.0 ,
+        1.0, 1.0 ,
+        0.0, 1.0 ,
+        0.0, 0.0 ,
+        1.0, 1.0 ,
+    };
+
     
     shader_set_color(white);
     
@@ -540,22 +569,16 @@ void draw_trees()
     
     glDrawArrays(GL_TRIANGLES, 0, 12*get_num_trees());
     
-    glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glDisableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
-    
-    glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, 0, 0);
-    glDisableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
-    
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    /*
+    //working on items now
+    
     itemLocs = get_item_locs();
     numItems = get_num_items();
-        
-    glVertexPointer (3, GL_FLOAT , 0, verticesItem);
-    glTexCoordPointer(2, GL_FLOAT, 0, texCoordsItem);
-
-    for (i = 0; i< numItems; i++ ) {
+    item_types = get_item_types();
+    
+    for (i = 0; i< numItems; i++) {
+        GLfloat xOffset, yOffset, zOffset;
         if (!game_has_herring()) {
             if ( itemLocs[i].collectable == 1) {
                 continue;
@@ -564,57 +587,57 @@ void draw_trees()
         if ( itemLocs[i].collectable == 0 || itemLocs[i].drawable == False) {
             continue;
         }
-            
-        if ( clip_course ) {
-            if ( eye_pt.z - itemLocs[i].ray.pt.z > fwd_clip_limit ) 
-                continue;
-                
-            if ( itemLocs[i].ray.pt.z - eye_pt.z > bwd_clip_limit )
-                continue;
-        }
-     
+        
         if (itemLocs[i].item_type != item_type) {
             item_type = itemLocs[i].item_type;
             item_name = get_item_name(item_type);
-            if (!get_texture_binding( item_name, &texture_id ) ) {
-                texture_id = 0;
+            if (!get_texture_binding(item_name, &texobj)) {
+                texobj = 0;
             }
-            glBindTexture( GL_TEXTURE_2D, texture_id );
+            glBindTexture(GL_TEXTURE_2D, texobj);
         }
-            
-        glPushMatrix();
-        {
-            glTranslatef( itemLocs[i].ray.pt.x, itemLocs[i].ray.pt.y, 
-                            itemLocs[i].ray.pt.z );
-                
-            itemRadius = itemLocs[i].diam/2.;
-            itemHeight = itemLocs[i].height;
-                
-            if ( item_types[item_type].use_normal ) {
-                normal = item_types[item_type].normal;
-            } else {
-                normal = subtract_points( eye_pt, itemLocs[i].ray.pt );
-                normalize_vector( &normal );
-            }
-                
-            if (normal.y == 1.0) {
-                continue;
-            }
-                
-            glNormal3f( normal.x, normal.y, normal.z );
-                
-            normal.y = 0.0;
+        
+        xOffset=itemLocs[i].ray.pt.x;
+        yOffset=itemLocs[i].ray.pt.y;
+        zOffset=itemLocs[i].ray.pt.z;
+        
+        itemRadius = itemLocs[i].diam/2.;
+        itemHeight = itemLocs[i].height;
+        
+        if (item_types[item_type].use_normal ) {
+            normal = item_types[item_type].normal;
+        } else {
+            normal = subtract_points( eye_pt, itemLocs[i].ray.pt );
             normalize_vector( &normal );
-                
-            glScalef(itemRadius*normal.z, itemHeight, itemRadius*normal.x);
-            glDrawArrays(GL_TRIANGLES, 0, 6);
         }
-        glPopMatrix();
-    } 
+        
+        if (normal.y == 1.0) {
+            continue;
+        }
+        
+        normal.y = 0.0;
+        normalize_vector( &normal );
+        
+        for (vertex=0; vertex<6; vertex++)
+        {
+            verticesItem[0+vertex*3]=xOffset + itemRadius * normal.z * verticesTemplateItem[0+vertex*3];
+            verticesItem[1+vertex*3]=yOffset + itemHeight * verticesTemplateItem[1+vertex*3];
+            verticesItem[2+vertex*3]=zOffset + itemRadius * normal.x * verticesTemplateItem[2+vertex*3];
+        }
+        
+        glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, 0, verticesItem);
+        glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, 0, texCoordsItem);
+        
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        
+    }
 
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    glDisableClientState(GL_VERTEX_ARRAY);
-     */
+    
+    glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glDisableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
+    
+    glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glDisableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
 } 
 
 /*! 
