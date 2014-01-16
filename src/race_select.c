@@ -369,12 +369,23 @@ void update_text()
 
 #include <jni.h>
 
-#define JNI(f)	Java_com_moonlite_tuxracer_SDLActivity_ ## f
+#ifndef SDL_PREFIX
+    #pragma warning Defaulting to org.libsdl.app
+	#define SDL_PREFIX		org_libdl_app_SDLActivity
+#endif
+
+#define CONCAT1(p,f)	CONCAT2(p,f)
+#define CONCAT2(p,f)	Java_ ## p ## _ ## f
+
+#define JNI(f)			CONCAT1(SDL_PREFIX,f)
 
 JNIEXPORT void JNICALL JNI(nativeCoursePrice)(JNIEnv * env, jobject obj, jfloat price)
 {
 	SDL_Log("IAP PRICE=$%0.2f", price);
-	course_price = price;
+	if (course_price != 0)
+	{
+		course_price = price;
+	}
 }
 
 static void buy_course_pack(void)

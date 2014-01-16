@@ -13,10 +13,10 @@
 #include <jni.h>
 
 #ifndef SDL_PREFIX
-	#define SDL_PREFIX org_libsdl_app
+	#define SDL_PREFIX org_libsdl_app_SDLActivity
 #endif
 
-#define JNI(f)	Java_ ## SDL_PREFIX ## _SDLActivity_ ## f
+#define JNI(f)	Java_ ## SDL_PREFIX ## _ ## f
 
 // Called before SDL_main() to initialize JNI bindings in SDL library
 extern void SDL_Android_Init(JNIEnv* env, jclass cls);

@@ -76,9 +76,6 @@ AppPurchasingObserverListener {
     // This is what SDL runs in. It invokes SDL_main(), eventually
     protected static Thread mSDLThread;
     
-    // Joystick
-    private static List<Integer> mJoyIdList;
-
     // Audio
     protected static Thread mAudioThread;
     protected static AudioTrack mAudioTrack;
@@ -143,6 +140,18 @@ AppPurchasingObserverListener {
 		PurchasingManager.registerObserver(purchasingObserver);
     }
     
+	/**
+	 * Enable entitlement for SKU
+	 * 
+	 * @param sku
+	 */
+	private void enableEntitlementForSKU(String sku) {
+		if (MySKU.COURSE_PACK.getSku().equals(sku))
+		{
+			nativeCoursePrice(0);
+		}
+	}
+	
 	/**
 	 * Callback for a successful get user id response
 	 * {@link GetUserIdResponseStatus#SUCCESSFUL}.
@@ -255,7 +264,8 @@ AppPurchasingObserverListener {
 			Item item = entry.getValue();
 			Log.i(TAG, "onItemDataResponseSuccessful: sku (" + sku + ") item (" + item + ")");
 			if (MySKU.COURSE_PACK.getSku().equals(sku)) {
-
+				float price = Float.parseFloat(item.getPrice());
+				nativeCoursePrice(price);
 			}
 		}
 	}
@@ -280,7 +290,7 @@ AppPurchasingObserverListener {
 	public void onPurchaseResponseSuccess(String userId, String sku,
 			String purchaseToken) {
 		Log.i(TAG, "onPurchaseResponseSuccess: for userId (" + userId + ") sku (" + sku + ") purchaseToken (" + purchaseToken + ")");
-		nativeCoursePrice(0);
+		enableEntitlementForSKU(sku);
 	}
 
 	/**
@@ -294,7 +304,7 @@ AppPurchasingObserverListener {
 	public void onPurchaseResponseAlreadyEntitled(String userId, String sku) {
 		Log.i(TAG, "onPurchaseResponseAlreadyEntitled: for userId (" + userId + ") sku ("+sku+")");
 		// For entitlements, even if already entitled, make sure to enable.
-		nativeCoursePrice(0);
+		enableEntitlementForSKU(sku);
 	}
 
 	/**
@@ -334,7 +344,7 @@ AppPurchasingObserverListener {
 	public void onPurchaseUpdatesResponseSuccess(String userId, String sku,
 			String purchaseToken) {
 		Log.i(TAG, "onPurchaseUpdatesResponseSuccess: for userId (" + userId + ") sku (" + sku + ") purchaseToken (" + purchaseToken + ")");
-//	  enableEntitlementForSKU(sku);
+		enableEntitlementForSKU(sku);
 	}
 
 	/**
@@ -388,7 +398,37 @@ AppPurchasingObserverListener {
 		Log.i(TAG, "AmazonBuyItem: requestId (" + requestId + ") requestState (" + purchaseData.getRequestState() + ")");
 	}
     
-    // Setup
+	/************************************************************************/
+	/*																		*/
+	/*				    O U Y A   S P E C I F I C   C O D E 				*/
+	/*																		*/
+	/************************************************************************/
+
+     private static void updateUserInfo()
+    {
+        UserController userController=new UserController(new RequestControllerObserver() {
+			@Override
+			public void requestControllerDidReceiveResponse(RequestController arg0) {
+				mUserCanSubmitScores=!((UserController)arg0).getUser().isAnonymous();
+				if (mUserCanSubmitScores)
+				{
+					nativeUpdateUserInfo(((UserController)arg0).getUser().getLogin());
+				}
+				else
+				{
+					nativeUpdateUserInfo(null);
+				}
+			}
+			@Override
+			public void requestControllerDidFail(RequestController arg0, Exception arg1) {
+				//something's up, not sure what to do.
+				nativeUpdateUserInfo("[error]");
+			}
+		});
+        userController.loadUser();
+    }
+    
+   // Setup
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //Log.v("SDL", "onCreate()");
@@ -398,7 +438,7 @@ AppPurchasingObserverListener {
         mSingleton = this;
 
         // Set up the surface
-        mSurface = new SDLSurface(getApplication(), getWindowManager().getDefaultDisplay().getRotation());
+        mSurface = new SDLSurface(getApplication());
         Point size=new Point();
         getWindowManager().getDefaultDisplay().getSize(size);
         
@@ -443,30 +483,6 @@ AppPurchasingObserverListener {
         });
         controller.query(this);
         AmazonInitIAP();
-    }
-    
-    private static void updateUserInfo()
-    {
-        UserController userController=new UserController(new RequestControllerObserver() {
-			@Override
-			public void requestControllerDidReceiveResponse(RequestController arg0) {
-				mUserCanSubmitScores=!((UserController)arg0).getUser().isAnonymous();
-				if (mUserCanSubmitScores)
-				{
-					nativeUpdateUserInfo(((UserController)arg0).getUser().getLogin());
-				}
-				else
-				{
-					nativeUpdateUserInfo(null);
-				}
-			}
-			@Override
-			public void requestControllerDidFail(RequestController arg0, Exception arg1) {
-				//something's up, not sure what to do.
-				nativeUpdateUserInfo("[error]");
-			}
-		});
-        userController.loadUser();
     }
     
     // Events
@@ -563,22 +579,11 @@ AppPurchasingObserverListener {
         }
     }
 
-    public void minimize()
-    {
-    	Runnable minimizeTask=new Runnable() {
-			@Override
-			public void run() {
-				android.os.Process.killProcess(android.os.Process.myPid());
-			}
-    	};
-    	runOnUiThread(minimizeTask);
-    }
 
     // Messages from the SDLMain thread
     static final int COMMAND_CHANGE_TITLE = 1;
     static final int COMMAND_UNUSED = 2;
     static final int COMMAND_TEXTEDIT_HIDE = 3;
-    static final int COMMAND_MINIMIZE = 4;
 
     protected static final int COMMAND_USER = 0x8000;
 
@@ -623,13 +628,6 @@ AppPurchasingObserverListener {
                     imm.hideSoftInputFromWindow(mTextEdit.getWindowToken(), 0);
                 }
                 break;
-            case COMMAND_MINIMIZE:
-                if (context instanceof SDLActivity) {
-                    ((SDLActivity) context).minimize();
-                } else {
-                    Log.e(TAG, "error handling message, getContext() returned no SDLActivity");
-                }
-                break;
             default:
                 if ((context instanceof SDLActivity) && !((SDLActivity) context).onUnhandledMessage(msg.arg1, msg.obj)) {
                     Log.e(TAG, "error handling message, command is " + msg.arg1);
@@ -655,20 +653,10 @@ AppPurchasingObserverListener {
     public static native void nativeQuit();
     public static native void nativePause();
     public static native void nativeResume();
-    public static native void nativeSetPlayerData(String playerName, boolean isOnOuya);
-    public static native void nativeScoreloopGotScores(int scoreMode, Object[] scoreStrings);
-    public static native void nativeTextCallback(String string);
-    public static native void nativeDisableAliasPrompt();
-    public static native void nativeUpdateUserInfo(String alias);
     public static native void onNativeResize(int x, int y, int format);
-    public static native void onNativePadDown(int padId, int keycode);
-    public static native void onNativePadUp(int padId, int keycode);
-    public static native void onNativeJoy(int joyId, int axis, double value);
-    public static native void onNativeJoyAttached(int joyId);
-    public static native void onNativeJoyRemoved(int joyId);
     public static native void onNativeKeyDown(int keycode);
     public static native void onNativeKeyUp(int keycode);
-    public static native void onNativeKenativeCoursePriceyboardFocusLost();
+    public static native void onNativeKeyboardFocusLost();
     public static native void onNativeTouch(int touchDevId, int pointerFingerId,
                                             int action, float x, 
                                             float y, float p);
@@ -677,6 +665,11 @@ AppPurchasingObserverListener {
     public static native void onNativeSurfaceDestroyed();
     public static native void nativeFlipBuffers();
 	
+    public static native void nativeSetPlayerData(String playerName, boolean isOnOuya);
+    public static native void nativeScoreloopGotScores(int scoreMode, Object[] scoreStrings);
+    public static native void nativeTextCallback(String string);
+    public static native void nativeDisableAliasPrompt();
+    public static native void nativeUpdateUserInfo(String alias);
 	public static native void nativeCoursePrice(float price);
 
     public static void flipBuffers() {
@@ -688,59 +681,6 @@ AppPurchasingObserverListener {
         return mSingleton.sendCommand(COMMAND_CHANGE_TITLE, title);
     }
     
-    // Create a list of valid ID's the first time this function is called
-    private static void createJoystickList() {
-        mJoyIdList = new ArrayList<Integer>();
-        // InputDevice.getDeviceIds requires SDK >= 16
-        if(Build.VERSION.SDK_INT >= 16) {
-            int[] deviceIds = InputDevice.getDeviceIds();
-            for(int i=0; i<deviceIds.length; i++) {
-                if( (InputDevice.getDevice(deviceIds[i]).getSources() & InputDevice.SOURCE_CLASS_JOYSTICK) != 0) {
-                    mJoyIdList.add(deviceIds[i]);
-                }
-            }
-        }
-    }
-    
-    public static int getNumJoysticks() {
-        createJoystickList();
-        
-        return mJoyIdList.size();
-    }
-    
-    public static String getJoystickName(int joy) {
-        createJoystickList();
-        Log.d("joyid", ""+joy);
-        Log.d("joyname", ""+InputDevice.getDevice(mJoyIdList.get(joy)).getName());
-        return InputDevice.getDevice(mJoyIdList.get(joy)).getName();
-    }
-    
-    public static int getJoystickAxes(int joy) {
-        createJoystickList();
-        
-        // In newer Android versions we can get a real value
-        // In older versions, we can assume a sane X-Y default configuration
-        if(Build.VERSION.SDK_INT >= 12) {
-            return InputDevice.getDevice(mJoyIdList.get(joy)).getMotionRanges().size();
-        } else {
-            return 2;
-        }
-    }
-    
-    public static int getJoyId(int devId) {
-        int i=0;
-        
-        createJoystickList();
-        
-        for(i=0; i<mJoyIdList.size(); i++) {
-            if(mJoyIdList.get(i) == devId) {
-                return i;
-            }
-        }
-        
-        return -1;
-    }
-
     public static boolean sendMessage(int command, int param) {
         return mSingleton.sendCommand(command, Integer.valueOf(param));
     }
@@ -1253,12 +1193,6 @@ AppPurchasingObserverListener {
     		return false;
     	}
     }
-
-	public static void onNativeKeyboardFocusLost() {
-		// TODO Auto-generated method stub
-		
-	}
-
 }
 
 /**
@@ -1274,7 +1208,6 @@ class SDLMain implements Runnable {
     }
 }
 
-
 /**
     SDLSurface. This is what we draw on, so we need to know when it's created
     in order to do anything useful. 
@@ -1286,14 +1219,13 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
 
     // Sensors
     protected static SensorManager mSensorManager;
+    protected static Display mDisplay;
 
     // Keep track of the surface size to normalize touch events
     protected static float mWidth, mHeight;
-    
-    protected int mScreenRotation;
 
     // Startup    
-    public SDLSurface(Context context, int screenRotation) {
+    public SDLSurface(Context context) {
         super(context);
         getHolder().addCallback(this); 
     
@@ -1302,36 +1234,9 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         requestFocus();
         setOnKeyListener(this); 
         setOnTouchListener(this);   
-        
-        mScreenRotation=screenRotation;
 
+        mDisplay = ((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         mSensorManager = (SensorManager)context.getSystemService(Context.SENSOR_SERVICE);
-        
-        if(Build.VERSION.SDK_INT >= 12) {
-        	genericInputHandler handler=new genericInputHandler();
-            setOnGenericMotionListener(handler);
-            if (Build.VERSION.SDK_INT >= 16)
-            {
-            	((android.hardware.input.InputManager)getContext().getSystemService(Context.INPUT_SERVICE)).registerInputDeviceListener(
-            			new android.hardware.input.InputManager.InputDeviceListener() {
-            				@Override
-            				public void onInputDeviceAdded(int joyId) {
-            					SDLActivity.onNativeJoyAttached(joyId);
-            				}
-
-            				@Override
-            				public void onInputDeviceChanged(int joyId) {
-            					// not sure what to do here
-            				}
-
-            				@Override
-            				public void onInputDeviceRemoved(int joyId) {
-            					SDLActivity.onNativeJoyRemoved(joyId);
-            				}
-            		        
-            			}, null);
-            }
-        }
 
         // Some arbitrary defaults to avoid a potential division by zero
         mWidth = 1.0f;
@@ -1438,26 +1343,15 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
     // Key events
     @Override
     public boolean onKey(View  v, int keyCode, KeyEvent event) {
-        // Dispatch the different events depending on where they come from
-        if(event.getSource() == InputDevice.SOURCE_KEYBOARD) {
-            if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                //Log.v("SDL", "key down: " + keyCode);
-                SDLActivity.onNativeKeyDown(keyCode);
-                return true;
-            }
-            else if (event.getAction() == KeyEvent.ACTION_UP) {
-                //Log.v("SDL", "key up: " + keyCode);
-                SDLActivity.onNativeKeyUp(keyCode);
-                return true;
-            }
-        } else if ( (event.getSource() & 0x00000401) != 0 || /* API 12: SOURCE_GAMEPAD */
-                   (event.getSource() & InputDevice.SOURCE_DPAD) != 0 ) {
-            int id = SDLActivity.getJoyId( event.getDeviceId() );
-            if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                SDLActivity.onNativePadDown(id, keyCode);
-            } else if (event.getAction() == KeyEvent.ACTION_UP) {
-                SDLActivity.onNativePadUp(id, keyCode);
-            }
+        
+        if (event.getAction() == KeyEvent.ACTION_DOWN) {
+            //Log.v("SDL", "key down: " + keyCode);
+            SDLActivity.onNativeKeyDown(keyCode);
+            return true;
+        }
+        else if (event.getAction() == KeyEvent.ACTION_UP) {
+            //Log.v("SDL", "key up: " + keyCode);
+            SDLActivity.onNativeKeyUp(keyCode);
             return true;
         }
         
@@ -1467,37 +1361,35 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
     // Touch events
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-    	float screenWidth=mWidth/SDLActivity.scaleFactor, screenHeight=mHeight/SDLActivity.scaleFactor;
-		final int touchDevId = event.getDeviceId();
-		final int pointerCount = event.getPointerCount();
-		// touchId, pointerId, action, x, y, pressure
-		int actionPointerIndex = (event.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT; /* API 8: event.getActionIndex(); */
-		int pointerFingerId = event.getPointerId(actionPointerIndex);
-		int action = (event.getAction() & MotionEvent.ACTION_MASK); /* API 8: event.getActionMasked(); */
-		
-		float x = event.getX(actionPointerIndex) / screenWidth;
-		float y = event.getY(actionPointerIndex) / screenHeight;
-		float p = event.getPressure(actionPointerIndex);
-		
-		if (action == MotionEvent.ACTION_MOVE && pointerCount > 1)
-		{
-			// TODO send motion to every pointer if its position has
-			// changed since prev event.
-			for (int i = 0; i < pointerCount; i++)
-			{
-				pointerFingerId = event.getPointerId(i);
-				x = event.getX(i) / screenWidth;
-				y = event.getY(i) / screenHeight;
-				p = event.getPressure(i);
-				SDLActivity.onNativeTouch(touchDevId, pointerFingerId, action, x, y, p);
-			}
-		}
-		else
-		{
-			SDLActivity.onNativeTouch(touchDevId, pointerFingerId, action, x, y, p);
-		}
-		return true;
-	} 
+    		 float screenWidth=mWidth/SDLActivity.scaleFactor;
+    		 float screenHeight=mHeight/SDLActivity.scaleFactor;
+    	
+             final int touchDevId = event.getDeviceId();
+             final int pointerCount = event.getPointerCount();
+             // touchId, pointerId, action, x, y, pressure
+             int actionPointerIndex = (event.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT; /* API 8: event.getActionIndex(); */
+             int pointerFingerId = event.getPointerId(actionPointerIndex);
+             int action = (event.getAction() & MotionEvent.ACTION_MASK); /* API 8: event.getActionMasked(); */
+
+             float x = event.getX(actionPointerIndex) / screenWidth;
+             float y = event.getY(actionPointerIndex) / screenHeight;
+             float p = event.getPressure(actionPointerIndex);
+
+             if (action == MotionEvent.ACTION_MOVE && pointerCount > 1) {
+                // TODO send motion to every pointer if its position has
+                // changed since prev event.
+                for (int i = 0; i < pointerCount; i++) {
+                    pointerFingerId = event.getPointerId(i);
+                    x = event.getX(i) / screenWidth;
+                    y = event.getY(i) / screenHeight;
+                    p = event.getPressure(i);
+                    SDLActivity.onNativeTouch(touchDevId, pointerFingerId, action, x, y, p);
+                }
+             } else {
+                SDLActivity.onNativeTouch(touchDevId, pointerFingerId, action, x, y, p);
+             }
+      return true;
+   } 
 
     // Sensor events
     public void enableSensor(int sensortype, boolean enabled) {
@@ -1520,50 +1412,31 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            float[] adjustedValues = new float[3];
-
-            final int axisSwap[][] = {
-            {  1,  -1,  0,  1  },     // ROTATION_0 
-            {-1,  -1,  1,  0  },     // ROTATION_90 
-            {-1,    1,  0,  1  },     // ROTATION_180 
-            {  1,    1,  1,  0  }  }; // ROTATION_270 
-
-            final int[] as = axisSwap[mScreenRotation];
-            adjustedValues[0]  =  (float)as[0] * event.values[ as[2] ]; 
-            adjustedValues[1]  =  (float)as[1] * event.values[ as[3] ]; 
-            adjustedValues[2]  =  event.values[2];
-            SDLActivity.onNativeAccel(adjustedValues[0] / SensorManager.GRAVITY_EARTH,
-            		adjustedValues[1] / SensorManager.GRAVITY_EARTH,
-            		adjustedValues[2] / SensorManager.GRAVITY_EARTH);
+            float x, y;
+            switch (mDisplay.getRotation()) {
+                case Surface.ROTATION_90:
+                    x = event.values[1];
+                    y = event.values[0];
+                    break;
+                case Surface.ROTATION_270:
+                    x = -event.values[1];
+                    y = -event.values[0];
+                    break;
+                case Surface.ROTATION_180:
+                    x = -event.values[1];
+                    y = -event.values[0];
+                    break;
+                default:
+                    x = event.values[0];
+                    y = event.values[1];
+                    break;
+            }
+            SDLActivity.onNativeAccel(-x / SensorManager.GRAVITY_EARTH,
+                                      y / SensorManager.GRAVITY_EARTH,
+                                      event.values[2] / SensorManager.GRAVITY_EARTH - 1);
         }
     }
     
-    class genericInputHandler extends Activity implements View.OnGenericMotionListener {
-        // Generic Input (mouse hover, joystick...) events go here
-        // We only have joysticks yet
-        @Override
-        public boolean onGenericMotion(View v, MotionEvent event) {
-            int actionPointerIndex = event.getActionIndex();
-            int action = event.getActionMasked();
-
-            if ( (event.getSource() & InputDevice.SOURCE_JOYSTICK) != 0) {
-                switch(action) {
-                    case MotionEvent.ACTION_MOVE:
-                        int id = SDLActivity.getJoyId( event.getDeviceId() );
-                        float axes[]=new float[2];
-                        axes[0]= event.getAxisValue(MotionEvent.AXIS_X, actionPointerIndex);
-                        axes[1]= event.getAxisValue(MotionEvent.AXIS_Y, actionPointerIndex);
-                        for (int i=0; i<axes.length; i++) {
-                        	SDLActivity.onNativeJoy(id, i, axes[i]);
-                        }
-                        break;
-                }
-            }
-            return true;
-        }
-    }
-
-
 }
 
 /* This is a fake invisible editor view that receives the input and defines the
