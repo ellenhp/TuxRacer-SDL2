@@ -114,15 +114,6 @@ bool_t load_texture( const char *texname, const char *filename, int repeatable )
     
     glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
     
-    
-    if ( repeatable ) {
-        glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-        glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-    }
-    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                    get_min_filter() );
-    
     /* Check if we need to scale image */
     glGetIntegerv( GL_MAX_TEXTURE_SIZE, &max_texture_size );
 	if ( texImage->w > max_texture_size ||
@@ -130,10 +121,11 @@ bool_t load_texture( const char *texname, const char *filename, int repeatable )
     {
         abort(); //We don't support that yet
     }
+    
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
     
 	switch (texImage->format->BytesPerPixel)
 	{
@@ -153,6 +145,8 @@ bool_t load_texture( const char *texname, const char *filename, int repeatable )
 	glTexImage2D( GL_TEXTURE_2D, 0, format, texImage->w,texImage->h,
                  0, format, GL_UNSIGNED_BYTE, texImage->pixels );
 
+    glGenerateMipmap(GL_TEXTURE_2D);
+    
 	SDL_UnlockSurface(texImage);
 	SDL_FreeSurface(texImage);
     return True;
@@ -266,7 +260,7 @@ bool_t flush_textures(void)
 
 }
 
-static int load_texture_cb ( ClientData cd, Tcl_Interp *ip, int argc, 
+static int load_texture_cb ( ClientData cd, Tcl_Interp *ip, int argc,
 			     const char *argv[]) 
 {
     int repeatable = 1;
