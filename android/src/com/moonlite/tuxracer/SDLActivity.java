@@ -96,7 +96,7 @@ AppPurchasingObserverListener {
         //System.loadLibrary("SDL2_ttf");
         System.loadLibrary("tcl");
 		// Step 1 Load libscoreloopcore.so before loading your game's native library.
-        System.loadLibrary("scoreloopcore");
+//        System.loadLibrary("scoreloopcore");
         System.loadLibrary("main");
     }
     
