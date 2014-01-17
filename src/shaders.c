@@ -2,6 +2,7 @@
 #include "shaders.h"
 #include "winsys.h"
 #include "gl_util.h"
+#include "course_load.h"
 #include "SDL.h"
 
 #define MAX_SHADER_SIZE 10000
@@ -111,6 +112,7 @@ void use_terrain_program()
         glUseProgram(terrain_program);
         active_program=terrain_program;
         set_MVP();
+        set_light_uniforms();
     }
 }
 

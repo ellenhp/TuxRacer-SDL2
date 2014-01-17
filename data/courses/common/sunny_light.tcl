@@ -1,3 +1,6 @@
+tux_course_light 0 -on -position { 1 1 0 0 } -diffuse { 0.8 0.7 0.8 1 } \
+     -specular { 0.0 0.0 0.0 1 } -ambient { 0.45 0.53 0.75 1.0 }
+
 tux_load_texture envmap courses/textures/conditions/envmap.png 0
 tux_bind_texture terrain_envmap envmap
 

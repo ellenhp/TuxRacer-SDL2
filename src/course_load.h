@@ -72,6 +72,7 @@ void          register_course_load_tcl_callbacks( Tcl_Interp *interp );
 item_t       *get_item_locs();
 int           get_num_items();
 char         *get_item_name(int type);
+void          set_light_uniforms();
 
 typedef struct {
     char * name;

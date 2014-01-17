@@ -218,6 +218,9 @@ void draw_course_vbo()
     glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, STRIDE_BYTES, startZ*course_x_size*STRIDE_BYTES);
     glEnableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
     
+    glVertexAttribPointer(shader_get_attrib_location(SHADER_NORMAL_NAME), 3, GL_FLOAT, GL_FALSE, STRIDE_BYTES, startZ*course_x_size*STRIDE_BYTES+3*sizeof(GLfloat));
+    glEnableVertexAttribArray(shader_get_attrib_location(SHADER_NORMAL_NAME));
+    
     glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, STRIDE_BYTES, startZ*course_x_size*STRIDE_BYTES+6*sizeof(GLfloat));
     glEnableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
     
@@ -230,6 +233,7 @@ void draw_course_vbo()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     
     glDisableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
+    glDisableVertexAttribArray(shader_get_attrib_location(SHADER_NORMAL_NAME));
     glDisableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
     glDisableVertexAttribArray(shader_get_attrib_location(SHADER_TERRAINS_NAME));
     

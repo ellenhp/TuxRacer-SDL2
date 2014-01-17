@@ -33,6 +33,7 @@
 #include "track_marks.h"
 #include "bonus.h"
 #include "course_vbo.h"
+#include "shaders.h"
 
 #define MAX_TREES 8192
 #define MAX_TREE_TYPES 32
@@ -53,6 +54,8 @@
 #define DEP_TREE_BLUE 0
 
 #define SCRIPT_MAXSIZE 10000
+
+#define NUM_COURSE_LIGHTS 3
 
 static bool_t        course_loaded = False;
 
@@ -84,6 +87,8 @@ static item_t        item_locs[MAX_ITEMS];
 static item_type_t   item_types[MAX_ITEM_TYPES];
 static int           num_item_types = 0;
 static int           num_items;
+
+static light_t course_lights[NUM_COURSE_LIGHTS];
 
 /* Interleaved vertex, normal, and color data */
 static GLubyte      *vnc_array = NULL;
@@ -1700,6 +1705,127 @@ item_spec_bail:
     return TCL_ERROR;
 }
 
+void set_light_uniforms()
+{
+    glUniform3fv(shader_get_uniform_location(SHADER_LIGHT_POSITION_NAME), 1, course_lights[0].position);
+    glUniform4fv(shader_get_uniform_location(SHADER_LIGHT_SPECULAR_NAME), 1, course_lights[0].specular);
+    glUniform4fv(shader_get_uniform_location(SHADER_LIGHT_DIFFUSE_NAME), 1, course_lights[0].diffuse);
+    glUniform4fv(shader_get_uniform_location(SHADER_LIGHT_AMBIENT_NAME), 1, course_lights[0].ambient);
+}
+
+static int course_light_cb (ClientData cd, Tcl_Interp *ip,
+                            int argc, const char **argv)
+{
+    int light_num;
+    scalar_t tmp_arr[4];
+    double tmp_dbl;
+    bool_t error = False;
+    int i;
+    
+    if (argc < 3) {
+        error = True;
+    }
+    
+    NEXT_ARG;
+    
+    if ( Tcl_GetInt( ip, *argv, &light_num ) == TCL_ERROR ) {
+        error = True;
+    }
+    
+    if ( light_num < 0 || light_num >= NUM_COURSE_LIGHTS ) {
+        error = True;
+    }
+    
+    NEXT_ARG;
+    
+    while ( !error && argc > 0 ) {
+        if ( strcmp( "-on", *argv ) == 0 ) {
+            course_lights[light_num].is_on = True;
+        } else if ( strcmp( "-off", *argv ) == 0 ) {
+            course_lights[light_num].is_on = False;
+        } else if ( strcmp( "-ambient", *argv ) == 0 ) {
+            NEXT_ARG;
+            if ( argc == 0 ) {
+                error = True;
+                break;
+            }
+            if ( get_tcl_tuple ( ip, *argv, tmp_arr, 4 ) == TCL_ERROR ) {
+                error = True;
+                break;
+            }
+            copy_to_glfloat_array( course_lights[light_num].ambient,
+                                  tmp_arr, 4 );
+        } else if ( strcmp( "-diffuse", *argv ) == 0 ) {
+            NEXT_ARG;
+            if ( argc == 0 ) {
+                error = True;
+                break;
+            }
+            if ( get_tcl_tuple ( ip, *argv, tmp_arr, 4 ) == TCL_ERROR ) {
+                error = True;
+                break;
+            }
+            copy_to_glfloat_array( course_lights[light_num].diffuse,
+                                  tmp_arr, 4 );
+        } else if ( strcmp( "-specular", *argv ) == 0 ) {
+            NEXT_ARG;
+            if ( argc == 0 ) {
+                error = True;
+                break;
+            }
+            if ( get_tcl_tuple ( ip, *argv, tmp_arr, 4 ) == TCL_ERROR ) {
+                error = True;
+                break;
+            }
+            copy_to_glfloat_array( course_lights[light_num].specular,
+                                  tmp_arr, 4 );
+        } else if ( strcmp( "-position", *argv ) == 0 ) {
+            NEXT_ARG;
+            if ( argc == 0 ) {
+                error = True;
+                break;
+            }
+            if ( get_tcl_tuple ( ip, *argv, tmp_arr, 4 ) == TCL_ERROR ) {
+                error = True;
+                break;
+            }
+            copy_to_glfloat_array( course_lights[light_num].position,
+                                  tmp_arr, 4 );
+            GLfloat magnitude=0;
+            for (i=0; i<3; i++)
+            {
+                magnitude+=course_lights[light_num].position[i]*course_lights[light_num].position[i];
+            }
+            for (i=0; i<3; i++)
+            {
+                course_lights[light_num].position[i]/=magnitude;
+            }
+        } else {
+            print_warning( TCL_WARNING, "tux_course_light: unrecognized "
+                          "parameter `%s'", *argv );
+        }
+        
+        NEXT_ARG;
+    }
+    
+    if ( error ) {
+        print_warning( TCL_WARNING, "error in call to tux_course_light" );
+        Tcl_AppendResult(
+                         ip,
+                         "\nUsage: tux_course_light <light_number> [-on|-off] "
+                         "[-ambient { r g b a }] "
+                         "[-diffuse { r g b a }] "
+                         "[-specular { r g b a }] "
+                         "[-position { x y z w }] ",
+                         (char *) 0 );
+        return TCL_ERROR;
+    }
+    
+    set_light_uniforms();
+    
+    return TCL_OK;
+}
+
 void register_course_load_tcl_callbacks( Tcl_Interp *ip )
 {
     Tcl_CreateCommand (ip, "tux_course_dim", course_dim_cb,  0,0);
@@ -1723,5 +1849,6 @@ void register_course_load_tcl_callbacks( Tcl_Interp *ip )
     Tcl_CreateCommand (ip, "tux_base_height_value", base_height_value_cb, 0,0);
     Tcl_CreateCommand (ip, "tux_tree_props",  tree_props_cb,   0,0);
     Tcl_CreateCommand (ip, "tux_item_spec",  item_spec_cb,   0,0);
+    Tcl_CreateCommand (ip, "tux_course_light", course_light_cb, 0,0);
 }
 

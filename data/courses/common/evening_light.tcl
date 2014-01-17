@@ -1,3 +1,12 @@
+tux_course_light 0 -on -position { 1 1 0 0 } \
+	-diffuse {0.7 0.7 0.7 1.0} \
+	-ambient {0.8 0.55 0.5 1.0} 
+  
+tux_course_light 1 -on -position { 1 1 2 0 } \
+	-specular { 0.9 0.55 0.5 1 } 
+
+tux_particle_color { 0.9 0.7 0.35 1.0 }
+
 #
 # Environmental sphere map
     
