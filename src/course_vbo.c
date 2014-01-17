@@ -162,6 +162,7 @@ int get_num_vertices(int startZ)
 void bind_textures()
 {
     GLuint texobj[3];
+    GLuint envmapObj;
     
     glActiveTexture(GL_TEXTURE0+Ice);
     if (!get_texture_binding("ice", texobj+Ice) ) {
@@ -181,10 +182,18 @@ void bind_textures()
     }
     glBindTexture(GL_TEXTURE_2D, texobj[Snow]);
     
+    glActiveTexture(GL_TEXTURE0+3);
+    if (!get_texture_binding("terrain_envmap", &envmapObj) ) {
+        return;
+    }
+    glBindTexture(GL_TEXTURE_2D, envmapObj);
+    
     glUniform1i(shader_get_uniform_location(SHADER_TERRAIN_TEXTURES_NAME "0"), 0);
     glUniform1i(shader_get_uniform_location(SHADER_TERRAIN_TEXTURES_NAME "1"), 1);
     glUniform1i(shader_get_uniform_location(SHADER_TERRAIN_TEXTURES_NAME "2"), 2);
-
+    
+    glUniform1i(shader_get_uniform_location(SHADER_ENVMAP_NAME), 3);
+    
     glActiveTexture(GL_TEXTURE0);
 }
 
@@ -199,6 +208,9 @@ void unbind_textures()
     glActiveTexture(GL_TEXTURE0+Snow);
     glBindTexture(GL_TEXTURE_2D, 0);
 
+    glActiveTexture(GL_TEXTURE0+3);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    
     glActiveTexture(GL_TEXTURE0);
 }
 

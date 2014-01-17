@@ -13,6 +13,7 @@ extern "C"
 #define SHADER_NORMAL_NAME "source_normal"
 #define SHADER_TERRAINS_NAME "source_terrain"
 #define SHADER_TERRAIN_TEXTURES_NAME "terrain"
+#define SHADER_ENVMAP_NAME "envmap"
     
 #define SHADER_LIGHT_POSITION_NAME "lightpos"
 #define SHADER_LIGHT_SPECULAR_NAME "lightspecular"

@@ -240,7 +240,10 @@ void set_gl_options( RenderMode mode )
 
 void set_MVP()
 {
+    //eye_pos
+    glm::vec4 eye_pos=view*glm::vec4(0, 0, 0, 1);
     glUniformMatrix4fv(shader_get_uniform_location("MVP_mat"), 1, GL_FALSE, glm::value_ptr(projection*view*model));
+    glUniform3f(shader_get_uniform_location("eye_pos"), eye_pos[0], eye_pos[1], eye_pos[2]);
 }
 
 void util_set_view(float* mat)
