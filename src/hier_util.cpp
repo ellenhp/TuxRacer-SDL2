@@ -31,9 +31,16 @@
 #include "glm/gtc/type_ptr.hpp"
 
 #include <deque>
+#include <vector>
 
 std::deque<glm::mat4> matrix_stack;
 glm::mat4 current_mat;
+
+std::vector<GLfloat> tux_verts;
+std::vector<GLfloat> tux_normals;
+std::vector<GLushort> tux_indices;
+
+void traverse_dag_sub( scene_node_t *node, material_t *mat );
 
 enum firstDraw {
     Yes,
@@ -47,123 +54,65 @@ struct cas {
     scalar_t* z;
 };
 
-//-------------------------------------------------------------------------------------------------------------
-void PlotSpherePoints(GLfloat radius, GLint stacks, GLint slices, GLfloat* v, GLfloat* n)
+void batchSolidSphere(float radius, unsigned int rings, unsigned int sectors)
 {
+    float const R = 1./(float)(rings-1);
+    float const S = 1./(float)(sectors-1);
+    int r, s;
+    int offset=tux_verts.size()/3;
 
-	GLint i, j; 
-	GLfloat slicestep, stackstep;
+    for(r = 0; r < rings; r++) for(s = 0; s < sectors; s++)
+    {
+        float const y = sin( -M_PI_2 + M_PI * r * R );
+        float const x = cos(2*M_PI * s * S) * sin( M_PI * r * R );
+        float const z = sin(2*M_PI * s * S) * sin( M_PI * r * R );
+        glm::vec4 vertex=glm::vec4(x, y, z, 1.0);
+        vertex=current_mat*vertex;
+        
+        tux_verts.push_back(vertex.x * radius);
+        tux_verts.push_back(vertex.y * radius);
+        tux_verts.push_back(vertex.z * radius);
+        
+        tux_normals.push_back(vertex.x);
+        tux_normals.push_back(vertex.y);
+        tux_normals.push_back(vertex.z);
+    }
+    
+    for(r = 0; r < rings-1; r++) for(s = 0; s < sectors-1; s++)
+    {
+        tux_indices.push_back(offset + r * sectors + s);
+        tux_indices.push_back(offset + r * sectors + (s+1));
+        tux_indices.push_back(offset + (r+1) * sectors + (s+1));
 
-	stackstep = ((GLfloat)M_PI) / stacks;
-	slicestep = 2.0f * ((GLfloat)M_PI) / slices;
-
-	for (i = 0; i < stacks; ++i)		
-	{
-		GLfloat a = i * stackstep;
-		GLfloat b = a + stackstep;
-
-		GLfloat s0 =  (GLfloat)sin(a);
-		GLfloat s1 =  (GLfloat)sin(b);
-
-		GLfloat c0 =  (GLfloat)cos(a);
-		GLfloat c1 =  (GLfloat)cos(b);
-
-		for (j = 0; j <= slices; ++j)		
-		{
-			GLfloat c = j * slicestep;
-			GLfloat x = (GLfloat)cos(c);
-			GLfloat y = (GLfloat)sin(c);
-
-			*n = x * s0;
-			*v = *n * radius;
-
-			n++;
-			v++;
-
-			*n = y * s0;
-			*v = *n * radius;
-
-			n++;
-			v++;
-
-			*n = c0;
-			*v = *n * radius;
-
-			n++;
-			v++;
-
-			*n = x * s1;
-			*v = *n * radius;
-
-			n++;
-			v++;
-
-			*n = y * s1;
-			*v = *n * radius;
-
-			n++;
-			v++;
-
-			*n = c1;
-			*v = *n * radius;
-
-			n++;
-			v++;
-
-		}
-	}
+        
+        tux_indices.push_back(offset + (r+1) * sectors + (s+1));
+        tux_indices.push_back(offset + (r+1) * sectors + s);
+        tux_indices.push_back(offset + r * sectors + s);
+    }
 }
 
-
-void
-glutSolidSphere(GLfloat radius, GLint slices, GLint stacks) 
+void draw_batched_objects()
 {
-	GLint i, triangles; 
-	static GLfloat* v, *n;
-	static GLfloat parms[3];
-	if (v) 
-	{
-		if (parms[0] != radius || parms[1] != slices || parms[2] != stacks) 
-		{
-			free(v); 
-			free(n);
-
-			n = v = 0;
-		}
-	}
-
-	if (!v) 
-	{
-		parms[0] = radius; 
-		parms[1] = (GLfloat)slices; 
-		parms[2] = (GLfloat)stacks;
-
-		v = (GLfloat*)malloc(stacks*(slices+1)*2*3*sizeof *v);
-		n = (GLfloat*)malloc(stacks*(slices+1)*2*3*sizeof *n);
-
-     //TRDebugLog("Computing sphere\n");
-		PlotSpherePoints(radius, stacks, slices, v, n);
-	}
-
-    glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, 0, v);
+    glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, 0, &tux_verts[0]);
     glEnableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
     
-    glVertexAttribPointer(shader_get_attrib_location(SHADER_NORMAL_NAME), 2, GL_FLOAT, GL_FALSE, 0, n);
-    glEnableVertexAttribArray(shader_get_attrib_location(SHADER_NORMAL_NAME));
-
-	triangles = (slices + 1) * 2;
-
-	for(i = 0; i < stacks; i++)
-		glDrawArrays(GL_TRIANGLE_STRIP, i * triangles, triangles);
-
+    //glVertexAttribPointer(shader_get_attrib_location(SHADER_NORMAL_NAME), 2, GL_FLOAT, GL_FALSE, 0, n);
+    //glEnableVertexAttribArray(shader_get_attrib_location(SHADER_NORMAL_NAME));
+    
+    glDrawElements(GL_TRIANGLES, tux_indices.size(), GL_UNSIGNED_SHORT, &tux_indices[0]);
+    
     glDisableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
-    glDisableVertexAttribArray(shader_get_attrib_location(SHADER_NORMAL_NAME));
+    //glDisableVertexAttribArray(shader_get_attrib_location(SHADER_NORMAL_NAME));
+    
+    tux_verts.clear();
+    tux_indices.clear();
+    tux_normals.clear();
 }
 
 void draw_sphere( int num_divisions )
 {
     int div = num_divisions;
-    glutSolidSphere(1, num_divisions+1, num_divisions+1);
+    batchSolidSphere(1, num_divisions+1, num_divisions+1);
 }
 
 void hier_push_mat()
@@ -177,18 +126,12 @@ void hier_pop_mat()
     {
         current_mat=matrix_stack.back();
         matrix_stack.pop_back();
-        util_set_model_matrix(glm::value_ptr(current_mat));
-    }
-    else
-    {
-        util_set_translation(0, 0, 0);
     }
 }
 
 void hier_mult_mat(glm::mat4 mat)
 {
     current_mat=current_mat*mat;
-    util_set_model_matrix(glm::value_ptr(current_mat));
 }
 
 /*--------------------------------------------------------------------------*/
@@ -196,6 +139,12 @@ void hier_mult_mat(glm::mat4 mat)
 /* Traverses the DAG structure and draws the nodes
  */
 void traverse_dag( scene_node_t *node, material_t *mat )
+{
+    traverse_dag_sub(node, mat);
+    draw_batched_objects();
+}
+
+void traverse_dag_sub( scene_node_t *node, material_t *mat )
 {
     scene_node_t *child;
     glm::mat4 matrix;
@@ -213,22 +162,22 @@ void traverse_dag( scene_node_t *node, material_t *mat )
     
     if ( node->mat != NULL ) {
         mat = node->mat;
-    } 
+    }
     
     if ( node->geom == Sphere ) {
         
         //FIXME
         draw_sphere(std::min(MAX_SPHERE_DIVISIONS, std::max(MIN_SPHERE_DIVISIONS, ROUND_TO_NEAREST(getparam_tux_sphere_divisions() * node->param.sphere.divisions))));
-    } 
+    }
     
     child = node->child;
     while (child != NULL) {
-        traverse_dag( child, mat );
+        traverse_dag_sub( child, mat );
         child = child->next;
-    } 
+    }
     
     hier_pop_mat();
-} 
+}
 
 /*--------------------------------------------------------------------------*/
 
