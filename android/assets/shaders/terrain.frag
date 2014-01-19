@@ -20,7 +20,7 @@ void main()
 {
     vec4 color_envmap=texture2D(envmap, dest_env_coord);
     
-    vec4 color0=(texture2D(terrain0, dest_tex_coord)+color_envmap*0.4);
+    vec4 color0=(texture2D(terrain0, dest_tex_coord)+color_envmap);
     vec4 color1=texture2D(terrain1, dest_tex_coord);
     vec4 color2=texture2D(terrain2, dest_tex_coord);
     vec4 terrain_color=color0*transparencies[0]+color1*transparencies[1]+color2*transparencies[2];

@@ -93,8 +93,8 @@ void init_course_vbo(scalar_t* elevation, terrain_t* terrain, int nx, int nz, sc
             NORMAL_AT_COORD[1]=normal.y;
             NORMAL_AT_COORD[2]=normal.z;
             
-            TEXCOORD_AT_COORD[0]=(GLfloat)x / (nx-1.) * course_width/10;
-            TEXCOORD_AT_COORD[1]=(GLfloat)z / (nz-1.) * course_length/10;
+            TEXCOORD_AT_COORD[0]=(GLfloat)x / (nx-1.) * course_width/20;
+            TEXCOORD_AT_COORD[1]=(GLfloat)z / (nz-1.) * course_length/20;
             
             TERRAIN_AT_COORD[0]=0;
             TERRAIN_AT_COORD[1]=0;
