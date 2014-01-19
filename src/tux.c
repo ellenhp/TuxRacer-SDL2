@@ -137,6 +137,8 @@ void draw_tux()
 
     if(get_player_data(local_player())->view.mode == TUXEYE) return;
 
+    use_tux_program();
+    
     set_gl_options( TUX );
 
     draw_scene_graph( tuxRootNode );

@@ -23,6 +23,8 @@ extern "C"
 void init_programs();
 void use_terrain_program();
 void use_generic_program();
+void use_hud_program();
+void use_tux_program();
 
 void shader_set_texture(GLuint texture);
 void shader_set_color(GLfloat* argb);

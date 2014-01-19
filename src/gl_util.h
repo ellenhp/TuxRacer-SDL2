@@ -93,6 +93,7 @@ void set_MVP();
 void util_set_view(float* mat);
 void util_setup_projection(float near, float far);
 void util_set_translation(float x, float y, float z);
+void util_set_model_matrix(float* mat);
 
 void check_gl_error();
 

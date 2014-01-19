@@ -273,6 +273,19 @@ void util_set_translation(float x, float y, float z)
     set_MVP();
 }
 
+void util_set_model_matrix(float* mat)
+{
+    int x, y;
+    for (x=0; x<4; x++)
+    {
+        for (y=0; y<4; y++)
+        {
+            model[x][y]=mat[x*4+y];
+        }
+    }
+    set_MVP();
+}
+
 /* Checking for GL errors is really just another type of assertion, so we
    turn off the check if TUXRACER_NO_ASSERT is defined */
 #if defined( TUXRACER_NO_ASSERT )

@@ -19,8 +19,21 @@
 
 #include "tuxracer.h"
 #include "render_util.h"
+#include "gl_util.h"
+#include "hier_util.h"
 #include "hier.h"
+#include "shaders.h"
 #include "alglib.h"
+
+#define GLM_FORCE_RADIANS
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
+
+#include <deque>
+
+std::deque<glm::mat4> matrix_stack;
+glm::mat4 current_mat;
 
 enum firstDraw {
     Yes,
@@ -105,7 +118,6 @@ void PlotSpherePoints(GLfloat radius, GLint stacks, GLint slices, GLfloat* v, GL
 void
 glutSolidSphere(GLfloat radius, GLint slices, GLint stacks) 
 {
-    /*
 	GLint i, triangles; 
 	static GLfloat* v, *n;
 	static GLfloat parms[3];
@@ -117,9 +129,6 @@ glutSolidSphere(GLfloat radius, GLint slices, GLint stacks)
 			free(n);
 
 			n = v = 0;
-
-			glVertexPointer(3, GL_FLOAT, 0, 0);
-			glNormalPointer(GL_FLOAT, 0, 0);
 		}
 	}
 
@@ -136,20 +145,19 @@ glutSolidSphere(GLfloat radius, GLint slices, GLint stacks)
 		PlotSpherePoints(radius, stacks, slices, v, n);
 	}
 
-	glVertexPointer(3, GL_FLOAT, 0, v);
-	glNormalPointer(GL_FLOAT, 0, n);
-
-	glEnableClientState (GL_VERTEX_ARRAY);
-	glEnableClientState (GL_NORMAL_ARRAY);
+    glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, 0, v);
+    glEnableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
+    
+    glVertexAttribPointer(shader_get_attrib_location(SHADER_NORMAL_NAME), 2, GL_FLOAT, GL_FALSE, 0, n);
+    glEnableVertexAttribArray(shader_get_attrib_location(SHADER_NORMAL_NAME));
 
 	triangles = (slices + 1) * 2;
 
 	for(i = 0; i < stacks; i++)
 		glDrawArrays(GL_TRIANGLE_STRIP, i * triangles, triangles);
 
-//	glDisableClientState(GL_VERTEX_ARRAY);
-//	glDisableClientState(GL_NORMAL_ARRAY);
-*/
+    glDisableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
+    glDisableVertexAttribArray(shader_get_attrib_location(SHADER_NORMAL_NAME));
 }
 
 void draw_sphere( int num_divisions )
@@ -158,7 +166,30 @@ void draw_sphere( int num_divisions )
     glutSolidSphere(1, num_divisions+1, num_divisions+1);
 }
 
+void hier_push_mat()
+{
+    matrix_stack.push_back(current_mat);
+}
 
+void hier_pop_mat()
+{
+    if (!matrix_stack.empty())
+    {
+        current_mat=matrix_stack.back();
+        matrix_stack.pop_back();
+        util_set_model_matrix(glm::value_ptr(current_mat));
+    }
+    else
+    {
+        util_set_translation(0, 0, 0);
+    }
+}
+
+void hier_mult_mat(glm::mat4 mat)
+{
+    current_mat=current_mat*mat;
+    util_set_model_matrix(glm::value_ptr(current_mat));
+}
 
 /*--------------------------------------------------------------------------*/
 
@@ -166,20 +197,19 @@ void draw_sphere( int num_divisions )
  */
 void traverse_dag( scene_node_t *node, material_t *mat )
 {
-    /*
     scene_node_t *child;
-    GLfloat matrix[4][4];
+    glm::mat4 matrix;
     int i,j;
     
     check_assertion( node != NULL, "node is NULL" );
-    glPushMatrix();
+    hier_push_mat();
     
     for( i = 0; i < 4; i++ )
     {
         for( j = 0; j < 4; j++ )
             matrix[i][j] = node->trans[i][j];
     }
-    glMultMatrixf( (GLfloat *) matrix );
+    hier_mult_mat(matrix);
     
     if ( node->mat != NULL ) {
         mat = node->mat;
@@ -188,10 +218,7 @@ void traverse_dag( scene_node_t *node, material_t *mat )
     if ( node->geom == Sphere ) {
         
         //FIXME
-        draw_sphere(
-        min(MAX_SPHERE_DIVISIONS, max( 
-            MIN_SPHERE_DIVISIONS, 
-            ROUND_TO_NEAREST( getparam_tux_sphere_divisions() * node->param.sphere.divisions ) )));
+        draw_sphere(std::min(MAX_SPHERE_DIVISIONS, std::max(MIN_SPHERE_DIVISIONS, ROUND_TO_NEAREST(getparam_tux_sphere_divisions() * node->param.sphere.divisions))));
     } 
     
     child = node->child;
@@ -200,8 +227,7 @@ void traverse_dag( scene_node_t *node, material_t *mat )
         child = child->next;
     } 
     
-    glPopMatrix();
-     */
+    hier_pop_mat();
 } 
 
 /*--------------------------------------------------------------------------*/
