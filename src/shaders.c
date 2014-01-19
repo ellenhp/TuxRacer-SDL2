@@ -124,6 +124,7 @@ void use_tux_program()
         glUseProgram(tux_program);
         active_program=tux_program;
         set_MVP();
+        set_light_uniforms();
     }
 }
 

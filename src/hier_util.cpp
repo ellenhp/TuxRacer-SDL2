@@ -38,6 +38,7 @@ glm::mat4 current_mat;
 
 std::vector<GLfloat> tux_verts;
 std::vector<GLfloat> tux_normals;
+std::vector<GLfloat> tux_colors;
 std::vector<GLushort> tux_indices;
 
 void traverse_dag_sub( scene_node_t *node, material_t *mat );
@@ -54,7 +55,7 @@ struct cas {
     scalar_t* z;
 };
 
-void batchSolidSphere(float radius, unsigned int rings, unsigned int sectors)
+void batchSolidSphere(float radius, unsigned int rings, unsigned int sectors, material_t* material)
 {
     float const R = 1./(float)(rings-1);
     float const S = 1./(float)(sectors-1);
@@ -67,27 +68,34 @@ void batchSolidSphere(float radius, unsigned int rings, unsigned int sectors)
         float const x = cos(2*M_PI * s * S) * sin( M_PI * r * R );
         float const z = sin(2*M_PI * s * S) * sin( M_PI * r * R );
         glm::vec4 vertex=glm::vec4(x, y, z, 1.0);
+        glm::vec4 origin=glm::vec4(0, 0, 0, 1.0);
         vertex=current_mat*vertex;
+        origin=current_mat*origin;
         
         tux_verts.push_back(vertex.x * radius);
         tux_verts.push_back(vertex.y * radius);
         tux_verts.push_back(vertex.z * radius);
         
-        tux_normals.push_back(vertex.x);
-        tux_normals.push_back(vertex.y);
-        tux_normals.push_back(vertex.z);
+        tux_colors.push_back(material->diffuse.r);
+        tux_colors.push_back(material->diffuse.g);
+        tux_colors.push_back(material->diffuse.b);
+        
+        glm::vec4 normal=glm::normalize(vertex-origin);
+        tux_normals.push_back(normal.x);
+        tux_normals.push_back(normal.y);
+        tux_normals.push_back(normal.z);
     }
     
     for(r = 0; r < rings-1; r++) for(s = 0; s < sectors-1; s++)
     {
         tux_indices.push_back(offset + r * sectors + s);
-        tux_indices.push_back(offset + r * sectors + (s+1));
         tux_indices.push_back(offset + (r+1) * sectors + (s+1));
+        tux_indices.push_back(offset + r * sectors + (s+1));
 
         
         tux_indices.push_back(offset + (r+1) * sectors + (s+1));
-        tux_indices.push_back(offset + (r+1) * sectors + s);
         tux_indices.push_back(offset + r * sectors + s);
+        tux_indices.push_back(offset + (r+1) * sectors + s);
     }
 }
 
@@ -96,23 +104,28 @@ void draw_batched_objects()
     glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, 0, &tux_verts[0]);
     glEnableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
     
-    //glVertexAttribPointer(shader_get_attrib_location(SHADER_NORMAL_NAME), 2, GL_FLOAT, GL_FALSE, 0, n);
-    //glEnableVertexAttribArray(shader_get_attrib_location(SHADER_NORMAL_NAME));
+    glVertexAttribPointer(shader_get_attrib_location(SHADER_NORMAL_NAME), 3, GL_FLOAT, GL_FALSE, 0, &tux_normals[0]);
+    glEnableVertexAttribArray(shader_get_attrib_location(SHADER_NORMAL_NAME));
+    
+    glVertexAttribPointer(shader_get_attrib_location(SHADER_COLOR_ATTRIB_NAME), 3, GL_FLOAT, GL_FALSE, 0, &tux_colors[0]);
+    glEnableVertexAttribArray(shader_get_attrib_location(SHADER_COLOR_ATTRIB_NAME));
     
     glDrawElements(GL_TRIANGLES, tux_indices.size(), GL_UNSIGNED_SHORT, &tux_indices[0]);
     
     glDisableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
-    //glDisableVertexAttribArray(shader_get_attrib_location(SHADER_NORMAL_NAME));
+    glDisableVertexAttribArray(shader_get_attrib_location(SHADER_NORMAL_NAME));
+    glDisableVertexAttribArray(shader_get_attrib_location(SHADER_COLOR_ATTRIB_NAME));
     
+    tux_colors.clear();
     tux_verts.clear();
     tux_indices.clear();
     tux_normals.clear();
 }
 
-void draw_sphere( int num_divisions )
+void draw_sphere( int num_divisions, material_t* material )
 {
     int div = num_divisions;
-    batchSolidSphere(1, num_divisions+1, num_divisions+1);
+    batchSolidSphere(1, num_divisions, num_divisions, material);
 }
 
 void hier_push_mat()
@@ -167,7 +180,7 @@ void traverse_dag_sub( scene_node_t *node, material_t *mat )
     if ( node->geom == Sphere ) {
         
         //FIXME
-        draw_sphere(std::min(MAX_SPHERE_DIVISIONS, std::max(MIN_SPHERE_DIVISIONS, ROUND_TO_NEAREST(getparam_tux_sphere_divisions() * node->param.sphere.divisions))));
+        draw_sphere(std::min(MAX_SPHERE_DIVISIONS, std::max(MIN_SPHERE_DIVISIONS, ROUND_TO_NEAREST(node->param.sphere.divisions))), mat);
     }
     
     child = node->child;
