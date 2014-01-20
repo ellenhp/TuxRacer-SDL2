@@ -602,8 +602,6 @@ void racing_loop( scalar_t time_step )
     
     util_setup_projection(NEAR_CLIP_DIST, getparam_forward_clip_distance());
     
-    draw_sky(plyr->view.pos);
-    
     set_course_clipping( True );
     set_course_eye_point( plyr->view.pos );
     
@@ -612,8 +610,6 @@ void racing_loop( scalar_t time_step )
     render_course();
     
     use_generic_program();
-    
-    draw_trees();
     
     if ( getparam_draw_particles() ) {
         update_particles( time_step );
@@ -627,6 +623,12 @@ void racing_loop( scalar_t time_step )
     draw_hud( plyr );
     
     draw_hud_training(plyr);
+    
+    use_generic_program();
+    
+    draw_sky(plyr->view.pos);
+    
+    draw_trees();
     
     reshape( width, height );
     

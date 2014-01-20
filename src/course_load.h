@@ -89,7 +89,7 @@ typedef struct {
 
 typedef struct {
     char * name;
-    char * texture;
+    int atlas_index;
     scalar_t diam, height;
     scalar_t above_ground;
     unsigned char red, green, blue;

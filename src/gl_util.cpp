@@ -160,7 +160,7 @@ void set_gl_options( RenderMode mode )
 
     case SKY:
 	glEnable( GL_TEXTURE_2D );
-	glDisable( GL_DEPTH_TEST );
+	glEnable( GL_DEPTH_TEST );
 	glDisable( GL_CULL_FACE );
 	glEnable( GL_BLEND );
 	glDisable( GL_STENCIL_TEST );

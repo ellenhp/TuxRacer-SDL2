@@ -264,9 +264,6 @@ static void reset_course()
 	free( item_types[i].name );
 	item_types[i].name = NULL;
 
-	free( item_types[i].texture );
-	item_types[i].texture = NULL;
-
 	item_types[i].pos = NULL;
 	item_types[i].insert_pos = NULL;
 
@@ -1531,7 +1528,7 @@ static int item_spec_cb( ClientData cd, Tcl_Interp *ip,
     }
 
     item_types[num_item_types].name = NULL;
-    item_types[num_item_types].texture = NULL;
+    item_types[num_item_types].atlas_index = 0;
     item_types[num_item_types].diam = .8;
     item_types[num_item_types].height = 0.5;
     item_types[num_item_types].above_ground = 0.0;
@@ -1574,15 +1571,12 @@ static int item_spec_cb( ClientData cd, Tcl_Interp *ip,
 					(char *) 0);
 	    }
 	
-	} else if ( strcmp( "-texture", *argv ) == 0 ) {
+	} else if ( strcmp( "-atlaspos", *argv ) == 0 ) {
 	    NEXT_ARG;
-	    CHECK_ARG( "-texture", err_msg, item_spec_bail );
+	    CHECK_ARG( "-atlaspos", err_msg, item_spec_bail );
 
-	    if ( !item_types[num_item_types].texture ) {
-		item_types[num_item_types].texture = string_copy(*argv);
-	    } else {
-		Tcl_AppendResult(ip, argv[0], ": specify only one texture\n",
-				(char *)0 );
+	    if ( Tcl_GetInt( ip, *argv, &item_types[num_item_types].atlas_index) != TCL_OK ) {
+            Tcl_AppendResult(ip, argv[0], ": invalid atlas index\n", (char *) 0);
 	    }
 
 	} else if ( strcmp( "-above_ground", *argv ) == 0 ) {
@@ -1656,20 +1650,10 @@ static int item_spec_cb( ClientData cd, Tcl_Interp *ip,
 	NEXT_ARG;
     }
 
-    if ( item_types[num_item_types].name == 0 ||
-	 ( item_types[num_item_types].texture == 0 &&
-	   item_types[num_item_types].reset_point == False ) ) 
+    if ( item_types[num_item_types].name == 0 )
     {
 	err_msg = "Some mandatory elements not filled.  "
 	    "Item name and texture name must be supplied.";
-	goto item_spec_bail;
-    }
-
-    if ( item_types[num_item_types].reset_point == False &&
-	 !bind_texture( item_types[num_item_types].name,
-			item_types[num_item_types].texture )) 
-    {
-	err_msg = "could not bind specified texture";
 	goto item_spec_bail;
     }
 
@@ -1686,11 +1670,6 @@ item_spec_bail:
 	free( item_types[num_item_types].name );
 	item_types[num_item_types].name = NULL;
     }
-
-    if ( item_types[num_item_types].texture ) {
-	free( item_types[num_item_types].texture );
-	item_types[num_item_types].texture = NULL;
-    }    
 
     Tcl_AppendResult(
 	ip,

@@ -329,52 +329,54 @@ void draw_sky(point_t pos)
 {
     GLuint texture_id[6];
     
-    static const GLfloat vertices []=
+#define DIST (getparam_forward_clip_distance()*0.7)
+    
+    GLfloat vertices []=
     {
-        -1, -1, -1, //0
-        1, -1, -1, //1
-        1,  1, -1, //2
-        -1,  1, -1, //3
-        -1, -1, -1, //0
-        1,  1, -1, //2
+        -DIST, -DIST, -DIST,
+        DIST, -DIST, -DIST,
+        DIST,  DIST, -DIST,
+        -DIST,  DIST, -DIST,
+        -DIST, -DIST, -DIST,
+        DIST,  DIST, -DIST,
         
-        -1,  1, -1,
-        1,  1, -1,
-        1,  1,  1,
-        -1,  1,  1,
-        -1,  1, -1,
-        1,  1,  1,
+        -DIST,  DIST, -DIST,
+        DIST,  DIST, -DIST,
+        DIST,  DIST,  DIST,
+        -DIST,  DIST,  DIST,
+        -DIST,  DIST, -DIST,
+        DIST,  DIST,  DIST,
         
-        -1, -1,  1,
-        1, -1,  1,
-        1, -1, -1,
-        -1, -1, -1,
-        -1, -1,  1,
-        1, -1, -1,
+        -DIST, -DIST,  DIST,
+        DIST, -DIST,  DIST,
+        DIST, -DIST, -DIST,
+        -DIST, -DIST, -DIST,
+        -DIST, -DIST,  DIST,
+        DIST, -DIST, -DIST,
         
-        -1, -1,  1,
-        -1, -1, -1,
-        -1,  1, -1,
-        -1,  1,  1,
-        -1, -1,  1,
-        -1,  1, -1,
+        -DIST, -DIST,  DIST,
+        -DIST, -DIST, -DIST,
+        -DIST,  DIST, -DIST,
+        -DIST,  DIST,  DIST,
+        -DIST, -DIST,  DIST,
+        -DIST,  DIST, -DIST,
         
-        1, -1, -1,
-        1, -1,  1,
-        1,  1,  1,
-        1,  1, -1,
-        1, -1, -1,
-        1,  1,  1,
+        DIST, -DIST, -DIST,
+        DIST, -DIST,  DIST,
+        DIST,  DIST,  DIST,
+        DIST,  DIST, -DIST,
+        DIST, -DIST, -DIST,
+        DIST,  DIST,  DIST,
         
-        1, -1,  1,
-        -1, -1,  1,
-        -1,  1,  1,
-        1,  1,  1,
-        1, -1,  1,
-        -1,  1,  1,
+        DIST, -DIST,  DIST,
+        -DIST, -DIST,  DIST,
+        -DIST,  DIST,  DIST,
+        DIST,  DIST,  DIST,
+        DIST, -DIST,  DIST,
+        -DIST,  DIST,  DIST,
     };
     
-    static const GLfloat texCoords []=
+    GLfloat texCoords []=
     {
         // Work around an iphone FPU/GL? bug
         // that makes the plane and texture non contiguous.
@@ -511,6 +513,8 @@ void draw_trees()
     vector_t normal;
     item_type_t* item_types;
     
+    int current_item=0;
+    
     const GLfloat verticesTemplateItem[]=
     {
         -1.0, 0.0,  1.0,
@@ -521,18 +525,17 @@ void draw_trees()
         1.0, 1.0, -1.0,
     };
     
-    GLfloat verticesItem[18];
-    
-    const GLfloat texCoordsItem[]=
+    const GLfloat texCoordsTemplateItem[]=
     {
-        0.0, 0.0 ,
-        1.0, 0.0 ,
-        1.0, 1.0 ,
-        0.0, 1.0 ,
-        0.0, 0.0 ,
-        1.0, 1.0 ,
+        0.0, 0.0,
+        1.0/4, 0.0,
+        1.0/4, 1.0,
+        0.0, 1.0,
+        0.0, 0.0,
+        1.0/4, 1.0,
     };
-
+    GLfloat* verticesItem;
+    GLfloat* texCoordsItem;
     
     shader_set_color(white);
     
@@ -540,7 +543,7 @@ void draw_trees()
         return;
     }
     glBindTexture(GL_TEXTURE_2D, texobj);
-    
+
     set_gl_options(TREES);
     
     glBindBuffer(GL_ARRAY_BUFFER, trees_vbo);
@@ -559,6 +562,10 @@ void draw_trees()
     
     itemLocs = get_item_locs();
     numItems = get_num_items();
+    
+    verticesItem=(GLfloat*)malloc(numItems*18*sizeof(GLfloat));
+    texCoordsItem=(GLfloat*)malloc(numItems*12*sizeof(GLfloat));
+    
     item_types = get_item_types();
     
     for (i = 0; i< numItems; i++) {
@@ -604,25 +611,36 @@ void draw_trees()
         
         for (vertex=0; vertex<6; vertex++)
         {
-            verticesItem[0+vertex*3]=xOffset + itemRadius * normal.z * verticesTemplateItem[0+vertex*3];
-            verticesItem[1+vertex*3]=yOffset + itemHeight * verticesTemplateItem[1+vertex*3];
-            verticesItem[2+vertex*3]=zOffset + itemRadius * normal.x * verticesTemplateItem[2+vertex*3];
+            verticesItem[current_item*18+0+vertex*3]=xOffset + itemRadius * normal.z * verticesTemplateItem[0+vertex*3];
+            verticesItem[current_item*18+1+vertex*3]=yOffset + itemHeight * verticesTemplateItem[1+vertex*3];
+            verticesItem[current_item*18+2+vertex*3]=zOffset + itemRadius * normal.x * verticesTemplateItem[2+vertex*3];
+            
+            texCoordsItem[current_item*12+0+vertex*2]=texCoordsTemplateItem[0+vertex*2]+item_types[item_type].atlas_index/4.0;
+            texCoordsItem[current_item*12+1+vertex*2]=texCoordsTemplateItem[1+vertex*2];
         }
         
-        glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, 0, verticesItem);
-        glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, 0, texCoordsItem);
-        
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-        
+        current_item++;
     }
+    
+    if (!get_texture_binding("items", &texobj) ) {
+        return;
+    }
+    glBindTexture(GL_TEXTURE_2D, texobj);
 
+    glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, 0, verticesItem);
+    glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, 0, texCoordsItem);
+    
+    glDrawArrays(GL_TRIANGLES, 0, current_item*6);
     
     glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, 0, 0);
     glDisableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
     
     glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, 0, 0);
     glDisableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
-} 
+    
+    free(verticesItem);
+    free(texCoordsItem);
+}
 
 /*! 
  Draws a fog plane at the far clipping plane to mask out clipping of terrain.
