@@ -329,7 +329,7 @@ void draw_sky(point_t pos)
 {
     GLuint texture_id[6];
     
-#define DIST (getparam_forward_clip_distance()*0.7)
+#define DIST (getparam_forward_clip_distance()*0.5)
     
     GLfloat vertices []=
     {

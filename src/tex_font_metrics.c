@@ -19,9 +19,15 @@
 
 #include "tuxracer.h"
 #include "tex_font_metrics.h"
-#include "primitive_draw.h"z
+#include "primitive_draw.h"
+#include "shaders.h"
 
 #define MAX_TEX_FONT_CHARS 256
+
+static GLfloat string_vertices[MAX_TEX_FONT_CHARS*18];
+static GLfloat string_texcoords[MAX_TEX_FONT_CHARS*12];
+
+static int num_batched_chars;
 
 struct tex_font_metrics_ {
     int max_ascent;
@@ -267,18 +273,44 @@ void get_tex_font_string_bbox( tex_font_metrics_t *tfm,
     *max_descent = tfm->max_descent;
 }
 
-float draw_tex_font_char( tfm_char_data_t* cd, char c, float x, float y, float scale )
+float batch_tex_font_char( tfm_char_data_t* cd, char c, float x, float y, float scale )
 {
+#define TO_RELATIVE(screen, val) (((val)/screen*2.0)-1.0)
+    float screen_w = getparam_x_resolution();
+    float screen_h = getparam_y_resolution();
+
+    int i;
+   
     GLfloat texcoords[]={
 		cd->tex_ll.x, cd->tex_ll.y,
 		cd->tex_ul.x, cd->tex_ul.y,
 		cd->tex_ur.x, cd->tex_ur.y,
-		cd->tex_lr.x, cd->tex_lr.y};
+		cd->tex_ur.x, cd->tex_ur.y,
+		cd->tex_lr.x, cd->tex_lr.y,
+        cd->tex_ll.x, cd->tex_ll.y};
+    
+    GLfloat vertices[]={
+        scale*cd->ll.x+x, scale*cd->ll.y+y,
+        scale*cd->ul.x+x, scale*cd->ul.y+y,
+        scale*cd->ur.x+x, scale*cd->ur.y+y,
+        scale*cd->ur.x+x, scale*cd->ur.y+y,
+        scale*cd->lr.x+x, scale*cd->lr.y+y,
+        scale*cd->ll.x+x, scale*cd->ll.y+y,
+    };
 
-	GLubyte indices[]={0, 1, 2, 2, 3, 0};
-
-	draw_textured_quad_texcoords(scale*cd->ll.x+x, scale*cd->ll.y+y, scale*(cd->ur.x-cd->ll.x), scale*(cd->ur.y-cd->ll.y), texcoords);
-
+    for (i=0; i<6; i++)
+    {
+        string_vertices[num_batched_chars*12+i*2]=TO_RELATIVE(screen_w, vertices[i*2]);
+        string_vertices[num_batched_chars*12+i*2+1]=TO_RELATIVE(screen_h, vertices[i*2+1]);
+    }
+    
+    for (i=0; i<12; i++)
+    {
+        string_texcoords[num_batched_chars*12+i]=texcoords[i];
+    }
+    
+    num_batched_chars++;
+    
 	return scale*cd->kern_width;
 }
 
@@ -291,10 +323,24 @@ void draw_tex_font_string( tex_font_metrics_t *tfm, const char *string, float x,
 
     len = strlen( string );
 
+    num_batched_chars=0;
+
     for (i=0; i<len; i++) {
     cd = find_char_data( tfm, string[i] );
-	x+=draw_tex_font_char( cd, string[i], x, y, scale );
+	x+=batch_tex_font_char( cd, string[i], x, y, scale );
     }
+    
+    glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 2, GL_FLOAT, GL_FALSE, 0, string_vertices);
+    glEnableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
+    
+    glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, 0, string_texcoords);
+    glEnableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
+    
+    glDrawArrays(GL_TRIANGLES, 0, num_batched_chars*6);
+    
+    glDisableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
+    glDisableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
+
 }
 
 bool_t is_character_in_tex_font( tex_font_metrics_t *tfm, char c ) 

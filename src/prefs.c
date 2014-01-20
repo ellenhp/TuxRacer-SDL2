@@ -45,9 +45,9 @@ typedef struct graphics_options_t
 
 #define NUM_GRAPHICS_OPTIONS 3
 graphics_options_t graphics_options[]={
-	{5, 30, 0, False, False, False, 9, False, False},
-	{10, 75, 20, True, False, True, 9, True, False},
-	{20, 150, 70, True, True, True, 9, True, False},
+	{5, 75, 0, False, False, False, 9, False, False},
+	{10, 150, 20, True, False, True, 9, True, False},
+	{20, 225, 70, True, True, True, 9, True, False},
 };
 
 widget_t* music_volume_slider=NULL;
