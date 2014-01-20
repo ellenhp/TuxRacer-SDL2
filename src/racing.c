@@ -618,17 +618,17 @@ void racing_loop( scalar_t time_step )
     
     draw_tux();
     
-    use_hud_program();
-
-    draw_hud( plyr );
-    
-    draw_hud_training(plyr);
-    
     use_generic_program();
     
     draw_sky(plyr->view.pos);
     
     draw_trees();
+
+    use_hud_program();
+
+    draw_hud( plyr );
+    
+    draw_hud_training(plyr);
     
     reshape( width, height );
     

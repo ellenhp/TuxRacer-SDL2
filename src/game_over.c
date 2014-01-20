@@ -248,6 +248,12 @@ void game_over_loop( scalar_t time_step )
     
     draw_tux();
     
+    use_generic_program();
+    
+    draw_sky(plyr->view.pos);
+    
+    draw_trees();
+    
     use_hud_program();
     
     set_gl_options( GUI );
@@ -260,12 +266,6 @@ void game_over_loop( scalar_t time_step )
     draw_hud( plyr );
 #endif
     draw_hud_training(plyr);
-
-    use_generic_program();
-    
-    draw_sky(plyr->view.pos);
-    
-    draw_trees();
     
     reshape( width, height );
     

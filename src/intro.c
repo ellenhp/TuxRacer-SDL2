@@ -163,16 +163,16 @@ void intro_loop( scalar_t time_step )
 
     draw_tux();
 
+    use_generic_program();
+    
+    draw_sky(plyr->view.pos);
+    
+    draw_trees();
+    
     use_hud_program();
 
     draw_hud( plyr );
     draw_hud_training(plyr);
-    
-    use_generic_program();
-    
-    draw_sky( plyr->view.pos );
-    
-    draw_trees();
     
     reshape( width, height );
     winsys_swap_buffers();
