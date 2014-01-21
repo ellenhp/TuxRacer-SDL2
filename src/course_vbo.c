@@ -141,13 +141,15 @@ int get_start_z()
     }
 }
 
-int get_num_vertices(int startZ)
+int get_num_vertices(int startZ, int* nextStartZ)
 {
     int z, x;
     int indices=0;
+    scalar_t course_width, course_length;
+    get_course_dimensions(&course_width, &course_length);
     for (z=startZ; z<course_z_size-1; z++)
     {
-        if (indices+6*course_x_size>=USHRT_MAX)
+        if (indices+6*course_x_size>=USHRT_MAX || ((GLfloat)(z-get_start_z())/(course_z_size-1.)*course_length)>getparam_forward_clip_distance()/2)
         {
             break;
         }
@@ -156,6 +158,7 @@ int get_num_vertices(int startZ)
             indices+=6;
         }
     }
+    *nextStartZ=z;
     return indices;
 }
 
@@ -217,6 +220,8 @@ void unbind_textures()
 void draw_course_vbo()
 {
     int startZ=get_start_z();
+    int nextStartZ=0;
+    int numVerticies=0;
     if (!data_vbo)
     {
         return;
@@ -227,19 +232,24 @@ void draw_course_vbo()
     glBindBuffer(GL_ARRAY_BUFFER, data_vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_vbo);
     
-    glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, STRIDE_BYTES, startZ*course_x_size*STRIDE_BYTES);
-    glEnableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
-    
-    glVertexAttribPointer(shader_get_attrib_location(SHADER_NORMAL_NAME), 3, GL_FLOAT, GL_FALSE, STRIDE_BYTES, startZ*course_x_size*STRIDE_BYTES+3*sizeof(GLfloat));
-    glEnableVertexAttribArray(shader_get_attrib_location(SHADER_NORMAL_NAME));
-    
-    glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, STRIDE_BYTES, startZ*course_x_size*STRIDE_BYTES+6*sizeof(GLfloat));
-    glEnableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
-    
-    glVertexAttribPointer(shader_get_attrib_location(SHADER_TERRAINS_NAME), 3, GL_UNSIGNED_BYTE, GL_FALSE, STRIDE_BYTES, startZ*course_x_size*STRIDE_BYTES+8*sizeof(GLfloat));
-    glEnableVertexAttribArray(shader_get_attrib_location(SHADER_TERRAINS_NAME));
-   
-    glDrawElements(GL_TRIANGLES, get_num_vertices(startZ), GL_UNSIGNED_SHORT, 0);
+    while (numVerticies=get_num_vertices(startZ, &nextStartZ))
+    {
+        glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, STRIDE_BYTES, startZ*course_x_size*STRIDE_BYTES);
+        glEnableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
+        
+        glVertexAttribPointer(shader_get_attrib_location(SHADER_NORMAL_NAME), 3, GL_FLOAT, GL_FALSE, STRIDE_BYTES, startZ*course_x_size*STRIDE_BYTES+3*sizeof(GLfloat));
+        glEnableVertexAttribArray(shader_get_attrib_location(SHADER_NORMAL_NAME));
+        
+        glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, STRIDE_BYTES, startZ*course_x_size*STRIDE_BYTES+6*sizeof(GLfloat));
+        glEnableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
+        
+        glVertexAttribPointer(shader_get_attrib_location(SHADER_TERRAINS_NAME), 3, GL_UNSIGNED_BYTE, GL_FALSE, STRIDE_BYTES, startZ*course_x_size*STRIDE_BYTES+8*sizeof(GLfloat));
+        glEnableVertexAttribArray(shader_get_attrib_location(SHADER_TERRAINS_NAME));
+        
+        glDrawElements(GL_TRIANGLES, numVerticies, GL_UNSIGNED_SHORT, 0);
+        
+        startZ=nextStartZ;
+    }
     
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
