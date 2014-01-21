@@ -537,6 +537,7 @@ void draw_trees()
     GLfloat* verticesItem;
     GLfloat* texCoordsItem;
     
+    use_tree_program();
     shader_set_color(white);
     
     if (!get_texture_binding("trees", &texobj) ) {
@@ -582,10 +583,6 @@ void draw_trees()
         if (itemLocs[i].item_type != item_type) {
             item_type = itemLocs[i].item_type;
             item_name = get_item_name(item_type);
-            if (!get_texture_binding(item_name, &texobj)) {
-                texobj = 0;
-            }
-            glBindTexture(GL_TEXTURE_2D, texobj);
         }
         
         xOffset=itemLocs[i].ray.pt.x;
@@ -625,6 +622,7 @@ void draw_trees()
     if (!get_texture_binding("items", &texobj) ) {
         return;
     }
+    
     glBindTexture(GL_TEXTURE_2D, texobj);
 
     glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, 0, verticesItem);

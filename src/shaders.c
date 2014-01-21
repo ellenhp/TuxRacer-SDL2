@@ -9,7 +9,9 @@
 
 static GLuint generic_program;
 static GLuint hud_program;
-static GLuint terrain_program;
+static GLuint terrain_program_high;
+static GLuint terrain_program_low;
+static GLuint tree_program;
 static GLuint tux_program;
 
 static GLuint active_program;
@@ -80,50 +82,58 @@ void init_programs()
     
     init_shader_program(&generic_program, "shaders/generic.vert", "shaders/generic.frag");
     init_shader_program(&hud_program, "shaders/hud.vert", "shaders/hud.frag");
-    init_shader_program(&terrain_program, "shaders/terrain.vert", "shaders/terrain.frag");
+    init_shader_program(&terrain_program_high, "shaders/terrain.vert", "shaders/terrain.frag");
+    init_shader_program(&terrain_program_low, "shaders/terrainlow.vert", "shaders/terrainlow.frag");
+    init_shader_program(&tree_program, "shaders/trees.vert", "shaders/trees.frag");
     init_shader_program(&tux_program, "shaders/tux.vert", "shaders/tux.frag");
     
     programs_initialized=True;
 }
 
+static bool_t use_program(GLuint program)
+{
+    if (programs_initialized && active_program!=program)
+    {
+        glUseProgram(program);
+        active_program=program;
+        set_MVP();
+        return True;
+    }
+    return False;
+}
+
 void use_terrain_program()
 {
-    if (programs_initialized && active_program!=terrain_program)
+    GLuint terrain_program=terrain_program_low;
+    if (getparam_terrain_envmap())
     {
-        glUseProgram(terrain_program);
-        active_program=terrain_program;
-        set_MVP();
+        terrain_program=terrain_program_high;
+    }
+    if (use_program(terrain_program))
+    {
         set_light_uniforms();
     }
 }
 
 void use_generic_program()
 {
-    if (programs_initialized && active_program!=generic_program)
-    {
-        glUseProgram(generic_program);
-        active_program=generic_program;
-        set_MVP();
-    }
+    use_program(generic_program);
 }
 
 void use_hud_program()
 {
-    if (programs_initialized && active_program!=hud_program)
-    {
-        glUseProgram(hud_program);
-        active_program=hud_program;
-        set_MVP();
-    }
+    use_program(hud_program);
+}
+
+void use_tree_program()
+{
+    use_program(tree_program);
 }
 
 void use_tux_program()
 {
-    if (programs_initialized && active_program!=tux_program)
+    if (use_program(tux_program))
     {
-        glUseProgram(tux_program);
-        active_program=tux_program;
-        set_MVP();
         set_light_uniforms();
     }
 }

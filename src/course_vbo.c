@@ -4,7 +4,7 @@
 //TODO is this poorly aligned?
 //data array. V=position, N=normal, C=texture coord, T=terrain transperency
 //VVV NNN CC TTT
-#define STRIDE 11
+#define STRIDE 9
 #define STRIDE_BYTES (STRIDE*sizeof(GLfloat))
 
 static GLuint data_vbo=0;
@@ -82,7 +82,7 @@ void init_course_vbo(scalar_t* elevation, terrain_t* terrain, int nx, int nz, sc
 #define VERTEX_AT_COORD DATA_AT_COORD
 #define NORMAL_AT_COORD (DATA_AT_COORD+3)
 #define TEXCOORD_AT_COORD (DATA_AT_COORD+6)
-#define TERRAIN_AT_COORD (DATA_AT_COORD+8)
+#define TERRAIN_AT_COORD ((GLubyte*)(DATA_AT_COORD+8))
             
             VERTEX_AT_COORD[0]=(GLfloat)x / (nx-1.) * course_width;
             VERTEX_AT_COORD[1]=elevation[absolute_index];
@@ -236,7 +236,7 @@ void draw_course_vbo()
     glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, STRIDE_BYTES, startZ*course_x_size*STRIDE_BYTES+6*sizeof(GLfloat));
     glEnableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
     
-    glVertexAttribPointer(shader_get_attrib_location(SHADER_TERRAINS_NAME), 3, GL_FLOAT, GL_FALSE, STRIDE_BYTES, startZ*course_x_size*STRIDE_BYTES+8*sizeof(GLfloat));
+    glVertexAttribPointer(shader_get_attrib_location(SHADER_TERRAINS_NAME), 3, GL_UNSIGNED_BYTE, GL_FALSE, STRIDE_BYTES, startZ*course_x_size*STRIDE_BYTES+8*sizeof(GLfloat));
     glEnableVertexAttribArray(shader_get_attrib_location(SHADER_TERRAINS_NAME));
    
     glDrawElements(GL_TRIANGLES, get_num_vertices(startZ), GL_UNSIGNED_SHORT, 0);
