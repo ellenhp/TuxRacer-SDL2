@@ -163,6 +163,7 @@ android/assets/config/*
 android/assets/courses/*
 android/assets/fonts/*
 android/assets/music/*
+android/assets/shaders/*
 android/assets/sounds/*
 android/assets/textures/*
 android/assets/tux.tcl
