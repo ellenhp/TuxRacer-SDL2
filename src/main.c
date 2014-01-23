@@ -61,6 +61,12 @@
     #include "sharedGeneralFunctions.h"
 #endif
 
+//#define NV_PROFILE
+#ifdef NV_PROFILE
+#include "EGL/egl.h"
+#include "EGL/eglext.h"
+#endif
+
 #define WINDOW_TITLE "Tux Racer " VERSION
 
 #define GAME_INIT_SCRIPT "tuxracer_init.tcl"
@@ -250,7 +256,14 @@ int main( int argc, char **argv )
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
     init_opengl_extensions();
-
+    
+#ifdef NV_PROFILE
+    PFNEGLGETSYSTEMTIMENVPROC eglGetSystemTimeNV;
+    eglGetSystemTimeNV = (PFNEGLGETSYSTEMTIMENVPROC) eglGetProcAddress("eglGetSystemTimeNV");
+    
+    eglGetSystemTimeNV();
+#endif
+    
     /* Print OpenGL debugging information if requested */
     if ( debug_mode_is_active( DEBUG_GL_INFO ) ) {
 	print_debug( DEBUG_GL_INFO, 
