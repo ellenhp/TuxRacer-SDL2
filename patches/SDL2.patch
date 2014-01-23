@@ -1,7 +1,7 @@
-diff -r a6981e0b9fe2 VisualC/SDL/SDL_VS2008.vcproj
---- a/VisualC/SDL/SDL_VS2008.vcproj	Thu Dec 05 09:54:22 2013 -0800
-+++ b/VisualC/SDL/SDL_VS2008.vcproj	Thu Dec 05 20:19:04 2013 -0800
-@@ -1,1366 +1,1368 @@
+diff -r b9663c77f5c9 VisualC/SDL/SDL_VS2008.vcproj
+--- a/VisualC/SDL/SDL_VS2008.vcproj	Wed Oct 23 20:58:31 2013 -0700
++++ b/VisualC/SDL/SDL_VS2008.vcproj	Wed Jan 15 23:04:26 2014 -0800
+@@ -1,1338 +1,1340 @@
 -<?xml version="1.0" encoding="Windows-1252"?>
 -<VisualStudioProject
 -	ProjectType="Visual C++"
@@ -417,18 +417,6 @@ diff -r a6981e0b9fe2 VisualC/SDL/SDL_VS2008.vcproj
 -			</File>
 -			<File
 -				RelativePath="..\..\include\SDL_cpuinfo.h"
--				>
--			</File>
--			<File 
--				RelativePath="..\..\include\\SDL_egl.h" 
--				>
--			</File>
--			<File 
--				RelativePath="..\..\src\video\sdl_egl_c.h" 
--				>
--			</File>
--			<File 
--				RelativePath="..\..\src\video\windows\SDL_windowsopengles.h" 
 -				>
 -			</File>
 -			<File
@@ -1289,22 +1277,6 @@ diff -r a6981e0b9fe2 VisualC/SDL/SDL_VS2008.vcproj
 -			>
 -		</File>
 -		<File
--			RelativePath="..\..\src\render\opengles2\SDL_render_gles2.c" 
--			>
--		</File>
--		<File 
--			RelativePath="..\..\src\render\opengles2\SDL_shaders_gles2.c" 
--			>
--		</File>
--		<File 
--			RelativePath="..\..\src\video\SDL_egl.c" 
--			>
--		</File>
--		<File 
--			RelativePath="..\..\src\video\windows\SDL_windowsopengles.c" 
--			>
--		</File>
--		<File
 -			RelativePath="..\..\src\video\windows\SDL_windowsopengl.h"
 -			>
 -		</File>
@@ -1470,7 +1442,7 @@ diff -r a6981e0b9fe2 VisualC/SDL/SDL_VS2008.vcproj
 +			/>
 +			<Tool
 +				Name="VCPostBuildEventTool"
-+				CommandLine="mkdir $(SolutionDir)\..\lib&#x0D;&#x0A;mkdir $(SolutionDir)\..\lib\x86&#x0D;&#x0A;copy $(TargetDir)\SDL2.dll $(SolutionDir)\..\lib\x86&#x0D;&#x0A;copy $(TargetDir)\SDL2.lib $(SolutionDir)\..\lib\x86"
++				CommandLine="mkdir ..\..\lib&#x0D;&#x0A;mkdir ..\..\lib\x86&#x0D;&#x0A;copy $(OutDir)\$(ProjectName).lib ..\..\lib\x86&#x0D;&#x0A;copy $(OutDir)\$(ProjectName).dll ..\..\lib\x86&#x0D;&#x0A;"
 +			/>
 +		</Configuration>
 +		<Configuration
@@ -1560,7 +1532,7 @@ diff -r a6981e0b9fe2 VisualC/SDL/SDL_VS2008.vcproj
 +			/>
 +			<Tool
 +				Name="VCPostBuildEventTool"
-+				CommandLine="mkdir $(SolutionDir)\..\lib&#x0D;&#x0A;mkdir $(SolutionDir)\..\lib\x86&#x0D;&#x0A;copy $(TargetDir)\SDL2.dll $(SolutionDir)\..\lib\x86&#x0D;&#x0A;copy $(TargetDir)\SDL2.lib $(SolutionDir)\..\lib\x86"
++				CommandLine="mkdir ..\..\lib&#x0D;&#x0A;mkdir ..\..\lib\x86&#x0D;&#x0A;copy $(OutDir)\$(ProjectName).lib ..\..\lib\x86&#x0D;&#x0A;copy $(OutDir)\$(ProjectName).dll ..\..\lib\x86&#x0D;&#x0A;"
 +			/>
 +		</Configuration>
 +		<Configuration
@@ -1788,14 +1760,6 @@ diff -r a6981e0b9fe2 VisualC/SDL/SDL_VS2008.vcproj
 +				>
 +			</File>
 +			<File
-+				RelativePath="..\..\include\\SDL_egl.h"
-+				>
-+			</File>
-+			<File
-+				RelativePath="..\..\src\video\sdl_egl_c.h"
-+				>
-+			</File>
-+			<File
 +				RelativePath="..\..\include\SDL_endian.h"
 +				>
 +			</File>
@@ -1953,10 +1917,6 @@ diff -r a6981e0b9fe2 VisualC/SDL/SDL_VS2008.vcproj
 +			</File>
 +			<File
 +				RelativePath="..\..\include\SDL_video.h"
-+				>
-+			</File>
-+			<File
-+				RelativePath="..\..\src\video\windows\SDL_windowsopengles.h"
 +				>
 +			</File>
 +		</Filter>
@@ -2237,10 +2197,6 @@ diff -r a6981e0b9fe2 VisualC/SDL/SDL_VS2008.vcproj
 +			>
 +		</File>
 +		<File
-+			RelativePath="..\..\src\video\SDL_egl.c"
-+			>
-+		</File>
-+		<File
 +			RelativePath="..\..\src\SDL_error.c"
 +			>
 +		</File>
@@ -2405,10 +2361,6 @@ diff -r a6981e0b9fe2 VisualC/SDL/SDL_VS2008.vcproj
 +			>
 +		</File>
 +		<File
-+			RelativePath="..\..\src\render\opengles2\SDL_render_gles2.c"
-+			>
-+		</File>
-+		<File
 +			RelativePath="..\..\src\render\software\SDL_render_sw.c"
 +			>
 +		</File>
@@ -2442,10 +2394,6 @@ diff -r a6981e0b9fe2 VisualC/SDL/SDL_VS2008.vcproj
 +		</File>
 +		<File
 +			RelativePath="..\..\src\render\opengl\SDL_shaders_gl.h"
-+			>
-+		</File>
-+		<File
-+			RelativePath="..\..\src\render\opengles2\SDL_shaders_gles2.c"
 +			>
 +		</File>
 +		<File
@@ -2673,10 +2621,6 @@ diff -r a6981e0b9fe2 VisualC/SDL/SDL_VS2008.vcproj
 +			>
 +		</File>
 +		<File
-+			RelativePath="..\..\src\video\windows\SDL_windowsopengles.c"
-+			>
-+		</File>
-+		<File
 +			RelativePath="..\..\src\video\windows\SDL_windowsshape.c"
 +			>
 +		</File>
@@ -2736,147 +2680,165 @@ diff -r a6981e0b9fe2 VisualC/SDL/SDL_VS2008.vcproj
 +	<Globals>
 +	</Globals>
 +</VisualStudioProject>
-diff -r a6981e0b9fe2 VisualC/SDLmain/SDLmain_VS2008.vcproj
---- a/VisualC/SDLmain/SDLmain_VS2008.vcproj	Thu Dec 05 09:54:22 2013 -0800
-+++ b/VisualC/SDLmain/SDLmain_VS2008.vcproj	Thu Dec 05 20:19:04 2013 -0800
-@@ -83,6 +83,133 @@
- 			/>
- 			<Tool
- 				Name="VCPostBuildEventTool"
-+				CommandLine="mkdir $(SolutionDir)\..\lib&#x0D;&#x0A;mkdir $(SolutionDir)\..\lib\x86&#x0D;&#x0A;copy $(TargetDir)\SDL2main.lib $(SolutionDir)\..\lib\x86&#x0D;&#x0A;"
-+			/>
-+		</Configuration>
-+		<Configuration
-+			Name="Release_NoSTDIO|Win32"
-+			IntermediateDirectory="$(ConfigurationName)"
-+			ConfigurationType="1"
-+			>
-+			<Tool
-+				Name="VCPreBuildEventTool"
-+			/>
-+			<Tool
-+				Name="VCCustomBuildTool"
-+			/>
-+			<Tool
-+				Name="VCXMLDataGeneratorTool"
-+			/>
-+			<Tool
-+				Name="VCWebServiceProxyGeneratorTool"
-+			/>
-+			<Tool
-+				Name="VCMIDLTool"
-+			/>
-+			<Tool
-+				Name="VCCLCompilerTool"
-+				ExceptionHandling="0"
-+				DebugInformationFormat="1"
-+			/>
-+			<Tool
-+				Name="VCManagedResourceCompilerTool"
-+			/>
-+			<Tool
-+				Name="VCResourceCompilerTool"
-+			/>
-+			<Tool
-+				Name="VCPreLinkEventTool"
-+			/>
-+			<Tool
-+				Name="VCLinkerTool"
-+			/>
-+			<Tool
-+				Name="VCALinkTool"
-+			/>
-+			<Tool
-+				Name="VCManifestTool"
-+			/>
-+			<Tool
-+				Name="VCXDCMakeTool"
-+			/>
-+			<Tool
-+				Name="VCBscMakeTool"
-+			/>
-+			<Tool
-+				Name="VCFxCopTool"
-+			/>
-+			<Tool
-+				Name="VCAppVerifierTool"
-+			/>
-+			<Tool
-+				Name="VCPostBuildEventTool"
-+				CommandLine="mkdir $(SolutionDir)\..\lib&#x0D;&#x0A;mkdir $(SolutionDir)\..\lib\x86&#x0D;&#x0A;copy $(TargetDir)\SDL2main.lib $(SolutionDir)\..\lib\x86&#x0D;&#x0A;"
-+			/>
-+		</Configuration>
-+		<Configuration
-+			Name="Debug|Win32"
-+			OutputDirectory=".\Debug"
-+			IntermediateDirectory=".\Debug"
-+			ConfigurationType="4"
-+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC70.vsprops"
-+			UseOfMFC="0"
-+			ATLMinimizesCRunTimeLibraryUsage="false"
-+			>
-+			<Tool
-+				Name="VCPreBuildEventTool"
-+				CommandLine=""
-+			/>
-+			<Tool
-+				Name="VCCustomBuildTool"
-+			/>
-+			<Tool
-+				Name="VCXMLDataGeneratorTool"
-+			/>
-+			<Tool
-+				Name="VCWebServiceProxyGeneratorTool"
-+			/>
-+			<Tool
-+				Name="VCMIDLTool"
-+			/>
-+			<Tool
-+				Name="VCCLCompilerTool"
-+				Optimization="0"
-+				AdditionalIncludeDirectories="..\..\include,..\..\include\SDL"
-+				PreprocessorDefinitions="WIN32,_DEBUG,_WINDOWS"
-+				ExceptionHandling="0"
-+				RuntimeLibrary="3"
-+				WarningLevel="3"
-+				SuppressStartupBanner="true"
-+				DebugInformationFormat="1"
-+				CompileAs="0"
-+			/>
-+			<Tool
-+				Name="VCManagedResourceCompilerTool"
-+			/>
-+			<Tool
-+				Name="VCResourceCompilerTool"
-+			/>
-+			<Tool
-+				Name="VCPreLinkEventTool"
-+			/>
-+			<Tool
-+				Name="VCLibrarianTool"
-+			/>
-+			<Tool
-+				Name="VCALinkTool"
-+			/>
-+			<Tool
-+				Name="VCXDCMakeTool"
-+			/>
-+			<Tool
-+				Name="VCBscMakeTool"
-+			/>
-+			<Tool
-+				Name="VCFxCopTool"
-+			/>
-+			<Tool
-+				Name="VCPostBuildEventTool"
-+				CommandLine="mkdir $(SolutionDir)\..\lib&#x0D;&#x0A;mkdir $(SolutionDir)\..\lib\x86&#x0D;&#x0A;copy $(TargetDir)\SDL2main.lib $(SolutionDir)\..\lib\x86&#x0D;&#x0A;"
- 			/>
- 		</Configuration>
- 		<Configuration
-@@ -153,65 +280,6 @@
- 			/>
- 		</Configuration>
- 		<Configuration
+diff -r b9663c77f5c9 VisualC/SDLmain/SDLmain_VS2008.vcproj
+--- a/VisualC/SDLmain/SDLmain_VS2008.vcproj	Wed Oct 23 20:58:31 2013 -0700
++++ b/VisualC/SDLmain/SDLmain_VS2008.vcproj	Wed Jan 15 23:04:26 2014 -0800
+@@ -1,424 +1,425 @@
+-<?xml version="1.0" encoding="Windows-1252"?>
+-<VisualStudioProject
+-	ProjectType="Visual C++"
+-	Version="9.00"
+-	Name="SDL2main"
+-	ProjectGUID="{DA956FD3-E142-46F2-9DD5-C78BEBB56B7A}"
+-	RootNamespace="SDLmain"
+-	TargetFrameworkVersion="131072"
+-	>
+-	<Platforms>
+-		<Platform
+-			Name="Win32"
+-		/>
+-		<Platform
+-			Name="x64"
+-		/>
+-	</Platforms>
+-	<ToolFiles>
+-	</ToolFiles>
+-	<Configurations>
+-		<Configuration
+-			Name="Release|Win32"
+-			OutputDirectory=".\Release"
+-			IntermediateDirectory=".\Release"
+-			ConfigurationType="4"
+-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC70.vsprops"
+-			UseOfMFC="0"
+-			ATLMinimizesCRunTimeLibraryUsage="false"
+-			>
+-			<Tool
+-				Name="VCPreBuildEventTool"
+-				CommandLine=""
+-			/>
+-			<Tool
+-				Name="VCCustomBuildTool"
+-			/>
+-			<Tool
+-				Name="VCXMLDataGeneratorTool"
+-			/>
+-			<Tool
+-				Name="VCWebServiceProxyGeneratorTool"
+-			/>
+-			<Tool
+-				Name="VCMIDLTool"
+-			/>
+-			<Tool
+-				Name="VCCLCompilerTool"
+-				InlineFunctionExpansion="1"
+-				AdditionalIncludeDirectories="..\..\include,..\..\include\SDL"
+-				PreprocessorDefinitions="WIN32,NDEBUG,_WINDOWS"
+-				StringPooling="true"
+-				ExceptionHandling="0"
+-				RuntimeLibrary="2"
+-				EnableFunctionLevelLinking="true"
+-				WarningLevel="3"
+-				SuppressStartupBanner="true"
+-				DebugInformationFormat="1"
+-				CompileAs="0"
+-			/>
+-			<Tool
+-				Name="VCManagedResourceCompilerTool"
+-			/>
+-			<Tool
+-				Name="VCResourceCompilerTool"
+-			/>
+-			<Tool
+-				Name="VCPreLinkEventTool"
+-			/>
+-			<Tool
+-				Name="VCLibrarianTool"
+-			/>
+-			<Tool
+-				Name="VCALinkTool"
+-			/>
+-			<Tool
+-				Name="VCXDCMakeTool"
+-			/>
+-			<Tool
+-				Name="VCBscMakeTool"
+-			/>
+-			<Tool
+-				Name="VCFxCopTool"
+-			/>
+-			<Tool
+-				Name="VCPostBuildEventTool"
+-			/>
+-		</Configuration>
+-		<Configuration
+-			Name="Release|x64"
+-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+-			ConfigurationType="4"
+-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC70.vsprops"
+-			UseOfMFC="0"
+-			ATLMinimizesCRunTimeLibraryUsage="false"
+-			>
+-			<Tool
+-				Name="VCPreBuildEventTool"
+-			/>
+-			<Tool
+-				Name="VCCustomBuildTool"
+-			/>
+-			<Tool
+-				Name="VCXMLDataGeneratorTool"
+-			/>
+-			<Tool
+-				Name="VCWebServiceProxyGeneratorTool"
+-			/>
+-			<Tool
+-				Name="VCMIDLTool"
+-				TargetEnvironment="3"
+-			/>
+-			<Tool
+-				Name="VCCLCompilerTool"
+-				InlineFunctionExpansion="1"
+-				AdditionalIncludeDirectories="..\..\include,..\..\include\SDL"
+-				PreprocessorDefinitions="WIN32,NDEBUG,_WINDOWS"
+-				StringPooling="true"
+-				ExceptionHandling="0"
+-				RuntimeLibrary="2"
+-				EnableFunctionLevelLinking="true"
+-				WarningLevel="3"
+-				SuppressStartupBanner="true"
+-				DebugInformationFormat="1"
+-				CompileAs="0"
+-			/>
+-			<Tool
+-				Name="VCManagedResourceCompilerTool"
+-			/>
+-			<Tool
+-				Name="VCResourceCompilerTool"
+-			/>
+-			<Tool
+-				Name="VCPreLinkEventTool"
+-			/>
+-			<Tool
+-				Name="VCLibrarianTool"
+-			/>
+-			<Tool
+-				Name="VCALinkTool"
+-			/>
+-			<Tool
+-				Name="VCXDCMakeTool"
+-			/>
+-			<Tool
+-				Name="VCBscMakeTool"
+-			/>
+-			<Tool
+-				Name="VCFxCopTool"
+-			/>
+-			<Tool
+-				Name="VCPostBuildEventTool"
+-			/>
+-		</Configuration>
+-		<Configuration
 -			Name="Release_NoSTDIO|Win32"
 -			IntermediateDirectory="$(ConfigurationName)"
 -			ConfigurationType="1"
@@ -2936,13 +2898,75 @@ diff -r a6981e0b9fe2 VisualC/SDLmain/SDLmain_VS2008.vcproj
 -			/>
 -		</Configuration>
 -		<Configuration
- 			Name="Release_NoSTDIO|x64"
- 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
- 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
-@@ -281,71 +349,6 @@
- 			/>
- 		</Configuration>
- 		<Configuration
+-			Name="Release_NoSTDIO|x64"
+-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+-			ConfigurationType="4"
+-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC70.vsprops"
+-			UseOfMFC="0"
+-			ATLMinimizesCRunTimeLibraryUsage="false"
+-			>
+-			<Tool
+-				Name="VCPreBuildEventTool"
+-			/>
+-			<Tool
+-				Name="VCCustomBuildTool"
+-			/>
+-			<Tool
+-				Name="VCXMLDataGeneratorTool"
+-			/>
+-			<Tool
+-				Name="VCWebServiceProxyGeneratorTool"
+-			/>
+-			<Tool
+-				Name="VCMIDLTool"
+-				TargetEnvironment="3"
+-			/>
+-			<Tool
+-				Name="VCCLCompilerTool"
+-				InlineFunctionExpansion="1"
+-				AdditionalIncludeDirectories="..\..\include,..\..\include\SDL"
+-				PreprocessorDefinitions="WIN32,NDEBUG,_WINDOWS,NO_STDIO_REDIRECT"
+-				StringPooling="true"
+-				ExceptionHandling="0"
+-				RuntimeLibrary="2"
+-				EnableFunctionLevelLinking="true"
+-				WarningLevel="3"
+-				SuppressStartupBanner="true"
+-				DebugInformationFormat="1"
+-				CompileAs="0"
+-			/>
+-			<Tool
+-				Name="VCManagedResourceCompilerTool"
+-			/>
+-			<Tool
+-				Name="VCResourceCompilerTool"
+-			/>
+-			<Tool
+-				Name="VCPreLinkEventTool"
+-			/>
+-			<Tool
+-				Name="VCLibrarianTool"
+-				OutputFile="$(IntDir)\SDLmain.lib"
+-				SuppressStartupBanner="true"
+-			/>
+-			<Tool
+-				Name="VCALinkTool"
+-			/>
+-			<Tool
+-				Name="VCXDCMakeTool"
+-			/>
+-			<Tool
+-				Name="VCBscMakeTool"
+-			/>
+-			<Tool
+-				Name="VCFxCopTool"
+-			/>
+-			<Tool
+-				Name="VCPostBuildEventTool"
+-			/>
+-		</Configuration>
+-		<Configuration
 -			Name="Debug|Win32"
 -			OutputDirectory=".\Debug"
 -			IntermediateDirectory=".\Debug"
@@ -3008,19 +3032,517 @@ diff -r a6981e0b9fe2 VisualC/SDLmain/SDLmain_VS2008.vcproj
 -			/>
 -		</Configuration>
 -		<Configuration
- 			Name="Debug|x64"
- 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
- 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
-diff -r a6981e0b9fe2 src/core/android/SDL_android.c
---- a/src/core/android/SDL_android.c	Thu Dec 05 09:54:22 2013 -0800
-+++ b/src/core/android/SDL_android.c	Thu Dec 05 20:19:04 2013 -0800
-@@ -49,6 +49,16 @@
+-			Name="Debug|x64"
+-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+-			ConfigurationType="4"
+-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC70.vsprops"
+-			UseOfMFC="0"
+-			ATLMinimizesCRunTimeLibraryUsage="false"
+-			>
+-			<Tool
+-				Name="VCPreBuildEventTool"
+-			/>
+-			<Tool
+-				Name="VCCustomBuildTool"
+-			/>
+-			<Tool
+-				Name="VCXMLDataGeneratorTool"
+-			/>
+-			<Tool
+-				Name="VCWebServiceProxyGeneratorTool"
+-			/>
+-			<Tool
+-				Name="VCMIDLTool"
+-				TargetEnvironment="3"
+-			/>
+-			<Tool
+-				Name="VCCLCompilerTool"
+-				Optimization="0"
+-				AdditionalIncludeDirectories="..\..\include,..\..\include\SDL"
+-				PreprocessorDefinitions="WIN32,_DEBUG,_WINDOWS"
+-				ExceptionHandling="0"
+-				RuntimeLibrary="2"
+-				WarningLevel="3"
+-				SuppressStartupBanner="true"
+-				DebugInformationFormat="1"
+-				CompileAs="0"
+-			/>
+-			<Tool
+-				Name="VCManagedResourceCompilerTool"
+-			/>
+-			<Tool
+-				Name="VCResourceCompilerTool"
+-			/>
+-			<Tool
+-				Name="VCPreLinkEventTool"
+-			/>
+-			<Tool
+-				Name="VCLibrarianTool"
+-			/>
+-			<Tool
+-				Name="VCALinkTool"
+-			/>
+-			<Tool
+-				Name="VCXDCMakeTool"
+-			/>
+-			<Tool
+-				Name="VCBscMakeTool"
+-			/>
+-			<Tool
+-				Name="VCFxCopTool"
+-			/>
+-			<Tool
+-				Name="VCPostBuildEventTool"
+-			/>
+-		</Configuration>
+-	</Configurations>
+-	<References>
+-	</References>
+-	<Files>
+-		<File
+-			RelativePath="..\..\src\main\windows\SDL_windows_main.c"
+-			>
+-		</File>
+-	</Files>
+-	<Globals>
+-	</Globals>
+-</VisualStudioProject>
++<?xml version="1.0" encoding="Windows-1252"?>
++<VisualStudioProject
++	ProjectType="Visual C++"
++	Version="9.00"
++	Name="SDL2main"
++	ProjectGUID="{DA956FD3-E142-46F2-9DD5-C78BEBB56B7A}"
++	RootNamespace="SDLmain"
++	TargetFrameworkVersion="131072"
++	>
++	<Platforms>
++		<Platform
++			Name="Win32"
++		/>
++		<Platform
++			Name="x64"
++		/>
++	</Platforms>
++	<ToolFiles>
++	</ToolFiles>
++	<Configurations>
++		<Configuration
++			Name="Release|Win32"
++			OutputDirectory=".\Release"
++			IntermediateDirectory=".\Release"
++			ConfigurationType="4"
++			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC70.vsprops"
++			UseOfMFC="0"
++			ATLMinimizesCRunTimeLibraryUsage="false"
++			>
++			<Tool
++				Name="VCPreBuildEventTool"
++				CommandLine=""
++			/>
++			<Tool
++				Name="VCCustomBuildTool"
++			/>
++			<Tool
++				Name="VCXMLDataGeneratorTool"
++			/>
++			<Tool
++				Name="VCWebServiceProxyGeneratorTool"
++			/>
++			<Tool
++				Name="VCMIDLTool"
++			/>
++			<Tool
++				Name="VCCLCompilerTool"
++				InlineFunctionExpansion="1"
++				AdditionalIncludeDirectories="..\..\include,..\..\include\SDL"
++				PreprocessorDefinitions="WIN32,NDEBUG,_WINDOWS"
++				StringPooling="true"
++				ExceptionHandling="0"
++				RuntimeLibrary="2"
++				EnableFunctionLevelLinking="true"
++				WarningLevel="3"
++				SuppressStartupBanner="true"
++				DebugInformationFormat="1"
++				CompileAs="0"
++			/>
++			<Tool
++				Name="VCManagedResourceCompilerTool"
++			/>
++			<Tool
++				Name="VCResourceCompilerTool"
++			/>
++			<Tool
++				Name="VCPreLinkEventTool"
++			/>
++			<Tool
++				Name="VCLibrarianTool"
++			/>
++			<Tool
++				Name="VCALinkTool"
++			/>
++			<Tool
++				Name="VCXDCMakeTool"
++			/>
++			<Tool
++				Name="VCBscMakeTool"
++			/>
++			<Tool
++				Name="VCFxCopTool"
++			/>
++			<Tool
++				Name="VCPostBuildEventTool"
++				CommandLine="mkdir ..\..\lib&#x0D;&#x0A;mkdir ..\..\lib\x86&#x0D;&#x0A;copy $(OutDir)\$(ProjectName).lib ..\..\lib\x86&#x0D;&#x0A;"
++			/>
++		</Configuration>
++		<Configuration
++			Name="Release_NoSTDIO|Win32"
++			IntermediateDirectory="$(ConfigurationName)"
++			ConfigurationType="1"
++			>
++			<Tool
++				Name="VCPreBuildEventTool"
++			/>
++			<Tool
++				Name="VCCustomBuildTool"
++			/>
++			<Tool
++				Name="VCXMLDataGeneratorTool"
++			/>
++			<Tool
++				Name="VCWebServiceProxyGeneratorTool"
++			/>
++			<Tool
++				Name="VCMIDLTool"
++			/>
++			<Tool
++				Name="VCCLCompilerTool"
++				ExceptionHandling="0"
++				DebugInformationFormat="1"
++			/>
++			<Tool
++				Name="VCManagedResourceCompilerTool"
++			/>
++			<Tool
++				Name="VCResourceCompilerTool"
++			/>
++			<Tool
++				Name="VCPreLinkEventTool"
++			/>
++			<Tool
++				Name="VCLinkerTool"
++			/>
++			<Tool
++				Name="VCALinkTool"
++			/>
++			<Tool
++				Name="VCManifestTool"
++			/>
++			<Tool
++				Name="VCXDCMakeTool"
++			/>
++			<Tool
++				Name="VCBscMakeTool"
++			/>
++			<Tool
++				Name="VCFxCopTool"
++			/>
++			<Tool
++				Name="VCAppVerifierTool"
++			/>
++			<Tool
++				Name="VCPostBuildEventTool"
++				CommandLine="mkdir ..\..\lib&#x0D;&#x0A;mkdir ..\..\lib\x86&#x0D;&#x0A;copy $(OutDir)\$(ProjectName).lib ..\..\lib\x86&#x0D;&#x0A;"
++			/>
++		</Configuration>
++		<Configuration
++			Name="Debug|Win32"
++			OutputDirectory=".\Debug"
++			IntermediateDirectory=".\Debug"
++			ConfigurationType="4"
++			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC70.vsprops"
++			UseOfMFC="0"
++			ATLMinimizesCRunTimeLibraryUsage="false"
++			>
++			<Tool
++				Name="VCPreBuildEventTool"
++				CommandLine=""
++			/>
++			<Tool
++				Name="VCCustomBuildTool"
++			/>
++			<Tool
++				Name="VCXMLDataGeneratorTool"
++			/>
++			<Tool
++				Name="VCWebServiceProxyGeneratorTool"
++			/>
++			<Tool
++				Name="VCMIDLTool"
++			/>
++			<Tool
++				Name="VCCLCompilerTool"
++				Optimization="0"
++				AdditionalIncludeDirectories="..\..\include,..\..\include\SDL"
++				PreprocessorDefinitions="WIN32,_DEBUG,_WINDOWS"
++				ExceptionHandling="0"
++				RuntimeLibrary="3"
++				WarningLevel="3"
++				SuppressStartupBanner="true"
++				DebugInformationFormat="1"
++				CompileAs="0"
++			/>
++			<Tool
++				Name="VCManagedResourceCompilerTool"
++			/>
++			<Tool
++				Name="VCResourceCompilerTool"
++			/>
++			<Tool
++				Name="VCPreLinkEventTool"
++			/>
++			<Tool
++				Name="VCLibrarianTool"
++			/>
++			<Tool
++				Name="VCALinkTool"
++			/>
++			<Tool
++				Name="VCXDCMakeTool"
++			/>
++			<Tool
++				Name="VCBscMakeTool"
++			/>
++			<Tool
++				Name="VCFxCopTool"
++			/>
++			<Tool
++				Name="VCPostBuildEventTool"
++				CommandLine="mkdir ..\..\lib&#x0D;&#x0A;mkdir ..\..\lib\x86&#x0D;&#x0A;copy $(OutDir)\$(ProjectName).lib ..\..\lib\x86&#x0D;&#x0A;"
++			/>
++		</Configuration>
++		<Configuration
++			Name="Release|x64"
++			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
++			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
++			ConfigurationType="4"
++			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC70.vsprops"
++			UseOfMFC="0"
++			ATLMinimizesCRunTimeLibraryUsage="false"
++			>
++			<Tool
++				Name="VCPreBuildEventTool"
++			/>
++			<Tool
++				Name="VCCustomBuildTool"
++			/>
++			<Tool
++				Name="VCXMLDataGeneratorTool"
++			/>
++			<Tool
++				Name="VCWebServiceProxyGeneratorTool"
++			/>
++			<Tool
++				Name="VCMIDLTool"
++				TargetEnvironment="3"
++			/>
++			<Tool
++				Name="VCCLCompilerTool"
++				InlineFunctionExpansion="1"
++				AdditionalIncludeDirectories="..\..\include,..\..\include\SDL"
++				PreprocessorDefinitions="WIN32,NDEBUG,_WINDOWS"
++				StringPooling="true"
++				ExceptionHandling="0"
++				RuntimeLibrary="2"
++				EnableFunctionLevelLinking="true"
++				WarningLevel="3"
++				SuppressStartupBanner="true"
++				DebugInformationFormat="1"
++				CompileAs="0"
++			/>
++			<Tool
++				Name="VCManagedResourceCompilerTool"
++			/>
++			<Tool
++				Name="VCResourceCompilerTool"
++			/>
++			<Tool
++				Name="VCPreLinkEventTool"
++			/>
++			<Tool
++				Name="VCLibrarianTool"
++			/>
++			<Tool
++				Name="VCALinkTool"
++			/>
++			<Tool
++				Name="VCXDCMakeTool"
++			/>
++			<Tool
++				Name="VCBscMakeTool"
++			/>
++			<Tool
++				Name="VCFxCopTool"
++			/>
++			<Tool
++				Name="VCPostBuildEventTool"
++			/>
++		</Configuration>
++		<Configuration
++			Name="Release_NoSTDIO|x64"
++			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
++			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
++			ConfigurationType="4"
++			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC70.vsprops"
++			UseOfMFC="0"
++			ATLMinimizesCRunTimeLibraryUsage="false"
++			>
++			<Tool
++				Name="VCPreBuildEventTool"
++			/>
++			<Tool
++				Name="VCCustomBuildTool"
++			/>
++			<Tool
++				Name="VCXMLDataGeneratorTool"
++			/>
++			<Tool
++				Name="VCWebServiceProxyGeneratorTool"
++			/>
++			<Tool
++				Name="VCMIDLTool"
++				TargetEnvironment="3"
++			/>
++			<Tool
++				Name="VCCLCompilerTool"
++				InlineFunctionExpansion="1"
++				AdditionalIncludeDirectories="..\..\include,..\..\include\SDL"
++				PreprocessorDefinitions="WIN32,NDEBUG,_WINDOWS,NO_STDIO_REDIRECT"
++				StringPooling="true"
++				ExceptionHandling="0"
++				RuntimeLibrary="2"
++				EnableFunctionLevelLinking="true"
++				WarningLevel="3"
++				SuppressStartupBanner="true"
++				DebugInformationFormat="1"
++				CompileAs="0"
++			/>
++			<Tool
++				Name="VCManagedResourceCompilerTool"
++			/>
++			<Tool
++				Name="VCResourceCompilerTool"
++			/>
++			<Tool
++				Name="VCPreLinkEventTool"
++			/>
++			<Tool
++				Name="VCLibrarianTool"
++				OutputFile="$(IntDir)\SDLmain.lib"
++				SuppressStartupBanner="true"
++			/>
++			<Tool
++				Name="VCALinkTool"
++			/>
++			<Tool
++				Name="VCXDCMakeTool"
++			/>
++			<Tool
++				Name="VCBscMakeTool"
++			/>
++			<Tool
++				Name="VCFxCopTool"
++			/>
++			<Tool
++				Name="VCPostBuildEventTool"
++			/>
++		</Configuration>
++		<Configuration
++			Name="Debug|x64"
++			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
++			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
++			ConfigurationType="4"
++			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC70.vsprops"
++			UseOfMFC="0"
++			ATLMinimizesCRunTimeLibraryUsage="false"
++			>
++			<Tool
++				Name="VCPreBuildEventTool"
++			/>
++			<Tool
++				Name="VCCustomBuildTool"
++			/>
++			<Tool
++				Name="VCXMLDataGeneratorTool"
++			/>
++			<Tool
++				Name="VCWebServiceProxyGeneratorTool"
++			/>
++			<Tool
++				Name="VCMIDLTool"
++				TargetEnvironment="3"
++			/>
++			<Tool
++				Name="VCCLCompilerTool"
++				Optimization="0"
++				AdditionalIncludeDirectories="..\..\include,..\..\include\SDL"
++				PreprocessorDefinitions="WIN32,_DEBUG,_WINDOWS"
++				ExceptionHandling="0"
++				RuntimeLibrary="2"
++				WarningLevel="3"
++				SuppressStartupBanner="true"
++				DebugInformationFormat="1"
++				CompileAs="0"
++			/>
++			<Tool
++				Name="VCManagedResourceCompilerTool"
++			/>
++			<Tool
++				Name="VCResourceCompilerTool"
++			/>
++			<Tool
++				Name="VCPreLinkEventTool"
++			/>
++			<Tool
++				Name="VCLibrarianTool"
++			/>
++			<Tool
++				Name="VCALinkTool"
++			/>
++			<Tool
++				Name="VCXDCMakeTool"
++			/>
++			<Tool
++				Name="VCBscMakeTool"
++			/>
++			<Tool
++				Name="VCFxCopTool"
++			/>
++			<Tool
++				Name="VCPostBuildEventTool"
++			/>
++		</Configuration>
++	</Configurations>
++	<References>
++	</References>
++	<Files>
++		<File
++			RelativePath="..\..\src\main\windows\SDL_windows_main.c"
++			>
++		</File>
++	</Files>
++</VisualStudioProject>
+diff -r b9663c77f5c9 src/core/android/SDL_android.c
+--- a/src/core/android/SDL_android.c	Wed Oct 23 20:58:31 2013 -0700
++++ b/src/core/android/SDL_android.c	Wed Jan 15 23:04:26 2014 -0800
+@@ -48,6 +48,16 @@
  /* Uncomment this to log messages entering and exiting methods in this file */
  /* #define DEBUG_JNI */
  
 +#ifndef SDL_PREFIX
 +    #pragma warning Defaulting to org.libsdl.app
-+	#define SDL_PREFIX		org_libdl_app
++	#define SDL_PREFIX		org_libsdl_app_SDLActivity
 +#endif
 +
 +#define CONCAT1(p,f)	CONCAT2(p,f)
@@ -3031,70 +3553,46 @@ diff -r a6981e0b9fe2 src/core/android/SDL_android.c
  static void Android_JNI_ThreadDestroyed(void*);
  
  /*******************************************************************************
-@@ -140,7 +150,7 @@
+@@ -139,7 +149,7 @@
  }
  
  /* Resize */
 -void Java_org_libsdl_app_SDLActivity_onNativeResize(
-+void JNI(SDLActivity_onNativeResize)(
++void JNI(onNativeResize)(
                                      JNIEnv* env, jclass jcls,
                                      jint width, jint height, jint format)
  {
-@@ -173,7 +183,7 @@
+@@ -148,7 +158,7 @@
  
  
  /* Surface Created */
 -void Java_org_libsdl_app_SDLActivity_onNativeSurfaceChanged(JNIEnv* env, jclass jcls)
-+void JNI(SDLActivity_onNativeSurfaceChanged)(JNIEnv* env, jclass jcls)
++void JNI(onNativeSurfaceChanged)(JNIEnv* env, jclass jcls)
  {
      SDL_WindowData *data;
      SDL_VideoDevice *_this;
-@@ -199,7 +209,7 @@
+@@ -174,7 +184,7 @@
  }
  
  /* Surface Destroyed */
 -void Java_org_libsdl_app_SDLActivity_onNativeSurfaceDestroyed(JNIEnv* env, jclass jcls)
-+void JNI(SDLActivity_onNativeSurfaceDestroyed)(JNIEnv* env, jclass jcls)
++void JNI(onNativeSurfaceDestroyed)(JNIEnv* env, jclass jcls)
  {
      /* We have to clear the current context and destroy the egl surface here
       * Otherwise there's BAD_NATIVE_WINDOW errors coming from eglCreateWindowSurface on resume
-@@ -225,27 +235,51 @@
+@@ -200,27 +210,27 @@
  
  }
  
 -void Java_org_libsdl_app_SDLActivity_nativeFlipBuffers(JNIEnv* env, jclass jcls)
-+void JNI(SDLActivity_nativeFlipBuffers)(JNIEnv* env, jclass jcls)
++void JNI(nativeFlipBuffers)(JNIEnv* env, jclass jcls)
  {
      SDL_GL_SwapWindow(Android_Window);
  }
  
-+/* Paddown */
-+void JNI(SDLActivity_onNativePadDown)(
-+                                                     JNIEnv* env, jclass jcls,
-+                                                     jint padId, jint keycode)
-+{
-+    Android_OnPadDown(padId, keycode);
-+}
-+
-+/* Padup */
-+void JNI(SDLActivity_onNativePadUp)(
-+                                                   JNIEnv* env, jclass jcls,
-+                                                   jint padId, jint keycode)
-+{
-+    Android_OnPadUp(padId, keycode);
-+}
-+
-+/* OnJoy */
-+void JNI(SDLActivity_onNativeJoy)(
-+                                                 JNIEnv* env, jclass jcls,
-+                                                 jint joyId, jint axis, jdouble value)
-+{
-+    Android_OnJoy(joyId, axis, value);
-+}
-+
  /* Keydown */
 -void Java_org_libsdl_app_SDLActivity_onNativeKeyDown(
-+void JNI(SDLActivity_onNativeKeyDown)(
++void JNI(onNativeKeyDown)(
                                      JNIEnv* env, jclass jcls, jint keycode)
  {
      Android_OnKeyDown(keycode);
@@ -3102,7 +3600,7 @@ diff -r a6981e0b9fe2 src/core/android/SDL_android.c
  
  /* Keyup */
 -void Java_org_libsdl_app_SDLActivity_onNativeKeyUp(
-+void JNI(SDLActivity_onNativeKeyUp)(
++void JNI(onNativeKeyUp)(
                                      JNIEnv* env, jclass jcls, jint keycode)
  {
      Android_OnKeyUp(keycode);
@@ -3110,34 +3608,34 @@ diff -r a6981e0b9fe2 src/core/android/SDL_android.c
  
  /* Keyboard Focus Lost */
 -void Java_org_libsdl_app_SDLActivity_onNativeKeyboardFocusLost(
-+void JNI(SDLActivity_onNativeKeyboardFocusLost)(
++void JNI(onNativeKeyboardFocusLost)(
                                      JNIEnv* env, jclass jcls)
  {
      /* Calling SDL_StopTextInput will take care of hiding the keyboard and cleaning up the DummyText widget */
-@@ -254,7 +288,7 @@
+@@ -229,7 +239,7 @@
  
  
  /* Touch */
 -void Java_org_libsdl_app_SDLActivity_onNativeTouch(
-+void JNI(SDLActivity_onNativeTouch)(
++void JNI(onNativeTouch)(
                                      JNIEnv* env, jclass jcls,
                                      jint touch_device_id_in, jint pointer_finger_id_in,
                                      jint action, jfloat x, jfloat y, jfloat p)
-@@ -263,7 +297,7 @@
+@@ -238,7 +248,7 @@
  }
  
  /* Accelerometer */
 -void Java_org_libsdl_app_SDLActivity_onNativeAccel(
-+void JNI(SDLActivity_onNativeAccel)(
++void JNI(onNativeAccel)(
                                      JNIEnv* env, jclass jcls,
                                      jfloat x, jfloat y, jfloat z)
  {
-@@ -274,14 +308,14 @@
+@@ -249,14 +259,14 @@
  }
  
  /* Low memory */
 -void Java_org_libsdl_app_SDLActivity_nativeLowMemory(
-+void JNI(SDLActivity_nativeLowMemory)(
++void JNI(nativeLowMemory)(
                                      JNIEnv* env, jclass cls)
  {
      SDL_SendAppEvent(SDL_APP_LOWMEMORY);
@@ -3145,326 +3643,52 @@ diff -r a6981e0b9fe2 src/core/android/SDL_android.c
  
  /* Quit */
 -void Java_org_libsdl_app_SDLActivity_nativeQuit(
-+void JNI(SDLActivity_nativeQuit)(
++void JNI(nativeQuit)(
                                      JNIEnv* env, jclass cls)
  {
-     /* Discard previous events. The user should have handled state storage
-@@ -297,7 +331,7 @@
+     /* Inject a SDL_QUIT event */
+@@ -265,7 +275,7 @@
  }
  
  /* Pause */
 -void Java_org_libsdl_app_SDLActivity_nativePause(
-+void JNI(SDLActivity_nativePause)(
++void JNI(nativePause)(
                                      JNIEnv* env, jclass cls)
  {
-     __android_log_print(ANDROID_LOG_VERBOSE, "SDL", "nativePause()");
-@@ -314,7 +348,7 @@
+     if (Android_Window) {
+@@ -281,7 +291,7 @@
  }
  
  /* Resume */
 -void Java_org_libsdl_app_SDLActivity_nativeResume(
-+void JNI(SDLActivity_nativeResume)(
++void JNI(nativeResume)(
                                      JNIEnv* env, jclass cls)
  {
      __android_log_print(ANDROID_LOG_VERBOSE, "SDL", "nativeResume()");
-@@ -332,7 +366,7 @@
-     }
- }
- 
--void Java_org_libsdl_app_SDLInputConnection_nativeCommitText(
-+void JNI(SDLInputConnection_nativeCommitText)(
-                                     JNIEnv* env, jclass cls,
-                                     jstring text, jint newCursorPosition)
- {
-@@ -343,7 +377,7 @@
-     (*env)->ReleaseStringUTFChars(env, text, utftext);
- }
- 
--void Java_org_libsdl_app_SDLInputConnection_nativeSetComposingText(
-+void JNI(SDLInputConnection_nativeSetComposingText)(
-                                     JNIEnv* env, jclass cls,
-                                     jstring text, jint newCursorPosition)
- {
-@@ -1300,7 +1334,6 @@
-     return (int)(*env)->CallIntMethod(env, mActivityClass, mid, joy);
- }
- 
--
- /* sends message to be handled on the UI event dispatch thread */
- int Android_JNI_SendMessage(int command, int param)
- {
-diff -r a6981e0b9fe2 src/joystick/android/SDL_sysjoystick.c
---- a/src/joystick/android/SDL_sysjoystick.c	Thu Dec 05 09:54:22 2013 -0800
-+++ b/src/joystick/android/SDL_sysjoystick.c	Thu Dec 05 20:19:04 2013 -0800
-@@ -341,10 +341,11 @@
- }
- 
- int
--Android_OnJoy(int joyId, int axis, float value)
-+Android_OnJoy(int joyId, int axis, double value)
- {
-     /* Android gives joy info normalized as [-1.0, 1.0] or [0.0, 1.0] */
-     /* TODO: Are the reported values right? */
-+    SDL_Log("Android_OnJoy joyId: %d, axis: %d, value: %f, SYS_Joysticks: %8x", joyId, axis, value, SYS_Joysticks);
-     if (SYS_Joysticks[joyId]) {
-         SDL_PrivateJoystickAxis(SYS_Joysticks[joyId], axis, (Sint16) (32767.*value) );
-     }
-diff -r a6981e0b9fe2 src/joystick/android/SDL_sysjoystick.h
---- a/src/joystick/android/SDL_sysjoystick.h	Thu Dec 05 09:54:22 2013 -0800
-+++ b/src/joystick/android/SDL_sysjoystick.h	Thu Dec 05 20:19:04 2013 -0800
-@@ -23,6 +23,6 @@
- 
- extern int Android_OnPadDown(int padId, int keycode);
- extern int Android_OnPadUp(int padId, int keycode);
--extern int Android_OnJoy(int joyId, int axisnum, float value);
-+extern int Android_OnJoy(int joyId, int axisnum, double value);
- 
- /* vi: set ts=4 sw=4 expandtab: */
-diff -r a6981e0b9fe2 src/main/android/SDL_android_main.c
---- a/src/main/android/SDL_android_main.c	Thu Dec 05 09:54:22 2013 -0800
-+++ b/src/main/android/SDL_android_main.c	Thu Dec 05 20:19:04 2013 -0800
-@@ -6,6 +6,27 @@
- /* Include the SDL main definition header */
- #include "SDL_main.h"
- 
-+#ifndef SDL_PREFIX
-+    #pragma warning Defaulting to org.libsdl.app
-+	#define SDL_PREFIX		org_libdl_app
-+#endif
-+
-+#define CONCAT1(p,f)	CONCAT2(p,f)
-+#define CONCAT2(p,f)	Java_ ## p ## _ ## f
-+
-+#define JNI(f)			CONCAT1(SDL_PREFIX,f)
-+
-+
-+#ifndef SDL_PREFIX
-+    #pragma warning Defaulting to org.libsdl.app
-+	#define SDL_PREFIX		org_libdl_app
-+#endif
-+
-+#define CONCAT1(p,f)	CONCAT2(p,f)
-+#define CONCAT2(p,f)	Java_ ## p ## _ ## f
-+
-+#define JNI(f)			CONCAT1(SDL_PREFIX,f)
-+
- /*******************************************************************************
-                  Functions called by JNI
+diff -r b9663c77f5c9 src/main/android/SDL_android_main.c
+--- a/src/main/android/SDL_android_main.c	Wed Oct 23 20:58:31 2013 -0700
++++ b/src/main/android/SDL_android_main.c	Wed Jan 15 23:04:26 2014 -0800
+@@ -11,11 +11,22 @@
  *******************************************************************************/
-@@ -15,7 +36,7 @@
+ #include <jni.h>
+ 
++#ifndef SDL_PREFIX
++    #pragma warning Defaulting to org.libsdl.app
++	#define SDL_PREFIX		org_libdl_app_SDLActivity
++#endif
++
++#define CONCAT1(p,f)	CONCAT2(p,f)
++#define CONCAT2(p,f)	Java_ ## p ## _ ## f
++
++#define JNI(f)			CONCAT1(SDL_PREFIX,f)
++
++
+ /* Called before SDL_main() to initialize JNI bindings in SDL library */
  extern void SDL_Android_Init(JNIEnv* env, jclass cls);
  
  /* Start up the SDL app */
 -void Java_org_libsdl_app_SDLActivity_nativeInit(JNIEnv* env, jclass cls, jobject obj)
-+void JNI(SDLActivity_nativeInit)(JNIEnv* env, jclass cls, jobject obj)
++void JNI(nativeInit)(JNIEnv* env, jclass cls, jobject obj)
  {
      /* This interface could expand with ABI negotiation, calbacks, etc. */
      SDL_Android_Init(env, cls);
-diff -r a6981e0b9fe2 test/testjoystick.c
---- a/test/testjoystick.c	Thu Dec 05 09:54:22 2013 -0800
-+++ b/test/testjoystick.c	Thu Dec 05 20:19:04 2013 -0800
-@@ -20,20 +20,32 @@
- 
- #ifndef SDL_JOYSTICK_DISABLED
- 
--#ifdef __IPHONEOS__
--#define SCREEN_WIDTH    320
--#define SCREEN_HEIGHT   480
--#else
--#define SCREEN_WIDTH    640
--#define SCREEN_HEIGHT   480
--#endif
-+int SCREEN_WIDTH = 640;
-+int SCREEN_HEIGHT = 480;
- 
-+static void 
-+SDL_RenderDrawBox(SDL_Renderer* r, const SDL_Rect* rect)
-+{
-+	const int left = rect->x;
-+	const int top = rect->y;
-+	const int right = rect->x + rect->w;
-+	const int bottom = rect->y + rect->h;
-+    SDL_RenderDrawLine(r, left,  top,    right, top);		// top edge
-+    SDL_RenderDrawLine(r, left,  top,    left,  bottom);		// right edge
-+    SDL_RenderDrawLine(r, right, top,    right, bottom);		// right edge
-+    SDL_RenderDrawLine(r, left,  bottom, right, bottom);		// bottom edge
-+}
- 
--static void
--DrawRect(SDL_Renderer *r, const int x, const int y, const int w, const int h)
-+static int 
-+ScaleCoord(short int x, int max)
- {
--    const SDL_Rect area = { x, y, w, h };
--    SDL_RenderFillRect(r, &area);
-+    x = ((int) x * max) / 65536 + max / 2;
-+    if (x < 0) {
-+        x = 0;
-+    } else if (x > max) {
-+        x = max;
-+    }
-+	return x;
- }
- 
- static SDL_bool
-@@ -45,16 +57,18 @@
-     SDL_bool retval = SDL_FALSE;
-     SDL_bool done = SDL_FALSE;
-     SDL_Event event;
--    int i;
-+    int i, nAxes, nButtons;
- 
-     /* Create a window to display joystick axis position */
-     window = SDL_CreateWindow("Joystick Test", SDL_WINDOWPOS_CENTERED,
--                              SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH,
--                              SCREEN_HEIGHT, 0);
-+                              SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH,SCREEN_HEIGHT,
-+                              SDL_WINDOW_FULLSCREEN_DESKTOP);
-     if (window == NULL) {
-         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create window: %s\n", SDL_GetError());
-         return SDL_FALSE;
-     }
-+	
-+	SDL_GetWindowSize(window, &SCREEN_WIDTH, &SCREEN_HEIGHT);
- 
-     screen = SDL_CreateRenderer(window, -1, 0);
-     if (screen == NULL) {
-@@ -70,11 +84,14 @@
- 
-     /* Print info about the joystick we are watching */
-     name = SDL_JoystickName(joystick);
-+	nAxes = SDL_JoystickNumAxes(joystick);
-+	nButtons = SDL_JoystickNumButtons(joystick);
-+
-     SDL_Log("Watching joystick %d: (%s)\n", SDL_JoystickInstanceID(joystick),
-            name ? name : "Unknown Joystick");
-     SDL_Log("Joystick has %d axes, %d hats, %d balls, and %d buttons\n",
--           SDL_JoystickNumAxes(joystick), SDL_JoystickNumHats(joystick),
--           SDL_JoystickNumBalls(joystick), SDL_JoystickNumButtons(joystick));
-+           nAxes, SDL_JoystickNumHats(joystick),
-+           SDL_JoystickNumBalls(joystick), nButtons);
- 
-     /* Loop, getting joystick events! */
-     while (!done) {
-@@ -135,45 +152,39 @@
-         /* Update visual joystick state */
-         SDL_SetRenderDrawColor(screen, 0x00, 0xFF, 0x00, SDL_ALPHA_OPAQUE);
-         for (i = 0; i < SDL_JoystickNumButtons(joystick); ++i) {
-+			const SDL_Rect rect = { (i%20) * 34, SCREEN_HEIGHT - 68 + (i/20) * 34, 32, 32 };
-             if (SDL_JoystickGetButton(joystick, i) == SDL_PRESSED) {
--                DrawRect(screen, (i%20) * 34, SCREEN_HEIGHT - 68 + (i/20) * 34, 32, 32);
--            }
-+                SDL_RenderFillRect(screen, &rect);
-+			} else {
-+				SDL_RenderDrawBox(screen, &rect);
-+			}
-         }
- 
-         SDL_SetRenderDrawColor(screen, 0xFF, 0x00, 0x00, SDL_ALPHA_OPAQUE);
--        for (i = 0; i < SDL_JoystickNumAxes(joystick); ++i) {
-+        for (i = 0; i < nAxes; ++i) {
-             /* Draw the X/Y axis */
-             int x, y;
--            x = (((int) SDL_JoystickGetAxis(joystick, i)) + 32768);
--            x *= SCREEN_WIDTH;
--            x /= 65535;
--            if (x < 0) {
--                x = 0;
--            } else if (x > (SCREEN_WIDTH - 16)) {
--                x = SCREEN_WIDTH - 16;
-+            x = (short int) SDL_JoystickGetAxis(joystick, i);
-+			x = ScaleCoord(x, SCREEN_WIDTH - 16);
-+            ++i;
-+            if (i < nAxes) {
-+                y = (short int) SDL_JoystickGetAxis(joystick, i);
-+            } else {
-+                y = 0;
-             }
--            ++i;
--            if (i < SDL_JoystickNumAxes(joystick)) {
--                y = (((int) SDL_JoystickGetAxis(joystick, i)) + 32768);
--            } else {
--                y = 32768;
--            }
--            y *= SCREEN_HEIGHT;
--            y /= 65535;
--            if (y < 0) {
--                y = 0;
--            } else if (y > (SCREEN_HEIGHT - 16)) {
--                y = SCREEN_HEIGHT - 16;
--            }
--
--            DrawRect(screen, x, y, 16, 16);
-+			y = ScaleCoord(y, SCREEN_HEIGHT - 16);
-+			{
-+//				SDL_Log("x=%d y=%d xmin=%d xmax=%d ymin=%d ymax=%d\n", x, y, xmin, xmax, ymin, ymax);
-+				const SDL_Rect rect = { x, y, 16, 16 };
-+				SDL_RenderFillRect(screen, &rect);
-+			}
-         }
- 
-         SDL_SetRenderDrawColor(screen, 0x00, 0x00, 0xFF, SDL_ALPHA_OPAQUE);
-         for (i = 0; i < SDL_JoystickNumHats(joystick); ++i) {
-             /* Derive the new position */
--            int x = SCREEN_WIDTH/2;
--            int y = SCREEN_HEIGHT/2;
-+            int x = SCREEN_WIDTH/2 + 4;
-+            int y = SCREEN_HEIGHT/2 + 4;
-             const Uint8 hat_pos = SDL_JoystickGetHat(joystick, i);
- 
-             if (hat_pos & SDL_HAT_UP) {
-@@ -188,7 +199,10 @@
-                 x = SCREEN_WIDTH-8;
-             }
- 
--            DrawRect(screen, x, y, 8, 8);
-+			{
-+				const SDL_Rect rect = { x, y, 8, 8 };
-+				SDL_RenderFillRect(screen, &rect);
-+			}
-         }
- 
-         SDL_RenderPresent(screen);
-@@ -197,6 +211,7 @@
-             done = SDL_TRUE;
-             retval = SDL_TRUE;  /* keep going, wait for reattach. */
-         }
-+		SDL_Delay(1);
-     }
- 
-     SDL_DestroyRenderer(screen);
-@@ -208,7 +223,7 @@
- main(int argc, char *argv[])
- {
-     const char *name;
--    int i;
-+    int i, joyid;
-     SDL_Joystick *joystick;
- 
-     /* Enable standard application logging */
-@@ -243,20 +258,15 @@
-         }
-     }
- 
--#ifdef ANDROID
-     if (SDL_NumJoysticks() > 0) {
--#else
--    if (argv[1]) {
--#endif
-+		/* Get joystick id from command line (default to joyid 0) */
-+		int joyid = argv[1] ? atoi(argv[1]) : 0;
-         SDL_bool reportederror = SDL_FALSE;
-         SDL_bool keepGoing = SDL_TRUE;
-         SDL_Event event;
--#ifdef ANDROID
--        joystick = SDL_JoystickOpen(0);
--#else
--        joystick = SDL_JoystickOpen(atoi(argv[1]));
--#endif
--        while ( keepGoing ) {
-+        joystick = SDL_JoystickOpen(joyid);
-+
-+		while ( keepGoing ) {
-             if (joystick == NULL) {
-                 if ( !reportederror ) {
-                     SDL_Log("Couldn't open joystick %d: %s\n", atoi(argv[1]), SDL_GetError());
