@@ -30,6 +30,7 @@ LOCAL_SRC_FILES := \
 	$(LOCAL_PATH)/src/atomic/SDL_spinlock.c.arm \
 	$(wildcard $(LOCAL_PATH)/src/core/android/*.c) \
 	$(wildcard $(LOCAL_PATH)/src/cpuinfo/*.c) \
+	$(wildcard $(LOCAL_PATH)/src/dynapi/*.c) \
 	$(wildcard $(LOCAL_PATH)/src/events/*.c) \
 	$(wildcard $(LOCAL_PATH)/src/file/*.c) \
 	$(wildcard $(LOCAL_PATH)/src/haptic/*.c) \
@@ -48,10 +49,10 @@ LOCAL_SRC_FILES := \
 	$(wildcard $(LOCAL_PATH)/src/timer/*.c) \
 	$(wildcard $(LOCAL_PATH)/src/timer/unix/*.c) \
 	$(wildcard $(LOCAL_PATH)/src/video/*.c) \
-	$(wildcard $(LOCAL_PATH)/src/video/android/*.c) \
-    $(wildcard $(LOCAL_PATH)/src/test/*.c))
+	$(wildcard $(LOCAL_PATH)/src/video/android/*.c))
 
-LOCAL_CFLAGS += -DGL_GLEXT_PROTOTYPES -DSDL_PREFIX=com_moonlite_tuxracer
+
+LOCAL_CFLAGS += -DGL_GLEXT_PROTOTYPES -DSDL_PREFIX=com_moonlite_tuxracer_SDLActivity
 LOCAL_LDLIBS := -ldl -lGLESv1_CM -lGLESv2 -llog -landroid
 
 include $(BUILD_SHARED_LIBRARY)
