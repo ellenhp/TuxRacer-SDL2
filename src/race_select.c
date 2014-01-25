@@ -371,7 +371,7 @@ void update_text()
 
 #ifndef SDL_PREFIX
     #pragma warning Defaulting to org.libsdl.app
-	#define SDL_PREFIX		org_libdl_app_SDLActivity
+	#define SDL_PREFIX		org_libdl_app
 #endif
 
 #define CONCAT1(p,f)	CONCAT2(p,f)
@@ -379,7 +379,7 @@ void update_text()
 
 #define JNI(f)			CONCAT1(SDL_PREFIX,f)
 
-JNIEXPORT void JNICALL JNI(nativeCoursePrice)(JNIEnv * env, jobject obj, jfloat price)
+JNIEXPORT void JNICALL JNI(SDLActivity_nativeCoursePrice)(JNIEnv * env, jobject obj, jfloat price)
 {
 	SDL_Log("IAP PRICE=$%0.2f", price);
 	if (course_price != 0)

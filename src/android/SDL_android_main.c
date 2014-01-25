@@ -13,7 +13,7 @@
 #include <jni.h>
 
 #ifndef SDL_PREFIX
-	#define SDL_PREFIX org_libsdl_app_SDLActivity
+	#define SDL_PREFIX org_libsdl_app
 #endif
 
 #define CONCAT1(p,f)	CONCAT2(p,f)
@@ -25,7 +25,7 @@
 extern void SDL_Android_Init(JNIEnv* env, jclass cls);
 
 // Initialize ScoreLoop C SDK
-void JNI(nativeInit)(JNIEnv* env, jclass cls, jobject obj)
+void JNI(SDLActivity_nativeInit)(JNIEnv* env, jclass cls, jobject obj)
 {
     /* This interface could expand with ABI negotiation, calbacks, etc. */
     SDL_Android_Init(env, cls);

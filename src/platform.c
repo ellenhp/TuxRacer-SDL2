@@ -13,9 +13,9 @@ static bool_t is_on_ouya_val=False;
 
 #ifdef __ANDROID__
 
-#define JNI(f)	Java_com_moonlite_tuxracer_SDLActivity_ ## f
+#define JNI(f)	Java_com_moonlite_tuxracer_ ## f
 
-JNIEXPORT jdouble JNICALL JNI(nativeSetPlayerData)
+JNIEXPORT jdouble JNICALL JNI(SDLActivity_nativeSetPlayerData)
 (JNIEnv * env, jobject jobj, jstring path, jboolean on_ouya)
 {
 	const char* name = (*env)->GetStringUTFChars(env, path , 0);

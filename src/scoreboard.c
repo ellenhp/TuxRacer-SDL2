@@ -42,7 +42,7 @@ int stored_score_value=0;
 #define  LOG_TAG    "scoreloop"
 #define  LOG(...)   __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
 
-#define JNI(f)	Java_com_moonlite_tuxracer_SDLActivity_ ## f
+#define JNI(f)	Java_com_moonlite_tuxracer_ ## f
 
 int scoreloop_submit_score(unsigned int scoreMode, unsigned int scoreValue)
 {
@@ -84,7 +84,7 @@ int scoreloop_submit_score(unsigned int scoreMode, unsigned int scoreValue)
     }
 }
 
-JNIEXPORT void JNICALL JNI(nativeDisableAliasPrompt)(JNIEnv *env, jclass cls)
+JNIEXPORT void JNICALL JNI(SDLActivity_nativeDisableAliasPrompt)(JNIEnv *env, jclass cls)
 {
     setparam_should_prompt_alias(False);
 }
@@ -106,7 +106,7 @@ int scoreloop_refresh_scores(unsigned int scoreMode)
     (*env)->CallStaticVoidMethod(env, mActivityClass, mid, (int)scoreMode);
 }
 
-JNIEXPORT void JNICALL JNI(nativeScoreloopGotScores)(JNIEnv *env, jclass cls, jint scoreMode, jobjectArray scoreStrings)
+JNIEXPORT void JNICALL JNI(SDLActivity_nativeScoreloopGotScores)(JNIEnv *env, jclass cls, jint scoreMode, jobjectArray scoreStrings)
 {
     if (scoreMode==current_scoreboard)
     {
