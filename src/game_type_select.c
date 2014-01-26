@@ -142,7 +142,6 @@ static void game_type_select_init(void)
 	gui_add_widget(practice_btn=create_button("Play", practice_click_cb), NULL);
 	gui_add_widget(enter_event_btn=create_button("Tutorial", enter_event_click_cb), NULL);
 	gui_add_widget(pref_btn=create_button("Settings", pref_click_cb), NULL);
-	gui_add_widget(buy_btn=create_button("Upgrade", buy_click_cb), NULL);
 	gui_add_widget(credits_btn=create_button("Credits", credits_click_cb), NULL);
 
     if (is_on_ouya())

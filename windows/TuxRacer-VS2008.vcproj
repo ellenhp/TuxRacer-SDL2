@@ -233,10 +233,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\fog.c"
-				>
-			</File>
-			<File
 				RelativePath="..\src\fonts.c"
 				>
 			</File>
@@ -265,10 +261,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\gl_util.c"
-				>
-			</File>
-			<File
 				RelativePath="..\src\gui_abstraction.c"
 				>
 			</File>
@@ -282,10 +274,6 @@
 			</File>
 			<File
 				RelativePath="..\src\hier_cb.c"
-				>
-			</File>
-			<File
-				RelativePath="..\src\hier_util.c"
 				>
 			</File>
 			<File
@@ -321,10 +309,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\lights.c"
-				>
-			</File>
-			<File
 				RelativePath="..\src\list.c"
 				>
 			</File>
@@ -342,10 +326,6 @@
 			</File>
 			<File
 				RelativePath="..\src\main.c"
-				>
-			</File>
-			<File
-				RelativePath="..\src\mirror_course.c"
 				>
 			</File>
 			<File
@@ -421,10 +401,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\splash_screen.c"
-				>
-			</File>
-			<File
 				RelativePath="..\src\ssbutton.c"
 				>
 			</File>
@@ -474,10 +450,6 @@
 			</File>
 			<File
 				RelativePath="..\src\view.c"
-				>
-			</File>
-			<File
-				RelativePath="..\src\viewfrustum.c"
 				>
 			</File>
 			<File
