@@ -139,7 +139,7 @@ public class SDLActivity extends Activity implements
 
 	/************************************************************************/
 	/*																		*/
-	/* A M A Z O N I N A P P P U R C H A S E */
+	/*                A M A Z O N   I N - A P P   P U R C H A S E           */
 	/*																		*/
 	/************************************************************************/
 
@@ -1284,7 +1284,7 @@ public class SDLActivity extends Activity implements
 	public static native void onNativeResize(int x, int y, int format);
 	public static native int onNativePadDown(int device_id, int keycode);
 	public static native int onNativePadUp(int device_id, int keycode);
-	public static native void onNativeJoy(int device_id, int axis, double value);
+	public static native void onNativeJoy(int device_id, int axis, float value);
 	public static native void onNativeKeyDown(int keycode);
 	public static native void onNativeKeyUp(int keycode);
 	public static native void onNativeKeyboardFocusLost();
@@ -1493,7 +1493,7 @@ public class SDLActivity extends Activity implements
 
 	/************************************************************************/
 	/*																		*/
-	/* S C O R E L O O P A C H E I V E M E N T */
+	/*                  S C O R E L O O P   A C H E I V E M E N T           */
 	/*																		*/
 	/************************************************************************/
 
