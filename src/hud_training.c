@@ -35,6 +35,7 @@
 #include "hud.h"
 #include "hud_training.h"
 #include "game_over.h"
+#include "shaders.h"
 #ifdef TARGET_OS_IPHONE
     #include "sharedGeneralFunctions.h"
 #endif
@@ -55,6 +56,9 @@ static void print_instruction(const char* string, int line) {
 	const int width = getparam_x_resolution();
 	const int height = getparam_y_resolution();
 	const int y_base = winsys_scale(75);
+    float transparent_bg[]={1,1,1,0.4};
+    float white[]={1,1,1,1};
+    GLuint texobj;
 
     if ( !get_font_binding( binding, &font ) ) {
         print_warning( IMPORTANT_WARNING,
@@ -62,44 +66,55 @@ static void print_instruction(const char* string, int line) {
         return;
     }
     
+    get_font_metrics( font, (char*)string, &w, &asc, &desc );
+    
+    shader_set_color(transparent_bg);
+    
+    if (!get_texture_binding("white1x1", &texobj) ) {
+        return;
+    }
+    glBindTexture(GL_TEXTURE_2D, texobj);
+    
+#define TO_RELATIVE(screen, val) (((val)/screen*2.0)-1.0)
+	{
+        GLfloat vertices[]={
+            -0.6, TO_RELATIVE(height, (y_base-(line-2)*(asc+desc)) - winsys_scale(5.0)), 0,
+            -0.6, TO_RELATIVE(height, (y_base-(line-1)*(asc+desc)) - winsys_scale(5.0)), 0,
+            0.6, TO_RELATIVE(height, (y_base-(line-1)*(asc+desc)) - winsys_scale(5.0)), 0,
+            0.6, TO_RELATIVE(height, (y_base-(line-2)*(asc+desc)) - winsys_scale(5.0)), 0};
+        
+        GLfloat texcoords[]={
+            0, 0,
+            0, 1,
+            1, 1,
+            1, 0};
+        
+        GLubyte indices[] = {0, 1, 2, 2, 3, 0};
+        
+        glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, 0, vertices);
+        glEnableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
+        
+        glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, 0, texcoords);
+        glEnableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
+        
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
+        
+        glDisableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
+        glDisableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
+        
+        shader_set_color(white);
+	}
+    
     bind_font_texture( font );
     
-    get_font_metrics( font, (char*)string, &w, &asc, &desc );
-    glDisable(GL_TEXTURE_2D);
-    
-	{
-    GLfloat vertices[]={
-		width * 0.20, (float)(y_base-(line-2)*(asc+desc)) - winsys_scale(5.0), 0,
-		width * 0.20, (float)(y_base-(line-1)*(asc+desc)) - winsys_scale(5.0), 0,
-		width * 0.8, (float)(y_base-(line-1)*(asc+desc)) - winsys_scale(5.0), 0,
-		width * 0.8, (float)(y_base-(line-2)*(asc+desc)) - winsys_scale(5.0), 0};
-
-	GLubyte indices[] = {0, 1, 2, 2, 3, 0};
-
-	/*glEnableClientState(GL_VERTEX_ARRAY);
-
-	glVertexPointer(3, GL_FLOAT, 0, vertices);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
-		
-	glDisableClientState(GL_VERTEX_ARRAY);*/
-
-    glEnable(GL_TEXTURE_2D);
-    /*
-    glPushMatrix();
-    {
-        glTranslatef( width / 2 - (float)w / 2.0,
-                     y_base-(line-1)*(asc+desc),
-                     0 );
-        draw_string( font, (char*)string );
-    }
-    glPopMatrix();
-     */
-	}
+    draw_string(font, (char*)string, width/2-w/2, y_base-(line-1)*(asc+desc));
 }
 
 static void drawRedCircle(GLint x, GLint y, GLint diameter) {
     int x_org = x;
     int y_org = y;
+ 	const int width = getparam_x_resolution();
+	const int height = getparam_y_resolution();
     GLuint texobj;
     point2d_t tll, tur;
     point2d_t ll, ur;
@@ -122,25 +137,27 @@ static void drawRedCircle(GLint x, GLint y, GLint diameter) {
 		tur.x, tur.y,
 		tur.x, tll.y};
 
+#define TO_RELATIVE(screen, val) (((val)/screen*2.0)-1.0)
 	GLfloat vertices[]={
-		ll.x, ll.y, 0,
-		ll.x, ur.y, 0,
-		ur.x, ur.y, 0,
-		ur.x, ll.y, 0};
+		TO_RELATIVE(width, ll.x), TO_RELATIVE(height, ll.y), 0,
+		TO_RELATIVE(width, ll.x), TO_RELATIVE(height, ur.y), 0,
+		TO_RELATIVE(width, ur.x), TO_RELATIVE(height, ur.y), 0,
+		TO_RELATIVE(width, ur.x), TO_RELATIVE(height, ll.y), 0};
 
 	GLubyte indices[] = {0, 1, 2, 2, 3, 0};
 
     glEnable(GL_TEXTURE_2D);
 
-	/*glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-	glTexCoordPointer(2, GL_FLOAT, 0, texcoords);
-	glVertexPointer(3, GL_FLOAT, 0, vertices);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
-		
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);*/
+    glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, 0, vertices);
+    glEnableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
+        
+    glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, 0, texcoords);
+    glEnableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
+    
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
+    
+    glDisableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
+    glDisableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
 
 	}
 }  
@@ -280,10 +297,6 @@ static void draw_instructions(player_data_t *plyr)
             break;
         case 7:
             print_instruction(Localize("Cool! Now come back to game.", ""),0);
- 			if (!winsys_is_controller_active())
-			{
-	            print_instruction(Localize("Tap anywhere on the screen.", ""),1);
-			}
 
             if(g_game.race_paused==False) step=-1;
             break;

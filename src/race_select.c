@@ -549,16 +549,6 @@ static void race_select_init(void)
         cup_data = NULL;
         last_completed_race = NULL;
         event_data = NULL;
-    } else {
-        event_data = (event_data_t*) get_list_elem_data( 
-                                                        get_event_by_name( g_game.current_event ) );
-        check_assertion( event_data != NULL,
-                        "Couldn't find current event." );
-        cup_data = (cup_data_t*) get_list_elem_data(
-                                                    get_event_cup_by_name( event_data, g_game.current_cup ) );
-        check_assertion( cup_data != NULL,
-                        "Couldn't find current cup." );
-        race_list = get_cup_race_list( cup_data );
     }
     
     /* Unless we're coming back from a race, initialize the race data to 

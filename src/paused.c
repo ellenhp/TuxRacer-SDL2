@@ -55,7 +55,14 @@ void end_game()
 {
     g_game.race_aborted=True;
     g_game.race_paused=False;
-    set_game_mode(RACE_SELECT);
+    if (g_game.practicing)
+    {
+        set_game_mode(RACE_SELECT);
+    }
+    else
+    {
+        set_game_mode(GAME_TYPE_SELECT);
+    }
 }
 void come_back_to_game(void) {
 	if (SDL_GetTicks()-pause_start<pause_min_ticks)

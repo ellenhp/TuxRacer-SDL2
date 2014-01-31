@@ -224,6 +224,9 @@ tux_bind_texture gauge_speed_mask gauge_speed_mask
 tux_load_texture red_circle textures/redCircle.png 0
 tux_bind_texture red_circle red_circle
 
+tux_load_texture white1x1 textures/white1x1.png 0
+tux_bind_texture white1x1 white1x1
+
 # UI widgets
 tux_load_texture listbox_arrows textures/listbox_arrows.png 0
 tux_bind_texture listbox_arrows listbox_arrows
