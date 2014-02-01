@@ -499,7 +499,7 @@ void winsys_scan_joysticks()
 
 		/* Get number of axes */
 		winsys_num_axes = SDL_JoystickNumAxes(winsys_joystick);
-		print_debug( DEBUG_JOYSTICK, "Joystick has %d ax%ss", 
+		print_debug( DEBUG_JOYSTICK, "Joystick has %d ax%ss",
 			 winsys_num_axes, winsys_num_axes == 1 ? "i" : "e" );
 
 		if (winsys_num_axes==3 && winsys_num_buttons==0)
@@ -509,9 +509,14 @@ void winsys_scan_joysticks()
 		}
 		else
 		{
+            char mapping_buffer[200];
 			print_debug(DEBUG_JOYSTICK, "Incompatible joystick '%s' with GUID '%s'", js_name, guid);
+			print_debug(DEBUG_JOYSTICK, "Creating best-guess mapping for joystick '%s' with GUID '%s'", js_name, guid);
+            sprintf(mapping_buffer, "%s,Unrecognized Joystick,a:b5,b:b6,x:b8,y:b9,dpup:b0,dpleft:b2,dpdown:b1,dpright:b3,leftx:a0,lefty:a1,");
+            SDL_GameControllerAddMapping(mapping_buffer);
 			SDL_JoystickClose(winsys_joystick);
 			winsys_joystick=NULL;
+            winsys_scan_joysticks();
 		}
 	}
 }
