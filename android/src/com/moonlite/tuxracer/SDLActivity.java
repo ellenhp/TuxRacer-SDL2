@@ -1070,8 +1070,8 @@ public class SDLActivity extends Activity implements
 
 		myActivity = this;
 
-		nativeSetPlayerData("", OuyaFacade.getInstance()
-				.isRunningOnOUYAHardware());
+		boolean onOUYA = OuyaFacade.getInstance().isRunningOnOUYAHardware();
+		nativeSetPlayerData("", onOUYA);
 
 		Client.init(this.getApplicationContext(),
 				xor_secret("S)TEPoEmjI_]" + ((char) 127)
@@ -1093,8 +1093,11 @@ public class SDLActivity extends Activity implements
 					}
 				});
 		controller.query(this);
-		AmazonInitIAP();
-		OuyaInitIAP();
+		// Initialize appropriate In-App Purchase system
+		if (onOUYA)
+			OuyaInitIAP();
+		else
+			AmazonInitIAP();
 	}
 
 	// Events
