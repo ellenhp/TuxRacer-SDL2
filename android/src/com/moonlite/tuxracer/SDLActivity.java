@@ -440,7 +440,7 @@ public class SDLActivity extends Activity implements
 
 	/************************************************************************/
 	/*																		*/
-	/* O U Y A S P E C I F I C C O D E */
+	/*                  O U Y A   S P E C I F I C   C O D E                 */
 	/*																		*/
 	/************************************************************************/
 
@@ -566,6 +566,8 @@ public class SDLActivity extends Activity implements
 	 */
 
 	private static PublicKey mPublicKey;
+	
+	boolean onOUYA;
 
 	protected void OuyaInitIAP() {
 
@@ -1070,7 +1072,7 @@ public class SDLActivity extends Activity implements
 
 		myActivity = this;
 
-		boolean onOUYA = OuyaFacade.getInstance().isRunningOnOUYAHardware();
+		onOUYA = OuyaFacade.getInstance().isRunningOnOUYAHardware();
 		nativeSetPlayerData("", onOUYA);
 
 		Client.init(this.getApplicationContext(),
@@ -1113,7 +1115,8 @@ public class SDLActivity extends Activity implements
 		Log.v("SDL", "onResume()");
 		super.onResume();
 		SDLActivity.handleResume();
-		AmazonRequestIAP();
+		if (!onOUYA)
+			AmazonRequestIAP();
 	}
 
 	@Override
@@ -1160,15 +1163,9 @@ public class SDLActivity extends Activity implements
 		// Ignore certain special keys so they're handled by Android
 		if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN
 				|| keyCode == KeyEvent.KEYCODE_VOLUME_UP
-				|| keyCode == KeyEvent.KEYCODE_CAMERA || keyCode == 168 || /*
-																			 * API
-																			 * 11
-																			 * :
-																			 * KeyEvent
-																			 * .
-																			 * KEYCODE_ZOOM_IN
-																			 */
-				keyCode == 169 /* API 11: KeyEvent.KEYCODE_ZOOM_OUT */
+				|| keyCode == KeyEvent.KEYCODE_CAMERA
+				|| keyCode == 168 // API 11: KeyEvent.KEYCODE_ZOOM_IN
+				|| keyCode == 169 // API 11: KeyEvent.KEYCODE_ZOOM_OUT
 		) {
 			return false;
 		}
