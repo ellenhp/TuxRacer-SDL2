@@ -30,7 +30,7 @@
 #include "hash.h"
 #ifdef TARGET_OS_IPHONE
     #include "sharedAudioFunctions.h"
-#up
+#endif
 
 typedef struct {
     int num_sounds;
