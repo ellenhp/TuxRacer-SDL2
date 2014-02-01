@@ -89,7 +89,7 @@ public class SDLActivity extends Activity implements
 			mHasFocus = true;
 	public static boolean mExitCalledFromJava;
 
-	public static float scaleFactor = 0;
+	public static float scaleFactor = 1.0f;
 
 	// Main components
 	protected static SDLActivity mSingleton;
@@ -1056,7 +1056,6 @@ public class SDLActivity extends Activity implements
 		Point size = new Point();
 		getWindowManager().getDefaultDisplay().getSize(size);
 
-		scaleFactor = 1;
 		size.x *= scaleFactor;
 		size.y *= scaleFactor;
 

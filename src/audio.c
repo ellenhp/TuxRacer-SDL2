@@ -30,7 +30,7 @@
 #include "hash.h"
 #ifdef TARGET_OS_IPHONE
     #include "sharedAudioFunctions.h"
-#endif
+#up
 
 typedef struct {
     int num_sounds;
@@ -680,8 +680,8 @@ update_audio()
     if ( volume < 0 ) {
 	volume = 0;
     }
-    if ( volume > 10 ) {
-	volume = 10;
+    if ( volume > 127 ) {
+	volume = 127;
     }
     setparam_sound_volume( volume );
 
@@ -690,15 +690,15 @@ update_audio()
 		volume=0;
 	}
 
-    Mix_Volume( -1, volume * 12 ); /* channel of -1 sets volume for all channels */
+    Mix_Volume( -1, volume ); /* channel of -1 sets volume for all channels */
 
     /* Set music volume level */
     volume = getparam_music_volume();
     if ( volume < 0 ) {
 	volume = 0;
     }
-    if ( volume > 10 ) {
-	volume = 10;
+    if ( volume > 127 ) {
+	volume = 127;
     }
     setparam_music_volume( volume );
  
@@ -707,7 +707,7 @@ update_audio()
 		volume=0;
 	}
 
-    Mix_VolumeMusic( volume * 8 );
+    Mix_VolumeMusic( volume );
 
     /* Update music status */
 

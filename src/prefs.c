@@ -26,6 +26,7 @@
 #include "joystick.h"
 
 #define VOLUME_TOTAL_TICKS 10
+#define VOLUME_SCALE		12
 
 #define MUSIC_VOLUME_STRING "Music Volume: %d"
 #define SOUND_VOLUME_STRING "Effects Volume: %d"
@@ -71,13 +72,13 @@ bool_t display_fps;
 
 void update_music_volume(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type, widget_t* widget)
 {
-	setparam_music_volume(widget->option);
+	setparam_music_volume(widget->option * VOLUME_SCALE);
 	write_config_file();
 }
 
 void update_sound_volume(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type, widget_t* widget)
 {
-	setparam_sound_volume(widget->option);
+	setparam_sound_volume(widget->option * VOLUME_SCALE);
 	write_config_file();
 }
 
@@ -151,11 +152,11 @@ static void prefs_init(void)
     GameMenu_set_y_offset(-0.1);
 
 	music_volume_slider=create_slider("Music Volume: ", 11, NULL, update_music_volume);
-	slider_set_value(music_volume_slider, getparam_music_volume());
+	slider_set_value(music_volume_slider, getparam_music_volume() / VOLUME_SCALE);
 	gui_add_widget(music_volume_slider, NULL);
 
 	sound_volume_slider=create_slider("Effects Volume: ", 11, NULL, update_sound_volume);
-	slider_set_value(sound_volume_slider, getparam_sound_volume());
+	slider_set_value(sound_volume_slider, getparam_sound_volume() / VOLUME_SCALE);
 	gui_add_widget(sound_volume_slider, NULL);
 
 	graphics_slider=create_slider("Graphics Setting: ", 3, "Low|Medium|High", update_graphics);

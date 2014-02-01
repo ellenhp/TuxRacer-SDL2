@@ -445,7 +445,7 @@ void init_game_configuration()
 #endif
 
 	INIT_PARAM_INT( 
-	graphics_slider_tick, 0,
+	graphics_slider_tick, 2,
 	"# [DO NOT MODIFY] This param is modified by the options menu inside \n"
 	"# Tux Racer." );
 
@@ -706,10 +706,10 @@ void init_game_configuration()
 	music_enabled, True ,
 	"# Use this to turn music on and off." );
     INIT_PARAM_INT( 
-	sound_volume, 127 ,
+	sound_volume, 64 ,
 	"# This controls the sound volume (valid range is 0-127)." );
     INIT_PARAM_INT( 
-	music_volume, 64 ,
+	music_volume, 16 ,
 	"# This controls the music volume (valid range is 0-127)." );
     INIT_PARAM_INT( 
 	audio_freq_mode, 1 ,
