@@ -100,6 +100,7 @@ const char* get_current_course_name()
 }
 
 float course_price = 2.99;
+bool_t price_update = False;
 
 bool_t buy_or_play_course(void)
 {
@@ -384,6 +385,7 @@ JNIEXPORT void JNICALL JNI(SDLActivity_nativeCoursePrice)(JNIEnv * env, jobject 
 	SDL_Log("IAP PRICE=$%0.2f", price);
 	if (course_price != 0)
 	{
+		price_update = True;
 		course_price = price;
 	}
 }
@@ -690,6 +692,12 @@ static void race_select_loop( scalar_t time_step )
     }
     
     ui_draw_menu_decorations(False);
+	
+	if (price_update)
+	{
+		update_text();
+		price_update = False;
+	}
     
 	GameMenu_draw();
 
