@@ -13,7 +13,7 @@ extern "C"
 #define JNI_NULL_CHAR "\xC0\x80"
 #endif
 
-void start_dialog(char* title, char* message);
+void start_dialog(char* title, char* message, bool_t isUsername);
     
 void scoreloop_add_widgets();
 

@@ -44,7 +44,7 @@ typedef enum TEXT_ENTRY_MODE
 
 TEXT_ENTRY_MODE text_entry=TEXT_ENTRY_NONE;
 
-void start_dialog(char* title, char* message)
+void start_dialog(char* title, char* message, bool_t isUsername)
 {
 #ifdef __ANDROID__
     JNIEnv* env = Android_JNI_GetEnv();
@@ -55,12 +55,12 @@ void start_dialog(char* title, char* message)
         return;
     }
     jclass mActivityClass = (*env)->FindClass(env, "com/moonlite/tuxracer/SDLActivity");
-    jmethodID mid = (*env)->GetStaticMethodID(env, mActivityClass, "displayTextInputDialog", "(Ljava/lang/String;Ljava/lang/String;)V");
+    jmethodID mid = (*env)->GetStaticMethodID(env, mActivityClass, "displayTextInputDialog", "(Ljava/lang/String;Ljava/lang/String;Z)V");
     if (!mid)
     {
         return ;
     }
-    (*env)->CallStaticVoidMethod(env, mActivityClass, mid, j_title, j_message);
+    (*env)->CallStaticVoidMethod(env, mActivityClass, mid, j_title, j_message, isUsername);
     (*env)->DeleteLocalRef(env, j_title);
     (*env)->DeleteLocalRef(env, j_message);
 #endif
@@ -68,13 +68,13 @@ void start_dialog(char* title, char* message)
 
 void nickname_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb)
 {
-    start_dialog(ALIAS_PROMPT_TITLE, ALIAS_PROMPT_MESSAGE);
+    start_dialog(ALIAS_PROMPT_TITLE, ALIAS_PROMPT_MESSAGE, True);
     text_entry=TEXT_ENTRY_ALIAS;
 }
 
 void email_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb)
 {
-    start_dialog("Enter Email" JNI_NULL_CHAR, "Enter an email address. This is entirely optional, but recommended if you like your alias and might want to use it again on another device." JNI_NULL_CHAR);
+    start_dialog("Enter Email" JNI_NULL_CHAR, "Enter an email address. This is entirely optional, but recommended if you like your alias and might want to use it again on another device." JNI_NULL_CHAR, False);
     text_entry=TEXT_ENTRY_EMAIL;
 }
 
@@ -154,7 +154,7 @@ JNIEXPORT void JNICALL JNI(SDLActivity_nativeUpdateUserInfo)(JNIEnv *env, jclass
     if (alias)
     {
         string_tmp=(*env)->GetStringUTFChars(env, alias, 0);
-        sprintf(alias_buf, "Change Alias (using: %s)", string_tmp);
+        sprintf(alias_buf, "Change Alias (%s)", string_tmp);
         (*env)->ReleaseStringUTFChars(env, alias, string_tmp);
     }
     else

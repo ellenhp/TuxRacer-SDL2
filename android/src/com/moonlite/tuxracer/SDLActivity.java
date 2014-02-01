@@ -111,6 +111,7 @@ public class SDLActivity extends Activity implements
 	private static Runnable mScoreToSubmit = null;
 
 	private static String mOuyaUsername = null;
+	private static String mScoreloopUsername = "";
 
 	// Load the .so
 	static {
@@ -995,8 +996,9 @@ public class SDLActivity extends Activity implements
 						mUserCanSubmitScores = !((UserController) arg0)
 								.getUser().isAnonymous();
 						if (mUserCanSubmitScores) {
-							nativeUpdateUserInfo(((UserController) arg0)
-									.getUser().getLogin());
+							mScoreloopUsername=((UserController) arg0)
+									.getUser().getLogin();
+							nativeUpdateUserInfo(mScoreloopUsername);
 						} else {
 							nativeUpdateUserInfo(null);
 						}
@@ -1654,14 +1656,17 @@ public class SDLActivity extends Activity implements
 		mSingleton.runOnUiThread(aliasSetter);
 	}
 
-	public static void displayTextInputDialog(String title, String message) {
+	public static void displayTextInputDialog(String title, String message, boolean isUsername) {
 		Log.d("dialog", "displaying dialog");
 		class DialogDisplayer implements Runnable {
 			String title, message;
-
-			public DialogDisplayer(String title, String message) {
+			boolean isUsername;
+			EditText input;
+			
+			public DialogDisplayer(String title, String message, boolean isUsername) {
 				this.title = title;
 				this.message = message;
+				this.isUsername = isUsername;
 			}
 
 			@Override
@@ -1669,7 +1674,12 @@ public class SDLActivity extends Activity implements
 				AlertDialog.Builder alert = new AlertDialog.Builder(mSingleton);
 				alert.setTitle(title);
 				alert.setMessage(message);
-				final EditText input = new EditText(mSingleton);
+				input = new EditText(mSingleton);
+				if (isUsername)
+				{
+					input.setText(SDLActivity.mScoreloopUsername);
+					input.setSelection(mScoreloopUsername.length());
+				}
 				alert.setView(input);
 
 				alert.setPositiveButton("OK",
@@ -1690,7 +1700,7 @@ public class SDLActivity extends Activity implements
 				alert.show();
 			}
 		}
-		DialogDisplayer displayer = new DialogDisplayer(title, message);
+		DialogDisplayer displayer = new DialogDisplayer(title, message, isUsername);
 		mSingleton.runOnUiThread(displayer);
 	}
 
