@@ -306,12 +306,7 @@ static void draw_instructions(player_data_t *plyr)
             print_instruction(Localize("The next tutorial will teach you how to jump", ""),1);
             print_instruction(Localize("and do tricks!", ""),2);
             
-            if(training_is_resumed())
-            {
-                g_game.race.course="frozen_river";
-                init_starting_tutorial_step(10);
-                set_game_mode( LOADING );
-            }
+            set_game_mode( GAME_OVER );
             break;
             					/* Fin du premier Tutorial */
                                 

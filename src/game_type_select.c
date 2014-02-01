@@ -40,7 +40,8 @@
     #include "sharedGeneralFunctions.h"
 #endif
 
-widget_t* enter_event_btn = NULL;
+widget_t* basic_tutorial_btn = NULL;
+widget_t* advanced_tutorial_btn = NULL;
 widget_t* practice_btn = NULL;
 widget_t* credits_btn = NULL;
 widget_t* pref_btn = NULL;
@@ -49,8 +50,7 @@ widget_t* buy_btn = NULL;
 widget_t* main_select_button=NULL;
 widget_t* main_quit_button=NULL;
 
-//The training mode of Tux Racer World challenge has been binded to the event mode of tuxracer
-void enter_event_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb)
+void basic_tutorial_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb)
 {
     g_game.current_event = NULL;
     g_game.current_cup = NULL;
@@ -61,7 +61,22 @@ void enter_event_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_
     init_starting_tutorial_step(0);
     
     set_game_mode( LOADING );
+    
+    ui_set_dirty();
+}
 
+void advanced_tutorial_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb)
+{
+    g_game.current_event = NULL;
+    g_game.current_cup = NULL;
+    g_game.current_race = -1;
+    g_game.practicing = False;
+    
+    g_game.race.course="frozen_river";
+    init_starting_tutorial_step(10);
+    
+    set_game_mode( LOADING );
+    
     ui_set_dirty();
 }
 
@@ -140,7 +155,8 @@ static void game_type_select_init(void)
 	setup_gui();
 
 	gui_add_widget(practice_btn=create_button("Play", practice_click_cb), NULL);
-	gui_add_widget(enter_event_btn=create_button("Tutorial", enter_event_click_cb), NULL);
+	gui_add_widget(basic_tutorial_btn=create_button("Tutorial 1", basic_tutorial_click_cb), NULL);
+	gui_add_widget(advanced_tutorial_btn=create_button("Tutorial 2", advanced_tutorial_click_cb), NULL);
 	gui_add_widget(pref_btn=create_button("Settings", pref_click_cb), NULL);
 	gui_add_widget(credits_btn=create_button("Credits", credits_click_cb), NULL);
 
@@ -226,11 +242,6 @@ START_KEYBOARD_CB( game_type_select_cb )
 	case 27: /* Esc */
 	case SDLK_AC_BACK:
 	    winsys_exit(0);
-	    break;
-	case 'e':
-	    if ( enter_event_btn ) {
-		GameMenu_simulate_click( enter_event_btn );
-	    }
 	    break;
 	case 'p':
 	    if ( practice_btn ) {
