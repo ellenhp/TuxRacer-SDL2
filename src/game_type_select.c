@@ -155,8 +155,8 @@ static void game_type_select_init(void)
 	setup_gui();
 
 	gui_add_widget(practice_btn=create_button("Play", practice_click_cb), NULL);
-	gui_add_widget(basic_tutorial_btn=create_button("Tutorial 1", basic_tutorial_click_cb), NULL);
-	gui_add_widget(advanced_tutorial_btn=create_button("Tutorial 2", advanced_tutorial_click_cb), NULL);
+	gui_add_widget(basic_tutorial_btn=create_button("Basic Tutorial", basic_tutorial_click_cb), NULL);
+	gui_add_widget(advanced_tutorial_btn=create_button("Jump Tutorial", advanced_tutorial_click_cb), NULL);
 	gui_add_widget(pref_btn=create_button("Settings", pref_click_cb), NULL);
 	gui_add_widget(credits_btn=create_button("Credits", credits_click_cb), NULL);
 
