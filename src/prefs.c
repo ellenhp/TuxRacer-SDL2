@@ -46,8 +46,8 @@ typedef struct graphics_options_t
 
 #define NUM_GRAPHICS_OPTIONS 3
 graphics_options_t graphics_options[]={
-	{5, 75, 0, False, False, False, 9, False, False},
-	{10, 150, 20, True, False, False, 12, True, False},
+	{5, 150, 0, False, False, False, 9, False, False},
+	{10, 225, 20, True, False, False, 12, True, False},
 	{20, 350, 70, True, True, True, 15, True, True},
 };
 
