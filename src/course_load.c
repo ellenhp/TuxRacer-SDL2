@@ -1686,10 +1686,13 @@ item_spec_bail:
 
 void set_light_uniforms()
 {
+    GLfloat fog[]={0.95, 0.95, 0.95, 1.0};
     glUniform3fv(shader_get_uniform_location(SHADER_LIGHT_POSITION_NAME), 1, course_lights[0].position);
     glUniform4fv(shader_get_uniform_location(SHADER_LIGHT_SPECULAR_NAME), 1, course_lights[0].specular);
     glUniform4fv(shader_get_uniform_location(SHADER_LIGHT_DIFFUSE_NAME), 1, course_lights[0].diffuse);
     glUniform4fv(shader_get_uniform_location(SHADER_LIGHT_AMBIENT_NAME), 1, course_lights[0].ambient);
+    
+    glUniform4fv(shader_get_uniform_location(SHADER_FOG_NAME), 1, fog);
 }
 
 static int course_light_cb (ClientData cd, Tcl_Interp *ip,

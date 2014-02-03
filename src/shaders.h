@@ -20,10 +20,15 @@ extern "C"
 #define SHADER_LIGHT_SPECULAR_NAME "lightspecular"
 #define SHADER_LIGHT_DIFFUSE_NAME "lightdiffuse"
 #define SHADER_LIGHT_AMBIENT_NAME "lightambient"
+    
+#define SHADER_FOG_NAME "fog_color"
+    
+#define SHADER_CLIP_NAME "forward_clip"
 
 void init_programs();
 void use_terrain_program();
 void use_generic_program();
+void use_fog_program();
 void use_hud_program();
 void use_tux_program();
 

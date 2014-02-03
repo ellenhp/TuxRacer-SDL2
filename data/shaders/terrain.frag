@@ -11,10 +11,13 @@ uniform vec4 lightspecular;
 uniform vec4 lightdiffuse;
 uniform vec4 lightambient;
 
+uniform vec4 fog_color;
+
 varying vec2 dest_env_coord;
 varying vec2 dest_tex_coord;
 varying vec3 dest_normal;
 varying vec3 transparencies;
+varying float fog_factor;
 
 void main()
 {
@@ -27,7 +30,8 @@ void main()
     
     float diffuse_intensity=dot(dest_normal, lightpos);
     
-    vec4 color=(diffuse_intensity * lightdiffuse + lightambient) * terrain_color;
+    vec4 light=diffuse_intensity * lightdiffuse + lightambient;
+    vec4 color=mix(light*terrain_color, fog_color, fog_factor);
     
     color.a=1.0;
     
