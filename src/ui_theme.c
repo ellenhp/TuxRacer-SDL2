@@ -83,8 +83,9 @@ void ui_draw_menu_decorations(bool_t draw_logo)
 	{
 		/* title */
 		if ( get_texture_binding( title, &texobj ) ) {
+            float scale_factor=0.28;
 			glBindTexture( GL_TEXTURE_2D, texobj );
-            draw_textured_quad( w/2-h*0.3, h*0.965-h*0.3, h*0.3*2, h*0.3 );
+            draw_textured_quad( w/2-h*scale_factor, h*0.965-h*scale_factor, h*scale_factor*2, h*scale_factor );
 		}
 	}
 
