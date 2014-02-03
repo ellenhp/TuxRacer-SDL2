@@ -2221,30 +2221,23 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
 
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-			float x, y;
-			switch (mDisplay.getRotation()) {
-			case Surface.ROTATION_90:
-				x = event.values[1];
-				y = event.values[0];
-				break;
-			case Surface.ROTATION_270:
-				x = -event.values[1];
-				y = -event.values[0];
-				break;
-			case Surface.ROTATION_180:
-				x = -event.values[1];
-				y = -event.values[0];
-				break;
-			default:
-				x = event.values[0];
-				y = event.values[1];
-				break;
-			}
-			SDLActivity.onNativeAccel(-x / SensorManager.GRAVITY_EARTH, y
-					/ SensorManager.GRAVITY_EARTH, event.values[2]
-					/ SensorManager.GRAVITY_EARTH - 1);
-		}
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            float[] adjustedValues = new float[3];
+
+            final int axisSwap[][] = {
+            {  1,  -1,  0,  1  },     // ROTATION_0 
+            {-1,  -1,  1,  0  },     // ROTATION_90 
+            {-1,    1,  0,  1  },     // ROTATION_180 
+            {  1,    1,  1,  0  }  }; // ROTATION_270 
+
+            final int[] as = axisSwap[mDisplay.getRotation()];
+            adjustedValues[0]  =  (float)as[0] * event.values[ as[2] ]; 
+            adjustedValues[1]  =  (float)as[1] * event.values[ as[3] ]; 
+            adjustedValues[2]  =  event.values[2];
+            SDLActivity.onNativeAccel(adjustedValues[0] / SensorManager.GRAVITY_EARTH,
+            		adjustedValues[1] / SensorManager.GRAVITY_EARTH,
+            		adjustedValues[2] / SensorManager.GRAVITY_EARTH);
+        }
 	}
 
 }
