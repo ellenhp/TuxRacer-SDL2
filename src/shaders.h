@@ -28,7 +28,6 @@ extern "C"
 void init_programs();
 void use_terrain_program();
 void use_generic_program();
-void use_fog_program();
 void use_hud_program();
 void use_tux_program();
 

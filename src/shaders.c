@@ -8,7 +8,6 @@
 #define MAX_SHADER_SIZE 10000
 
 static GLuint generic_program;
-static GLuint fog_program;
 static GLuint hud_program;
 static GLuint terrain_program_high;
 static GLuint terrain_program_low;
@@ -82,7 +81,6 @@ void init_programs()
     }
     
     init_shader_program(&generic_program, "shaders/generic.vert", "shaders/generic.frag");
-    init_shader_program(&fog_program, "shaders/fog.vert", "shaders/fog.frag");
     init_shader_program(&hud_program, "shaders/hud.vert", "shaders/hud.frag");
     init_shader_program(&terrain_program_high, "shaders/terrain.vert", "shaders/terrain.frag");
     init_shader_program(&terrain_program_low, "shaders/terrainlow.vert", "shaders/terrainlow.frag");
@@ -126,11 +124,6 @@ void use_generic_program()
         glUniform1f(glGetUniformLocation(active_program, "course_angle"), get_course_angle()/180*3.14159);
         set_light_uniforms();
     }
-}
-
-void use_fog_program()
-{
-    use_program(fog_program);
 }
 
 void use_hud_program()
