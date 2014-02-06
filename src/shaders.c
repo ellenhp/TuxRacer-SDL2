@@ -90,6 +90,16 @@ void init_programs()
     programs_initialized=True;
 }
 
+static void set_tux_pos()
+{
+    GLfloat tux_pos[3];
+    player_data_t* plyr=get_player_data(local_player());
+    tux_pos[0]=plyr->pos.x;
+    tux_pos[1]=plyr->pos.y;
+    tux_pos[2]=plyr->pos.z;
+    glUniform3fv(glGetUniformLocation(active_program, "tux_pos"), 1, tux_pos);
+}
+
 static bool_t use_program(GLuint program)
 {
     if (programs_initialized && active_program!=program)
@@ -98,7 +108,7 @@ static bool_t use_program(GLuint program)
         active_program=program;
         set_MVP();
         set_light_uniforms();
-        glUniform1f(shader_get_uniform_location(SHADER_CLIP_NAME), getparam_forward_clip_distance()/2);
+        glUniform1f(shader_get_uniform_location(SHADER_CLIP_NAME), getparam_forward_clip_distance()/3);
         return True;
     }
     return False;
@@ -114,6 +124,7 @@ void use_terrain_program()
     if (use_program(terrain_program))
     {
         set_light_uniforms();
+        set_tux_pos();
     }
 }
 
@@ -133,7 +144,11 @@ void use_hud_program()
 
 void use_tree_program()
 {
-    use_program(tree_program);
+    if (use_program(tree_program))
+    {
+        set_light_uniforms();
+        set_tux_pos();
+    }
 }
 
 void use_tux_program()
