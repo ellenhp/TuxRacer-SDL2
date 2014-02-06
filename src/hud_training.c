@@ -343,7 +343,7 @@ static void draw_instructions(player_data_t *plyr)
 			}
             break;
         case 13:
- 			if (!winsys_is_controller_active())
+ 			if (winsys_is_controller_active())
 			{
                 print_instruction(Localize("Release \x01 to jump!", ""),1);
             }
