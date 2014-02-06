@@ -34,6 +34,8 @@
 #endif
 #include "multiplayer.h"
 
+#define ZERO 0.005
+#define ONE 0.995
 
 /* 
  *  Constants 
@@ -384,8 +386,6 @@ void draw_sky(point_t pos)
 
 		// nopoe 10/13/2013: necessary even on windows when using OpenGL ES rendering code
 
-#define ZERO 0.005
-#define ONE 0.995
         ZERO, ZERO ,
         ONE, ZERO ,
         ONE, ONE ,
@@ -517,12 +517,12 @@ void draw_trees()
     
     const GLfloat verticesTemplateItem[]=
     {
-        -1.0, 0.0,  1.0,
-        1.0, 0.0, -1.0,
-        1.0, 1.0, -1.0,
-        -1.0, 1.0,  1.0,
-        -1.0, 0.0,  1.0,
-        1.0, 1.0, -1.0,
+        -ONE, ZERO,  ONE,
+        ONE, ZERO, -ONE,
+        ONE, ONE, -ONE,
+        -ONE, ONE,  ONE,
+        -ONE, ZERO,  ONE,
+        ONE, ONE, -ONE,
     };
     
     const GLfloat texCoordsTemplateItem[]=
