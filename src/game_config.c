@@ -464,7 +464,7 @@ void init_game_configuration()
 	"# performance." );
 
     INIT_PARAM_INT( 
-	tux_sphere_divisions, 8,
+	tux_sphere_divisions, 15,
 	"# [EXPERT] Higher values result in a more finely subdivided mesh \n"
 	"# for Tux, and vice versa.  If you're experiencing low framerates,\n"
 	"# try lowering this value." );
@@ -644,7 +644,7 @@ void init_game_configuration()
 	warning_level, 100 ,
 	"# [EXPERT] Controls the Tux Racer warning messages" );
     INIT_PARAM_INT( 
-	forward_clip_distance, 40 ,
+	forward_clip_distance, 350 ,
 	"# Controls how far ahead of the camera the course\n"
 	"# is rendered.  Larger values mean that more of the course is\n"
 	"# rendered, resulting in slower performance. Decreasing this \n"
