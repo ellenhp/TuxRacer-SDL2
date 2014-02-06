@@ -343,7 +343,14 @@ static void draw_instructions(player_data_t *plyr)
 			}
             break;
         case 13:
-            print_instruction(Localize("Release \x01 to jump!", ""),1);
+ 			if (!winsys_is_controller_active())
+			{
+                print_instruction(Localize("Release \x01 to jump!", ""),1);
+            }
+            else
+            {
+                print_instruction(Localize("Release to jump!", ""),1);
+            }
             if (plyr->control.jumping) step++;
             break;
         case 14:
