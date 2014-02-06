@@ -123,6 +123,7 @@ coord_t get_absolute(coord_t coord, int asc, int desc)
 widget_bounding_box_t GameMenu_get_bb(widget_t* widget)
 {
 	widget_bounding_box_t bb;
+    float extra_size=0.3;
 
     font_t *font;
     int w, asc, desc;
@@ -153,9 +154,9 @@ widget_bounding_box_t GameMenu_get_bb(widget_t* widget)
 	absolute_coord=get_absolute(widget->layout_info, asc, desc);
 
 	bb.x=absolute_coord.x;
-	bb.y=GameMenu_get_window_height()-absolute_coord.y;
+	bb.y=GameMenu_get_window_height()-absolute_coord.y-extra_size*(asc+desc);
 	bb.width=w;
-	bb.height=asc+desc;
+	bb.height=(1+extra_size)*(asc+desc);
 
 	switch (absolute_coord.x_just)
 	{
