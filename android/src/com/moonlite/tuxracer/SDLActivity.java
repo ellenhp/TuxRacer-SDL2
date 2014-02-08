@@ -31,7 +31,15 @@ import android.graphics.*;
 import android.media.*;
 import android.hardware.*;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.*;
 import java.util.Collection;
@@ -796,6 +804,21 @@ public class SDLActivity extends Activity implements
 		 */
 		@Override
 		public void onSuccess(String receiptResponse) {
+			FileOutputStream fos;
+			try {
+				fos = mSingleton.openFileOutput("receipts", Context.MODE_PRIVATE);
+				OutputStreamWriter osw = new OutputStreamWriter(fos);
+				osw.append(receiptResponse);
+				osw.close();
+				fos.close();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+						
 			OuyaEncryptionHelper helper = new OuyaEncryptionHelper();
 			List<Receipt> receipts;
 			try {
@@ -810,11 +833,13 @@ public class SDLActivity extends Activity implements
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
+			
 			// Iterate through receipts
 			for (Receipt receipt : receipts) {
 				String item = receipt.getIdentifier();
+				String gamer = receipt.getGamer();
 				Date date = receipt.getPurchaseDate();
-				Log.i(TAG, "Bbought " + item + " on " + date);
+				Log.i(TAG, gamer + " bought " + item + " on " + date);
 				nativeCoursePrice(0);
 			}
 		}
@@ -839,12 +864,39 @@ public class SDLActivity extends Activity implements
 		 */
 
 		@Override
-		public void onFailure(int errorCode, String errorMessage,
-				Bundle optionalData) {
-			Log.w(TAG, "Request Receipts error (code " + errorCode + ": "
-					+ errorMessage + ")");
-			showError("Could not fetch receipts (error " + errorCode + ": "
-					+ errorMessage + ")");
+		public void onFailure(int errorCode, String errorMessage, Bundle optionalData) {
+			OuyaEncryptionHelper helper = new OuyaEncryptionHelper();
+			List<Receipt> receipts;
+			try {
+				FileInputStream fis = mSingleton.openFileInput("receipts");
+				InputStreamReader isr = new InputStreamReader(fis);
+				BufferedReader bufferedReader = new BufferedReader(isr);
+				StringBuilder sb = new StringBuilder();
+				String line;
+				while ((line = bufferedReader.readLine()) != null) {
+					sb.append(line);
+				}
+				
+				JSONObject response = new JSONObject(sb.toString());
+				receipts = helper.decryptReceiptResponse(response, mPublicKey);
+			} catch (ParseException e) {
+				throw new RuntimeException(e);
+			} catch (JSONException e) {
+				throw new RuntimeException(e);
+			} catch (GeneralSecurityException e) {
+				throw new RuntimeException(e);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			
+			// Iterate through receipts
+			for (Receipt receipt : receipts) {
+				String item = receipt.getIdentifier();
+				String gamer = receipt.getGamer();
+				Date date = receipt.getPurchaseDate();
+				Log.i(TAG, gamer + " bought " + item + " on " + date);
+				nativeCoursePrice(0);
+			}
 		}
 
 		/*
