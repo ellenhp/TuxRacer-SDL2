@@ -886,7 +886,9 @@ public class SDLActivity extends Activity implements
 			} catch (GeneralSecurityException e) {
 				throw new RuntimeException(e);
 			} catch (IOException e) {
-				throw new RuntimeException(e);
+				//no big deal, the file probably just doesn't exist
+				nativeCoursePrice(2.99f);
+				return;
 			}
 			
 			// Iterate through receipts
