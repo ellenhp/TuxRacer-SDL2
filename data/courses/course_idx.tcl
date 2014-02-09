@@ -66,35 +66,35 @@ tux_open_courses [concat \
     } \
     { \
         -course twisty_slope -name "Twisty Slope" \
-            -description "Tight twists make grabbing herring difficult.  Hard turns will lead you to victory." \
+            -description "Tight twists make grabbing herring difficult.  Hard turns will lead you to victory. Only available in full version." \
                     -par_time 40.0  -no_speed \
     } \
     { \
         -course bumpy_ride -name "Bumpy Ride" \
-            -description "This hill has a series of ramps to tackle.  Make sure to line yourself up before getting airborne." \
+            -description "This hill has a series of ramps to tackle.  Make sure to line yourself up before getting airborne. Only available in full version." \
                     -par_time 40.0 \
                     -conditions sunny -no_speed \
     } \
     { \
         -course penguins_cant_fly -name "Flying Penguins" \
-            -description "Go fast, and try to keep a bit of control to catch herrings!" \
+            -description "Go fast, and try to keep a bit of control to catch herrings! Only available in full version." \
                     -par_time 120.0 \
     } \
     { \
         -course slippy_slidey -name "Slippy Slidey" \
-            -description "Choose your way to be the best!" \
+            -description "Choose your way to be the best! Only available in full version." \
                     -par_time 120.0 \
                     -conditions sunny \
     } \
     { \
         -course chinese_wall -name "Chinese Wall" \
-            -description "Choose your way to be the best!" \
+            -description "Try to stay on the wall to get the most Herring. Only available in full version." \
                     -par_time 120.0 \
                     -conditions sunny \
     } \
     { \
         -course bobsled_ride -name "Bobsled Ride" \
-            -description "Just like a real bobsled ride, only more dangerous!" \
+            -description "Just like a real bobsled ride, only more dangerous! Only available in full version." \
                     -par_time 80.0 -conditions sunny \
     } \
     { \
@@ -105,19 +105,19 @@ tux_open_courses [concat \
     } \
     { \
         -course half_pipe -name "Half Pipe" \
-            -description "Do tricks on this course to get a higher score. Make sure to watch the time remaining." \
+            -description "Do tricks on this course to get a higher score. Make sure to watch the time remaining. Only available in full version." \
                     -par_time 80.0 \
                     -conditions sunny -no_speed \
     } \
     { \
         -course off_piste_skiing -name "Off-Piste Skiing" \
-            -description "Free-ride in the mountain! Be careful of trees and use jumps to take short paths." \
+            -description "Free-ride in the mountain! Be careful of trees and use jumps to take short paths. Only available in full version." \
                     -par_time 120.0 \
                     -conditions evening \
     } \
     { \
         -course in_search_of_vodka -name "In Search of Vodka" \
-            -description "Tux needs some vodka to warm up is cold belly. Join Tux on the quest for vodka. Pick up herring for dinner along the way!" \
+            -description "Tux needs some vodka to warm up is cold belly. Join Tux on the quest for vodka. Pick up herring for dinner along the way! Only available in full version." \
                     -par_time 120.0 \
                     -conditions night \
     } \
