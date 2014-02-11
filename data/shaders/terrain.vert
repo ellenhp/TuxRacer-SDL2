@@ -5,6 +5,7 @@ attribute vec3 source_terrain;
 
 uniform mat4 MVP_mat;
 uniform vec3 eye_pos;
+uniform vec3 tux_pos;
 uniform float forward_clip;
 
 varying vec2 dest_env_coord;
@@ -21,7 +22,7 @@ void main()
     dest_tex_coord=source_tex_coord;
     transparencies=source_terrain;
     dest_normal=source_normal;
-    fog_factor=clamp((-eye_pos.z-vert_pos.z)/forward_clip, 0.0, 1.0);
+    fog_factor=clamp((tux_pos.z-vert_pos.z)/forward_clip, 0.0, 1.0);
     //fog_factor=fog_factor*fog_factor;
     gl_Position=MVP_mat*vert_pos;
 }
