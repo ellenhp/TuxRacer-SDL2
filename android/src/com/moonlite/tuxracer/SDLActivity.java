@@ -805,7 +805,8 @@ public class SDLActivity extends Activity implements
 		@Override
 		public void onSuccess(String receiptResponse) {
 			OuyaFacade.getInstance().putGameData("receipts", receiptResponse);
-						
+			Log.d(TAG, "storing receipts");
+			
 			OuyaEncryptionHelper helper = new OuyaEncryptionHelper();
 			List<Receipt> receipts;
 			try {
@@ -852,6 +853,8 @@ public class SDLActivity extends Activity implements
 
 		@Override
 		public void onFailure(int errorCode, String errorMessage, Bundle optionalData) {
+			Log.e(TAG, "getting receipts failed");
+			
 			OuyaEncryptionHelper helper = new OuyaEncryptionHelper();
 			List<Receipt> receipts;
 			try {
@@ -859,6 +862,8 @@ public class SDLActivity extends Activity implements
 				
 				if (receiptResponse==null)
 					return;
+				
+				Log.e(TAG, "using stored receipts");
 				
 				JSONObject response = new JSONObject(receiptResponse);
 				receipts = helper.decryptReceiptResponse(response, mPublicKey);
