@@ -804,20 +804,7 @@ public class SDLActivity extends Activity implements
 		 */
 		@Override
 		public void onSuccess(String receiptResponse) {
-			FileOutputStream fos;
-			try {
-				fos = mSingleton.openFileOutput("receipts", Context.MODE_PRIVATE);
-				OutputStreamWriter osw = new OutputStreamWriter(fos);
-				osw.append(receiptResponse);
-				osw.close();
-				fos.close();
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			OuyaFacade.getInstance().putGameData("receipts", receiptResponse);
 						
 			OuyaEncryptionHelper helper = new OuyaEncryptionHelper();
 			List<Receipt> receipts;
@@ -868,16 +855,12 @@ public class SDLActivity extends Activity implements
 			OuyaEncryptionHelper helper = new OuyaEncryptionHelper();
 			List<Receipt> receipts;
 			try {
-				FileInputStream fis = mSingleton.openFileInput("receipts");
-				InputStreamReader isr = new InputStreamReader(fis);
-				BufferedReader bufferedReader = new BufferedReader(isr);
-				StringBuilder sb = new StringBuilder();
-				String line;
-				while ((line = bufferedReader.readLine()) != null) {
-					sb.append(line);
-				}
+				String receiptResponse=OuyaFacade.getInstance().getGameData("receipts");
 				
-				JSONObject response = new JSONObject(sb.toString());
+				if (receiptResponse==null)
+					return;
+				
+				JSONObject response = new JSONObject(receiptResponse);
 				receipts = helper.decryptReceiptResponse(response, mPublicKey);
 			} catch (ParseException e) {
 				throw new RuntimeException(e);
@@ -886,8 +869,6 @@ public class SDLActivity extends Activity implements
 			} catch (GeneralSecurityException e) {
 				throw new RuntimeException(e);
 			} catch (IOException e) {
-				//no big deal, the file probably just doesn't exist
-				nativeCoursePrice(2.99f);
 				return;
 			}
 			
