@@ -528,11 +528,11 @@ void draw_trees()
     const GLfloat texCoordsTemplateItem[]=
     {
         0.0, 0.0,
-        1.0/4, 0.0,
-        1.0/4, 1.0,
+        1.0, 0.0,
+        1.0, 1.0,
         0.0, 1.0,
         0.0, 0.0,
-        1.0/4, 1.0,
+        1.0, 1.0,
     };
     GLfloat* verticesItem;
     GLfloat* texCoordsItem;
@@ -612,8 +612,10 @@ void draw_trees()
             verticesItem[current_item*18+1+vertex*3]=yOffset + itemHeight * verticesTemplateItem[1+vertex*3];
             verticesItem[current_item*18+2+vertex*3]=zOffset + itemRadius * normal.x * verticesTemplateItem[2+vertex*3];
             
-            texCoordsItem[current_item*12+0+vertex*2]=texCoordsTemplateItem[0+vertex*2]+item_types[item_type].atlas_index/4.0;
-            texCoordsItem[current_item*12+1+vertex*2]=texCoordsTemplateItem[1+vertex*2];
+            int item_index=item_types[item_type].atlas_index;
+            
+            texCoordsItem[current_item*12+0+vertex*2]=((item_index%2)+texCoordsTemplateItem[vertex*2])/2.0f;
+            texCoordsItem[current_item*12+1+vertex*2]=(1-(item_index/2)+texCoordsTemplateItem[1+vertex*2])/2.0f;
         }
         
         current_item++;
@@ -871,8 +873,10 @@ void init_trees_vbo()
             NORMAL(1)=normal.y;
             NORMAL(2)=normal.z;
             
-            TEXCOORD(0)=((float)get_tree_index(treeLocs[i].tree_type))/3.0f+texCoordsTree[vertex*2]/3.0f;
-            TEXCOORD(1)=texCoordsTree[1+vertex*2];
+            int tree_type=get_tree_index(treeLocs[i].tree_type);
+            
+            TEXCOORD(0)=((tree_type%2)+texCoordsTree[vertex*2])/2.0f;
+            TEXCOORD(1)=(1-(tree_type/2)+texCoordsTree[1+vertex*2])/2.0f;
             
 #undef COMPONENT
 #undef POSITION
