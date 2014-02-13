@@ -1097,14 +1097,6 @@ public class SDLActivity extends Activity implements
             mJoystickHandler = new SDLJoystickHandler();
         }
 		
-		Point size = new Point();
-		getWindowManager().getDefaultDisplay().getSize(size);
-
-		size.x *= scaleFactor;
-		size.y *= scaleFactor;
-
-		mSurface.getHolder().setFixedSize(size.x, size.y);
-
 		mLayout = new FrameLayout(this);
 		mLayout.addView(mSurface);
 
