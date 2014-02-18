@@ -763,8 +763,35 @@ FN_PARAM_INT( tux_shadow_sphere_divisions )
 FN_PARAM_BOOL( nice_fog )
 FN_PARAM_BOOL( use_sphere_display_list )
 FN_PARAM_BOOL( display_fps )
+
+#ifdef __ANDROID__
+
+extern int Android_ScreenWidth;
+extern int Android_ScreenHeight;
+
+int getparam_x_resolution(void)
+{
+	return Android_ScreenWidth;
+}
+
+void setparam_x_resolution(int width)
+{
+}
+
+int getparam_y_resolution(void)
+{
+	return Android_ScreenHeight;
+}
+
+void setparam_y_resolution(int height)
+{
+}
+
+#else
 FN_PARAM_INT( x_resolution )
 FN_PARAM_INT( y_resolution )
+#endif
+
 FN_PARAM_BOOL( capture_mouse )
 FN_PARAM_BOOL( do_intro_animation )
 FN_PARAM_INT( mipmap_type )
