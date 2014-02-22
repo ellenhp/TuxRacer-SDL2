@@ -8,31 +8,18 @@ import java.security.spec.X509EncodedKeySpec;
 import java.text.ParseException;
 import java.util.Arrays;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.lang.*;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -58,8 +45,14 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.amazon.inapp.purchasing.GetUserIdResponse;
+import com.amazon.inapp.purchasing.GetUserIdResponse.GetUserIdRequestStatus;
 import com.amazon.inapp.purchasing.Item;
+import com.amazon.inapp.purchasing.ItemDataResponse.ItemDataRequestStatus;
+import com.amazon.inapp.purchasing.PurchaseResponse.PurchaseRequestStatus;
+import com.amazon.inapp.purchasing.PurchaseUpdatesResponse.PurchaseUpdatesRequestStatus;
 import com.amazon.inapp.purchasing.PurchasingManager;
+
 import com.moonlite.tuxracer.AppPurchasingObserver.PurchaseData;
 import com.moonlite.tuxracer.AppPurchasingObserver.PurchaseDataStorage;
 
@@ -906,7 +899,7 @@ public class GameActivity extends SDLActivity implements
 		 */
 		@Override
 		public void onSuccess(String result) {
-			Product product;
+//			Product product;
 			String id;
 			try {
 				OuyaEncryptionHelper helper = new OuyaEncryptionHelper();
@@ -1046,6 +1039,24 @@ public class GameActivity extends SDLActivity implements
 		else
 			AmazonInitIAP();
 	}
+
+    // Events
+    @Override
+    protected void onPause() {
+        Log.v(TAG, "onPause()");
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        Log.v(TAG, "onResume()");
+        super.onResume();
+        if (!onOUYA)
+        {
+        	AmazonRequestIAP();
+        }
+    }
+
 
 	public static native void nativeSetPlayerData(String playerName, boolean isOnOuya);
 	public static native void nativeScoreloopGotScores(int scoreMode, Object[] scoreStrings);
