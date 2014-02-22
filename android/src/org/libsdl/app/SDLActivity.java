@@ -741,19 +741,19 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
             float x, y;
             switch (mDisplay.getRotation()) {
                 case Surface.ROTATION_90:
-                    x = event.values[1];
+                    x = -event.values[1];
                     y = event.values[0];
                     break;
                 case Surface.ROTATION_270:
-                    x = -event.values[1];
-                    y = -event.values[0];
-                    break;
-                case Surface.ROTATION_180:
                     x = event.values[1];
                     y = -event.values[0];
                     break;
+                case Surface.ROTATION_180:
+                    x = -event.values[1];
+                    y = -event.values[0];
+                    break;
                 default:
-                    x = -event.values[0];
+                    x = event.values[0];
                     y = event.values[1];
                     break;
             }
