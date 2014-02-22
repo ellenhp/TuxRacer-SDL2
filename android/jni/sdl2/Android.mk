@@ -52,7 +52,7 @@ LOCAL_SRC_FILES := \
 	$(wildcard $(LOCAL_PATH)/src/video/android/*.c))
 
 
-LOCAL_CFLAGS += -DGL_GLEXT_PROTOTYPES -DSDL_PREFIX=com_moonlite_tuxracer
+LOCAL_CFLAGS += -DGL_GLEXT_PROTOTYPES
 LOCAL_LDLIBS := -ldl -lGLESv1_CM -lGLESv2 -llog -landroid
 
 include $(BUILD_SHARED_LIBRARY)

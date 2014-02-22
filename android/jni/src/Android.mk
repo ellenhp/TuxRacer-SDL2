@@ -17,8 +17,6 @@ LOCAL_SRC_FILES += $(wildcard $(LOCAL_PATH)/src/*.cpp)
 LOCAL_SRC_FILES += $(wildcard $(LOCAL_PATH)/src/android/*.c)
 LOCAL_SRC_FILES += $(wildcard $(GAMEMENU_HOME)/src/*.c)
 
-LOCAL_CFLAGS += -DSDL_PREFIX=com_moonlite_tuxracer
-
 LOCAL_SHARED_LIBRARIES := SDL2
 LOCAL_SHARED_LIBRARIES += SDL2_mixer
 LOCAL_SHARED_LIBRARIES += SDL2_image

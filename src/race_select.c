@@ -370,17 +370,9 @@ void update_text()
 
 #include <jni.h>
 
-#ifndef SDL_PREFIX
-    #pragma warning Defaulting to org.libsdl.app
-	#define SDL_PREFIX		org_libdl_app
-#endif
+#define JNI(f)	Java_com_moonlite_tuxracer_ ## f
 
-#define CONCAT1(p,f)	CONCAT2(p,f)
-#define CONCAT2(p,f)	Java_ ## p ## _ ## f
-
-#define JNI(f)			CONCAT1(SDL_PREFIX,f)
-
-JNIEXPORT void JNICALL JNI(SDLActivity_nativeCoursePrice)(JNIEnv * env, jobject obj, jfloat price)
+JNIEXPORT void JNICALL JNI(GameActivity_nativeCoursePrice)(JNIEnv * env, jobject obj, jfloat price)
 {
 	SDL_Log("IAP PRICE=$%0.2f", price);
 	if (course_price != 0)
@@ -398,7 +390,7 @@ static void buy_course_pack(void)
     {
         return;
     }
-    jclass clazz = (*env)->FindClass(env, "com/moonlite/tuxracer/SDLActivity");
+    jclass clazz = (*env)->FindClass(env, "com/moonlite/tuxracer/GameActivity");
 	if (clazz == NULL)
 	{
 		return;

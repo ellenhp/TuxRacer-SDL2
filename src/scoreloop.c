@@ -54,7 +54,7 @@ void start_dialog(char* title, char* message, bool_t isUsername)
     {
         return;
     }
-    jclass mActivityClass = (*env)->FindClass(env, "com/moonlite/tuxracer/SDLActivity");
+    jclass mActivityClass = (*env)->FindClass(env, "com/moonlite/tuxracer/GameActivity");
     jmethodID mid = (*env)->GetStaticMethodID(env, mActivityClass, "displayTextInputDialog", "(Ljava/lang/String;Ljava/lang/String;Z)V");
     if (!mid)
     {
@@ -103,7 +103,7 @@ void scoreloop_update_widgets()
 }
 
 #ifdef __ANDROID__
-JNIEXPORT void JNICALL JNI(SDLActivity_nativeTextCallback)(JNIEnv *env, jclass cls, jstring str)
+JNIEXPORT void JNICALL JNI(GameActivity_nativeTextCallback)(JNIEnv *env, jclass cls, jstring str)
 {
     char buf[255]; //fun fact: an email can't be more than 254 characters long. Allow for a null character.
     char* string_tmp;
@@ -118,7 +118,7 @@ JNIEXPORT void JNICALL JNI(SDLActivity_nativeTextCallback)(JNIEnv *env, jclass c
         {
             return;
         }
-        jclass mActivityClass = (*env)->FindClass(env, "com/moonlite/tuxracer/SDLActivity");
+        jclass mActivityClass = (*env)->FindClass(env, "com/moonlite/tuxracer/GameActivity");
         jmethodID mid = (*env)->GetStaticMethodID(env, mActivityClass, "setUserAlias", "(Ljava/lang/String;)V");
         if (!mid)
         {
@@ -144,7 +144,7 @@ JNIEXPORT void JNICALL JNI(SDLActivity_nativeTextCallback)(JNIEnv *env, jclass c
     text_entry=TEXT_ENTRY_NONE;
 }
 
-JNIEXPORT void JNICALL JNI(SDLActivity_nativeUpdateUserInfo)(JNIEnv *env, jclass cls, jstring alias)
+JNIEXPORT void JNICALL JNI(GameActivity_nativeUpdateUserInfo)(JNIEnv *env, jclass cls, jstring alias)
 {
     char* string_tmp;
     

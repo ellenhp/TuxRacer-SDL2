@@ -51,7 +51,7 @@ int scoreloop_submit_score(unsigned int scoreMode, unsigned int scoreValue)
     {
         return;
     }
-    jclass mActivityClass = (*env)->FindClass(env, "com/moonlite/tuxracer/SDLActivity");
+    jclass mActivityClass = (*env)->FindClass(env, "com/moonlite/tuxracer/GameActivity");
     jmethodID mid = (*env)->GetStaticMethodID(env, mActivityClass, "submitScore", "(II)Z");
     if (!mid)
     {
@@ -72,7 +72,7 @@ int scoreloop_submit_score(unsigned int scoreMode, unsigned int scoreValue)
         {
             return;
         }
-        mActivityClass = (*env)->FindClass(env, "com/moonlite/tuxracer/SDLActivity");
+        mActivityClass = (*env)->FindClass(env, "com/moonlite/tuxracer/GameActivity");
         mid = (*env)->GetStaticMethodID(env, mActivityClass, "promptForAlias", "(II)V");
         if (!mid)
         {
@@ -84,7 +84,7 @@ int scoreloop_submit_score(unsigned int scoreMode, unsigned int scoreValue)
     }
 }
 
-JNIEXPORT void JNICALL JNI(SDLActivity_nativeDisableAliasPrompt)(JNIEnv *env, jclass cls)
+JNIEXPORT void JNICALL JNI(GameActivity_nativeDisableAliasPrompt)(JNIEnv *env, jclass cls)
 {
     setparam_should_prompt_alias(False);
 }
@@ -97,7 +97,7 @@ int scoreloop_refresh_scores(unsigned int scoreMode)
     {
         return;
     }
-    jclass mActivityClass = (*env)->FindClass(env, "com/moonlite/tuxracer/SDLActivity");
+    jclass mActivityClass = (*env)->FindClass(env, "com/moonlite/tuxracer/GameActivity");
     jmethodID mid = (*env)->GetStaticMethodID(env, mActivityClass, "requestScores", "(I)V");
     if (!mid)
     {
@@ -106,7 +106,7 @@ int scoreloop_refresh_scores(unsigned int scoreMode)
     (*env)->CallStaticVoidMethod(env, mActivityClass, mid, (int)scoreMode);
 }
 
-JNIEXPORT void JNICALL JNI(SDLActivity_nativeScoreloopGotScores)(JNIEnv *env, jclass cls, jint scoreMode, jobjectArray scoreStrings)
+JNIEXPORT void JNICALL JNI(GameActivity_nativeScoreloopGotScores)(JNIEnv *env, jclass cls, jint scoreMode, jobjectArray scoreStrings)
 {
     if (scoreMode==current_scoreboard)
     {
