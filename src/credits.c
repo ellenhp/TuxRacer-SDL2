@@ -164,7 +164,7 @@ static void draw_credits_text( scalar_t time_step )
     int i, string_w, asc, desc;
     scalar_t y;
     
-    y_offset += time_step * CREDITS_SPEED + time_step*joystick_y*CREDITS_JOYSTICK_SPEED;
+    y_offset += time_step * winsys_scale(CREDITS_SPEED + time_step*joystick_y*CREDITS_JOYSTICK_SPEED);
 	if (y_offset<0)
 	{
 		y_offset=0;
