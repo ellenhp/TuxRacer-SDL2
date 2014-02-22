@@ -330,6 +330,9 @@ void draw_tex_font_string( tex_font_metrics_t *tfm, const char *string, float x,
 	x+=batch_tex_font_char( cd, string[i], x, y, scale );
     }
     
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
     glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 2, GL_FLOAT, GL_FALSE, 0, string_vertices);
     glEnableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
     
