@@ -103,7 +103,7 @@ void scoreloop_update_widgets()
 }
 
 #ifdef __ANDROID__
-JNIEXPORT void JNICALL JNI(GameActivity_nativeTextCallback)(JNIEnv *env, jclass cls, jstring str)
+JNIEXPORT void JNICALL JNI(ScoreActivity_nativeTextCallback)(JNIEnv *env, jclass cls, jstring str)
 {
     char buf[255]; //fun fact: an email can't be more than 254 characters long. Allow for a null character.
     char* string_tmp;
@@ -144,7 +144,7 @@ JNIEXPORT void JNICALL JNI(GameActivity_nativeTextCallback)(JNIEnv *env, jclass 
     text_entry=TEXT_ENTRY_NONE;
 }
 
-JNIEXPORT void JNICALL JNI(GameActivity_nativeUpdateUserInfo)(JNIEnv *env, jclass cls, jstring alias)
+JNIEXPORT void JNICALL JNI(ScoreActivity_nativeUpdateUserInfo)(JNIEnv *env, jclass cls, jstring alias)
 {
     char* string_tmp;
     

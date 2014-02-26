@@ -84,7 +84,7 @@ int scoreloop_submit_score(unsigned int scoreMode, unsigned int scoreValue)
     }
 }
 
-JNIEXPORT void JNICALL JNI(GameActivity_nativeDisableAliasPrompt)(JNIEnv *env, jclass cls)
+JNIEXPORT void JNICALL JNI(ScoreActivity_nativeDisableAliasPrompt)(JNIEnv *env, jclass cls)
 {
     setparam_should_prompt_alias(False);
 }
@@ -106,7 +106,7 @@ int scoreloop_refresh_scores(unsigned int scoreMode)
     (*env)->CallStaticVoidMethod(env, mActivityClass, mid, (int)scoreMode);
 }
 
-JNIEXPORT void JNICALL JNI(GameActivity_nativeScoreloopGotScores)(JNIEnv *env, jclass cls, jint scoreMode, jobjectArray scoreStrings)
+JNIEXPORT void JNICALL JNI(ScoreActivity_nativeScoreloopGotScores)(JNIEnv *env, jclass cls, jint scoreMode, jobjectArray scoreStrings)
 {
     if (scoreMode==current_scoreboard)
     {
