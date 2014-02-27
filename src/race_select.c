@@ -395,8 +395,7 @@ static void buy_course_pack(void)
 	{
 		return;
 	}
-	method_name = is_on_ouya() ? "OUYABuyItem" : "AmazonBuyItem";
-    jmethodID mid = (*env)->GetStaticMethodID(env, clazz, method_name, "(I)V");
+    jmethodID mid = (*env)->GetStaticMethodID(env, clazz, "BuyItem", "(I)V");
     if (mid == 0)
     {
         return;

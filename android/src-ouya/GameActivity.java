@@ -587,7 +587,7 @@ public class GameActivity extends ScoreActivity {
 	 * {@link PurchasingManager#initiatePurchaseRequest(String)} with the SKU
 	 * for the course_pack entitlement.
 	 */
-	static public void OUYABuyItem(int id) {
+	static public void BuyItem(int id) {
 		try {
 			requestPurchase(mProduct);
 		} catch (UnsupportedEncodingException e) {
