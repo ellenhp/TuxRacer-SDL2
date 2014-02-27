@@ -79,6 +79,10 @@
 		<copy file="src-ouya/GameActivity.java" overwrite="true" todir="src/com/moonlite/tuxracer"/>
 	</target>
 	
+    <target name="-post-build">
+		<move file="bin/Tux Racer-debug.apk" tofile="bin/Tux Racer-ouya.apk"/>
+	</target>
+	
     <import file="custom_rules.xml" optional="true" />
 
     <!-- Import the actual build file.
