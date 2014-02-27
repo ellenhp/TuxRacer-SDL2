@@ -67,6 +67,18 @@
             -post-build
             -pre-clean
     -->
+	
+	<!-- Copy resources from data to assets directory -->
+    <target name="-pre-build">
+		<copy todir="assets">
+			<fileset dir="../data">
+				<exclude name="*.dll"/>
+				<exclude name="*.exe"/>
+			</fileset>
+		</copy>
+		<copy file="src-amazon/GameActivity.java" overwrite="true" todir="src/com/moonlite/tuxracer"/>
+	</target>
+	
     <import file="custom_rules.xml" optional="true" />
 
     <!-- Import the actual build file.
