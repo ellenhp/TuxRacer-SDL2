@@ -57,7 +57,7 @@ public class ScoreActivity extends SDLActivity {
 		System.loadLibrary("main");
 	}
 
-	private String xor_secret(String secret) {
+	protected String xor_secret(String secret) {
 		int i;
 		char[] buf = new char[secret.length()];
 		char[] secretBuf = secret.toCharArray();

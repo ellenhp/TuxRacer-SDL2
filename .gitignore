@@ -159,6 +159,7 @@ data/config/options.txt
 # DLL
 *.dll
 
+android/assets/play_key.txt
 android/assets/config/*
 android/assets/courses/*
 android/assets/fonts/*
