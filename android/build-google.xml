@@ -76,13 +76,13 @@
 				<exclude name="*.exe"/>
 			</fileset>
 		</copy>
-		<copy file="src-ouya/GameActivity.java" overwrite="true" todir="src/com/moonlite/tuxracer"/>
-		<copy file="src-ouya/AndroidManifest.xml" overwrite="true" todir="."/>
-		<delete dir="src/com/android/vending/billing"/>
+		<copy file="src-google/GameActivity.java" overwrite="true" todir="src/com/moonlite/tuxracer"/>
+		<copy file="src-google/AndroidManifest.xml" overwrite="true" todir="."/>
+		<copy file="src-google/IInAppBillingService.aidl" overwrite="true" todir="src/com/android/vending/billing"/>
 	</target>
 	
     <target name="-post-build">
-		<move file="bin/Tux Racer-debug.apk" tofile="bin/Tux Racer-ouya.apk"/>
+		<move file="bin/Tux Racer-release.apk" tofile="bin/Tux Racer-google.apk"/>
 	</target>
 	
     <import file="custom_rules.xml" optional="true" />

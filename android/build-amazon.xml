@@ -77,6 +77,8 @@
 			</fileset>
 		</copy>
 		<copy file="src-amazon/GameActivity.java" overwrite="true" todir="src/com/moonlite/tuxracer"/>
+		<copy file="src-amazon/AndroidManifest.xml" overwrite="true" todir="."/>
+		<delete dir="src/com/android/vending/billing"/>
 	</target>
 	
     <target name="-post-build">

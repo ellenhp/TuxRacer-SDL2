@@ -4,5 +4,6 @@
     <string name="ok">Ok</string>
     <string name="alert_title">Tux Racer Alert</string>
     <string name="userinfo">Username: %1$s\nUUID: %2$s</string>
+    <string name="app_id">933590848301</string>
     
 </resources>
