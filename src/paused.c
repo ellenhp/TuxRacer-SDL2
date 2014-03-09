@@ -68,7 +68,7 @@ void come_back_to_game(void) {
 	if (SDL_GetTicks()-pause_start<pause_min_ticks)
 		return;
 	pause_min_ticks=0;
-	if (pause_is_for_long_tutorial_explanation)
+	if (pause_is_for_long_tutorial_explanation())
 	{
 		training_resume_from_tutorial_explanation();
 	}
@@ -103,6 +103,18 @@ void paused_continue_cb(int button, int mouse_x, int mouse_y, widget_bounding_bo
 void paused_back_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type, widget_t* widget)
 {
     end_game();
+}
+
+void tutorial_pause_mouse_func( int button, int state, int finger_index, int x, int y )
+{
+    if (pause_is_for_long_tutorial_explanation())
+    {
+        come_back_to_game();
+    }
+    else
+    {
+        GameMenu_mouse_func(button, state, finger_index, x, y);
+    }
 }
 
 /*---------------------------------------------------------------------------*/
@@ -158,7 +170,7 @@ void paused_init(void)
     winsys_set_display_func( main_loop );
     winsys_set_idle_func( main_loop );
     winsys_set_reshape_func( reshape );
-    winsys_set_mouse_func( GameMenu_mouse_func );
+    winsys_set_mouse_func( tutorial_pause_mouse_func );
     winsys_set_motion_func( GameMenu_motion_func );
     winsys_set_passive_motion_func( GameMenu_motion_func );
 	winsys_set_joystick_func( NULL );
