@@ -267,7 +267,7 @@ static void draw_instructions(player_data_t *plyr)
 			if (!winsys_is_controller_active())
 			{
 				const GLint radius = winsys_scale(55);
-				print_instruction(Localize("Tap the bottom right corner to brake.", ""),2);
+				print_instruction(Localize("Tap the bottom left corner to brake.", ""),2);
 	            drawRedCircle(0, 0, radius * 2);
 			}
 			else
