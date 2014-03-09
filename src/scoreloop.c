@@ -133,7 +133,7 @@ JNIEXPORT void JNICALL JNI(ScoreActivity_nativeTextCallback)(JNIEnv *env, jclass
         {
             return;
         }
-        jclass mActivityClass = (*env)->FindClass(env, "com/moonlite/tuxracer/SDLActivity");
+        jclass mActivityClass = (*env)->FindClass(env, "com/moonlite/tuxracer/GameActivity");
         jmethodID mid = (*env)->GetStaticMethodID(env, mActivityClass, "setUserEmail", "(Ljava/lang/String;)V");
         if (!mid)
         {
