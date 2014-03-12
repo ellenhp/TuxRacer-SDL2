@@ -27,7 +27,7 @@ extern "C"
 
 #include "tuxracer.h"
 
-extern float course_price;
+extern char course_price[10];
 const char* get_current_course_name(void);
 
 bool_t buy_or_play_course(void);

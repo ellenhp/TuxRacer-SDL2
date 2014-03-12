@@ -61,7 +61,7 @@ public class GameActivity extends ScoreActivity implements
 	 */
 	private void enableEntitlementForSKU(String sku) {
 		if (MySKU.COURSE_PACK.getSku().equals(sku)) {
-			nativeCoursePrice(0);
+			nativeCoursePrice(null);
 		}
 	}
 
@@ -184,8 +184,7 @@ public class GameActivity extends ScoreActivity implements
 			Log.i(TAG, "onItemDataResponseSuccessful: sku (" + sku + ") item ("
 					+ item + ")");
 			if (MySKU.COURSE_PACK.getSku().equals(sku)) {
-				float price = Float.parseFloat(item.getPrice());
-				nativeCoursePrice(price);
+				nativeCoursePrice(item.getPrice());
 			}
 		}
 	}
@@ -359,5 +358,5 @@ public class GameActivity extends ScoreActivity implements
 
 
 	public static native void nativeSetPlayerData(String playerName, boolean isOnOuya);
-	public static native void nativeCoursePrice(float price);
+	public static native void nativeCoursePrice(String price);
 }

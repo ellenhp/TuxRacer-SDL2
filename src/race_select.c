@@ -99,14 +99,14 @@ const char* get_current_course_name()
     return data->course;
 }
 
-float course_price = 2.99;
+char course_price[10] = "$2.99";
 bool_t price_update = False;
 
 bool_t buy_or_play_course(void)
 {
 	const char* course_name = get_current_course_name();
 
-	return !is_course_free(course_name) && (course_price != 0.0);
+	return !is_course_free(course_name) && (course_price[0] != '\0');
 }
 
 /*---------------------------------------------------------------------------*/
@@ -372,13 +372,21 @@ void update_text()
 
 #define JNI(f)	Java_com_moonlite_tuxracer_ ## f
 
-JNIEXPORT void JNICALL JNI(GameActivity_nativeCoursePrice)(JNIEnv * env, jobject obj, jfloat price)
+JNIEXPORT void JNICALL JNI(GameActivity_nativeCoursePrice)(JNIEnv * env, jobject obj, jstring price)
 {
-	SDL_Log("IAP PRICE=$%0.2f", price);
-	if (course_price != 0)
+	if (course_price[0] != '\0')
 	{
 		price_update = True;
-		course_price = price;
+		if (price != NULL)
+		{
+			const char* price_str = (*env)->GetStringUTFChars(env, price, 0);
+			SDL_Log("nativeCoursePrice=%s\n", price_str);
+			strcpy(course_price, price_str);
+		}
+		else
+		{
+			memset(course_price, 0, sizeof(course_price));
+		}
 	}
 }
 

@@ -218,7 +218,7 @@ public class GameActivity extends ScoreActivity {
 					public void onSuccess(final ArrayList<Product> products) {
 						for (Product product : products) {
 							mProduct = product;
-							float price = (float) product.getLocalPrice();
+							String price = "$" + double.toString(product.getLocalPrice());
 							Log.i(TAG, "Product " + product.getName()
 									+ " price=" + price);
 							nativeCoursePrice(price);
@@ -421,7 +421,7 @@ public class GameActivity extends ScoreActivity {
 				String gamer = receipt.getGamer();
 				Date date = receipt.getPurchaseDate();
 				Log.i(TAG, gamer + " bought " + item + " on " + date);
-				nativeCoursePrice(0);
+				nativeCoursePrice(null);
 			}
 		}
 
@@ -476,7 +476,7 @@ public class GameActivity extends ScoreActivity {
 				String gamer = receipt.getGamer();
 				Date date = receipt.getPurchaseDate();
 				Log.i(TAG, gamer + " bought " + item + " on " + date);
-				nativeCoursePrice(0);
+				nativeCoursePrice(null);
 			}
 		}
 
@@ -632,5 +632,5 @@ public class GameActivity extends ScoreActivity {
 
 
 	public static native void nativeSetPlayerData(String playerName, boolean isOnOuya);
-	public static native void nativeCoursePrice(float price);
+	public static native void nativeCoursePrice(String price);
 }

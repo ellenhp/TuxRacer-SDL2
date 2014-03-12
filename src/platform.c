@@ -56,7 +56,7 @@ char* get_race_text(void)
 
 	if (buy_or_play_course())
 	{
-		button_format = "Buy $%0.2f";
+		button_format = "Buy %s";
 	}
 	else
 	{

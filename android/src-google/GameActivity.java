@@ -88,7 +88,7 @@ public class GameActivity extends ScoreActivity {
 					Log.d(TAG, "premium: "+(premiumPurchase!=null));
 					
 					if (premiumPurchase!=null) {
-						nativeCoursePrice(0);
+						nativeCoursePrice(null);
 					}
 				}
 			};
@@ -154,7 +154,7 @@ public class GameActivity extends ScoreActivity {
             Log.d(TAG, "Purchase successful.");
 
             if (purchase.getSku().equals(SKU_PREMIUM)) {
-            	nativeCoursePrice(0);
+            	nativeCoursePrice(null);
             }
         }
     };
@@ -162,5 +162,5 @@ public class GameActivity extends ScoreActivity {
 	public static native void nativeSetPlayerData(String playerName,
 			boolean isOnOuya);
 
-	public static native void nativeCoursePrice(float price);
+	public static native void nativeCoursePrice(String price);
 }
