@@ -89,6 +89,8 @@ public class GameActivity extends ScoreActivity {
 					
 					if (premiumPurchase!=null) {
 						nativeCoursePrice(null);
+					} else {
+						nativeCoursePrice(inventory.getSkuDetails(SKU_PREMIUM).getPrice());
 					}
 				}
 			};
@@ -109,7 +111,7 @@ public class GameActivity extends ScoreActivity {
 				// IAB is fully set up. Now, let's get an inventory of stuff we
 				// own.
 				Log.d(TAG, "Setup successful. Querying inventory.");
-				mHelper.queryInventoryAsync(mGotInventoryListener);
+				mHelper.queryInventoryAsync(true, mGotInventoryListener);
 				Log.d(TAG, "Started async inventory query.");
 			}
 		});

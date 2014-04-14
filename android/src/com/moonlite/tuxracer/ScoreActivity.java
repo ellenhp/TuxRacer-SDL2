@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 
 // Scoreloop interface
@@ -109,6 +110,8 @@ public class ScoreActivity extends SDLActivity {
 					}
 				});
 		controller.query(this);
+		
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 	}
 
 	/************************************************************************/
