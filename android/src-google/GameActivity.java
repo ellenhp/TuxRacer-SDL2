@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -111,7 +112,9 @@ public class GameActivity extends ScoreActivity {
 				// IAB is fully set up. Now, let's get an inventory of stuff we
 				// own.
 				Log.d(TAG, "Setup successful. Querying inventory.");
-				mHelper.queryInventoryAsync(true, mGotInventoryListener);
+				ArrayList<String> skuList=new ArrayList<String>();
+				skuList.add(SKU_PREMIUM);
+				mHelper.queryInventoryAsync(true, skuList, mGotInventoryListener);
 				Log.d(TAG, "Started async inventory query.");
 			}
 		});
