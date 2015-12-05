@@ -286,10 +286,6 @@ void rect_to_absolute(rect_t* rect)
 
 void GameMenu_draw_image(GLuint binding, rect_t image_rect, rect_t screen_rect)
 {
-	glBindTexture( GL_TEXTURE_2D, binding );
-
-	rect_to_absolute(&screen_rect);
-    
     GLfloat texCoords []=
     {
         image_rect.upper_right.x,image_rect.lower_left.y,
@@ -298,6 +294,10 @@ void GameMenu_draw_image(GLuint binding, rect_t image_rect, rect_t screen_rect)
         image_rect.lower_left.x,image_rect.lower_left.y
     };
     GLubyte indices[]={0, 1, 2, 0, 2, 3};
+
+	glBindTexture( GL_TEXTURE_2D, binding );
+
+	rect_to_absolute(&screen_rect);
     
 	draw_textured_quad_texcoords(screen_rect.lower_left.x, screen_rect.lower_left.y, screen_rect.upper_right.x-screen_rect.lower_left.x, screen_rect.upper_right.y-screen_rect.lower_left.y, texCoords);
 }

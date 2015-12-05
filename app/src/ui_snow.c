@@ -287,9 +287,9 @@ void draw_ui_snow( void )
         GLushort* indices=(GLushort*)malloc(6*num_particles*sizeof(GLushort));
         
         for ( i=0; i<num_particles; i++) {
-            init_arrays_for_particle(particles[i], vertices+i*8, tex_coords+i*8);
             int firstvert=i*4;
             int firstindex=i*6;
+            init_arrays_for_particle(particles[i], vertices+i*8, tex_coords+i*8);
             indices[0+firstindex]=0+firstvert;
             indices[1+firstindex]=1+firstvert;
             indices[2+firstindex]=2+firstvert;

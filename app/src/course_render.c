@@ -608,12 +608,14 @@ void draw_trees()
         
         for (vertex=0; vertex<6; vertex++)
         {
+			int item_index;
+			
             verticesItem[current_item*18+0+vertex*3]=xOffset + itemRadius * normal.z * verticesTemplateItem[0+vertex*3];
             verticesItem[current_item*18+1+vertex*3]=yOffset + itemHeight * verticesTemplateItem[1+vertex*3];
             verticesItem[current_item*18+2+vertex*3]=zOffset + itemRadius * normal.x * verticesTemplateItem[2+vertex*3];
             
-            int item_index=item_types[item_type].atlas_index;
-            
+            item_index=item_types[item_type].atlas_index;
+
             texCoordsItem[current_item*12+0+vertex*2]=((item_index%2)+texCoordsTemplateItem[vertex*2])/2.0f;
             texCoordsItem[current_item*12+1+vertex*2]=(1-(item_index/2)+texCoordsTemplateItem[1+vertex*2])/2.0f;
         }
@@ -860,6 +862,8 @@ void init_trees_vbo()
         
         for (vertex=0; vertex<12; vertex++)
         {
+			int tree_type;
+
 #define COMPONENT(value) (treeBuffer[(value)+i*96+vertex*8])
 #define POSITION(value) COMPONENT(value)
 #define NORMAL(value) COMPONENT((value)+3)
@@ -873,7 +877,7 @@ void init_trees_vbo()
             NORMAL(1)=normal.y;
             NORMAL(2)=normal.z;
             
-            int tree_type=get_tree_index(treeLocs[i].tree_type);
+            tree_type=get_tree_index(treeLocs[i].tree_type);
             
             TEXCOORD(0)=((tree_type%2)+texCoordsTree[vertex*2])/2.0f;
             TEXCOORD(1)=(1-(tree_type/2)+texCoordsTree[1+vertex*2])/2.0f;

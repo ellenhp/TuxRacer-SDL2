@@ -1762,6 +1762,7 @@ static int course_light_cb (ClientData cd, Tcl_Interp *ip,
             copy_to_glfloat_array( course_lights[light_num].specular,
                                   tmp_arr, 4 );
         } else if ( strcmp( "-position", *argv ) == 0 ) {
+            GLfloat magnitude=0;
             NEXT_ARG;
             if ( argc == 0 ) {
                 error = True;
@@ -1773,7 +1774,6 @@ static int course_light_cb (ClientData cd, Tcl_Interp *ip,
             }
             copy_to_glfloat_array( course_lights[light_num].position,
                                   tmp_arr, 4 );
-            GLfloat magnitude=0;
             for (i=0; i<3; i++)
             {
                 magnitude+=course_lights[light_num].position[i]*course_lights[light_num].position[i];
