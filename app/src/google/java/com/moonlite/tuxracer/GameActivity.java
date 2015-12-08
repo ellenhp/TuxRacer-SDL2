@@ -12,7 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.moonlite.tuxracer.ScoreActivity;
-import com.moonlite.tuxracer.googleplayiap.*;
+import com.android.vending.billing.*;
 
 /**
  * GameActivity implements (both Amazon and OUYA) In-App Purchase on top of

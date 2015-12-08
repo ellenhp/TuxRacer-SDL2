@@ -218,7 +218,7 @@ public class GameActivity extends ScoreActivity {
 					public void onSuccess(final ArrayList<Product> products) {
 						for (Product product : products) {
 							mProduct = product;
-							String price = "$" + double.toString(product.getLocalPrice());
+							String price = "$" + Double.toString(product.getLocalPrice());
 							Log.i(TAG, "Product " + product.getName()
 									+ " price=" + price);
 							nativeCoursePrice(price);
