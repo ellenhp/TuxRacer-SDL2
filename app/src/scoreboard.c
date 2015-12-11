@@ -165,7 +165,8 @@ void loading_scoreboards()
         strcpy(score->name, "");
         strcpy(score->score, "");
     }
-    strcpy(scoreboard[4].name, "     Loading...");
+//    strcpy(scoreboard[4].name, "     Loading...");
+    strcpy(scoreboard[4].name, "New Scoring System coming...");
     update_scoreboard_labels();
 }
 
