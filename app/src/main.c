@@ -115,7 +115,7 @@ int tux_eval(Tcl_Interp *interp, char* filename)
     if (!file)
     {
         handle_error( 1, "error opening script %s", filename);
-        return;
+        return 0;
     }
     bytes_read=SDL_RWread(file, tcl_script_buf, 1, SCRIPT_MAX_SIZE-1);
     tcl_script_buf[bytes_read]=0; //null terminate it!

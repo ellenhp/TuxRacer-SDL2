@@ -44,7 +44,7 @@ int stored_score_value=0;
 
 #define JNI(f)	Java_com_moonlite_tuxracer_ ## f
 
-int scoreloop_submit_score(unsigned int scoreMode, unsigned int scoreValue)
+void scoreloop_submit_score(unsigned int scoreMode, unsigned int scoreValue)
 {
     JNIEnv* env = Android_JNI_GetEnv();
     if (!env)
@@ -55,7 +55,7 @@ int scoreloop_submit_score(unsigned int scoreMode, unsigned int scoreValue)
     jmethodID mid = (*env)->GetStaticMethodID(env, mActivityClass, "submitScore", "(II)Z");
     if (!mid)
     {
-        return ;
+        return;
     }
     if (!(*env)->CallStaticBooleanMethod(env, mActivityClass, mid, (int)scoreMode, (int)scoreValue))
     {
@@ -76,12 +76,13 @@ int scoreloop_submit_score(unsigned int scoreMode, unsigned int scoreValue)
         mid = (*env)->GetStaticMethodID(env, mActivityClass, "promptForAlias", "(II)V");
         if (!mid)
         {
-            return ;
+            return;
         }
         (*env)->CallStaticVoidMethod(env, mActivityClass, mid, (int)scoreMode, (int)scoreValue);
         (*env)->DeleteLocalRef(env, j_title);
         (*env)->DeleteLocalRef(env, j_message);
     }
+	return;
 }
 
 JNIEXPORT void JNICALL JNI(ScoreActivity_nativeDisableAliasPrompt)(JNIEnv *env, jclass cls)
@@ -89,7 +90,10 @@ JNIEXPORT void JNICALL JNI(ScoreActivity_nativeDisableAliasPrompt)(JNIEnv *env, 
     setparam_should_prompt_alias(False);
 }
 
-int scoreloop_refresh_scores(unsigned int scoreMode)
+extern void loading_scoreboards();
+
+
+void scoreloop_refresh_scores(unsigned int scoreMode)
 {
     JNIEnv* env = Android_JNI_GetEnv();
     loading_scoreboards();
