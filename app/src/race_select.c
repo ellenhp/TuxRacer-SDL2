@@ -99,7 +99,7 @@ const char* get_current_course_name()
     return data->course;
 }
 
-char course_price[10] = "$2.99";
+char course_price[10] = "$1.99";
 bool_t price_update = False;
 
 bool_t buy_or_play_course(void)
@@ -369,6 +369,13 @@ void update_text()
 #ifdef __ANDROID__
 
 #include <jni.h>
+
+#define JNI(f)	Java_com_moonlite_tuxfull_ ## f
+
+JNIEXPORT void JNICALL JNI(GameActivity_nativeCoursePrice)(JNIEnv * env, jobject obj, jstring price)
+{
+	memset(course_price, 0, sizeof(course_price));
+}
 
 #define JNI(f)	Java_com_moonlite_tuxracer_ ## f
 

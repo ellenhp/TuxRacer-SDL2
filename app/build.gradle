@@ -4,6 +4,7 @@ android {
     buildToolsVersion "25.0.2"
 
     defaultConfig {
+        applicationId "com.moonlite.tuxracer"
         minSdkVersion 15
         targetSdkVersion 25
         versionCode 6
@@ -22,36 +23,23 @@ android {
         }
     }
     productFlavors {
-        ouya {
-            ndkConfig.abiFilters "armeabi-v7a"
-            applicationId "com.moonlite.tuxracer"
-            versionName '1.05-ouya'
-            minSdkVersion 15
-            targetSdkVersion 25
-            versionCode 6
-        }
-        amazon {
-            ndkConfig.abiFilters "armeabi-v7a"
-            minSdkVersion 15
-            targetSdkVersion 25
-            versionName '1.05-amazon'
-            applicationId 'com.moonlite.tuxracer'
-            versionCode 6
-        }
         google {
+            applicationId 'com.moonlite.tuxracer'
+            resValue "string", "app_name", "Tux Racer"
             ndkConfig.abiFilters "armeabi-v7a", "x86"
             versionName '1.05-google'
             minSdkVersion 15
             targetSdkVersion 25
-            applicationId 'com.moonlite.tuxracer'
             versionCode 6
         }
         full {
+            applicationId 'com.moonlite.tuxracer.full'
+            resValue "string", "app_name", "Tux Racer (Full)"
+
             ndkConfig.abiFilters "armeabi-v7a", "x86"
             versionName '1.05-full'
             minSdkVersion 15
             targetSdkVersion 25
-            applicationId 'com.moonlite.tuxracer'
             versionCode 6
         }
     }
@@ -65,7 +53,4 @@ android {
         compile fileTree(include: ['*.jar'], dir: 'libs')
         compile 'com.android.support:appcompat-v7:25.+'
     }
-}
-
-dependencies {
 }
