@@ -10,6 +10,7 @@
 
 # built native files (uncomment if you build your own)
 *.o
+*.o.d
 *.so
 
 # generated files
