@@ -70,7 +70,7 @@ static credit_line_t credit_lines[] =
     { "credits_h2", "Development Team:" },
     { "credits_text_small", "(Alphabetical Order)" },
     { "credits_text", "Lennie Araki" },
-    { "credits_text", "Nolan Poe" },
+    { "credits_text", "Ellen Poe" },
     { "credits_text", "" },
     { "credits_h2", "Original Tux Racer" },
     { "credits_h2", "Core Development Team:" },
@@ -89,7 +89,7 @@ static credit_line_t credit_lines[] =
     { "credits_text", "Felix Jankowski" },  
     { "credits_text", "" },
     { "credits_h2", "Source available at:" },
-    { "credits_text", "https://github.com/nopoe/TuxRacer-SDL2" },
+    { "credits_text", "https://github.com/ellenpoe/TuxRacer-SDL2" },
 };
 
 static scalar_t y_offset = 0;
