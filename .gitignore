@@ -42,3 +42,4 @@ Thumbs.db
 .idea/datasources.xml
 .idea/dataSources.ids
 .idea/libraries
+.idea/*
