@@ -25,112 +25,47 @@ JNIEXPORT jdouble JNICALL JNI(GameActivity_nativeSetPlayerData)
 	}
 	player_name=(char*)malloc(strlen(name));
 	strcpy(player_name, name);
-	
-	if (on_ouya)
-	{
-		is_on_ouya_val=True;
-		overscan_percent=5;
-	}
-	else
-	{
-		overscan_percent=0;
-	}
 }
 #endif
 
 bool_t is_on_ouya(void)
 {
-    return is_on_ouya_val;
+    return 0;
 }
 
 int get_overscan_percent(void)
 {
-	return overscan_percent;
+	return 0;
 }
 
 char race_button_text[20];
 
 char* get_race_text(void)
 {
-	const char* button_format;
-
-	if (buy_or_play_course())
-	{
-		button_format = "Buy %s";
-	}
-	else
-	{
-		button_format = "Race";
-	}
-
-	if (is_on_ouya_val)
-	{
-		strcpy(race_button_text, OUYA_O_BUTTON);
-		sprintf(race_button_text+2, button_format, course_price);
-	}
-	else
-	{
-		sprintf(race_button_text, button_format, course_price);
-	}
-	return race_button_text;
+	return "Race";
 }
 
 char* get_back_text(void)
 {
-	if (is_on_ouya_val)
-	{
-		return OUYA_A_BUTTON "Back";
-	}
-	else
-	{
-		return "Back";
-	}
+	return "Back";
 }
 
 char* get_continue_text(void)
 {
-	if (is_on_ouya_val)
-	{
-		return OUYA_O_BUTTON "Continue";
-	}
-	else
-	{
-		return "Continue";
-	}
+	return "Continue";
 }
 
 char* get_abort_text(void)
 {
-	if (is_on_ouya_val)
-	{
-		return OUYA_A_BUTTON "Exit Race";
-	}
-	else
-	{
-		return "Exit Race";
-	}
+	return "Exit Race";
 }
 
 char* get_select_text(void)
 {
-	if (is_on_ouya_val)
-	{
-		return OUYA_O_BUTTON "Select";
-	}
-	else
-	{
-		return "Select";
-	}
+	return "Select";
 }
 
 char* get_quit_text(void)
 {
-	if (is_on_ouya_val)
-	{
-		return OUYA_A_BUTTON "Quit";
-	}
-	else
-	{
-		return "Quit";
-	}
+	return "Quit";
 }

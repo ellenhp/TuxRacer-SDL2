@@ -1,17 +1,17 @@
-/* 
- * Tux Racer 
+/*
+ * Tux Racer
  * Copyright (C) 1999-2001 Jasmin F. Patry
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -90,7 +90,6 @@ static widget_t* back_button=NULL;
 
 /* Forward declaration */
 static void race_select_loop( scalar_t time_step );
-static void buy_course_pack(void);
 
 const char* get_current_course_name()
 {
@@ -99,18 +98,8 @@ const char* get_current_course_name()
     return data->course;
 }
 
-char course_price[10] = "$1.99";
-bool_t price_update = False;
-
-bool_t buy_or_play_course(void)
-{
-	const char* course_name = get_current_course_name();
-
-	return !is_course_free(course_name) && (course_price[0] != '\0');
-}
-
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
  Function used by listbox to convert list element to a string to display
  \author  jfpatry
  \date    Created:  2000-09-24
@@ -119,13 +108,13 @@ bool_t buy_or_play_course(void)
 static char* get_name_from_race_data( list_elem_data_t elem )
 {
     race_data_t *data;
-    
+
     data = (race_data_t*) elem;
     return data->name;
 }
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
  Updates g_game.race to reflect current race data
  \author  jfpatry
  \date    Created:  2000-09-24
@@ -134,10 +123,10 @@ static char* get_name_from_race_data( list_elem_data_t elem )
 void update_race_data( void )
 {
     int i, course_index;
-    
+
     if ( g_game.practicing ) {
         open_course_data_t *data;
-        
+
         data = (open_course_data_t*) get_list_elem_data( cur_elem );
         g_game.race.course = data->course;
         g_game.race.name = data->name;
@@ -148,7 +137,7 @@ void update_race_data( void )
             g_game.race.time_req[i] = 0;
             g_game.race.score_req[i] = 0;
         }
-        
+
         g_game.race.time_req[0] = data->par_time;
     } else {
         race_data_t *data;
@@ -158,7 +147,7 @@ void update_race_data( void )
 }
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
  Updates the race results based on the results of the race just completed
  Should be called before last_race_completed is updated.
  \author  jfpatry
@@ -174,7 +163,7 @@ static void update_race_results( void )
     scalar_t time;
     int herring;
     int score;
-    
+
     if ( g_game.practicing ) {
         open_course_data_t *data;
         data = (open_course_data_t*)get_list_elem_data( cur_elem );
@@ -184,10 +173,10 @@ static void update_race_results( void )
         data = (race_data_t*)get_list_elem_data( cur_elem );
         race_name = data->name;
     }
-    
+
     event = g_game.current_event;
     cup = g_game.current_cup;
-    
+
     if ( !get_saved_race_results( plyr->name,
                                  event,
                                  cup,
@@ -206,10 +195,10 @@ static void update_race_results( void )
     } else {
         update_score = False;
     }
-    
+
     if ( update_score ) {
         bool_t result;
-        result = 
+        result =
 	    set_saved_race_results( plyr->name,
                                event,
                                cup,
@@ -217,7 +206,7 @@ static void update_race_results( void )
                                g_game.difficulty,
                                g_game.time,
                                plyr->herring,
-                               plyr->score ); 
+                               plyr->score );
         if ( !result ) {
             print_warning( IMPORTANT_WARNING,
                           "Couldn't save race results" );
@@ -227,7 +216,7 @@ static void update_race_results( void )
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
  Call when a race has just been won
  \author  jfpatry
  \date    Created:  2000-09-24
@@ -236,22 +225,22 @@ static void update_race_results( void )
 void update_for_won_race( void )
 {
     race_data_t *race_data;
-    
+
     check_assertion( g_game.practicing == False,
                     "Tried to update for won race in practice mode" );
-    
+
     race_data = (race_data_t*)get_list_elem_data( cur_elem );
-    
+
     if ( last_completed_race == NULL ||
-        compare_race_positions( cup_data, last_completed_race, 
+        compare_race_positions( cup_data, last_completed_race,
                                cur_elem ) > 0 )
     {
         last_completed_race = cur_elem;
-		
+
         if ( cur_elem == get_list_tail( race_list ) ) {
             cup_complete = True;
-            
-            if ( !set_last_completed_cup( 
+
+            if ( !set_last_completed_cup(
                                          plyr->name,
                                          g_game.current_event,
                                          g_game.difficulty,
@@ -260,8 +249,8 @@ void update_for_won_race( void )
                 print_warning( IMPORTANT_WARNING,
                               "Couldn't save cup completion" );
             } else {
-                print_debug( DEBUG_GAME_LOGIC, 
-                            "Cup %s completed", 
+                print_debug( DEBUG_GAME_LOGIC,
+                            "Cup %s completed",
                             g_game.current_cup );
             }
         }
@@ -279,7 +268,7 @@ static void back()
     } else {
         set_game_mode( GAME_TYPE_SELECT );
     }
-    
+
 	winsys_reset_js_bindings();
 
     ui_set_dirty();
@@ -287,34 +276,23 @@ static void back()
 
 static void start_race()
 {
-	if (buy_or_play_course())
-	{
-#ifdef __ANDROID__
-		buy_course_pack();
-#else
-		// TODO: Implement In-App-Purchase here
-#endif
-	}
-	else
-	{
-		race_select_loop( 0 );
-		
-		update_race_data();
-		
-		//Select the starting step
-		if (!strcmp(g_game.race.name,"Basic tutorial")) init_starting_tutorial_step(0);
-		if (!strcmp(g_game.race.name,"Jump tutorial")) init_starting_tutorial_step(10);
-		
-		winsys_reset_js_bindings();
+	race_select_loop( 0 );
 
-		set_game_mode( LOADING );
-	}
+	update_race_data();
+
+	//Select the starting step
+	if (!strcmp(g_game.race.name,"Basic tutorial")) init_starting_tutorial_step(0);
+	if (!strcmp(g_game.race.name,"Jump tutorial")) init_starting_tutorial_step(10);
+
+	winsys_reset_js_bindings();
+
+	set_game_mode( LOADING );
 }
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
- Sets the widget positions and draws other on-screen goo 
+/*!
+ Sets the widget positions and draws other on-screen goo
  \author  jfpatry
  \date    Created:  2000-09-24
  \date    Modified: 2000-09-24
@@ -322,7 +300,7 @@ static void start_race()
 static void draw_preview()
 {
     GLuint texobj;
-    
+
 	{
 		rect_t screen_rect;
 		open_course_data_t *data;
@@ -337,7 +315,7 @@ static void draw_preview()
 				texobj = 0;
 			}
 		}
-        
+
         glBindTexture( GL_TEXTURE_2D, texobj );
 
         draw_textured_quad(0.105*w, 0.45*h, 0.34*w, 0.34*h);
@@ -365,61 +343,6 @@ void update_text()
 		refresh_scores_for_course(data->course);
     }
 }
-
-#ifdef __ANDROID__
-
-#include <jni.h>
-
-#define JNI(f)	Java_com_moonlite_tuxfull_ ## f
-
-JNIEXPORT void JNICALL JNI(GameActivity_nativeCoursePrice)(JNIEnv * env, jobject obj, jstring price)
-{
-	memset(course_price, 0, sizeof(course_price));
-}
-
-#define JNI(f)	Java_com_moonlite_tuxracer_ ## f
-
-JNIEXPORT void JNICALL JNI(GameActivity_nativeCoursePrice)(JNIEnv * env, jobject obj, jstring price)
-{
-	if (course_price[0] != '\0')
-	{
-		price_update = True;
-		if (price != NULL)
-		{
-			const char* price_str = (*env)->GetStringUTFChars(env, price, 0);
-			SDL_Log("nativeCoursePrice=%s\n", price_str);
-			strcpy(course_price, price_str);
-		}
-		else
-		{
-			memset(course_price, 0, sizeof(course_price));
-		}
-	}
-}
-
-static void buy_course_pack(void)
-{
-	const char* method_name;
-    JNIEnv* env = Android_JNI_GetEnv();
-    if (env == NULL)
-    {
-        return;
-    }
-    jclass clazz = (*env)->FindClass(env, "com/moonlite/tuxracer/GameActivity");
-	if (clazz == NULL)
-	{
-		return;
-	}
-    jmethodID mid = (*env)->GetStaticMethodID(env, clazz, "BuyItem", "(I)V");
-    if (mid == 0)
-    {
-        return;
-    }
-	/* Java callback to request In-App-Purchase */
-    (*env)->CallStaticVoidMethod(env, clazz, mid, 1);
-}
-
-#endif
 
 void play_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb, input_type_t input_type, widget_t* widget)
 {
@@ -496,14 +419,14 @@ static void init_scoreboard()
 		gui_add_widget(label=get_score_label(row), &item_coord);
 		label->font_binding="leaderboard_text";
 	}
-    
+
     update_text();
-    
+
 	gui_balance_lines(0);
 }
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
  Mode initialization function
  \author  jfpatry
  \date    Created:  2000-09-24
@@ -517,9 +440,9 @@ static void race_select_init(void)
 	coord_t button_coord;
 	list_elem_t tmp;
     int i;
-    
+
     scoreboard_open=True;
-    
+
     winsys_set_display_func( main_loop );
     winsys_set_idle_func( main_loop );
     winsys_set_reshape_func( reshape );
@@ -528,12 +451,12 @@ static void race_select_init(void)
     winsys_set_passive_motion_func( GameMenu_motion_func );
 	winsys_set_joystick_func( NULL );
 	winsys_set_joystick_button_func( NULL );
-    
+
 	winsys_reset_js_bindings();
 	winsys_add_js_axis_bindings();
 	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_A, SDLK_RETURN);
 	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_B, SDLK_ESCAPE);
-    
+
 	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_DPAD_LEFT, SDLK_LEFT);
 	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_DPAD_RIGHT, SDLK_RIGHT);
 
@@ -541,7 +464,7 @@ static void race_select_init(void)
 	setup_gui();
 
     plyr = get_player_data( local_player() );
-    
+
     /* Setup the race list */
     if ( g_game.practicing ) {
         g_game.current_event = "__Practice_Event__";
@@ -558,14 +481,14 @@ static void race_select_init(void)
         last_completed_race = NULL;
         event_data = NULL;
     }
-    
-    /* Unless we're coming back from a race, initialize the race data to 
+
+    /* Unless we're coming back from a race, initialize the race data to
      defaults.
      */
     if ( g_game.prev_mode != GAME_OVER ) {
         /* Make sure we don't play previously loaded course */
         cup_complete = False;
-        
+
         /* Initialize the race data */
 		if (cur_elem==NULL)
 		{
@@ -584,32 +507,32 @@ static void race_select_init(void)
 				cur_elem = get_list_head( race_list );
 			}
 		}
-        
+
         if ( g_game.practicing ) {
             g_game.race.course = NULL;
             g_game.race.name = NULL;
             g_game.race.description = NULL;
-            
+
             for (i=0; i<DIFFICULTY_NUM_LEVELS; i++) {
                 g_game.race.herring_req[i] = 0;
                 g_game.race.time_req[i] = 0;
                 g_game.race.score_req[i] = 0;
             }
-            
+
             g_game.race.mirrored = False;
             g_game.race.conditions = RACE_CONDITIONS_SUNNY;
             g_game.race.windy = False;
             g_game.race.snowing = False;
         } else {
             /* Not practicing */
-            
+
             race_data_t *data;
             data = (race_data_t*) get_list_elem_data( cur_elem );
             g_game.race = *data;
-            
-            if ( is_cup_complete( event_data, 
-                                 get_event_cup_by_name( 
-                                                       event_data, 
+
+            if ( is_cup_complete( event_data,
+                                 get_event_cup_by_name(
+                                                       event_data,
                                                        g_game.current_cup ) ) )
             {
                 cup_complete = True;
@@ -625,46 +548,46 @@ static void race_select_init(void)
             update_race_results();
         }
 	}
-    
-    /* 
-     * Create text area 
+
+    /*
+     * Create text area
      */
     desc_ta = textarea_create( make_point2d(
 		0.1*getparam_x_resolution(), 0.2*getparam_y_resolution()),
 		0.4*getparam_x_resolution(), 0.23*getparam_y_resolution(), "race_description", "" );
-    
+
     textarea_set_visible( desc_ta, True );
-    
+
     update_race_data();
-    
+
 	button_coord.x_coord_type=button_coord.y_coord_type=NORMALIZED_COORD;
 	button_coord.x=0.50;
 	button_coord.y=0.85;
 	button_coord.x_just=CENTER_JUST;
 	button_coord.y_just=CENTER_JUST;
-    
+
 	gui_add_widget(course_title_label=create_label(""), &button_coord);
-    
+
 	button_coord.x=0.1;
 	button_coord.x_just=LEFT_JUST;
 	gui_add_widget(prev_course_btn=create_button(LEFT_ARROW, prev_cb), &button_coord);
-    
+
 	button_coord.x=0.9;
 	button_coord.x_just=RIGHT_JUST;
 	gui_add_widget(next_course_btn=create_button(RIGHT_ARROW, next_cb), &button_coord);
-    
+
 	course_title_label->font_binding="race_selection_title";
 	prev_course_btn->font_binding="race_selection_title";
 	next_course_btn->font_binding="race_selection_title";
-    
+
 	button_coord.x=0.30;
 	button_coord.y=0.09;
 	button_coord.x_just=CENTER_JUST;
 	gui_add_widget(back_button=create_button(get_back_text(), back_cb), &button_coord);
-    
+
 	button_coord.x=0.70;
 	gui_add_widget(play_button=create_button(get_race_text(), play_cb), &button_coord);
-    
+
 	init_scoreboard_labels();
 	init_scoreboard();
 
@@ -672,7 +595,7 @@ static void race_select_init(void)
 }
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
  Mode loop function
  \author  jfpatry
  \date    Created:  2000-09-24
@@ -681,46 +604,40 @@ static void race_select_init(void)
 static void race_select_loop( scalar_t time_step )
 {
     use_hud_program();
-    
+
     check_gl_error();
-    
+
     update_audio();
-    
+
     set_gl_options( GUI );
-    
+
     clear_rendering_context();
-    
+
     ui_setup_display();
-    
+
     if (getparam_ui_snow()) {
         update_ui_snow( time_step, False );
         draw_ui_snow();
     }
-    
+
     ui_draw_menu_decorations(False);
-	
-	if (price_update)
-	{
-		update_text();
-		price_update = False;
-	}
-    
+
 	GameMenu_draw();
 
 	draw_preview();
-    
+
 	winsys_update_joysticks();
 
     ui_draw();
-    
+
     reshape( getparam_x_resolution(), getparam_y_resolution() );
-    
+
     winsys_swap_buffers();
 }
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
  Mode termination function
  \author  jfpatry
  \date    Created:  2000-09-24
@@ -738,7 +655,7 @@ START_KEYBOARD_CB( race_select_key_cb )
     if ( release ) {
         return;
     }
-    
+
     if ( special ) {
         switch (key) {
             case WSK_UP:
@@ -759,7 +676,7 @@ START_KEYBOARD_CB( race_select_key_cb )
         }
     } else {
         key = (int) tolower( (char) key );
-        
+
         switch (key) {
             case 13: /* Enter */
 				start_race();
@@ -767,10 +684,10 @@ START_KEYBOARD_CB( race_select_key_cb )
             case 27: /* Esc */
 				back();
                 break;
-            case 'c': 
+            case 'c':
                 //next_race_condition();
                 break;
-            case 'w': 
+            case 'w':
                 //toggle_wind();
                 break;
             case 'm':
@@ -781,14 +698,14 @@ START_KEYBOARD_CB( race_select_key_cb )
                 break;
         }
     }
-    
+
     ui_check_dirty();
 }
 END_KEYBOARD_CB
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
  Mode registration function
  \author  jfpatry
  \date    Created:  2000-09-24
@@ -797,15 +714,15 @@ END_KEYBOARD_CB
 void race_select_register()
 {
     int status = 0;
-    
-    status |= 
+
+    status |=
     add_keymap_entry( RACE_SELECT,
                      DEFAULT_CALLBACK, NULL, NULL, race_select_key_cb );
-    
+
     check_assertion( status == 0,
                     "out of keymap entries" );
-    
-    register_loop_funcs( RACE_SELECT, 
+
+    register_loop_funcs( RACE_SELECT,
                         race_select_init,
                         race_select_loop,
                         race_select_term );
