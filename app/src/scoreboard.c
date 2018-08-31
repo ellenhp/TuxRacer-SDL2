@@ -3,7 +3,6 @@
 #include "tuxracer.h"
 #include "gui_label.h"
 #include "platform.h"
-#include "scoreloop.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -46,43 +45,6 @@ int stored_score_value=0;
 
 void scoreloop_submit_score(unsigned int scoreMode, unsigned int scoreValue)
 {
-    JNIEnv* env = Android_JNI_GetEnv();
-    if (!env)
-    {
-        return;
-    }
-    jclass mActivityClass = (*env)->FindClass(env, "com/moonlite/tuxracer/GameActivity");
-    jmethodID mid = (*env)->GetStaticMethodID(env, mActivityClass, "submitScore", "(II)Z");
-    if (!mid)
-    {
-        return;
-    }
-    if (!(*env)->CallStaticBooleanMethod(env, mActivityClass, mid, (int)scoreMode, (int)scoreValue))
-    {
-        jstring j_title=(*env)->NewStringUTF(env, ALIAS_PROMPT_TITLE);
-        jstring j_message=(*env)->NewStringUTF(env, ALIAS_PROMPT_MESSAGE);
-        if (!getparam_should_prompt_alias())
-        {
-            return;
-        }
-        stored_score_mode=(int)scoreMode;
-        stored_score_value=(int)scoreValue;
-        env = Android_JNI_GetEnv();
-        if (!env)
-        {
-            return;
-        }
-        mActivityClass = (*env)->FindClass(env, "com/moonlite/tuxracer/GameActivity");
-        mid = (*env)->GetStaticMethodID(env, mActivityClass, "promptForAlias", "(II)V");
-        if (!mid)
-        {
-            return;
-        }
-        (*env)->CallStaticVoidMethod(env, mActivityClass, mid, (int)scoreMode, (int)scoreValue);
-        (*env)->DeleteLocalRef(env, j_title);
-        (*env)->DeleteLocalRef(env, j_message);
-    }
-	return;
 }
 
 JNIEXPORT void JNICALL JNI(ScoreActivity_nativeDisableAliasPrompt)(JNIEnv *env, jclass cls)
@@ -95,19 +57,6 @@ extern void loading_scoreboards();
 
 void scoreloop_refresh_scores(unsigned int scoreMode)
 {
-    JNIEnv* env = Android_JNI_GetEnv();
-    loading_scoreboards();
-    if (!env)
-    {
-        return;
-    }
-    jclass mActivityClass = (*env)->FindClass(env, "com/moonlite/tuxracer/GameActivity");
-    jmethodID mid = (*env)->GetStaticMethodID(env, mActivityClass, "requestScores", "(I)V");
-    if (!mid)
-    {
-        return ;
-    }
-    (*env)->CallStaticVoidMethod(env, mActivityClass, mid, (int)scoreMode);
 }
 
 JNIEXPORT void JNICALL JNI(ScoreActivity_nativeScoreloopGotScores)(JNIEnv *env, jclass cls, jint scoreMode, jobjectArray scoreStrings)
@@ -129,19 +78,19 @@ JNIEXPORT void JNICALL JNI(ScoreActivity_nativeScoreloopGotScores)(JNIEnv *env, 
             strcpy(score->name, "----");
             strcpy(score->score, "-");
         }
-        
+
         for (i=0; i<len; i++)
         {
             tmp_jstring=(jstring)((*env)->GetObjectArrayElement(env, scoreStrings, i));
             score_string_tmp=(*env)->GetStringUTFChars(env, tmp_jstring, 0);
             strcpy(score_string, score_string_tmp);
             (*env)->ReleaseStringUTFChars(env, tmp_jstring, score_string_tmp);
-            
+
             first_tab=strchr(score_string, '\t');
             second_tab=strchr(first_tab+1, '\t');
-            
+
             *first_tab=*second_tab=0;
-            
+
             strcpy(scoreboard[i].rank, score_string);
             strcpy(scoreboard[i].name, first_tab+1);
             strcpy(scoreboard[i].score, second_tab+1);
@@ -197,7 +146,6 @@ void refresh_scores_for_course(const char* course_name)
 {
 #ifdef __ANDROID__
 	current_scoreboard = get_course_index(course_name);
-	scoreloop_refresh_scores(current_scoreboard);
 #else
 #endif
 }
@@ -257,7 +205,6 @@ void submit_score(const char* course_name, int course_score)
 {
 #ifdef __ANDROID__
 	unsigned int courseID = get_course_index(course_name);
-	scoreloop_submit_score(courseID, course_score);
 #else
 	print_debug(DEBUG_OTHER, "");
 #endif

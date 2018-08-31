@@ -173,10 +173,6 @@ static void prefs_init(void)
     
 	display_fps=getparam_display_fps();
 
-#ifdef __ANDROID__
-    scoreloop_add_widgets();
-#endif
-    
     gui_balance_lines(0);
     
     if (is_on_ouya())
@@ -226,9 +222,7 @@ static void prefs_loop( scalar_t time_step )
     }
 
 	ui_draw_menu_decorations(True);
-#ifdef __ANDROID__
-    scoreloop_update_widgets();
-#endif
+
 	GameMenu_draw();
 
     ui_draw_cursor();
