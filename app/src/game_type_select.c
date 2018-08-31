@@ -1,17 +1,17 @@
-/* 
- * Tux Racer 
+/*
+ * Tux Racer
  * Copyright (C) 1999-2001 Jasmin F. Patry
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -56,12 +56,12 @@ void basic_tutorial_click_cb(int button, int mouse_x, int mouse_y, widget_boundi
     g_game.current_cup = NULL;
     g_game.current_race = -1;
     g_game.practicing = False;
-    
+
     g_game.race.course="bunny_hill";
     init_starting_tutorial_step(0);
-    
+
     set_game_mode( LOADING );
-    
+
     ui_set_dirty();
 }
 
@@ -71,12 +71,12 @@ void advanced_tutorial_click_cb(int button, int mouse_x, int mouse_y, widget_bou
     g_game.current_cup = NULL;
     g_game.current_race = -1;
     g_game.practicing = False;
-    
+
     g_game.race.course="frozen_river";
     init_starting_tutorial_step(10);
-    
+
     set_game_mode( LOADING );
-    
+
     ui_set_dirty();
 }
 
@@ -100,7 +100,7 @@ void practice_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box
 #else
         set_game_mode( RACE_SELECT );
 #endif
-        
+
         ui_set_dirty();
 #ifdef TARGET_OS_IPHONE
     /* } else {
@@ -119,7 +119,7 @@ void credits_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_
 void pref_click_cb(int button, int mouse_x, int mouse_y, widget_bounding_box_t bb)
 {
     set_game_mode( PREFS );
-    
+
     ui_set_dirty();
 }
 
@@ -160,30 +160,10 @@ static void game_type_select_init(void)
 	gui_add_widget(pref_btn=create_button("Settings", pref_click_cb), NULL);
 	gui_add_widget(credits_btn=create_button("Credits", credits_click_cb), NULL);
 
-    if (is_on_ouya())
-    {
-        button_coord.x=0.30;
-        button_coord.y=0.09;
-        button_coord.x_just=button_coord.y_just=CENTER_JUST;
-        button_coord.x_coord_type=button_coord.y_coord_type=NORMALIZED_COORD;
-        gui_add_widget(main_quit_button=create_label(get_quit_text(), main_quit_cb), &button_coord);
-    }
-    else
-    {
-        gui_add_widget(main_quit_button=create_button(get_quit_text(), main_quit_cb), NULL);
-    }
-
-    if (is_on_ouya())
-    {
-        button_coord.x=0.70;
-        button_coord.y=0.09;
-        button_coord.x_just=button_coord.y_just=CENTER_JUST;
-        button_coord.x_coord_type=button_coord.y_coord_type=NORMALIZED_COORD;
-        gui_add_widget(main_select_button=create_label(get_select_text(), main_select_cb), &button_coord);
-    }
+  gui_add_widget(main_quit_button=create_button(get_quit_text(), main_quit_cb), NULL);
 
 	gui_balance_lines(1);
-    
+
     GameMenu_set_y_offset(0);
 
 	winsys_add_js_button_binding(SDL_CONTROLLER_BUTTON_B, SDLK_ESCAPE);
@@ -197,7 +177,7 @@ static void game_type_select_init(void)
 static void game_type_select_loop( scalar_t time_step )
 {
     use_hud_program();
-    
+
     check_gl_error();
 
     update_audio();
@@ -207,7 +187,7 @@ static void game_type_select_loop( scalar_t time_step )
     ui_setup_display();
 
     clear_rendering_context();
-    
+
     if (getparam_ui_snow()) {
 	update_ui_snow( time_step, False );
 	draw_ui_snow();
@@ -256,7 +236,7 @@ START_KEYBOARD_CB( game_type_select_cb )
 	}
 
 	GameMenu_keypress(key);
-    
+
 	winsys_post_redisplay();
 }
 END_KEYBOARD_CB
@@ -268,7 +248,7 @@ void game_type_select_register()
     status |=
 	add_keymap_entry( GAME_TYPE_SELECT,
 			  DEFAULT_CALLBACK, NULL, NULL, game_type_select_cb );
-    register_loop_funcs( GAME_TYPE_SELECT, 
+    register_loop_funcs( GAME_TYPE_SELECT,
 			 game_type_select_init,
 			 game_type_select_loop,
 			 game_type_select_term );

@@ -498,7 +498,6 @@ void winsys_init_joystick()
 
 	SDL_GameControllerAddMapping("8e06f600000000000000504944564944,CH FLIGHTSTICK PRO,a:b1,b:b3,leftx:a0,lefty:a1,x:b0,y:b2,");
 	SDL_GameControllerAddMapping("8e06f400000000000000504944564944,CH COMBATSTICK,a:b6,b:b5,y:b4,x:b7,start:b9,dpup:h0.1,dpleft:h0.8,dpdown:h0.4,dpright:h0.2,leftx:a0,lefty:a1,");
-    SDL_GameControllerAddMapping("4f5559412047616d6520436f6e74726f,OUYA Game Controller,a:b5,b:b6,x:b8,y:b9,dpup:b0,dpleft:b2,dpdown:b1,dpright:b3,leftx:a0,lefty:a1,");
 	winsys_scan_joysticks();
 }
 

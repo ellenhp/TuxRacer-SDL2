@@ -1,17 +1,17 @@
-/* 
- * Tux Racer 
+/*
+ * Tux Racer
  * Copyright (C) 1999-2001 Jasmin F. Patry
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -65,16 +65,16 @@ static void print_instruction(const char* string, int line) {
                       "Couldn't get font for binding %s", binding );
         return;
     }
-    
+
     get_font_metrics( font, (char*)string, &w, &asc, &desc );
-    
+
     shader_set_color(transparent_bg);
-    
+
     if (!get_texture_binding("white1x1", &texobj) ) {
         return;
     }
     glBindTexture(GL_TEXTURE_2D, texobj);
-    
+
 #define TO_RELATIVE(screen, val) (((val)/screen*2.0)-1.0)
 	{
         GLfloat vertices[]={
@@ -82,31 +82,31 @@ static void print_instruction(const char* string, int line) {
             -0.6, TO_RELATIVE(height, (y_base-(line-1)*(asc+desc)) - winsys_scale(5.0)), 0,
             0.6, TO_RELATIVE(height, (y_base-(line-1)*(asc+desc)) - winsys_scale(5.0)), 0,
             0.6, TO_RELATIVE(height, (y_base-(line-2)*(asc+desc)) - winsys_scale(5.0)), 0};
-        
+
         GLfloat texcoords[]={
             0, 0,
             0, 1,
             1, 1,
             1, 0};
-        
+
         GLubyte indices[] = {0, 1, 2, 2, 3, 0};
-        
+
         glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, 0, vertices);
         glEnableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
-        
+
         glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, 0, texcoords);
         glEnableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
-        
+
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
-        
+
         glDisableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
         glDisableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
-        
+
         shader_set_color(white);
 	}
-    
+
     bind_font_texture( font );
-    
+
     draw_string(font, (char*)string, width/2-w/2, y_base-(line-1)*(asc+desc));
 }
 
@@ -121,15 +121,15 @@ static void drawRedCircle(GLint x, GLint y, GLint diameter) {
     if ( !get_texture_binding( "red_circle", &texobj ) ) {
         texobj = 0;
     }
-    
+
     glBindTexture( GL_TEXTURE_2D, texobj );
 
-        
+
     ll = make_point2d( x_org, y_org);
     ur = make_point2d( x_org + diameter, y_org + diameter );
     tll = make_point2d( 0, 0 );
     tur = make_point2d(1, 1 );
-    
+
 	{
  	GLfloat texcoords[]={
 		tll.x, tll.y,
@@ -150,17 +150,17 @@ static void drawRedCircle(GLint x, GLint y, GLint diameter) {
 
     glVertexAttribPointer(shader_get_attrib_location(SHADER_VERTEX_NAME), 3, GL_FLOAT, GL_FALSE, 0, vertices);
     glEnableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
-        
+
     glVertexAttribPointer(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME), 2, GL_FLOAT, GL_FALSE, 0, texcoords);
     glEnableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
-    
+
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
-    
+
     glDisableVertexAttribArray(shader_get_attrib_location(SHADER_VERTEX_NAME));
     glDisableVertexAttribArray(shader_get_attrib_location(SHADER_TEXTURE_COORD_NAME));
 
 	}
-}  
+}
 
 /* verifie qu'une condition a bien été vérifiée pendant au moins "sec" secondes */
 static bool_t check_condition_for_time(bool_t condition, unsigned int ms) {
@@ -305,11 +305,11 @@ static void draw_instructions(player_data_t *plyr)
             print_instruction(Localize("Good job. Now you know the basics of racing", ""),0);
             print_instruction(Localize("The next tutorial will teach you how to jump", ""),1);
             print_instruction(Localize("and do tricks!", ""),2);
-            
+
             set_game_mode( GAME_OVER );
             break;
             					/* Fin du premier Tutorial */
-                                
+
                                 /* Début du second Tutorial */
         case 10:
             print_instruction(Localize("Welcome to the Jump tutorial where", ""),1);
@@ -399,10 +399,6 @@ static void draw_instructions(player_data_t *plyr)
 				print_instruction(Localize("tap the upper right corner of the screen.", ""),3);
 	            drawRedCircle(getparam_x_resolution() - radius * 2, getparam_y_resolution() - radius * 2, radius * 2);
 			}
-			else
-			{
-				print_instruction(Localize("press the " OUYA_Y_BUTTON "button.", ""),3);
-			}
 			plyr->tricks=0;
             if(training_is_resumed()) step++;
             break;
@@ -450,18 +446,18 @@ static void draw_instructions(player_data_t *plyr)
             print_instruction(Localize("do tricks to get a good score.", ""),3);
             set_game_mode( GAME_OVER );
             break;
-            						/* Fin du second Tutorial */ 
+            						/* Fin du second Tutorial */
             break;
             		        			/*    abandon     */
         case -100:
             print_instruction(Localize("You didn't finish this tutorial.", ""),1);
             print_instruction(Localize("You should try again!", ""),2);
             break;
-            
+
         default:
             break;
     }
-    
+
 }
 
 void draw_hud_training( player_data_t *plyr )
@@ -469,15 +465,15 @@ void draw_hud_training( player_data_t *plyr )
     if (!g_game.practicing) {
         vector_t vel;
         scalar_t speed;
-        
+
         vel = plyr->vel;
         speed = normalize_vector( &vel );
-        
+
         ui_setup_display();
         draw_instructions(plyr);
     }
     //draw_gauge( speed * M_PER_SEC_TO_KM_PER_H, plyr->control.jump_amt );
-    
+
 }
 
 
@@ -488,4 +484,3 @@ void init_starting_tutorial_step(int i){
     step = i;
     game_over_set_next_mode( GAME_TYPE_SELECT );
 }
-
