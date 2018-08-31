@@ -1,25 +1,28 @@
-/* 
- * Tux Racer 
+/*
+ * Tux Racer
  * Copyright (C) 1999-2001 Jasmin F. Patry
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+#include "tux_types.h"
+#include <GLES2/gl2.h>
+#include <tcl.h>
+
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 #ifndef _TEXTURES_H_
@@ -28,26 +31,26 @@ extern "C"
 #define TEX_SCALE 6
 
 typedef struct {
-    GLuint texture_id;
-    int    repeatable;
-    int    ref_count;
+  GLuint texture_id;
+  int repeatable;
+  int ref_count;
 } texture_node_t;
 
 void init_textures();
 
-void load_texture_main_thread( void * texArg, void *texImageArg );
+void load_texture_main_thread(void *texArg, void *texImageArg);
 
-bool_t load_and_bind_texture( const char *binding, const char *filename );
+bool_t load_and_bind_texture(const char *binding, const char *filename);
 
-bool_t load_texture( const char *texname, const char *filename, int repeatable );
-bool_t get_texture( const char *texname, texture_node_t **tex );
-bool_t del_texture( const char *texname );
+bool_t load_texture(const char *texname, const char *filename, int repeatable);
+bool_t get_texture(const char *texname, texture_node_t **tex);
+bool_t del_texture(const char *texname);
 
-bool_t bind_texture( const char *binding, const char *texname );
-bool_t get_texture_binding( const char *binding, GLuint *texid );
-bool_t unbind_texture( const char *binding );
+bool_t bind_texture(const char *binding, const char *texname);
+bool_t get_texture_binding(const char *binding, GLuint *texid);
+bool_t unbind_texture(const char *binding);
 
-void get_current_texture_dimensions( int *width, int *height );
+void get_current_texture_dimensions(int *width, int *height);
 
 bool_t flush_textures(void);
 

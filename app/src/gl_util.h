@@ -1,25 +1,24 @@
-/* 
- * Tux Racer 
+/*
+ * Tux Racer
  * Copyright (C) 1999-2001 Jasmin F. Patry
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 #ifndef _GL_UTIL_H_
@@ -58,48 +57,48 @@ extern "C"
 #else
 #include <GL/glext.h>
 #endif
-    
-    
-#if (!defined(GL_GLEXT_VERSION) || GL_GLEXT_VERSION < 6) && !defined(HAVE_OPENGLES)
-#   error "*** You need a more recent copy of glext.h.  You can get one at http://oss.sgi.com/projects/ogl-sample/ABI/glext.h ; it goes in /usr/include/GL. ***"
+
+#if (!defined(GL_GLEXT_VERSION) || GL_GLEXT_VERSION < 6) &&                    \
+    !defined(HAVE_OPENGLES)
+#error                                                                         \
+    "*** You need a more recent copy of glext.h.  You can get one at http://oss.sgi.com/projects/ogl-sample/ABI/glext.h ; it goes in /usr/include/GL. ***"
 #endif
 
-    
 #endif
 
 typedef enum {
-    GUI,
-    GAUGE_BARS,
-    TEXFONT,
-    TEXT,
-    COURSE,
-    TREES,
-    PARTICLES,
-    PARTICLE_SHADOWS,
-    BACKGROUND,
-    TUX,
-    TUX_SHADOW,
-    SKY,
-    FOG_PLANE,
-    TRACK_MARKS,
-    OVERLAYS, 
-    SPLASH_SCREEN
+  GUI,
+  GAUGE_BARS,
+  TEXFONT,
+  TEXT,
+  COURSE,
+  TREES,
+  PARTICLES,
+  PARTICLE_SHADOWS,
+  BACKGROUND,
+  TUX,
+  TUX_SHADOW,
+  SKY,
+  FOG_PLANE,
+  TRACK_MARKS,
+  OVERLAYS,
+  SPLASH_SCREEN
 } RenderMode;
 
-void set_gl_options( RenderMode mode );
-    
+void set_gl_options(RenderMode mode);
+
 void set_MVP();
-    
-void util_set_view(float* mat);
+
+void util_set_view(float *mat);
 void util_setup_projection(float near, float far);
 void util_set_translation(float x, float y, float z);
-void util_set_model_matrix(float* mat);
+void util_set_model_matrix(float *mat);
 
 void check_gl_error();
 
-void copy_to_glfloat_array( GLfloat dest[], scalar_t src[], int n );
+void copy_to_glfloat_array(GLfloat dest[], scalar_t src[], int n);
 
-void init_glfloat_array( int num, GLfloat arr[], ... );
+void init_glfloat_array(int num, GLfloat arr[], ...);
 
 void init_opengl_extensions();
 

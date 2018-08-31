@@ -18,7 +18,7 @@
 #define BARLOWS_WHEEL 7
 
 void bonus_init();
-void add_new_bonus(const char* text, int value);
+void add_new_bonus(const char *text, int value);
 void remove_all_bonuses();
-void draw_bonus(player_data_t * plr);
+void draw_bonus(player_data_t *plr);
 int get_score_for_trick(int trick);

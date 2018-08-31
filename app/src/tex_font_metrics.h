@@ -1,25 +1,26 @@
-/* 
- * Tux Racer 
+/*
+ * Tux Racer
  * Copyright (C) 1999-2001 Jasmin F. Patry
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+#include "tux_types.h"
+
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 #ifndef TEX_FONT_METRICS_H
@@ -28,20 +29,21 @@ extern "C"
 typedef struct tex_font_metrics_ tex_font_metrics_t; /* Opaque */
 
 typedef struct {
-    point2d_t ll, lr, ul, ur;                 /* geometry coordinates */
-    point2d_t tex_ll, tex_lr, tex_ul, tex_ur; /* texture coordinates */
-    scalar_t kern_width;  /* distance that this char takes when rendered 
-			     as part of a string */
+  point2d_t ll, lr, ul, ur;                 /* geometry coordinates */
+  point2d_t tex_ll, tex_lr, tex_ul, tex_ur; /* texture coordinates */
+  scalar_t kern_width; /* distance that this char takes when rendered
+                          as part of a string */
 } tfm_char_data_t;
 
-tex_font_metrics_t* load_tex_font_metrics( const char *filename );
-void delete_tex_font_metrics( tex_font_metrics_t *tfm );
-void get_tex_font_string_bbox( tex_font_metrics_t *tfm, 
-			       const char *string, 
-			       int *width, int *max_ascent, int *max_descent );
-float draw_tex_font_char( tfm_char_data_t* cd, char c, float x, float y, float scale );
-void draw_tex_font_string( tex_font_metrics_t *tfm, const char *string, float x, float y, float scale );
-bool_t is_character_in_tex_font( tex_font_metrics_t *tfm, char c );
+tex_font_metrics_t *load_tex_font_metrics(const char *filename);
+void delete_tex_font_metrics(tex_font_metrics_t *tfm);
+void get_tex_font_string_bbox(tex_font_metrics_t *tfm, const char *string,
+                              int *width, int *max_ascent, int *max_descent);
+float draw_tex_font_char(tfm_char_data_t *cd, char c, float x, float y,
+                         float scale);
+void draw_tex_font_string(tex_font_metrics_t *tfm, const char *string, float x,
+                          float y, float scale);
+bool_t is_character_in_tex_font(tex_font_metrics_t *tfm, char c);
 
 #endif /* TEX_FONT_METRICS_H */
 

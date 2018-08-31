@@ -1,7 +1,6 @@
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 #ifndef PREFS_H
