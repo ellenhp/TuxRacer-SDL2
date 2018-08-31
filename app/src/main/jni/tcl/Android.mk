@@ -12,12 +12,30 @@ LOCAL_MODULE := tcl
 
 AC_FLAGS := -DPACKAGE_NAME=\"tcl\" -DPACKAGE_TARNAME=\"tcl\" -DPACKAGE_VERSION=\"8.6\" -DPACKAGE_STRING=\"tcl8.6\" -DPACKAGE_BUGREPORT=\"\" -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DNO_VALUES_H=1 -DHAVE_LIMITS_H=1 -DHAVE_SYS_PARAM_H=1 -DTCL_CFGVAL_ENCODING=\"iso8859-1\" -DMODULE_SCOPE=extern\ __attribute__\(\(__visibility__\(\"hidden\"\)\)\) -DTCL_SHLIB_EXT=\".so\" -DTCL_CFG_OPTIMIZED=1 -DTCL_CFG_DEBUG=1 -DTCL_TOMMATH=1 -DMP_PREC=4 -DTCL_WIDE_INT_TYPE=long\ long -DHAVE_GETCWD=1 -DHAVE_OPENDIR=1 -DHAVE_STRTOL=1 -DHAVE_WAITPID=1 -DNO_GETWD=1 -DHAVE_GETADDRINFO=1 -DNO_FD_SET=1 -DHAVE_SYS_TIME_H=1 -DTIME_WITH_SYS_TIME=1 -DHAVE_STRUCT_TM_TM_ZONE=1 -DHAVE_TM_ZONE=1 -DHAVE_GMTIME_R=1 -DHAVE_LOCALTIME_R=1 -DHAVE_MKTIME=1 -DHAVE_TM_GMTOFF=1 -DHAVE_TIMEZONE_VAR=1 -DHAVE_STRUCT_STAT_ST_BLKSIZE=1 -DHAVE_ST_BLKSIZE=1 -Dstrtod=fixstrtod -DHAVE_INTPTR_T=1 -DHAVE_UINTPTR_T=1 -DNO_UNION_WAIT=1 -DHAVE_SIGNED_CHAR=1 -DHAVE_SYS_IOCTL_H=1 -DTCL_UNLOAD_DLLS=1
 
-GENERIC_SRCS := \
+GENERIC_HDRS = \
+	$(GENERIC_DIR)/tcl.h \
+	$(GENERIC_DIR)/tclDecls.h \
+	$(GENERIC_DIR)/tclInt.h \
+	$(GENERIC_DIR)/tclIntDecls.h \
+	$(GENERIC_DIR)/tclIntPlatDecls.h \
+	$(GENERIC_DIR)/tclTomMath.h \
+	$(GENERIC_DIR)/tclTomMathDecls.h \
+	$(GENERIC_DIR)/tclOO.h \
+	$(GENERIC_DIR)/tclOODecls.h \
+	$(GENERIC_DIR)/tclOOInt.h \
+	$(GENERIC_DIR)/tclOOIntDecls.h \
+	$(GENERIC_DIR)/tclPatch.h \
+	$(GENERIC_DIR)/tclPlatDecls.h \
+	$(GENERIC_DIR)/tclPort.h \
+	$(GENERIC_DIR)/tclRegexp.h
+
+GENERIC_SRCS = \
 	$(GENERIC_DIR)/regcomp.c \
 	$(GENERIC_DIR)/regexec.c \
 	$(GENERIC_DIR)/regfree.c \
 	$(GENERIC_DIR)/regerror.c \
 	$(GENERIC_DIR)/tclAlloc.c \
+	$(GENERIC_DIR)/tclAssembly.c \
 	$(GENERIC_DIR)/tclAsync.c \
 	$(GENERIC_DIR)/tclBasic.c \
 	$(GENERIC_DIR)/tclBinary.c \
@@ -27,12 +45,16 @@ GENERIC_SRCS := \
 	$(GENERIC_DIR)/tclCmdIL.c \
 	$(GENERIC_DIR)/tclCmdMZ.c \
 	$(GENERIC_DIR)/tclCompCmds.c \
+	$(GENERIC_DIR)/tclCompCmdsGR.c \
+	$(GENERIC_DIR)/tclCompCmdsSZ.c \
 	$(GENERIC_DIR)/tclCompExpr.c \
 	$(GENERIC_DIR)/tclCompile.c \
 	$(GENERIC_DIR)/tclConfig.c \
 	$(GENERIC_DIR)/tclDate.c \
 	$(GENERIC_DIR)/tclDictObj.c \
+	$(GENERIC_DIR)/tclDisassemble.c \
 	$(GENERIC_DIR)/tclEncoding.c \
+	$(GENERIC_DIR)/tclEnsemble.c \
 	$(GENERIC_DIR)/tclEnv.c \
 	$(GENERIC_DIR)/tclEvent.c \
 	$(GENERIC_DIR)/tclExecute.c \
@@ -54,16 +76,18 @@ GENERIC_SRCS := \
 	$(GENERIC_DIR)/tclListObj.c \
 	$(GENERIC_DIR)/tclLiteral.c \
 	$(GENERIC_DIR)/tclLoad.c \
+	$(GENERIC_DIR)/tclLoadNone.c \
 	$(GENERIC_DIR)/tclMain.c \
 	$(GENERIC_DIR)/tclNamesp.c \
 	$(GENERIC_DIR)/tclNotify.c \
 	$(GENERIC_DIR)/tclObj.c \
-    $(GENERIC_DIR)/tclPkg.c \
-    $(GENERIC_DIR)/tclPkgConfig.c \
-    $(GENERIC_DIR)/tclPanic.c \
-    $(GENERIC_DIR)/tclParse.c \
+	$(GENERIC_DIR)/tclOptimize.c \
+	$(GENERIC_DIR)/tclPanic.c \
+	$(GENERIC_DIR)/tclParse.c \
 	$(GENERIC_DIR)/tclPathObj.c \
 	$(GENERIC_DIR)/tclPipe.c \
+	$(GENERIC_DIR)/tclPkg.c \
+	$(GENERIC_DIR)/tclPkgConfig.c \
 	$(GENERIC_DIR)/tclPosixStr.c \
 	$(GENERIC_DIR)/tclPreserve.c \
 	$(GENERIC_DIR)/tclProc.c \
@@ -74,6 +98,9 @@ GENERIC_SRCS := \
 	$(GENERIC_DIR)/tclStubInit.c \
 	$(GENERIC_DIR)/tclStringObj.c \
 	$(GENERIC_DIR)/tclStrToD.c \
+	$(GENERIC_DIR)/tclTest.c \
+	$(GENERIC_DIR)/tclTestObj.c \
+	$(GENERIC_DIR)/tclTestProcBodyObj.c \
 	$(GENERIC_DIR)/tclThread.c \
 	$(GENERIC_DIR)/tclThreadAlloc.c \
 	$(GENERIC_DIR)/tclThreadJoin.c \
@@ -83,9 +110,10 @@ GENERIC_SRCS := \
 	$(GENERIC_DIR)/tclTrace.c \
 	$(GENERIC_DIR)/tclUtf.c \
 	$(GENERIC_DIR)/tclUtil.c \
-	$(GENERIC_DIR)/tclVar.c
+	$(GENERIC_DIR)/tclVar.c \
+	$(GENERIC_DIR)/tclZlib.c
 
-OO_SRCS := \
+OO_SRCS = \
 	$(GENERIC_DIR)/tclOO.c \
 	$(GENERIC_DIR)/tclOOBasic.c \
 	$(GENERIC_DIR)/tclOOCall.c \
@@ -94,10 +122,12 @@ OO_SRCS := \
 	$(GENERIC_DIR)/tclOOMethod.c \
 	$(GENERIC_DIR)/tclOOStubInit.c
 
-STUB_SRCS := \
-	$(GENERIC_DIR)/tclStubLib.c
+STUB_SRCS = \
+	$(GENERIC_DIR)/tclStubLib.c \
+	$(GENERIC_DIR)/tclTomMathStubLib.c \
+	$(GENERIC_DIR)/tclOOStubLib.c
 
-TOMMATH_SRCS := \
+TOMMATH_SRCS = \
 	$(TOMMATH_DIR)/bncore.c \
 	$(TOMMATH_DIR)/bn_reverse.c \
 	$(TOMMATH_DIR)/bn_fast_s_mp_mul_digs.c \
@@ -112,6 +142,7 @@ TOMMATH_SRCS := \
 	$(TOMMATH_DIR)/bn_mp_cmp_d.c \
 	$(TOMMATH_DIR)/bn_mp_cmp_mag.c \
 	$(TOMMATH_DIR)/bn_mp_copy.c \
+	$(TOMMATH_DIR)/bn_mp_cnt_lsb.c \
 	$(TOMMATH_DIR)/bn_mp_count_bits.c \
 	$(TOMMATH_DIR)/bn_mp_div.c \
 	$(TOMMATH_DIR)/bn_mp_div_d.c \
@@ -125,6 +156,7 @@ TOMMATH_SRCS := \
 	$(TOMMATH_DIR)/bn_mp_init_copy.c \
 	$(TOMMATH_DIR)/bn_mp_init_multi.c \
 	$(TOMMATH_DIR)/bn_mp_init_set.c \
+	$(TOMMATH_DIR)/bn_mp_init_set_int.c \
 	$(TOMMATH_DIR)/bn_mp_init_size.c \
 	$(TOMMATH_DIR)/bn_mp_karatsuba_mul.c \
 	$(TOMMATH_DIR)/bn_mp_karatsuba_sqr.c \
@@ -142,6 +174,7 @@ TOMMATH_SRCS := \
 	$(TOMMATH_DIR)/bn_mp_read_radix.c \
 	$(TOMMATH_DIR)/bn_mp_rshd.c \
 	$(TOMMATH_DIR)/bn_mp_set.c \
+	$(TOMMATH_DIR)/bn_mp_set_int.c \
 	$(TOMMATH_DIR)/bn_mp_shrink.c \
 	$(TOMMATH_DIR)/bn_mp_sqr.c \
 	$(TOMMATH_DIR)/bn_mp_sqrt.c \
@@ -160,30 +193,33 @@ TOMMATH_SRCS := \
 	$(TOMMATH_DIR)/bn_s_mp_sqr.c \
 	$(TOMMATH_DIR)/bn_s_mp_sub.c
 
-UNIX_SRCS := \
+UNIX_HDRS = \
+	$(UNIX_DIR)/tclUnixPort.h
+#	$(UNIX_DIR)/tclConfig.h
+
+UNIX_SRCS = \
 	$(UNIX_DIR)/tclAppInit.c \
-    $(UNIX_DIR)/tclLoadDl.c \
 	$(UNIX_DIR)/tclUnixChan.c \
 	$(UNIX_DIR)/tclUnixEvent.c \
 	$(UNIX_DIR)/tclUnixFCmd.c \
 	$(UNIX_DIR)/tclUnixFile.c \
-	$(UNIX_DIR)/tclUnixInit.c \
 	$(UNIX_DIR)/tclUnixPipe.c \
 	$(UNIX_DIR)/tclUnixSock.c \
+	$(UNIX_DIR)/tclUnixTest.c \
 	$(UNIX_DIR)/tclUnixThrd.c \
 	$(UNIX_DIR)/tclUnixTime.c \
+	$(UNIX_DIR)/tclUnixInit.c \
 	$(UNIX_DIR)/tclUnixCompat.c
 
-NOTIFY_SRCS := \
+NOTIFY_SRCS = \
 	$(UNIX_DIR)/tclUnixNotfy.c
-
 
 LOCAL_C_INCLUDES := \
     $(LOCAL_PATH)/$(GENERIC_DIR) \
     $(LOCAL_PATH)/$(TOMMATH_DIR) \
     $(LOCAL_PATH)/$(UNIX_DIR) \
 
-LOCAL_CFLAGS := \
+LOCAL_CFLAGS := -fPIC \
     $(AC_FLAGS) \
     -DCFG_RUNTIME_LIBDIR=\"$(PKG_DIR)\" \
     -DCFG_RUNTIME_BINDIR=\"$(PKG_DIR)\" \

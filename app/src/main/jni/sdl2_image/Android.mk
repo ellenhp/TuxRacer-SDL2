@@ -7,17 +7,17 @@ LOCAL_MODULE := SDL2_image
 # Enable this if you want to support loading JPEG images
 # The library path should be a relative path to this directory.
 SUPPORT_JPG := true
-JPG_LIBRARY_PATH := external/jpeg-9
+JPG_LIBRARY_PATH := external/jpeg-9b
 
 # Enable this if you want to support loading PNG images
 # The library path should be a relative path to this directory.
 SUPPORT_PNG := true
-PNG_LIBRARY_PATH := external/libpng-1.6.2
+PNG_LIBRARY_PATH := external/libpng-1.6.32
 
 # Enable this if you want to support loading WebP images
 # The library path should be a relative path to this directory.
 SUPPORT_WEBP := false
-WEBP_LIBRARY_PATH := external/libwebp-0.3.0
+WEBP_LIBRARY_PATH := external/libwebp-0.6.0
 
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)
@@ -28,7 +28,7 @@ LOCAL_CFLAGS += -O3 -fstrict-aliasing -fprefetch-loop-arrays
 LOCAL_SRC_FILES := $(notdir $(filter-out %/showimage.c, $(wildcard $(LOCAL_PATH)/*.c)))
 
 LOCAL_LDLIBS :=
-LOCAL_STATIC_LIBRARIES :=
+LOCAL_STATIC_LIBRARIES := cpufeatures
 LOCAL_SHARED_LIBRARIES := SDL2
 
 ifeq ($(SUPPORT_JPG),true)
@@ -84,11 +84,7 @@ ifeq ($(SUPPORT_JPG),true)
         $(JPG_LIBRARY_PATH)/jmemmgr.c \
         $(JPG_LIBRARY_PATH)/jmem-android.c
 
-	ifeq ($(TARGET_ARCH),arm)
-	LOCAL_SRC_FILES += $(JPG_LIBRARY_PATH)/jidctfst.S
-	else
 	LOCAL_SRC_FILES += $(JPG_LIBRARY_PATH)/jidctfst.c
-	endif
 endif
 
 ifeq ($(SUPPORT_PNG),true)
@@ -124,3 +120,6 @@ endif
 LOCAL_EXPORT_C_INCLUDES += $(LOCAL_C_INCLUDES)
 
 include $(BUILD_SHARED_LIBRARY)
+
+$(call import-module,android/cpufeatures)
+

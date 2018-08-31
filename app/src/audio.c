@@ -749,7 +749,7 @@ is_music_playing()
   \date    Modified: 2000-08-14
 */
 static int bind_sounds_cb( ClientData cd, Tcl_Interp *ip, 
-			   int argc, char *argv[]) 
+			   int argc, char *argv[])
 {
     check_assertion( initialized_, "audio module not initialized" );
 

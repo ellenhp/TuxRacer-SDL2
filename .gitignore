@@ -43,3 +43,6 @@ Thumbs.db
 .idea/dataSources.ids
 .idea/libraries
 .idea/*
+
+
+app/.externalNativeBuild

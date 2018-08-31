@@ -7,7 +7,7 @@ LOCAL_MODULE := SDL2_mixer
 # Enable this if you want to support loading MOD music via modplug
 # The library path should be a relative path to this directory.
 SUPPORT_MOD_MODPLUG := true
-MODPLUG_LIBRARY_PATH := external/libmodplug-0.8.8.4
+MODPLUG_LIBRARY_PATH := external/libmodplug-0.8.9.0
 
 # Enable this if you want to support loading MOD music via mikmod
 # The library path should be a relative path to this directory.

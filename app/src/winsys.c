@@ -1,17 +1,17 @@
-/* 
- * Tux Racer 
+/*
+ * Tux Racer
  * Copyright (C) 1999-2001 Jasmin F. Patry
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -88,20 +88,20 @@ bool_t bind_js_axes=False;
 static bool_t winsys_drawing_allowed=True;
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Requests that the screen be redrawn
   \author  jfpatry
   \date    Created:  2000-10-19
   \date    Modified: 2000-10-19
 */
-void winsys_post_redisplay() 
+void winsys_post_redisplay()
 {
     redisplay = True;
 }
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Sets the display callback
   \author  jfpatry
   \date    Created:  2000-10-19
@@ -114,7 +114,7 @@ void winsys_set_display_func( winsys_display_func_t func )
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Sets the idle callback
   \author  jfpatry
   \date    Created:  2000-10-19
@@ -127,7 +127,7 @@ void winsys_set_idle_func( winsys_idle_func_t func )
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Sets the reshape callback
   \author  jfpatry
   \date    Created:  2000-10-19
@@ -140,7 +140,7 @@ void winsys_set_reshape_func( winsys_reshape_func_t func )
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Sets the keyboard callback
   \author  jfpatry
   \date    Created:  2000-10-19
@@ -153,7 +153,7 @@ void winsys_set_keyboard_func( winsys_keyboard_func_t func )
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Sets the mouse button-press callback
   \author  jfpatry
   \date    Created:  2000-10-19
@@ -166,7 +166,7 @@ void winsys_set_mouse_func( winsys_mouse_func_t func )
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Sets the mouse motion callback (when a mouse button is pressed)
   \author  jfpatry
   \date    Created:  2000-10-19
@@ -179,7 +179,7 @@ void winsys_set_motion_func( winsys_motion_func_t func )
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Sets the mouse motion callback (when no mouse button is pressed)
   \author  jfpatry
   \date    Created:  2000-10-19
@@ -191,7 +191,7 @@ void winsys_set_passive_motion_func( winsys_motion_func_t func )
 }
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Sets the joystick callback
   \author  nopoe
   \date    Created:  2013-10-06
@@ -203,7 +203,7 @@ void winsys_set_joystick_func( winsys_joystick_func_t func )
 }
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Sets the joystick button callback
   \author  nopoe
   \date    Created:  2013-10-06
@@ -217,7 +217,7 @@ void winsys_set_joystick_button_func( winsys_joystick_button_func_t func )
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Copies the OpenGL back buffer to the front buffer
   \author  jfpatry
   \date    Created:  2000-10-19
@@ -234,7 +234,7 @@ void winsys_swap_buffers()
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Moves the mouse pointer to (x,y)
   \author  jfpatry
   \date    Created:  2000-10-19
@@ -251,7 +251,7 @@ void winsys_warp_pointer( int x, int y )
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Sets up the SDL OpenGL rendering context
   \author  jfpatry
   \date    Created:  2000-10-20
@@ -290,7 +290,7 @@ static void setup_sdl_video_mode()
     } else {
 	video_flags |= SDL_RESIZABLE;
     }
-    
+
     width = getparam_x_resolution();
     height = getparam_y_resolution();
 
@@ -322,7 +322,7 @@ static void setup_sdl_video_mode()
 	if ( ( screen = SDL_SetVideoMode( width, height, bpp, video_flags ) ) == NULL )
 #endif
     {
-	handle_system_error( 1, "Couldn't initialize video: %s", 
+	handle_system_error( 1, "Couldn't initialize video: %s",
 			     SDL_GetError() );
     }
 #if SDL_MAJOR_VERSION==2
@@ -340,7 +340,7 @@ static void setup_sdl_video_mode()
 }
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Handles time-critical events on mobile devices.
   \author  nopoe
   \date    Created:  2013-10-08
@@ -367,14 +367,14 @@ int winsys_event_filter(void* userdata, SDL_Event* event)
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
-  Initializes the OpenGL rendering context, and creates a window (or 
+/*!
+  Initializes the OpenGL rendering context, and creates a window (or
   sets up fullscreen mode if selected)
   \author  jfpatry
   \date    Created:  2000-10-19
   \date    Modified: 2000-10-19
 */
-void winsys_init( int *argc, char **argv, char *window_title, 
+void winsys_init( int *argc, char **argv, char *window_title,
 		  char *icon_title )
 {
 	int i;
@@ -385,7 +385,7 @@ void winsys_init( int *argc, char **argv, char *window_title,
     if ( SDL_Init( sdl_flags ) < 0 ) {
 	handle_error( 1, "Couldn't initialize SDL: %s", SDL_GetError() );
     }
-    
+
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 
@@ -395,8 +395,8 @@ void winsys_init( int *argc, char **argv, char *window_title,
     }
 
 
-    /* 
-     * Init video 
+    /*
+     * Init video
      */
     SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 
@@ -406,7 +406,7 @@ void winsys_init( int *argc, char **argv, char *window_title,
 #endif
 
     setup_sdl_video_mode();
-    
+
     init_programs();
 
 #if SDL_MAJOR_VERSION==2
@@ -445,80 +445,52 @@ void winsys_scan_joysticks()
 
 	num_joysticks = SDL_NumJoysticks();
 
-    print_debug( DEBUG_JOYSTICK, "Found %d joysticks", num_joysticks );
+  print_debug( DEBUG_JOYSTICK, "Found %d joysticks", num_joysticks );
 
-    if ( num_joysticks == 0 )
+  if ( num_joysticks == 0 )
 	{
 		return;
-    }
+  }
 
-	for (i=0; i<num_joysticks; i++)
+	for (controllerIndex=0; controllerIndex<num_joysticks; controllerIndex++)
 	{
-		if (SDL_IsGameController(i))
-		{
-			controllerIndex=i;
-			break;
-		}
+    winsys_joystick = SDL_JoystickOpen(controllerIndex);
+
+  	if (winsys_joystick == NULL)
+  	{
+  		print_debug( DEBUG_JOYSTICK, "Cannot open joystick" );
+  		return;
+  	}
+
+  	js_name = (char*) SDL_JoystickName(winsys_joystick);
+  	SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(winsys_joystick), guid, sizeof(guid));
+
+  	winsys_num_buttons = SDL_JoystickNumButtons(winsys_joystick);
+  	print_debug( DEBUG_JOYSTICK, "Joystick has %d button%s",
+  		 winsys_num_buttons, winsys_num_buttons == 1 ? "" : "s" );
+
+  	/* Get number of axes */
+  	winsys_num_axes = SDL_JoystickNumAxes(winsys_joystick);
+  	print_debug( DEBUG_JOYSTICK, "Joystick has %d ax%ss",
+  		 winsys_num_axes, winsys_num_axes == 1 ? "i" : "e" );
+
+  	if (winsys_num_axes==3)
+  	{
+  		print_debug(DEBUG_JOYSTICK, "Using accelerometer");
+  		SDL_JoystickEventState(SDL_ENABLE);
+  	}
+  	else
+  	{
+      // char mapping_buffer[200];
+      // print_debug(DEBUG_JOYSTICK, "Incompatible joystick '%s' with GUID '%s'", js_name, guid);
+      // print_debug(DEBUG_JOYSTICK, "Creating best-guess mapping for joystick '%s' with GUID '%s'", js_name, guid);
+      // sprintf(mapping_buffer, "%s,Unrecognized Joystick,a:b5,b:b6,x:b8,y:b9,dpup:b0,dpleft:b2,dpdown:b1,dpright:b3,leftx:a0,lefty:a1,");
+      // SDL_GameControllerAddMapping(mapping_buffer);
+      SDL_JoystickClose(winsys_joystick);
+      winsys_joystick=NULL;
+  	}
 	}
-	if (i==num_joysticks) //exhausted our options, there are no game controllers attached.
-	{
-		i=0; //use the first device
-	}
 
-	if (SDL_IsGameController(i))
-	{
-		winsys_game_controller=SDL_GameControllerOpen(controllerIndex);
-		if (winsys_game_controller == NULL)
-		{
-			print_debug( DEBUG_JOYSTICK, "Cannot open game controller" );
-			return;
-		}
-
-		js_name = (char*) SDL_GameControllerName(winsys_game_controller);
-
-		print_debug( DEBUG_JOYSTICK, "Using game controller %s", js_name );
-
-		SDL_GameControllerEventState(SDL_ENABLE);
-	}
-	else
-	{
-		winsys_joystick = SDL_JoystickOpen(controllerIndex);
-
-		if (winsys_joystick == NULL)
-		{
-			print_debug( DEBUG_JOYSTICK, "Cannot open joystick" );
-			return;
-		}
-
-		js_name = (char*) SDL_JoystickName(winsys_joystick);
-		SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(winsys_joystick), guid, sizeof(guid));
-
-		winsys_num_buttons = SDL_JoystickNumButtons(winsys_joystick);
-		print_debug( DEBUG_JOYSTICK, "Joystick has %d button%s", 
-			 winsys_num_buttons, winsys_num_buttons == 1 ? "" : "s" );
-
-		/* Get number of axes */
-		winsys_num_axes = SDL_JoystickNumAxes(winsys_joystick);
-		print_debug( DEBUG_JOYSTICK, "Joystick has %d ax%ss",
-			 winsys_num_axes, winsys_num_axes == 1 ? "i" : "e" );
-
-		if (winsys_num_axes==3 && winsys_num_buttons==0)
-		{
-			print_debug(DEBUG_JOYSTICK, "Using accelerometer");
-			SDL_JoystickEventState(SDL_ENABLE);
-		}
-		else
-		{
-            char mapping_buffer[200];
-			print_debug(DEBUG_JOYSTICK, "Incompatible joystick '%s' with GUID '%s'", js_name, guid);
-			print_debug(DEBUG_JOYSTICK, "Creating best-guess mapping for joystick '%s' with GUID '%s'", js_name, guid);
-            sprintf(mapping_buffer, "%s,Unrecognized Joystick,a:b5,b:b6,x:b8,y:b9,dpup:b0,dpleft:b2,dpdown:b1,dpright:b3,leftx:a0,lefty:a1,");
-            SDL_GameControllerAddMapping(mapping_buffer);
-			SDL_JoystickClose(winsys_joystick);
-			winsys_joystick=NULL;
-            winsys_scan_joysticks();
-		}
-	}
 }
 
 void winsys_init_joystick()
@@ -541,7 +513,7 @@ bool_t winsys_is_controller_active()
 }
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Deallocates resources in preparation for program termination
   \author  jfpatry
   \date    Created:  2000-10-19
@@ -555,9 +527,9 @@ void winsys_shutdown()
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Enables/disables key repeat messages from being generated
-  \return  
+  \return
   \author  jfpatry
   \date    Created:  2000-10-19
   \date    Modified: 2000-10-19
@@ -576,7 +548,7 @@ void winsys_enable_key_repeat( bool_t enabled )
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Shows/hides mouse cursor
   \author  jfpatry
   \date    Created:  2000-10-19
@@ -588,7 +560,7 @@ void winsys_show_cursor( bool_t visible )
 }
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Processes and dispatches events.  This function never returns.
   \return  No.
   \author  jfpatry
@@ -598,7 +570,7 @@ void winsys_show_cursor( bool_t visible )
 void winsys_process_events()
 {
 	int z;
-    SDL_Event event; 
+    SDL_Event event;
     unsigned int key;
     int x, y;
 	int i;
@@ -609,12 +581,12 @@ void winsys_process_events()
 	SDL_UnlockAudio();
 
 	while ( SDL_PollEvent( &event ) ) {
-	    
+
 	    switch ( event.type ) {
 	    case SDL_KEYDOWN:
 		if ( keyboard_func ) {
 		    SDL_GetMouseState( &x, &y );
-		    key = event.key.keysym.sym; 
+		    key = event.key.keysym.sym;
 		    (*keyboard_func)( key,
 				      key >= 256,
 				      False,
@@ -625,7 +597,7 @@ void winsys_process_events()
 	    case SDL_KEYUP:
 		if ( keyboard_func ) {
 		    SDL_GetMouseState( &x, &y );
-		    key = event.key.keysym.sym; 
+		    key = event.key.keysym.sym;
 		    (*keyboard_func)( key,
 				      key >= 256,
 				      True,
@@ -715,7 +687,7 @@ void winsys_process_events()
 		break;
 
 	    case SDL_FINGERDOWN:
-	    
+
 		if ( mouse_func ) {
 		    (*mouse_func)( SDL_BUTTON_LEFT,
 				   SDL_PRESSED,
@@ -726,7 +698,7 @@ void winsys_process_events()
 		break;
 
 	    case SDL_FINGERUP:
-	    
+
 		if ( mouse_func ) {
 		    (*mouse_func)( SDL_BUTTON_LEFT,
 				   SDL_RELEASED,
@@ -801,7 +773,7 @@ void winsys_process_events()
 }
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Adds an assocation between a joystick button and an SDL Key.
   \author  nopoe
   \date    Created:  2013-10-08
@@ -818,7 +790,7 @@ void winsys_add_js_button_binding(int js_button, int sdl_key)
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Binds the joystick axes to the arrow keys
   \author  nopoe
   \date    Created:  2013-10-08
@@ -830,7 +802,7 @@ void winsys_add_js_axis_bindings()
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Resets all bindings of joystick axes or buttons to keys.
   \author  nopoe
   \date    Created:  2013-10-08
@@ -842,7 +814,7 @@ void winsys_reset_js_bindings()
 }
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Updates the joysticks for the purposes of sending keyboard events bound
   to the axes.
   \author  nopoe
@@ -956,7 +928,7 @@ void winsys_update_joysticks()
 }
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Sets the function to be called when program ends.  Note that this
   function should only be called once.
   \author  jfpatry
@@ -974,7 +946,7 @@ void winsys_atexit( winsys_atexit_func_t func )
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Exits the program
   \author  jfpatry
   \date    Created:  2000-10-20
@@ -1015,20 +987,20 @@ static bool_t redisplay = False;
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Requests that the screen be redrawn
   \author  jfpatry
   \date    Created:  2000-10-19
   \date    Modified: 2000-10-19
 */
-void winsys_post_redisplay() 
+void winsys_post_redisplay()
 {
     redisplay = True;
 }
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Sets the display callback
   \author  jfpatry
   \date    Created:  2000-10-19
@@ -1041,7 +1013,7 @@ void winsys_set_display_func( winsys_display_func_t func )
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Sets the idle callback
   \author  jfpatry
   \date    Created:  2000-10-19
@@ -1054,7 +1026,7 @@ void winsys_set_idle_func( winsys_idle_func_t func )
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Sets the reshape callback
   \author  jfpatry
   \date    Created:  2000-10-19
@@ -1067,28 +1039,28 @@ void winsys_set_reshape_func( winsys_reshape_func_t func )
 
 
 /* Keyboard callbacks */
-static void glut_keyboard_cb( unsigned char ch, int x, int y ) 
+static void glut_keyboard_cb( unsigned char ch, int x, int y )
 {
     if ( keyboard_func ) {
 	(*keyboard_func)( ch, False, False, x, y );
     }
 }
 
-static void glut_special_cb( int key, int x, int y ) 
+static void glut_special_cb( int key, int x, int y )
 {
     if ( keyboard_func ) {
 	(*keyboard_func)( key, True, False, x, y );
     }
 }
 
-static void glut_keyboard_up_cb( unsigned char ch, int x, int y ) 
+static void glut_keyboard_up_cb( unsigned char ch, int x, int y )
 {
     if ( keyboard_func ) {
 	(*keyboard_func)( ch, False, True, x, y );
     }
 }
 
-static void glut_special_up_cb( int key, int x, int y ) 
+static void glut_special_up_cb( int key, int x, int y )
 {
     if ( keyboard_func ) {
 	(*keyboard_func)( key, True, True, x, y );
@@ -1097,7 +1069,7 @@ static void glut_special_up_cb( int key, int x, int y )
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Sets the keyboard callback
   \author  jfpatry
   \date    Created:  2000-10-19
@@ -1110,7 +1082,7 @@ void winsys_set_keyboard_func( winsys_keyboard_func_t func )
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Sets the mouse button-press callback
   \author  jfpatry
   \date    Created:  2000-10-19
@@ -1123,7 +1095,7 @@ void winsys_set_mouse_func( winsys_mouse_func_t func )
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Sets the mouse motion callback (when a mouse button is pressed)
   \author  jfpatry
   \date    Created:  2000-10-19
@@ -1136,7 +1108,7 @@ void winsys_set_motion_func( winsys_motion_func_t func )
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Sets the mouse motion callback (when no mouse button is pressed)
   \author  jfpatry
   \date    Created:  2000-10-19
@@ -1150,7 +1122,7 @@ void winsys_set_passive_motion_func( winsys_motion_func_t func )
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Copies the OpenGL back buffer to the front buffer
   \author  jfpatry
   \date    Created:  2000-10-19
@@ -1163,7 +1135,7 @@ void winsys_swap_buffers()
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Moves the mouse pointer to (x,y)
   \author  jfpatry
   \date    Created:  2000-10-19
@@ -1176,14 +1148,14 @@ void winsys_warp_pointer( int x, int y )
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
-  Initializes the OpenGL rendering context, and creates a window (or 
+/*!
+  Initializes the OpenGL rendering context, and creates a window (or
   sets up fullscreen mode if selected)
   \author  jfpatry
   \date    Created:  2000-10-19
   \date    Modified: 2000-10-19
 */
-void winsys_init( int *argc, char **argv, char *window_title, 
+void winsys_init( int *argc, char **argv, char *window_title,
 		  char *icon_title )
 {
     int width, height;
@@ -1195,7 +1167,7 @@ void winsys_init( int *argc, char **argv, char *window_title,
     glutInitDisplayMode( GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE | GLUT_STENCIL );
 #else
     glutInitDisplayMode( GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE );
-#endif 
+#endif
 
     /* Create a window */
     if ( getparam_fullscreen() ) {
@@ -1221,7 +1193,7 @@ void winsys_init( int *argc, char **argv, char *window_title,
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Deallocates resources in preparation for program termination
   \author  jfpatry
   \date    Created:  2000-10-19
@@ -1235,9 +1207,9 @@ void winsys_shutdown()
 }
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Enables/disables key repeat messages from being generated
-  \return  
+  \return
   \author  jfpatry
   \date    Created:  2000-10-19
   \date    Modified: 2000-10-19
@@ -1248,7 +1220,7 @@ void winsys_enable_key_repeat( bool_t enabled )
 }
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Shows/hides mouse cursor
   \author  jfpatry
   \date    Created:  2000-10-19
@@ -1266,7 +1238,7 @@ void winsys_show_cursor( bool_t visible )
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Processes and dispatches events.  This function never returns.
   \return  No.
   \author  jfpatry
@@ -1285,7 +1257,7 @@ void winsys_process_events()
 }
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Sets the function to be called when program ends.  Note that this
   function should only be called once.
   \author  jfpatry
@@ -1304,7 +1276,7 @@ void winsys_atexit( winsys_atexit_func_t func )
 
 
 /*---------------------------------------------------------------------------*/
-/*! 
+/*!
   Exits the program
   \author  jfpatry
   \date    Created:  2000-10-20

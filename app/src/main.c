@@ -173,7 +173,7 @@ void read_game_init_script()
 #ifdef TARGET_OS_IPHONE
 int libtuxracer_main( int argc, char **argv )
 #elif defined(__ANDROID__)
-int SDL_main( int argc, char **argv )
+int __attribute__((visibility("default")))  SDL_main( int argc, char **argv )
 #else
 int main( int argc, char **argv ) 
 #endif

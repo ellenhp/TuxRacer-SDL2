@@ -1,4 +1,4 @@
-LOCAL_PATH := $(TUXRACER_HOME)
+LOCAL_PATH := $(call my-dir)/../../../../..
 
 include $(CLEAR_VARS)
 
@@ -14,7 +14,6 @@ LOCAL_C_INCLUDES += $(GLM_HOME)
 # Add your application source files here...
 LOCAL_SRC_FILES += $(wildcard $(LOCAL_PATH)/app/src/*.c)
 LOCAL_SRC_FILES += $(wildcard $(LOCAL_PATH)/app/src/*.cpp)
-LOCAL_SRC_FILES += $(wildcard $(LOCAL_PATH)/app/src/android/*.c)
 LOCAL_SRC_FILES += $(wildcard $(GAMEMENU_HOME)/src/*.c)
 
 LOCAL_SHARED_LIBRARIES := SDL2

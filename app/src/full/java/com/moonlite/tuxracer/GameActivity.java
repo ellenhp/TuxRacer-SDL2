@@ -24,13 +24,10 @@ public class GameActivity extends ScoreActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mSingleton=this;
-		nativeCoursePrice(null);
 	}
 
 	protected void onDestroy() {
 		super.onDestroy();
 		mSingleton=null;
 	}	
-
-	public static native void nativeCoursePrice(String price);
 }
