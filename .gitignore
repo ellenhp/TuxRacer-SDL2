@@ -177,3 +177,5 @@ android/libs/armeabi-v7a
 android/libs/jni
 android/libs/obj
 android/local.properties
+
+bazel-*
