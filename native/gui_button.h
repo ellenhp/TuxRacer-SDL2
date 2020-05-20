@@ -8,7 +8,7 @@ extern "C"
 {
 #endif
 
-widget_t* create_button(char* text, widget_click_callback_t click_cb);
+    widget_t *create_button(char *text, widget_click_callback_t click_cb);
 
 #ifdef __cplusplus
 }

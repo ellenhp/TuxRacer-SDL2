@@ -21,10 +21,12 @@
 #include "ui_mgr.h"
 #include "hash.h"
 #include "textures.h"
+#include "shaders.h"
 #include "ui_snow.h"
 #include "loop.h"
 
-typedef struct {
+typedef struct
+{
     void *widget;
     void *cb;
 } ui_callback_data_t;
@@ -36,7 +38,7 @@ static hash_table_t widget_draw_cbs;
 static bool_t initialized = False;
 static bool_t needs_redraw = True;
 static char key_buffer[12]; /* enough to hold a pointer in hex */
-static point2d_t cursor_pos = { 0, 0 };
+static point2d_t cursor_pos = {0, 0};
 static bool_t left_mouse_button_down = False;
 static bool_t middle_mouse_button_down = False;
 static bool_t right_mouse_button_down = False;
@@ -56,15 +58,15 @@ static bool_t right_mouse_button_down = False;
 */
 void init_ui_manager()
 {
-    if ( !initialized ) {
-	mouse_motion_cbs = create_hash_table();
-	mouse_down_cbs = create_hash_table();
-	mouse_up_cbs = create_hash_table();
-	widget_draw_cbs = create_hash_table();
+    if (!initialized)
+    {
+        mouse_motion_cbs = create_hash_table();
+        mouse_down_cbs = create_hash_table();
+        mouse_up_cbs = create_hash_table();
+        widget_draw_cbs = create_hash_table();
     }
     initialized = True;
 }
-
 
 /*---------------------------------------------------------------------------*/
 /*! 
@@ -79,7 +81,7 @@ void ui_setup_display()
 {
     use_hud_program();
     glViewport(0, 0, getparam_x_resolution(), getparam_y_resolution());
-    
+
     /*
     scalar_t offset = OFFSET_AMT;
 
@@ -95,7 +97,6 @@ void ui_setup_display()
      */
 }
 
-
 /*---------------------------------------------------------------------------*/
 /*! 
   Generates a key from a pointer.  This is a hack since our hash
@@ -109,12 +110,11 @@ void ui_setup_display()
   \date    Created:  2000-09-16
   \date    Modified: 2000-09-16 
 */
-static char* generate_key_from_pointer( void *ptr )
+static char *generate_key_from_pointer(void *ptr)
 {
-    sprintf( key_buffer, "%p", ptr );
+    sprintf(key_buffer, "%p", ptr);
     return key_buffer;
 }
-
 
 /*---------------------------------------------------------------------------*/
 /*! 
@@ -129,18 +129,17 @@ static char* generate_key_from_pointer( void *ptr )
   \date    Created:  2000-09-16
   \date    Modified: 2000-09-16
 */
-static ui_callback_data_t* generate_cb_data( void *widget, void *cb )
+static ui_callback_data_t *generate_cb_data(void *widget, void *cb)
 {
     ui_callback_data_t *cb_data;
 
-    cb_data = (ui_callback_data_t*)malloc( sizeof(ui_callback_data_t) );
+    cb_data = (ui_callback_data_t *)malloc(sizeof(ui_callback_data_t));
 
     cb_data->widget = widget;
     cb_data->cb = cb;
 
     return cb_data;
 }
-
 
 /*---------------------------------------------------------------------------*/
 /*! 
@@ -154,25 +153,26 @@ static ui_callback_data_t* generate_cb_data( void *widget, void *cb )
   \date    Created:  2000-09-16
   \date    Modified: 2000-09-16
 */
-void ui_add_mouse_motion_callback( void* widget, mouse_motion_event_cb_t cb ) 
+void ui_add_mouse_motion_callback(void *widget, mouse_motion_event_cb_t cb)
 {
     char *key;
     hash_table_t table;
     ui_callback_data_t *cb_data;
 
-    key = generate_key_from_pointer( widget );
+    key = generate_key_from_pointer(widget);
     table = mouse_motion_cbs;
 
-    if ( get_hash_entry( table, key, NULL) ) {
-	del_hash_entry( table, key, (hash_entry_t*)&cb_data );
-	free(cb_data);
+    if (get_hash_entry(table, key, NULL))
+    {
+        del_hash_entry(table, key, (hash_entry_t *)&cb_data);
+        free(cb_data);
     }
 
-    if ( cb != NULL ) {
-	add_hash_entry( table, key, generate_cb_data( widget, (void*)cb ) );
+    if (cb != NULL)
+    {
+        add_hash_entry(table, key, generate_cb_data(widget, (void *)cb));
     }
 }
-
 
 /*---------------------------------------------------------------------------*/
 /*! 
@@ -185,11 +185,10 @@ void ui_add_mouse_motion_callback( void* widget, mouse_motion_event_cb_t cb )
   \date    Created:  2000-09-16
   \date    Modified: 2000-09-16
 */
-void ui_delete_mouse_motion_callback( void* widget ) 
+void ui_delete_mouse_motion_callback(void *widget)
 {
-    ui_add_mouse_motion_callback( widget, NULL );
+    ui_add_mouse_motion_callback(widget, NULL);
 }
-
 
 /*---------------------------------------------------------------------------*/
 /*! 
@@ -203,25 +202,26 @@ void ui_delete_mouse_motion_callback( void* widget )
   \date    Created:  2000-09-16
   \date    Modified: 2000-09-16
 */
-void ui_add_mouse_down_callback( void* widget, mouse_button_event_cb_t cb ) 
+void ui_add_mouse_down_callback(void *widget, mouse_button_event_cb_t cb)
 {
     char *key;
     hash_table_t table;
     ui_callback_data_t *cb_data;
 
-    key = generate_key_from_pointer( widget );
+    key = generate_key_from_pointer(widget);
     table = mouse_down_cbs;
 
-    if ( get_hash_entry( table, key, NULL) ) {
-	del_hash_entry( table, key, (hash_entry_t*)&cb_data );
-	free(cb_data);
+    if (get_hash_entry(table, key, NULL))
+    {
+        del_hash_entry(table, key, (hash_entry_t *)&cb_data);
+        free(cb_data);
     }
 
-    if ( cb != NULL ) {
-	add_hash_entry( table, key, generate_cb_data( widget, (void*) cb ) );
+    if (cb != NULL)
+    {
+        add_hash_entry(table, key, generate_cb_data(widget, (void *)cb));
     }
 }
-
 
 /*---------------------------------------------------------------------------*/
 /*! 
@@ -234,11 +234,10 @@ void ui_add_mouse_down_callback( void* widget, mouse_button_event_cb_t cb )
   \date    Created:  2000-09-16
   \date    Modified: 2000-09-16
 */
-void ui_delete_mouse_down_callback( void* widget ) 
+void ui_delete_mouse_down_callback(void *widget)
 {
-    ui_add_mouse_down_callback( widget, NULL );
+    ui_add_mouse_down_callback(widget, NULL);
 }
-
 
 /*---------------------------------------------------------------------------*/
 /*! 
@@ -252,25 +251,26 @@ void ui_delete_mouse_down_callback( void* widget )
   \date    Created:  2000-09-16
   \date    Modified: 2000-09-16
 */
-void ui_add_mouse_up_callback( void* widget, mouse_button_event_cb_t cb ) 
+void ui_add_mouse_up_callback(void *widget, mouse_button_event_cb_t cb)
 {
     char *key;
     hash_table_t table;
     ui_callback_data_t *cb_data;
 
-    key = generate_key_from_pointer( widget );
+    key = generate_key_from_pointer(widget);
     table = mouse_up_cbs;
 
-    if ( get_hash_entry( table, key, NULL) ) {
-	del_hash_entry( table, key, (hash_entry_t*)&cb_data );
-	free(cb_data);
+    if (get_hash_entry(table, key, NULL))
+    {
+        del_hash_entry(table, key, (hash_entry_t *)&cb_data);
+        free(cb_data);
     }
 
-    if ( cb != NULL ) {
-	add_hash_entry( table, key, generate_cb_data( widget, (void*) cb ) );
+    if (cb != NULL)
+    {
+        add_hash_entry(table, key, generate_cb_data(widget, (void *)cb));
     }
 }
-
 
 /*---------------------------------------------------------------------------*/
 /*! 
@@ -283,11 +283,10 @@ void ui_add_mouse_up_callback( void* widget, mouse_button_event_cb_t cb )
   \date    Created:  2000-09-16
   \date    Modified: 2000-09-16
 */
-void ui_delete_mouse_up_callback( void* widget ) 
+void ui_delete_mouse_up_callback(void *widget)
 {
-    ui_add_mouse_up_callback( widget, NULL );
+    ui_add_mouse_up_callback(widget, NULL);
 }
-
 
 /*---------------------------------------------------------------------------*/
 /*! 
@@ -297,26 +296,26 @@ void ui_delete_mouse_up_callback( void* widget )
   \date    Created:  2000-09-17
   \date    Modified: 2000-09-17
 */
-void ui_add_widget_draw_callback( void* widget, widget_draw_cb_t cb )
+void ui_add_widget_draw_callback(void *widget, widget_draw_cb_t cb)
 {
     char *key;
     hash_table_t table;
     ui_callback_data_t *cb_data;
 
-    key = generate_key_from_pointer( widget );
+    key = generate_key_from_pointer(widget);
     table = widget_draw_cbs;
 
-    if ( get_hash_entry( table, key, NULL) ) {
-	del_hash_entry( table, key, (hash_entry_t*)&cb_data );
-	free(cb_data);
+    if (get_hash_entry(table, key, NULL))
+    {
+        del_hash_entry(table, key, (hash_entry_t *)&cb_data);
+        free(cb_data);
     }
 
-    if ( cb != NULL ) {
-	add_hash_entry( table, key, generate_cb_data( widget, (void*) cb ) );
+    if (cb != NULL)
+    {
+        add_hash_entry(table, key, generate_cb_data(widget, (void *)cb));
     }
-    
 }
-
 
 /*---------------------------------------------------------------------------*/
 /*! 
@@ -326,11 +325,10 @@ void ui_add_widget_draw_callback( void* widget, widget_draw_cb_t cb )
   \date    Created:  2000-09-17
   \date    Modified: 2000-09-17
 */
-void ui_delete_widget_draw_callback( void* widget )
+void ui_delete_widget_draw_callback(void *widget)
 {
-    ui_add_widget_draw_callback( widget, NULL );
+    ui_add_widget_draw_callback(widget, NULL);
 }
-
 
 /*---------------------------------------------------------------------------*/
 /*! 
@@ -346,7 +344,6 @@ void ui_set_dirty()
     needs_redraw = True;
 }
 
-
 /*---------------------------------------------------------------------------*/
 /*! 
   Checks the dirty flag for UI widgets and requests a screen redraw if dirty
@@ -358,12 +355,12 @@ void ui_set_dirty()
 */
 void ui_check_dirty()
 {
-    if ( needs_redraw ) {
-	winsys_post_redisplay();
-	needs_redraw = False;
+    if (needs_redraw)
+    {
+        winsys_post_redisplay();
+        needs_redraw = False;
     }
 }
-
 
 /*---------------------------------------------------------------------------*/
 /*! 
@@ -378,27 +375,28 @@ void ui_check_dirty()
   \date    Created:  2000-09-16
   \date    Modified: 2000-09-16
 */
-static void trigger_mouse_button_cbs( hash_table_t table, 
-				      winsys_mouse_button_t button, 
-				      int x, int y )
+static void trigger_mouse_button_cbs(hash_table_t table,
+                                     winsys_mouse_button_t button,
+                                     int x, int y)
 {
     hash_search_t iter;
     ui_callback_data_t *cb_data;
 
-    begin_hash_scan( table, &iter );
-    while ( next_hash_entry( iter, NULL, (hash_entry_t*)&cb_data ) ) {
-	((mouse_button_event_cb_t)cb_data->cb)( 
-	    cb_data->widget, (winsys_mouse_button_t)button, x, y );
+    begin_hash_scan(table, &iter);
+    while (next_hash_entry(iter, NULL, (hash_entry_t *)&cb_data))
+    {
+        ((mouse_button_event_cb_t)cb_data->cb)(
+            cb_data->widget, (winsys_mouse_button_t)button, x, y);
 
-	if ( is_mode_change_pending() ) {
-	    /* Callback just changed the mode; stop handling events
+        if (is_mode_change_pending())
+        {
+            /* Callback just changed the mode; stop handling events
 	       for this mode. */
-	    break;
-	}
+            break;
+        }
     }
-    end_hash_scan( iter );
+    end_hash_scan(iter);
 }
-
 
 /*---------------------------------------------------------------------------*/
 /*! 
@@ -412,24 +410,26 @@ static void trigger_mouse_button_cbs( hash_table_t table,
   \date    Created:  2000-09-16
   \date    Modified: 2000-09-16
 */
-static void trigger_mouse_motion_cbs( hash_table_t table, 
-				      int x, int y )
+static void trigger_mouse_motion_cbs(hash_table_t table,
+                                     int x, int y)
 {
     hash_search_t iter;
     ui_callback_data_t *cb_data;
 
-    begin_hash_scan( table, &iter );
-    while ( next_hash_entry( iter, NULL, (hash_entry_t*)&cb_data ) ) {
-	((mouse_motion_event_cb_t)cb_data->cb)( 
-	    cb_data->widget, x, y );
+    begin_hash_scan(table, &iter);
+    while (next_hash_entry(iter, NULL, (hash_entry_t *)&cb_data))
+    {
+        ((mouse_motion_event_cb_t)cb_data->cb)(
+            cb_data->widget, x, y);
 
-	if ( is_mode_change_pending() ) {
-	    /* Callback just changed the mode; stop handling events
+        if (is_mode_change_pending())
+        {
+            /* Callback just changed the mode; stop handling events
 	       for this mode. */
-	    break;
-	}
+            break;
+        }
     }
-    end_hash_scan( iter );
+    end_hash_scan(iter);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -441,30 +441,37 @@ static void trigger_mouse_motion_cbs( hash_table_t table,
   \date    Created:  2000-09-16
   \date    Modified: 2000-09-16
 */
-void ui_event_mouse_func( int button, int state, int finger_index, int x, int y )
+void ui_event_mouse_func(int button, int state, int finger_index, int x, int y)
 {
-    if ( is_mode_change_pending() ) {
-	/* Don't process events until mode change occurs */
-	return;
+    if (is_mode_change_pending())
+    {
+        /* Don't process events until mode change occurs */
+        return;
     }
 
     /* Reverse y coordinate */
     y = getparam_y_resolution() - y;
 
-    if ( state == WS_MOUSE_DOWN ) {
-	trigger_mouse_button_cbs( mouse_down_cbs, button, x, y );
-    } else {
-	trigger_mouse_button_cbs( mouse_up_cbs, button, x, y );
+    if (state == WS_MOUSE_DOWN)
+    {
+        trigger_mouse_button_cbs(mouse_down_cbs, button, x, y);
+    }
+    else
+    {
+        trigger_mouse_button_cbs(mouse_up_cbs, button, x, y);
     }
 
-    if ( button == WS_LEFT_BUTTON ) {
-	left_mouse_button_down = (bool_t) ( state == WS_MOUSE_DOWN );
+    if (button == WS_LEFT_BUTTON)
+    {
+        left_mouse_button_down = (bool_t)(state == WS_MOUSE_DOWN);
     }
-    if ( button == WS_MIDDLE_BUTTON ) {
-	middle_mouse_button_down = (bool_t) ( state == WS_MOUSE_DOWN );
+    if (button == WS_MIDDLE_BUTTON)
+    {
+        middle_mouse_button_down = (bool_t)(state == WS_MOUSE_DOWN);
     }
-    if ( button == WS_RIGHT_BUTTON ) {
-	right_mouse_button_down = (bool_t) ( state == WS_MOUSE_DOWN );
+    if (button == WS_RIGHT_BUTTON)
+    {
+        right_mouse_button_down = (bool_t)(state == WS_MOUSE_DOWN);
     }
 
     ui_check_dirty();
@@ -479,40 +486,48 @@ void ui_event_mouse_func( int button, int state, int finger_index, int x, int y 
   \date    Created:  2000-09-16
   \date    Modified: 2000-09-16
 */
-void ui_event_motion_func( int x, int y )
+void ui_event_motion_func(int x, int y)
 {
     point2d_t old_pos;
 
-    if ( is_mode_change_pending() ) {
-	/* Don't process events until mode change occurs */
-	return;
+    if (is_mode_change_pending())
+    {
+        /* Don't process events until mode change occurs */
+        return;
     }
 
     /* Reverse y coordinate */
     y = getparam_y_resolution() - y;
 
-    trigger_mouse_motion_cbs( mouse_motion_cbs, x, y );
+    trigger_mouse_motion_cbs(mouse_motion_cbs, x, y);
 
     old_pos = cursor_pos;
-    cursor_pos = make_point2d( x, y );
+    cursor_pos = make_point2d(x, y);
 
-    if ( old_pos.x != x || old_pos.y != y ) {
-	/* Update UI snow */
-	if ( getparam_ui_snow() ) {
-	    if ( right_mouse_button_down ) {
-		make_ui_snow( cursor_pos );
-		reset_ui_snow_cursor_pos( cursor_pos );
-	    } else if ( middle_mouse_button_down ) {
-		make_ui_snow( cursor_pos );
-		push_ui_snow( cursor_pos );
-	    } else {
-		push_ui_snow( cursor_pos );
-	    }
-	}
+    if (old_pos.x != x || old_pos.y != y)
+    {
+        /* Update UI snow */
+        if (getparam_ui_snow())
+        {
+            if (right_mouse_button_down)
+            {
+                make_ui_snow(cursor_pos);
+                reset_ui_snow_cursor_pos(cursor_pos);
+            }
+            else if (middle_mouse_button_down)
+            {
+                make_ui_snow(cursor_pos);
+                push_ui_snow(cursor_pos);
+            }
+            else
+            {
+                push_ui_snow(cursor_pos);
+            }
+        }
 
-	/* Need to redraw cursor */
-	ui_set_dirty();
-	ui_check_dirty();
+        /* Need to redraw cursor */
+        ui_set_dirty();
+        ui_check_dirty();
     }
 }
 
@@ -523,7 +538,7 @@ void ui_event_motion_func( int x, int y )
   \date    Created:  2000-09-29
   \date    Modified: 2000-09-29
 */
-void ui_draw_cursor( void )
+void ui_draw_cursor(void)
 {
     /*
     GLuint texobj;
@@ -566,7 +581,6 @@ void ui_draw_cursor( void )
      */
 }
 
-
 /*---------------------------------------------------------------------------*/
 /*! 
   Draws all UI widgets
@@ -575,24 +589,24 @@ void ui_draw_cursor( void )
   \date    Created:  2000-09-17
   \date    Modified: 2000-09-17
 */
-void ui_draw( )
+void ui_draw()
 {
     hash_search_t iter;
     ui_callback_data_t *cb_data;
 
     ui_setup_display();
 
-    begin_hash_scan( widget_draw_cbs, &iter );
-    while ( next_hash_entry( iter, NULL, (hash_entry_t*)&cb_data ) ) {
-	((widget_draw_cb_t)cb_data->cb)( cb_data->widget );
-	check_assertion( !is_mode_change_pending(),
-			 "widget draw callback changed the mode" );
+    begin_hash_scan(widget_draw_cbs, &iter);
+    while (next_hash_entry(iter, NULL, (hash_entry_t *)&cb_data))
+    {
+        ((widget_draw_cb_t)cb_data->cb)(cb_data->widget);
+        check_assertion(!is_mode_change_pending(),
+                        "widget draw callback changed the mode");
     }
-    end_hash_scan( iter );
+    end_hash_scan(iter);
 
     ui_draw_cursor();
 }
-
 
 /*---------------------------------------------------------------------------*/
 /*! 
@@ -601,7 +615,7 @@ void ui_draw( )
   \date    Created:  2000-09-29
   \date    Modified: 2000-09-29
 */
-point2d_t ui_get_mouse_position( void )
+point2d_t ui_get_mouse_position(void)
 {
     return cursor_pos;
 }

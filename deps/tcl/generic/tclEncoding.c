@@ -92,7 +92,7 @@ typedef struct TableEncodingData {
  */
 
 typedef struct EscapeSubTable {
-    unsigned sequenceLen;	/* Length of following string. */
+    unsigned int sequenceLen;	/* Length of following string. */
     char sequence[16];		/* Escape code that marks this encoding. */
     char name[32];		/* Name for encoding. */
     Encoding *encodingPtr;	/* Encoding loaded using above name, or NULL
@@ -104,10 +104,10 @@ typedef struct EscapeEncodingData {
     int fallback;		/* Character (in this encoding) to substitute
 				 * when this encoding cannot represent a UTF-8
 				 * character. */
-    unsigned initLen;		/* Length of following string. */
+    unsigned int initLen;	/* Length of following string. */
     char init[16];		/* String to emit or expect before first char
 				 * in conversion. */
-    unsigned finalLen;		/* Length of following string. */
+    unsigned int finalLen;	/* Length of following string. */
     char final[16];		/* String to emit or expect after last char in
 				 * conversion. */
     char prefixBytes[256];	/* If a byte in the input stream is the first
@@ -123,7 +123,7 @@ typedef struct EscapeEncodingData {
 } EscapeEncodingData;
 
 /*
- * Constants used when loading an encoding file to identify the type of the
+ * constants used when loading an encoding file to identify the type of the
  * file.
  */
 
@@ -180,9 +180,9 @@ TCL_DECLARE_MUTEX(encodingMutex)
  * the system encoding will be used to perform the conversion.
  */
 
-static Tcl_Encoding defaultEncoding = NULL;
-static Tcl_Encoding systemEncoding = NULL;
-Tcl_Encoding tclIdentityEncoding = NULL;
+static Tcl_Encoding defaultEncoding;
+static Tcl_Encoding systemEncoding;
+Tcl_Encoding tclIdentityEncoding;
 
 /*
  * The following variable is used in the sparse matrix code for a
@@ -276,7 +276,7 @@ static int		Iso88591ToUtfProc(ClientData clientData,
  * See concerns raised in [Bug 1077262].
  */
 
-static const Tcl_ObjType encodingType = {
+static Tcl_ObjType encodingType = {
     "encoding", FreeEncodingIntRep, DupEncodingIntRep, NULL, NULL
 };
 
@@ -294,7 +294,7 @@ static const Tcl_ObjType encodingType = {
  *	Standard Tcl return code.
  *
  * Side effects:
- *	Caches the Tcl_Encoding value as the internal rep of (*objPtr).
+ * 	Caches the Tcl_Encoding value as the internal rep of (*objPtr).
  *
  *----------------------------------------------------------------------
  */
@@ -305,8 +305,7 @@ Tcl_GetEncodingFromObj(
     Tcl_Obj *objPtr,
     Tcl_Encoding *encodingPtr)
 {
-    const char *name = TclGetString(objPtr);
-
+    const char *name = Tcl_GetString(objPtr);
     if (objPtr->typePtr != &encodingType) {
 	Tcl_Encoding encoding = Tcl_GetEncoding(interp, name);
 
@@ -314,7 +313,7 @@ Tcl_GetEncodingFromObj(
 	    return TCL_ERROR;
 	}
 	TclFreeIntRep(objPtr);
-	objPtr->internalRep.twoPtrValue.ptr1 = encoding;
+	objPtr->internalRep.twoPtrValue.ptr1 = (VOID *) encoding;
 	objPtr->typePtr = &encodingType;
     }
     *encodingPtr = Tcl_GetEncoding(NULL, name);
@@ -335,7 +334,7 @@ static void
 FreeEncodingIntRep(
     Tcl_Obj *objPtr)
 {
-    Tcl_FreeEncoding(objPtr->internalRep.twoPtrValue.ptr1);
+    Tcl_FreeEncoding((Tcl_Encoding) objPtr->internalRep.twoPtrValue.ptr1);
     objPtr->typePtr = NULL;
 }
 
@@ -354,7 +353,8 @@ DupEncodingIntRep(
     Tcl_Obj *srcPtr,
     Tcl_Obj *dupPtr)
 {
-    dupPtr->internalRep.twoPtrValue.ptr1 = Tcl_GetEncoding(NULL, srcPtr->bytes);
+    dupPtr->internalRep.twoPtrValue.ptr1 = (VOID *)
+	    Tcl_GetEncoding(NULL, srcPtr->bytes);
 }
 
 /*
@@ -453,8 +453,8 @@ TclSetLibraryPath(
  *
  * FillEncodingFileMap --
  *
- *	Called to bring the encoding file map in sync with the current value
- *	of the encoding search path.
+ * 	Called to bring the encoding file map in sync with the current value
+ * 	of the encoding search path.
  *
  *	Scan the directories on the encoding search path, find the *.enc
  *	files, and store the found pathnames in a map associated with the
@@ -507,12 +507,12 @@ FillEncodingFileMap(void)
 
 	Tcl_ListObjGetElements(NULL, matchFileList, &numFiles, &filev);
 	for (j=0; j<numFiles; j++) {
-	    Tcl_Obj *encodingName, *fileObj;
+	    Tcl_Obj *encodingName, *file;
 
-	    fileObj = TclPathPart(NULL, filev[j], TCL_PATH_TAIL);
-	    encodingName = TclPathPart(NULL, fileObj, TCL_PATH_ROOT);
+	    file = TclPathPart(NULL, filev[j], TCL_PATH_TAIL);
+	    encodingName = TclPathPart(NULL, file, TCL_PATH_ROOT);
 	    Tcl_DictObjPut(NULL, map, encodingName, directory);
-	    Tcl_DecrRefCount(fileObj);
+	    Tcl_DecrRefCount(file);
 	    Tcl_DecrRefCount(encodingName);
 	}
 	Tcl_DecrRefCount(matchFileList);
@@ -544,9 +544,6 @@ void
 TclInitEncodingSubsystem(void)
 {
     Tcl_EncodingType type;
-    TableEncodingData *dataPtr;
-    unsigned size;
-    unsigned short i;
 
     if (encodingsInitialized) {
 	return;
@@ -568,7 +565,10 @@ TclInitEncodingSubsystem(void)
     type.freeProc	= NULL;
     type.nullSize	= 1;
     type.clientData	= NULL;
-    tclIdentityEncoding = Tcl_CreateEncoding(&type);
+
+    defaultEncoding	= Tcl_CreateEncoding(&type);
+    tclIdentityEncoding = Tcl_GetEncoding(NULL, type.encodingName);
+    systemEncoding	= Tcl_GetEncoding(NULL, type.encodingName);
 
     type.encodingName	= "utf-8";
     type.toUtfProc	= UtfExtToUtfIntProc;
@@ -593,36 +593,42 @@ TclInitEncodingSubsystem(void)
      * code to duplicate the structure of a table encoding here.
      */
 
-    dataPtr = ckalloc(sizeof(TableEncodingData));
-    memset(dataPtr, 0, sizeof(TableEncodingData));
-    dataPtr->fallback = '?';
+    {
+	TableEncodingData *dataPtr = (TableEncodingData *)
+		ckalloc(sizeof(TableEncodingData));
+	unsigned size;
+	unsigned short i;
 
-    size = 256*(sizeof(unsigned short *) + sizeof(unsigned short));
-    dataPtr->toUnicode = ckalloc(size);
-    memset(dataPtr->toUnicode, 0, size);
-    dataPtr->fromUnicode = ckalloc(size);
-    memset(dataPtr->fromUnicode, 0, size);
+	memset(dataPtr, 0, sizeof(TableEncodingData));
+	dataPtr->fallback = '?';
 
-    dataPtr->toUnicode[0] = (unsigned short *) (dataPtr->toUnicode + 256);
-    dataPtr->fromUnicode[0] = (unsigned short *) (dataPtr->fromUnicode + 256);
-    for (i=1 ; i<256 ; i++) {
-	dataPtr->toUnicode[i] = emptyPage;
-	dataPtr->fromUnicode[i] = emptyPage;
+	size = 256*(sizeof(unsigned short *) + sizeof(unsigned short));
+	dataPtr->toUnicode = (unsigned short **) ckalloc(size);
+	memset(dataPtr->toUnicode, 0, size);
+	dataPtr->fromUnicode = (unsigned short **) ckalloc(size);
+	memset(dataPtr->fromUnicode, 0, size);
+
+	dataPtr->toUnicode[0] = (unsigned short *) (dataPtr->toUnicode + 256);
+	dataPtr->fromUnicode[0] = (unsigned short *)
+		(dataPtr->fromUnicode + 256);
+	for (i=1 ; i<256 ; i++) {
+	    dataPtr->toUnicode[i] = emptyPage;
+	    dataPtr->fromUnicode[i] = emptyPage;
+	}
+
+	for (i=0 ; i<256 ; i++) {
+	    dataPtr->toUnicode[0][i] = i;
+	    dataPtr->fromUnicode[0][i] = i;
+	}
+
+	type.encodingName	= "iso8859-1";
+	type.toUtfProc		= Iso88591ToUtfProc;
+	type.fromUtfProc	= Iso88591FromUtfProc;
+	type.freeProc		= TableFreeProc;
+	type.nullSize		= 1;
+	type.clientData		= dataPtr;
+	Tcl_CreateEncoding(&type);
     }
-
-    for (i=0 ; i<256 ; i++) {
-	dataPtr->toUnicode[0][i] = i;
-	dataPtr->fromUnicode[0][i] = i;
-    }
-
-    type.encodingName	= "iso8859-1";
-    type.toUtfProc	= Iso88591ToUtfProc;
-    type.fromUtfProc	= Iso88591FromUtfProc;
-    type.freeProc	= TableFreeProc;
-    type.nullSize	= 1;
-    type.clientData	= dataPtr;
-    defaultEncoding	= Tcl_CreateEncoding(&type);
-    systemEncoding	= Tcl_GetEncoding(NULL, type.encodingName);
 
     encodingsInitialized = 1;
 }
@@ -652,10 +658,7 @@ TclFinalizeEncodingSubsystem(void)
     Tcl_MutexLock(&encodingMutex);
     encodingsInitialized = 0;
     FreeEncoding(systemEncoding);
-    systemEncoding = NULL;
-    defaultEncoding = NULL;
     FreeEncoding(tclIdentityEncoding);
-    tclIdentityEncoding = NULL;
 
     hPtr = Tcl_FirstHashEntry(&encodingTable, &search);
     while (hPtr != NULL) {
@@ -666,7 +669,7 @@ TclFinalizeEncodingSubsystem(void)
 	 * cleaned up.
 	 */
 
-	FreeEncoding(Tcl_GetHashValue(hPtr));
+	FreeEncoding((Tcl_Encoding) Tcl_GetHashValue(hPtr));
 	hPtr = Tcl_FirstHashEntry(&encodingTable, &search);
     }
 
@@ -679,15 +682,15 @@ TclFinalizeEncodingSubsystem(void)
  *
  * Tcl_GetDefaultEncodingDir --
  *
- *	Legacy public interface to retrieve first directory in the encoding
- *	searchPath.
+ * 	Legacy public interface to retrieve first directory in the encoding
+ * 	searchPath.
  *
  * Results:
  *	The directory pathname, as a string, or NULL for an empty encoding
  *	search path.
  *
  * Side effects:
- *	None.
+ * 	None.
  *
  *-------------------------------------------------------------------------
  */
@@ -704,7 +707,7 @@ Tcl_GetDefaultEncodingDir(void)
     }
     Tcl_ListObjIndex(NULL, searchPath, 0, &first);
 
-    return TclGetString(first);
+    return Tcl_GetString(first);
 }
 
 /*
@@ -712,14 +715,14 @@ Tcl_GetDefaultEncodingDir(void)
  *
  * Tcl_SetDefaultEncodingDir --
  *
- *	Legacy public interface to set the first directory in the encoding
- *	search path.
+ * 	Legacy public interface to set the first directory in the encoding
+ * 	search path.
  *
  * Results:
- *	None.
+ * 	None.
  *
  * Side effects:
- *	Modifies the encoding search path.
+ * 	Modifies the encoding search path.
  *
  *-------------------------------------------------------------------------
  */
@@ -779,7 +782,7 @@ Tcl_GetEncoding(
 
     hPtr = Tcl_FindHashEntry(&encodingTable, name);
     if (hPtr != NULL) {
-	encodingPtr = Tcl_GetHashValue(hPtr);
+	encodingPtr = (Encoding *) Tcl_GetHashValue(hPtr);
 	encodingPtr->refCount++;
 	Tcl_MutexUnlock(&encodingMutex);
 	return (Tcl_Encoding) encodingPtr;
@@ -838,8 +841,9 @@ static void
 FreeEncoding(
     Tcl_Encoding encoding)
 {
-    Encoding *encodingPtr = (Encoding *) encoding;
+    Encoding *encodingPtr;
 
+    encodingPtr = (Encoding *) encoding;
     if (encodingPtr == NULL) {
 	return;
     }
@@ -849,13 +853,13 @@ FreeEncoding(
     encodingPtr->refCount--;
     if (encodingPtr->refCount == 0) {
 	if (encodingPtr->freeProc != NULL) {
-	    encodingPtr->freeProc(encodingPtr->clientData);
+	    (*encodingPtr->freeProc)(encodingPtr->clientData);
 	}
 	if (encodingPtr->hPtr != NULL) {
 	    Tcl_DeleteHashEntry(encodingPtr->hPtr);
 	}
-	ckfree(encodingPtr->name);
-	ckfree(encodingPtr);
+	ckfree((char *) encodingPtr->name);
+	ckfree((char *) encodingPtr);
     }
 }
 
@@ -925,10 +929,9 @@ Tcl_GetEncodingNames(
     Tcl_MutexLock(&encodingMutex);
     for (hPtr = Tcl_FirstHashEntry(&encodingTable, &search); hPtr != NULL;
 	    hPtr = Tcl_NextHashEntry(&search)) {
-	Encoding *encodingPtr = Tcl_GetHashValue(hPtr);
-
+	Encoding *encodingPtr = (Encoding *) Tcl_GetHashValue(hPtr);
 	Tcl_CreateHashEntry(&table,
-		Tcl_NewStringObj(encodingPtr->name, -1), &dummy);
+		(char *) Tcl_NewStringObj(encodingPtr->name, -1), &dummy);
     }
     Tcl_MutexUnlock(&encodingMutex);
 
@@ -941,7 +944,7 @@ Tcl_GetEncodingNames(
 
     Tcl_DictObjFirst(NULL, map, &mapSearch, &name, NULL, &done);
     for (; !done; Tcl_DictObjNext(&mapSearch, &name, NULL, &done)) {
-	Tcl_CreateHashEntry(&table, name, &dummy);
+	Tcl_CreateHashEntry(&table, (char *) name, &dummy);
     }
 
     /*
@@ -976,7 +979,7 @@ Tcl_GetEncodingNames(
  * Side effects:
  *	The reference count of the new system encoding is incremented. The
  *	reference count of the old system encoding is decremented and it may
- *	be freed. All VFS cached information is invalidated.
+ *	be freed.
  *
  *------------------------------------------------------------------------
  */
@@ -1007,7 +1010,6 @@ Tcl_SetSystemEncoding(
     FreeEncoding(systemEncoding);
     systemEncoding = encoding;
     Tcl_MutexUnlock(&encodingMutex);
-    Tcl_FSMountsChanged(NULL);
 
     return TCL_OK;
 }
@@ -1056,13 +1058,13 @@ Tcl_CreateEncoding(
 	 * reference goes away.
 	 */
 
-	encodingPtr = Tcl_GetHashValue(hPtr);
+	encodingPtr = (Encoding *) Tcl_GetHashValue(hPtr);
 	encodingPtr->hPtr = NULL;
     }
 
-    name = ckalloc(strlen(typePtr->encodingName) + 1);
+    name = ckalloc((unsigned) strlen(typePtr->encodingName) + 1);
 
-    encodingPtr = ckalloc(sizeof(Encoding));
+    encodingPtr = (Encoding *) ckalloc(sizeof(Encoding));
     encodingPtr->name		= strcpy(name, typePtr->encodingName);
     encodingPtr->toUtfProc	= typePtr->toUtfProc;
     encodingPtr->fromUtfProc	= typePtr->fromUtfProc;
@@ -1116,7 +1118,7 @@ Tcl_ExternalToUtfDString(
 {
     char *dst;
     Tcl_EncodingState state;
-    const Encoding *encodingPtr;
+    Encoding *encodingPtr;
     int flags, dstLen, result, soFar, srcRead, dstWrote, dstChars;
 
     Tcl_DStringInit(dstPtr);
@@ -1131,14 +1133,15 @@ Tcl_ExternalToUtfDString(
     if (src == NULL) {
 	srcLen = 0;
     } else if (srcLen < 0) {
-	srcLen = encodingPtr->lengthProc(src);
+	srcLen = (*encodingPtr->lengthProc)(src);
     }
 
     flags = TCL_ENCODING_START | TCL_ENCODING_END;
 
     while (1) {
-	result = encodingPtr->toUtfProc(encodingPtr->clientData, src, srcLen,
-		flags, &state, dst, dstLen, &srcRead, &dstWrote, &dstChars);
+	result = (*encodingPtr->toUtfProc)(encodingPtr->clientData, src,
+		srcLen, flags, &state, dst, dstLen, &srcRead, &dstWrote,
+		&dstChars);
 	soFar = dst + dstWrote - Tcl_DStringValue(dstPtr);
 
 	if (result != TCL_CONVERT_NOSPACE) {
@@ -1206,11 +1209,8 @@ Tcl_ExternalToUtf(
 				 * correspond to the bytes stored in the
 				 * output buffer. */
 {
-    const Encoding *encodingPtr;
-    int result, srcRead, dstWrote, dstChars = 0;
-    int noTerminate = flags & TCL_ENCODING_NO_TERMINATE;
-    int charLimited = (flags & TCL_ENCODING_CHAR_LIMIT) && dstCharsPtr;
-    int maxChars = INT_MAX;
+    Encoding *encodingPtr;
+    int result, srcRead, dstWrote, dstChars;
     Tcl_EncodingState state;
 
     if (encoding == NULL) {
@@ -1221,7 +1221,7 @@ Tcl_ExternalToUtf(
     if (src == NULL) {
 	srcLen = 0;
     } else if (srcLen < 0) {
-	srcLen = encodingPtr->lengthProc(src);
+	srcLen = (*encodingPtr->lengthProc)(src);
     }
     if (statePtr == NULL) {
 	flags |= TCL_ENCODING_START | TCL_ENCODING_END;
@@ -1235,40 +1235,19 @@ Tcl_ExternalToUtf(
     }
     if (dstCharsPtr == NULL) {
 	dstCharsPtr = &dstChars;
-	flags &= ~TCL_ENCODING_CHAR_LIMIT;
-    } else if (charLimited) {
-	maxChars = *dstCharsPtr;
     }
 
-    if (!noTerminate) {
-	/*
-	 * If there are any null characters in the middle of the buffer,
-	 * they will converted to the UTF-8 null character (\xC080). To get
-	 * the actual \0 at the end of the destination buffer, we need to
-	 * append it manually.  First make room for it...
-	 */
+    /*
+     * If there are any null characters in the middle of the buffer, they will
+     * converted to the UTF-8 null character (\xC080). To get the actual \0 at
+     * the end of the destination buffer, we need to append it manually.
+     */
 
-	dstLen--;
-    }
-    do {
-	int savedFlags = flags;
-	Tcl_EncodingState savedState = *statePtr;
-
-	result = encodingPtr->toUtfProc(encodingPtr->clientData, src, srcLen,
-		flags, statePtr, dst, dstLen, srcReadPtr, dstWrotePtr,
-		dstCharsPtr);
-	if (*dstCharsPtr <= maxChars) {
-	    break;
-	}
-	dstLen = Tcl_UtfAtIndex(dst, maxChars) - dst + (TCL_UTF_MAX - 1);
-	flags = savedFlags;
-	*statePtr = savedState;
-    } while (1);
-    if (!noTerminate) {
-	/* ...and then append it */
-
-	dst[*dstWrotePtr] = '\0';
-    }
+    dstLen--;
+    result = (*encodingPtr->toUtfProc)(encodingPtr->clientData, src, srcLen,
+	    flags, statePtr, dst, dstLen, srcReadPtr, dstWrotePtr,
+	    dstCharsPtr);
+    dst[*dstWrotePtr] = '\0';
 
     return result;
 }
@@ -1306,7 +1285,7 @@ Tcl_UtfToExternalDString(
 {
     char *dst;
     Tcl_EncodingState state;
-    const Encoding *encodingPtr;
+    Encoding *encodingPtr;
     int flags, dstLen, result, soFar, srcRead, dstWrote, dstChars;
 
     Tcl_DStringInit(dstPtr);
@@ -1325,7 +1304,7 @@ Tcl_UtfToExternalDString(
     }
     flags = TCL_ENCODING_START | TCL_ENCODING_END;
     while (1) {
-	result = encodingPtr->fromUtfProc(encodingPtr->clientData, src,
+	result = (*encodingPtr->fromUtfProc)(encodingPtr->clientData, src,
 		srcLen, flags, &state, dst, dstLen, &srcRead, &dstWrote,
 		&dstChars);
 	soFar = dst + dstWrote - Tcl_DStringValue(dstPtr);
@@ -1398,7 +1377,7 @@ Tcl_UtfToExternal(
 				 * correspond to the bytes stored in the
 				 * output buffer. */
 {
-    const Encoding *encodingPtr;
+    Encoding *encodingPtr;
     int result, srcRead, dstWrote, dstChars;
     Tcl_EncodingState state;
 
@@ -1427,7 +1406,7 @@ Tcl_UtfToExternal(
     }
 
     dstLen -= encodingPtr->nullSize;
-    result = encodingPtr->fromUtfProc(encodingPtr->clientData, src, srcLen,
+    result = (*encodingPtr->fromUtfProc)(encodingPtr->clientData, src, srcLen,
 	    flags, statePtr, dst, dstLen, srcReadPtr, dstWrotePtr,
 	    dstCharsPtr);
     if (encodingPtr->nullSize == 2) {
@@ -1451,11 +1430,11 @@ Tcl_UtfToExternal(
  *
  * Side effects:
  *	The absolute pathname for the application is computed and stored to be
- *	returned later by [info nameofexecutable].
+ *	returned later be [info nameofexecutable].
  *
  *---------------------------------------------------------------------------
  */
-#undef Tcl_FindExecutable
+
 void
 Tcl_FindExecutable(
     const char *argv0)		/* The value of the application's argv[0]
@@ -1474,9 +1453,9 @@ Tcl_FindExecutable(
  *	Open the file believed to hold data for the encoding, "name".
  *
  * Results:
- *	Returns the readable Tcl_Channel from opening the file, or NULL if the
- *	file could not be successfully opened. If NULL was returned, an error
- *	message is left in interp's result object, unless interp was NULL.
+ * 	Returns the readable Tcl_Channel from opening the file, or NULL if the
+ * 	file could not be successfully opened. If NULL was returned, an error
+ * 	message is left in interp's result object, unless interp was NULL.
  *
  * Side effects:
  *	Channel may be opened. Information about the filesystem may be cached
@@ -1518,10 +1497,9 @@ OpenEncodingFileChannel(
 	    }
 	}
 	if (!verified) {
-	    const char *dirString = TclGetString(directory);
-
+	    const char *dirString = Tcl_GetString(directory);
 	    for (i=0; i<numDirs && !verified; i++) {
-		if (strcmp(dirString, TclGetString(dir[i])) == 0) {
+		if (strcmp(dirString, Tcl_GetString(dir[i])) == 0) {
 		    verified = 1;
 		}
 	    }
@@ -1572,8 +1550,7 @@ OpenEncodingFileChannel(
     }
 
     if ((NULL == chan) && (interp != NULL)) {
-	Tcl_SetObjResult(interp, Tcl_ObjPrintf(
-		"unknown encoding \"%s\"", name));
+	Tcl_AppendResult(interp, "unknown encoding \"", name, "\"", NULL);
 	Tcl_SetErrorCode(interp, "TCL", "LOOKUP", "ENCODING", name, NULL);
     }
     Tcl_DecrRefCount(fileNameObj);
@@ -1647,9 +1624,7 @@ LoadEncodingFile(
 	break;
     }
     if ((encoding == NULL) && (interp != NULL)) {
-	Tcl_SetObjResult(interp, Tcl_ObjPrintf(
-		"invalid encoding file \"%s\"", name));
-	Tcl_SetErrorCode(interp, "TCL", "LOOKUP", "ENCODING", name, NULL);
+	Tcl_AppendResult(interp, "invalid encoding file \"", name, "\"", NULL);
     }
     Tcl_Close(NULL, chan);
 
@@ -1688,11 +1663,11 @@ LoadTableEncoding(
     Tcl_DString lineString;
     Tcl_Obj *objPtr;
     char *line;
-    int i, hi, lo, numPages, symbol, fallback, len;
+    int i, hi, lo, numPages, symbol, fallback;
     unsigned char used[256];
-    unsigned size;
+    unsigned int size;
     TableEncodingData *dataPtr;
-    unsigned short *pageMemPtr, *page;
+    unsigned short *pageMemPtr;
     Tcl_EncodingType encType;
 
     /*
@@ -1720,9 +1695,7 @@ LoadTableEncoding(
     };
 
     Tcl_DStringInit(&lineString);
-    if (Tcl_Gets(chan, &lineString) == -1) {
-	return NULL;
-    }
+    Tcl_Gets(chan, &lineString);
     line = Tcl_DStringValue(&lineString);
 
     fallback = (int) strtol(line, &line, 16);
@@ -1741,7 +1714,7 @@ LoadTableEncoding(
 #undef PAGESIZE
 #define PAGESIZE    (256 * sizeof(unsigned short))
 
-    dataPtr = ckalloc(sizeof(TableEncodingData));
+    dataPtr = (TableEncodingData *) ckalloc(sizeof(TableEncodingData));
     memset(dataPtr, 0, sizeof(TableEncodingData));
 
     dataPtr->fallback = fallback;
@@ -1753,7 +1726,7 @@ LoadTableEncoding(
      */
 
     size = 256 * sizeof(unsigned short *) + numPages * PAGESIZE;
-    dataPtr->toUnicode = ckalloc(size);
+    dataPtr->toUnicode = (unsigned short **) ckalloc(size);
     memset(dataPtr->toUnicode, 0, size);
     pageMemPtr = (unsigned short *) (dataPtr->toUnicode + 256);
 
@@ -1761,13 +1734,10 @@ LoadTableEncoding(
     Tcl_IncrRefCount(objPtr);
     for (i = 0; i < numPages; i++) {
 	int ch;
-	const char *p;
-	int expected = 3 + 16 * (16 * 4 + 1);
+	char *p;
 
-	if (Tcl_ReadChars(chan, objPtr, expected, 0) != expected) {
-	    return NULL;
-	}
-	p = TclGetString(objPtr);
+	Tcl_ReadChars(chan, objPtr, 3 + 16 * (16 * 4 + 1), 0);
+	p = Tcl_GetString(objPtr);
 	hi = (staticHex[UCHAR(p[0])] << 4) + staticHex[UCHAR(p[1])];
 	dataPtr->toUnicode[hi] = pageMemPtr;
 	p += 2;
@@ -1814,26 +1784,29 @@ LoadTableEncoding(
 	}
     }
     size = 256 * sizeof(unsigned short *) + numPages * PAGESIZE;
-    dataPtr->fromUnicode = ckalloc(size);
+    dataPtr->fromUnicode = (unsigned short **) ckalloc(size);
     memset(dataPtr->fromUnicode, 0, size);
     pageMemPtr = (unsigned short *) (dataPtr->fromUnicode + 256);
 
     for (hi = 0; hi < 256; hi++) {
 	if (dataPtr->toUnicode[hi] == NULL) {
 	    dataPtr->toUnicode[hi] = emptyPage;
-	    continue;
-	}
-	for (lo = 0; lo < 256; lo++) {
-	    int ch = dataPtr->toUnicode[hi][lo];
+	} else {
+	    for (lo = 0; lo < 256; lo++) {
+		int ch;
 
-	    if (ch != 0) {
-		page = dataPtr->fromUnicode[ch >> 8];
-		if (page == NULL) {
-		    page = pageMemPtr;
-		    pageMemPtr += 256;
-		    dataPtr->fromUnicode[ch >> 8] = page;
+		ch = dataPtr->toUnicode[hi][lo];
+		if (ch != 0) {
+		    unsigned short *page;
+
+		    page = dataPtr->fromUnicode[ch >> 8];
+		    if (page == NULL) {
+			page = pageMemPtr;
+			pageMemPtr += 256;
+			dataPtr->fromUnicode[ch >> 8] = page;
+		    }
+		    page[ch & 0xff] = (unsigned short) ((hi << 8) + lo);
 		}
-		page[ch & 0xff] = (unsigned short) ((hi << 8) + lo);
 	    }
 	}
     }
@@ -1852,6 +1825,8 @@ LoadTableEncoding(
 	}
     }
     if (symbol) {
+	unsigned short *page;
+
 	/*
 	 * Make a special symbol encoding that not only maps the symbol
 	 * characters from their Unicode code points down into page 0, but
@@ -1859,7 +1834,7 @@ LoadTableEncoding(
 	 * is so that a symbol font can be used to display a simple string
 	 * like "abcd" and have alpha, beta, chi, delta show up, rather than
 	 * have "unknown" chars show up because strictly speaking the symbol
-	 * font doesn't have glyphs for those low ASCII chars.
+	 * font doesn't have glyphs for those low ascii chars.
 	 */
 
 	page = dataPtr->fromUnicode[0];
@@ -1884,77 +1859,57 @@ LoadTableEncoding(
      */
 
     Tcl_DStringInit(&lineString);
-
-    /*
-     * Skip leading empty lines.
-     */
-
-    while ((len = Tcl_Gets(chan, &lineString)) == 0) {
-	/* empty body */
-    }
-    if (len < 0) {
-	goto doneParse;
-    }
-
-    /*
-     * Require that it starts with an 'R'.
-     */
-
-    line = Tcl_DStringValue(&lineString);
-    if (line[0] != 'R') {
-	goto doneParse;
-    }
-
-    /*
-     * Read lines from the encoding until EOF.
-     */
-
-    for (TclDStringClear(&lineString);
-	    (len = Tcl_Gets(chan, &lineString)) >= 0;
-	    TclDStringClear(&lineString)) {
-	const unsigned char *p;
-	int to, from;
+    do {
+	int len;
 
 	/*
-	 * Skip short lines.
+	 * Skip leading empty lines.
 	 */
 
-	if (len < 5) {
-	    continue;
+	while ((len = Tcl_Gets(chan, &lineString)) == 0) {
+	    /* empty body */
 	}
 
-	/*
-	 * Parse the line as a sequence of hex digits.
-	 */
-
-	p = (const unsigned char *) Tcl_DStringValue(&lineString);
-	to = (staticHex[p[0]] << 12) + (staticHex[p[1]] << 8)
-		+ (staticHex[p[2]] << 4) + staticHex[p[3]];
-	if (to == 0) {
-	    continue;
+	if (len < 0) {
+	    break;
 	}
-	for (p += 5, len -= 5; len >= 0 && *p; p += 5, len -= 5) {
-	    from = (staticHex[p[0]] << 12) + (staticHex[p[1]] << 8)
-		    + (staticHex[p[2]] << 4) + staticHex[p[3]];
-	    if (from == 0) {
+	line = Tcl_DStringValue(&lineString);
+	if (line[0] != 'R') {
+	    break;
+	}
+	for (Tcl_DStringSetLength(&lineString, 0);
+		(len = Tcl_Gets(chan, &lineString)) >= 0;
+		Tcl_DStringSetLength(&lineString, 0)) {
+	    unsigned char* p;
+	    int to, from;
+
+	    if (len < 5) {
 		continue;
 	    }
-	    dataPtr->fromUnicode[from >> 8][from & 0xff] = to;
+	    p = (unsigned char*) Tcl_DStringValue(&lineString);
+	    to = (staticHex[p[0]] << 12) + (staticHex[p[1]] << 8)
+		    + (staticHex[p[2]] << 4) + staticHex[p[3]];
+	    if (to == 0) {
+	    	continue;
+	    }
+	    for (p += 5, len -= 5; len >= 0 && *p; p += 5, len -= 5) {
+		from = (staticHex[p[0]] << 12) + (staticHex[p[1]] << 8)
+			+ (staticHex[p[2]] << 4) + staticHex[p[3]];
+	    	if (from == 0) {
+		    continue;
+		}
+		dataPtr->fromUnicode[from >> 8][from & 0xff] = to;
+	    }
 	}
-    }
-  doneParse:
+    } while (0);
     Tcl_DStringFree(&lineString);
-
-    /*
-     * Package everything into an encoding structure.
-     */
 
     encType.encodingName    = name;
     encType.toUtfProc	    = TableToUtfProc;
     encType.fromUtfProc	    = TableFromUtfProc;
     encType.freeProc	    = TableFreeProc;
     encType.nullSize	    = (type == ENCODING_DOUBLEBYTE) ? 2 : 1;
-    encType.clientData	    = dataPtr;
+    encType.clientData	    = (ClientData) dataPtr;
 
     return Tcl_CreateEncoding(&encType);
 }
@@ -1987,7 +1942,7 @@ LoadEscapeEncoding(
     Tcl_Channel chan)		/* File containing new encoding. */
 {
     int i;
-    unsigned size;
+    unsigned int size;
     Tcl_DString escapeData;
     char init[16], final[16];
     EscapeEncodingData *dataPtr;
@@ -2009,7 +1964,6 @@ LoadEscapeEncoding(
 	}
 	line = Tcl_DStringValue(&lineString);
 	if (Tcl_SplitList(NULL, line, &argc, &argv) != TCL_OK) {
-	    Tcl_DStringFree(&lineString);
 	    continue;
 	}
 	if (argc >= 2) {
@@ -2037,8 +1991,8 @@ LoadEscapeEncoding(
 		 */
 
 		e = (Encoding *) Tcl_GetEncoding(NULL, est.name);
-		if ((e != NULL) && (e->toUtfProc != TableToUtfProc)
-			&& (e->toUtfProc != Iso88591ToUtfProc)) {
+		if (e && e->toUtfProc != TableToUtfProc &&
+			e->toUtfProc != Iso88591ToUtfProc) {
 		   Tcl_FreeEncoding((Tcl_Encoding) e);
 		   e = NULL;
 		}
@@ -2046,21 +2000,21 @@ LoadEscapeEncoding(
 		Tcl_DStringAppend(&escapeData, (char *) &est, sizeof(est));
 	    }
 	}
-	ckfree(argv);
+	ckfree((char *) argv);
 	Tcl_DStringFree(&lineString);
     }
 
     size = sizeof(EscapeEncodingData) - sizeof(EscapeSubTable)
 	    + Tcl_DStringLength(&escapeData);
-    dataPtr = ckalloc(size);
+    dataPtr = (EscapeEncodingData *) ckalloc(size);
     dataPtr->initLen = strlen(init);
-    memcpy(dataPtr->init, init, dataPtr->initLen + 1);
+    strcpy(dataPtr->init, init);
     dataPtr->finalLen = strlen(final);
-    memcpy(dataPtr->final, final, dataPtr->finalLen + 1);
+    strcpy(dataPtr->final, final);
     dataPtr->numSubTables =
 	    Tcl_DStringLength(&escapeData) / sizeof(EscapeSubTable);
     memcpy(dataPtr->subTables, Tcl_DStringValue(&escapeData),
-	    Tcl_DStringLength(&escapeData));
+	    (size_t) Tcl_DStringLength(&escapeData));
     Tcl_DStringFree(&escapeData);
 
     memset(dataPtr->prefixBytes, 0, sizeof(dataPtr->prefixBytes));
@@ -2074,16 +2028,12 @@ LoadEscapeEncoding(
 	dataPtr->prefixBytes[UCHAR(dataPtr->final[0])] = 1;
     }
 
-    /*
-     * Package everything into an encoding structure.
-     */
-
     type.encodingName	= name;
     type.toUtfProc	= EscapeToUtfProc;
     type.fromUtfProc    = EscapeFromUtfProc;
     type.freeProc	= EscapeFreeProc;
     type.nullSize	= 1;
-    type.clientData	= dataPtr;
+    type.clientData	= (ClientData) dataPtr;
 
     return Tcl_CreateEncoding(&type);
 }
@@ -2137,9 +2087,6 @@ BinaryProc(
     if (dstLen < 0) {
 	dstLen = 0;
     }
-    if ((flags & TCL_ENCODING_CHAR_LIMIT) && srcLen > *dstCharsPtr) {
-	srcLen = *dstCharsPtr;
-    }
     if (srcLen > dstLen) {
 	srcLen = dstLen;
 	result = TCL_CONVERT_NOSPACE;
@@ -2148,14 +2095,14 @@ BinaryProc(
     *srcReadPtr = srcLen;
     *dstWrotePtr = srcLen;
     *dstCharsPtr = srcLen;
-    memcpy(dst, src, srcLen);
+    memcpy(dst, src, (size_t) srcLen);
     return result;
 }
 
 /*
  *-------------------------------------------------------------------------
  *
- * UtfIntToUtfExtProc --
+ * UtfExtToUtfIntProc --
  *
  *	Convert from UTF-8 to UTF-8. While converting null-bytes from the
  *	Tcl's internal representation (0xc0, 0x80) to the official
@@ -2218,7 +2165,6 @@ UtfIntToUtfExtProc(
  *
  *-------------------------------------------------------------------------
  */
-
 static int
 UtfExtToUtfIntProc(
     ClientData clientData,	/* Not used. */
@@ -2296,32 +2242,26 @@ UtfToUtfProc(
 				 * output buffer. */
     int pureNullMode)		/* Convert embedded nulls from internal
 				 * representation to real null-bytes or vice
-				 * versa. Also combine or separate surrogate pairs */
+				 * versa. */
 {
     const char *srcStart, *srcEnd, *srcClose;
-    const char *dstStart, *dstEnd;
-    int result, numChars, charLimit = INT_MAX;
-    Tcl_UniChar *chPtr = (Tcl_UniChar *) statePtr;
+    char *dstStart, *dstEnd;
+    int result, numChars;
+    Tcl_UniChar ch;
 
-    if (flags & TCL_ENCODING_START) {
-    	*statePtr = 0;
-    }
     result = TCL_OK;
 
     srcStart = src;
     srcEnd = src + srcLen;
     srcClose = srcEnd;
     if ((flags & TCL_ENCODING_END) == 0) {
-	srcClose -= 6;
-    }
-    if (flags & TCL_ENCODING_CHAR_LIMIT) {
-	charLimit = *dstCharsPtr;
+	srcClose -= TCL_UTF_MAX;
     }
 
     dstStart = dst;
-    dstEnd = dst + dstLen - ((pureNullMode == 1) ? 4 : TCL_UTF_MAX);
+    dstEnd = dst + dstLen - TCL_UTF_MAX;
 
-    for (numChars = 0; src < srcEnd && numChars <= charLimit; numChars++) {
+    for (numChars = 0; src < srcEnd; numChars++) {
 	if ((src > srcClose) && (!Tcl_UtfCharComplete(src, srcEnd - src))) {
 	    /*
 	     * If there is more string to follow, this will ensure that the
@@ -2337,7 +2277,7 @@ UtfToUtfProc(
 	}
 	if (UCHAR(*src) < 0x80 && !(UCHAR(*src) == 0 && pureNullMode == 0)) {
 	    /*
-	     * Copy 7bit characters, but skip null-bytes when we are in input
+	     * Copy 7bit chatacters, but skip null-bytes when we are in input
 	     * mode, so that they get converted to 0xc080.
 	     */
 
@@ -2352,37 +2292,17 @@ UtfToUtfProc(
 	    src += 2;
 	} else if (!Tcl_UtfCharComplete(src, srcEnd - src)) {
 	    /*
-	     * Always check before using TclUtfToUniChar. Not doing can so
-	     * cause it run beyond the end of the buffer! If we happen such an
-	     * incomplete char its bytes are made to represent themselves.
+	     * Always check before using Tcl_UtfToUniChar. Not doing can so
+	     * cause it run beyond the endof the buffer! If we happen such an
+	     * incomplete char its byts are made to represent themselves.
 	     */
 
-	    *chPtr = (unsigned char) *src;
+	    ch = (unsigned char) *src;
 	    src += 1;
-	    dst += Tcl_UniCharToUtf(*chPtr, dst);
+	    dst += Tcl_UniCharToUtf(ch, dst);
 	} else {
-	    src += TclUtfToUniChar(src, chPtr);
-	    if ((*chPtr & 0xFC00) == 0xD800) {
-		/* A high surrogate character is detected, handle especially */
-		Tcl_UniChar low = *chPtr;
-		size_t len = (src <= srcEnd-3) ? Tcl_UtfToUniChar(src, &low) : 0;
-		if ((low & 0xFC00) != 0xDC00) {
-			*dst++ = (char) (((*chPtr >> 12) | 0xE0) & 0xEF);
-			*dst++ = (char) (((*chPtr >> 6) | 0x80) & 0xBF);
-			*dst++ = (char) ((*chPtr | 0x80) & 0xBF);
-			continue;
-		} else if (pureNullMode == 1) {
-		    int full = (((*chPtr & 0x3FF) << 10) | (low & 0x3FF)) + 0x10000;
-		    *dst++ = (char) (((full >> 18) | 0xF0) & 0xF7);
-		    *dst++ = (char) (((full >> 12) | 0x80) & 0xBF);
-		    *dst++ = (char) (((full >> 6) | 0x80) & 0xBF);
-		    *dst++ = (char) ((full | 0x80) & 0xBF);
-			*chPtr = 0;
-		    src += len;
-		    continue;
-		}
-	    }
-	    dst += Tcl_UniCharToUtf(*chPtr, dst);
+	    src += Tcl_UtfToUniChar(src, &ch);
+	    dst += Tcl_UniCharToUtf(ch, dst);
 	}
     }
 
@@ -2436,13 +2356,10 @@ UnicodeToUtfProc(
 				 * output buffer. */
 {
     const char *srcStart, *srcEnd;
-    const char *dstEnd, *dstStart;
-    int result, numChars, charLimit = INT_MAX;
+    char *dstEnd, *dstStart;
+    int result, numChars;
     Tcl_UniChar ch;
 
-    if (flags & TCL_ENCODING_CHAR_LIMIT) {
-	charLimit = *dstCharsPtr;
-    }
     result = TCL_OK;
     if ((srcLen % sizeof(Tcl_UniChar)) != 0) {
 	result = TCL_CONVERT_MULTIBYTE;
@@ -2456,17 +2373,15 @@ UnicodeToUtfProc(
     dstStart = dst;
     dstEnd = dst + dstLen - TCL_UTF_MAX;
 
-    for (numChars = 0; src < srcEnd && numChars <= charLimit; numChars++) {
+    for (numChars = 0; src < srcEnd; numChars++) {
 	if (dst > dstEnd) {
 	    result = TCL_CONVERT_NOSPACE;
 	    break;
 	}
-
 	/*
-	 * Special case for 1-byte utf chars for speed. Make sure we work with
-	 * Tcl_UniChar-size data.
+	 * Special case for 1-byte utf chars for speed.  Make sure we
+	 * work with Tcl_UniChar-size data.
 	 */
-
 	ch = *(Tcl_UniChar *)src;
 	if (ch && ch < 0x80) {
 	    *dst++ = (ch & 0xFF);
@@ -2528,11 +2443,8 @@ UtfToUnicodeProc(
 {
     const char *srcStart, *srcEnd, *srcClose, *dstStart, *dstEnd;
     int result, numChars;
-    Tcl_UniChar *chPtr = (Tcl_UniChar *) statePtr;
+    Tcl_UniChar ch;
 
-    if (flags & TCL_ENCODING_START) {
-    	*statePtr = 0;
-    }
     srcStart = src;
     srcEnd = src + srcLen;
     srcClose = srcEnd;
@@ -2557,34 +2469,19 @@ UtfToUnicodeProc(
 	if (dst > dstEnd) {
 	    result = TCL_CONVERT_NOSPACE;
 	    break;
-	}
-	src += TclUtfToUniChar(src, chPtr);
-
+        }
+	src += TclUtfToUniChar(src, &ch);
 	/*
-	 * Need to handle this in a way that won't cause misalignment by
-	 * casting dst to a Tcl_UniChar. [Bug 1122671]
+	 * Need to handle this in a way that won't cause misalignment
+	 * by casting dst to a Tcl_UniChar. [Bug 1122671]
+	 * XXX: This hard-codes the assumed size of Tcl_UniChar as 2.
 	 */
-
 #ifdef WORDS_BIGENDIAN
-#if TCL_UTF_MAX > 4
-	*dst++ = (*chPtr >> 24);
-	*dst++ = ((*chPtr >> 16) & 0xFF);
-	*dst++ = ((*chPtr >> 8) & 0xFF);
-	*dst++ = (*chPtr & 0xFF);
+	*dst++ = (ch >> 8);
+	*dst++ = (ch & 0xFF);
 #else
-	*dst++ = (*chPtr >> 8);
-	*dst++ = (*chPtr & 0xFF);
-#endif
-#else
-#if TCL_UTF_MAX > 4
-	*dst++ = (*chPtr & 0xFF);
-	*dst++ = ((*chPtr >> 8) & 0xFF);
-	*dst++ = ((*chPtr >> 16) & 0xFF);
-	*dst++ = (*chPtr >> 24);
-#else
-	*dst++ = (*chPtr & 0xFF);
-	*dst++ = (*chPtr >> 8);
-#endif
+	*dst++ = (ch & 0xFF);
+	*dst++ = (ch >> 8);
 #endif
     }
     *srcReadPtr = src - srcStart;
@@ -2639,28 +2536,26 @@ TableToUtfProc(
 				 * output buffer. */
 {
     const char *srcStart, *srcEnd;
-    const char *dstEnd, *dstStart, *prefixBytes;
-    int result, byte, numChars, charLimit = INT_MAX;
-    Tcl_UniChar ch = 0;
-    const unsigned short *const *toUnicode;
-    const unsigned short *pageZero;
-    TableEncodingData *dataPtr = clientData;
+    char *dstEnd, *dstStart, *prefixBytes;
+    int result, byte, numChars;
+    Tcl_UniChar ch;
+    unsigned short **toUnicode;
+    unsigned short *pageZero;
+    TableEncodingData *dataPtr;
 
-    if (flags & TCL_ENCODING_CHAR_LIMIT) {
-	charLimit = *dstCharsPtr;
-    }
     srcStart = src;
     srcEnd = src + srcLen;
 
     dstStart = dst;
     dstEnd = dst + dstLen - TCL_UTF_MAX;
 
-    toUnicode = (const unsigned short *const *) dataPtr->toUnicode;
+    dataPtr = (TableEncodingData *) clientData;
+    toUnicode = dataPtr->toUnicode;
     prefixBytes = dataPtr->prefixBytes;
     pageZero = toUnicode[0];
 
     result = TCL_OK;
-    for (numChars = 0; src < srcEnd && numChars <= charLimit; numChars++) {
+    for (numChars = 0; src < srcEnd; numChars++) {
 	if (dst > dstEnd) {
 	    result = TCL_CONVERT_NOSPACE;
 	    break;
@@ -2687,11 +2582,9 @@ TableToUtfProc(
 	    }
 	    ch = (Tcl_UniChar) byte;
 	}
-
 	/*
 	 * Special case for 1-byte utf chars for speed.
 	 */
-
 	if (ch && ch < 0x80) {
 	    *dst++ = (char) ch;
 	} else {
@@ -2752,16 +2645,17 @@ TableFromUtfProc(
 				 * output buffer. */
 {
     const char *srcStart, *srcEnd, *srcClose;
-    const char *dstStart, *dstEnd, *prefixBytes;
-    Tcl_UniChar ch = 0;
+    char *dstStart, *dstEnd, *prefixBytes;
+    Tcl_UniChar ch;
     int result, len, word, numChars;
-    TableEncodingData *dataPtr = clientData;
-    const unsigned short *const *fromUnicode;
+    TableEncodingData *dataPtr;
+    unsigned short **fromUnicode;
 
     result = TCL_OK;
 
+    dataPtr = (TableEncodingData *) clientData;
     prefixBytes = dataPtr->prefixBytes;
-    fromUnicode = (const unsigned short *const *) dataPtr->fromUnicode;
+    fromUnicode = dataPtr->fromUnicode;
 
     srcStart = src;
     srcEnd = src + srcLen;
@@ -2785,17 +2679,13 @@ TableFromUtfProc(
 	}
 	len = TclUtfToUniChar(src, &ch);
 
-#if TCL_UTF_MAX > 4
+#if TCL_UTF_MAX > 3
 	/*
 	 * This prevents a crash condition. More evaluation is required for
 	 * full support of int Tcl_UniChar. [Bug 1004065]
 	 */
 
 	if (ch & 0xffff0000) {
-	    word = 0;
-	} else
-#elif TCL_UTF_MAX == 4
-	if (!len) {
 	    word = 0;
 	} else
 #endif
@@ -2877,12 +2767,9 @@ Iso88591ToUtfProc(
 				 * output buffer. */
 {
     const char *srcStart, *srcEnd;
-    const char *dstEnd, *dstStart;
-    int result, numChars, charLimit = INT_MAX;
+    char *dstEnd, *dstStart;
+    int result, numChars;
 
-    if (flags & TCL_ENCODING_CHAR_LIMIT) {
-	charLimit = *dstCharsPtr;
-    }
     srcStart = src;
     srcEnd = src + srcLen;
 
@@ -2890,19 +2777,17 @@ Iso88591ToUtfProc(
     dstEnd = dst + dstLen - TCL_UTF_MAX;
 
     result = TCL_OK;
-    for (numChars = 0; src < srcEnd && numChars <= charLimit; numChars++) {
-	Tcl_UniChar ch = 0;
+    for (numChars = 0; src < srcEnd; numChars++) {
+	Tcl_UniChar ch;
 
 	if (dst > dstEnd) {
 	    result = TCL_CONVERT_NOSPACE;
 	    break;
 	}
 	ch = (Tcl_UniChar) *((unsigned char *) src);
-
 	/*
 	 * Special case for 1-byte utf chars for speed.
 	 */
-
 	if (ch && ch < 0x80) {
 	    *dst++ = (char) ch;
 	} else {
@@ -2961,9 +2846,8 @@ Iso88591FromUtfProc(
 				 * output buffer. */
 {
     const char *srcStart, *srcEnd, *srcClose;
-    const char *dstStart, *dstEnd;
+    char *dstStart, *dstEnd;
     int result, numChars;
-    Tcl_UniChar ch = 0;
 
     result = TCL_OK;
 
@@ -2978,6 +2862,7 @@ Iso88591FromUtfProc(
     dstEnd = dst + dstLen - 1;
 
     for (numChars = 0; src < srcEnd; numChars++) {
+	Tcl_UniChar ch;
 	int len;
 
 	if ((src > srcClose) && (!Tcl_UtfCharComplete(src, srcEnd - src))) {
@@ -2995,18 +2880,11 @@ Iso88591FromUtfProc(
 	 * Check for illegal characters.
 	 */
 
-	if (ch > 0xff
-#if TCL_UTF_MAX == 4
-		|| ((ch >= 0xD800) && (len < 3))
-#endif
-		) {
+	if (ch > 0xff) {
 	    if (flags & TCL_ENCODING_STOPONERROR) {
 		result = TCL_CONVERT_UNKNOWN;
 		break;
 	    }
-#if TCL_UTF_MAX == 4
-	    if ((ch >= 0xD800) && (len < 3)) len = 4;
-#endif
 
 	    /*
 	     * Plunge on, using '?' as a fallback character.
@@ -3051,17 +2929,16 @@ TableFreeProc(
     ClientData clientData)	/* TableEncodingData that specifies
 				 * encoding. */
 {
-    TableEncodingData *dataPtr = clientData;
+    TableEncodingData *dataPtr;
 
     /*
      * Make sure we aren't freeing twice on shutdown. [Bug 219314]
      */
 
-    ckfree(dataPtr->toUnicode);
-    dataPtr->toUnicode = NULL;
-    ckfree(dataPtr->fromUnicode);
-    dataPtr->fromUnicode = NULL;
-    ckfree(dataPtr);
+    dataPtr = (TableEncodingData *) clientData;
+    ckfree((char *) dataPtr->toUnicode);
+    ckfree((char *) dataPtr->fromUnicode);
+    ckfree((char *) dataPtr);
 }
 
 /*
@@ -3109,19 +2986,20 @@ EscapeToUtfProc(
 				 * correspond to the bytes stored in the
 				 * output buffer. */
 {
-    EscapeEncodingData *dataPtr = clientData;
-    const char *prefixBytes, *tablePrefixBytes, *srcStart, *srcEnd;
-    const unsigned short *const *tableToUnicode;
-    const Encoding *encodingPtr;
-    int state, result, numChars, charLimit = INT_MAX;
-    const char *dstStart, *dstEnd;
+    EscapeEncodingData *dataPtr;
+    char *prefixBytes, *tablePrefixBytes;
+    unsigned short **tableToUnicode;
+    Encoding *encodingPtr;
+    int state, result, numChars;
+    const char *srcStart, *srcEnd;
+    char *dstStart, *dstEnd;
 
-    if (flags & TCL_ENCODING_CHAR_LIMIT) {
-	charLimit = *dstCharsPtr;
-    }
     result = TCL_OK;
+
     tablePrefixBytes = NULL;	/* lint. */
     tableToUnicode = NULL;	/* lint. */
+
+    dataPtr = (EscapeEncodingData *) clientData;
     prefixBytes = dataPtr->prefixBytes;
     encodingPtr = NULL;
 
@@ -3136,7 +3014,7 @@ EscapeToUtfProc(
 	state = 0;
     }
 
-    for (numChars = 0; src < srcEnd && numChars <= charLimit; ) {
+    for (numChars = 0; src < srcEnd; ) {
 	int byte, hi, lo, ch;
 
 	if (dst > dstEnd) {
@@ -3145,9 +3023,9 @@ EscapeToUtfProc(
 	}
 	byte = *((unsigned char *) src);
 	if (prefixBytes[byte]) {
-	    unsigned left, len, longest;
+	    unsigned int left, len, longest;
 	    int checked, i;
-	    const EscapeSubTable *subTablePtr;
+	    EscapeSubTable *subTablePtr;
 
 	    /*
 	     * Saw the beginning of an escape sequence.
@@ -3245,10 +3123,9 @@ EscapeToUtfProc(
 	    TableEncodingData *tableDataPtr;
 
 	    encodingPtr = GetTableEncoding(dataPtr, state);
-	    tableDataPtr = encodingPtr->clientData;
+	    tableDataPtr = (TableEncodingData *) encodingPtr->clientData;
 	    tablePrefixBytes = tableDataPtr->prefixBytes;
-	    tableToUnicode = (const unsigned short *const*)
-		    tableDataPtr->toUnicode;
+	    tableToUnicode = tableDataPtr->toUnicode;
 	}
 
 	if (tablePrefixBytes[byte]) {
@@ -3323,17 +3200,18 @@ EscapeFromUtfProc(
 				 * correspond to the bytes stored in the
 				 * output buffer. */
 {
-    EscapeEncodingData *dataPtr = clientData;
-    const Encoding *encodingPtr;
+    EscapeEncodingData *dataPtr;
+    Encoding *encodingPtr;
     const char *srcStart, *srcEnd, *srcClose;
-    const char *dstStart, *dstEnd;
+    char *dstStart, *dstEnd;
     int state, result, numChars;
-    const TableEncodingData *tableDataPtr;
-    const char *tablePrefixBytes;
-    const unsigned short *const *tableFromUnicode;
-    Tcl_UniChar ch = 0;
+    TableEncodingData *tableDataPtr;
+    char *tablePrefixBytes;
+    unsigned short **tableFromUnicode;
 
     result = TCL_OK;
+
+    dataPtr = (EscapeEncodingData *) clientData;
 
     srcStart = src;
     srcEnd = src + srcLen;
@@ -3346,7 +3224,7 @@ EscapeFromUtfProc(
     dstEnd = dst + dstLen - 1;
 
     /*
-     * RFC 1468 states that the text starts in ASCII, and switches to Japanese
+     * RFC1468 states that the text starts in ASCII, and switches to Japanese
      * characters, and that the text must end in ASCII. [Patch 474358]
      */
 
@@ -3357,21 +3235,21 @@ EscapeFromUtfProc(
 	    *dstWrotePtr = 0;
 	    return TCL_CONVERT_NOSPACE;
 	}
-	memcpy(dst, dataPtr->init, dataPtr->initLen);
+	memcpy(dst, dataPtr->init, (size_t)dataPtr->initLen);
 	dst += dataPtr->initLen;
     } else {
 	state = PTR2INT(*statePtr);
     }
 
     encodingPtr = GetTableEncoding(dataPtr, state);
-    tableDataPtr = encodingPtr->clientData;
+    tableDataPtr = (TableEncodingData *) encodingPtr->clientData;
     tablePrefixBytes = tableDataPtr->prefixBytes;
-    tableFromUnicode = (const unsigned short *const *)
-	    tableDataPtr->fromUnicode;
+    tableFromUnicode = tableDataPtr->fromUnicode;
 
     for (numChars = 0; src < srcEnd; numChars++) {
-	unsigned len;
+	unsigned int len;
 	int word;
+	Tcl_UniChar ch;
 
 	if ((src > srcClose) && (!Tcl_UtfCharComplete(src, srcEnd - src))) {
 	    /*
@@ -3387,13 +3265,13 @@ EscapeFromUtfProc(
 
 	if ((word == 0) && (ch != 0)) {
 	    int oldState;
-	    const EscapeSubTable *subTablePtr;
+	    EscapeSubTable *subTablePtr;
 
 	    oldState = state;
 	    for (state = 0; state < dataPtr->numSubTables; state++) {
 		encodingPtr = GetTableEncoding(dataPtr, state);
-		tableDataPtr = encodingPtr->clientData;
-		word = tableDataPtr->fromUnicode[(ch >> 8)][ch & 0xff];
+		tableDataPtr = (TableEncodingData *) encodingPtr->clientData;
+	    	word = tableDataPtr->fromUnicode[(ch >> 8)][ch & 0xff];
 		if (word != 0) {
 		    break;
 		}
@@ -3406,17 +3284,16 @@ EscapeFromUtfProc(
 		    break;
 		}
 		encodingPtr = GetTableEncoding(dataPtr, state);
-		tableDataPtr = encodingPtr->clientData;
+		tableDataPtr = (TableEncodingData *) encodingPtr->clientData;
 		word = tableDataPtr->fallback;
 	    }
 
-	    tablePrefixBytes = (const char *) tableDataPtr->prefixBytes;
-	    tableFromUnicode = (const unsigned short *const *)
-		    tableDataPtr->fromUnicode;
+	    tablePrefixBytes = tableDataPtr->prefixBytes;
+	    tableFromUnicode = tableDataPtr->fromUnicode;
 
 	    /*
 	     * The state variable has the value of oldState when word is 0.
-	     * In this case, the escape sequence should not be copied to dst
+	     * In this case, the escape sequense should not be copied to dst
 	     * because the current character set is not changed.
 	     */
 
@@ -3435,7 +3312,7 @@ EscapeFromUtfProc(
 		    break;
 		}
 		memcpy(dst, subTablePtr->sequence,
-			subTablePtr->sequenceLen);
+			(size_t) subTablePtr->sequenceLen);
 		dst += subTablePtr->sequenceLen;
 	    }
 	}
@@ -3460,25 +3337,25 @@ EscapeFromUtfProc(
     }
 
     if ((result == TCL_OK) && (flags & TCL_ENCODING_END)) {
-	unsigned len = dataPtr->subTables[0].sequenceLen;
-
+	unsigned int len = dataPtr->subTables[0].sequenceLen;
 	/*
-	 * Certain encodings like iso2022-jp need to write an escape sequence
-	 * after all characters have been converted. This logic checks that
-	 * enough room is available in the buffer for the escape bytes. The
-	 * TCL_ENCODING_END flag is cleared after a final escape sequence has
-	 * been added to the buffer so that another call to this method does
-	 * not attempt to append escape bytes a second time.
+	 * Certain encodings like iso2022-jp need to write
+	 * an escape sequence after all characters have
+	 * been converted. This logic checks that enough
+	 * room is available in the buffer for the escape bytes.
+	 * The TCL_ENCODING_END flag is cleared after a final
+	 * escape sequence has been added to the buffer so
+	 * that another call to this method does not attempt
+	 * to append escape bytes a second time.
 	 */
-
 	if ((dst + dataPtr->finalLen + (state?len:0)) > dstEnd) {
 	    result = TCL_CONVERT_NOSPACE;
 	} else {
 	    if (state) {
-		memcpy(dst, dataPtr->subTables[0].sequence, len);
+		memcpy(dst, dataPtr->subTables[0].sequence, (size_t) len);
 		dst += len;
 	    }
-	    memcpy(dst, dataPtr->final, dataPtr->finalLen);
+	    memcpy(dst, dataPtr->final, (size_t) dataPtr->finalLen);
 	    dst += dataPtr->finalLen;
 	    state &= ~TCL_ENCODING_END;
 	}
@@ -3513,34 +3390,33 @@ EscapeFreeProc(
     ClientData clientData)	/* EscapeEncodingData that specifies
 				 * encoding. */
 {
-    EscapeEncodingData *dataPtr = clientData;
+    EscapeEncodingData *dataPtr;
     EscapeSubTable *subTablePtr;
     int i;
 
+    dataPtr = (EscapeEncodingData *) clientData;
     if (dataPtr == NULL) {
 	return;
     }
-
     /*
-     * The subTables should be freed recursively in normal operation but not
-     * during TclFinalizeEncodingSubsystem because they are also present as a
-     * weak reference in the toplevel encodingTable (i.e., they don't have a
-     * +1 refcount for this), and unpredictable nuking order could remove them
-     * from under the following loop's feet. [Bug 2891556]
-     *
-     * The encodingsInitialized flag, being reset on entry to TFES, can serve
-     * as a "not in finalization" test.
+     *  The subTables should be freed recursively in normal operation but not
+     *  during TclFinalizeEncodingSubsystem because they are also present as a
+     *  weak reference in the toplevel encodingTable (ie they don't have a +1
+     *  refcount for this), and unpredictable nuking order could remove them
+     *  from under the following loop's feet [Bug 2891556].
+     *  
+     *  The encodingsInitialized flag, being reset on entry to TFES, can serve
+     *  as a "not in finalization" test.
      */
-
-    if (encodingsInitialized) {
-	subTablePtr = dataPtr->subTables;
-	for (i = 0; i < dataPtr->numSubTables; i++) {
-	    FreeEncoding((Tcl_Encoding) subTablePtr->encodingPtr);
-	    subTablePtr->encodingPtr = NULL;
-	    subTablePtr++;
+    if (encodingsInitialized)
+	{
+	    subTablePtr = dataPtr->subTables;
+	    for (i = 0; i < dataPtr->numSubTables; i++) {
+		FreeEncoding((Tcl_Encoding) subTablePtr->encodingPtr);
+		subTablePtr++;
+	    }
 	}
-    }
-    ckfree(dataPtr);
+    ckfree((char *) dataPtr);
 }
 
 /*
@@ -3568,8 +3444,11 @@ GetTableEncoding(
     EscapeEncodingData *dataPtr,/* Contains names of encodings. */
     int state)			/* Index in dataPtr of desired Encoding. */
 {
-    EscapeSubTable *subTablePtr = &dataPtr->subTables[state];
-    Encoding *encodingPtr = subTablePtr->encodingPtr;
+    EscapeSubTable *subTablePtr;
+    Encoding *encodingPtr;
+
+    subTablePtr = &dataPtr->subTables[state];
+    encodingPtr = subTablePtr->encodingPtr;
 
     if (encodingPtr == NULL) {
 	encodingPtr = (Encoding *) Tcl_GetEncoding(NULL, subTablePtr->name);
@@ -3644,43 +3523,43 @@ InitializeEncodingSearchPath(
     int *lengthPtr,
     Tcl_Encoding *encodingPtr)
 {
-    const char *bytes;
+    char *bytes;
     int i, numDirs, numBytes;
-    Tcl_Obj *libPathObj, *encodingObj, *searchPathObj;
+    Tcl_Obj *libPath, *encodingObj, *searchPath;
 
     TclNewLiteralStringObj(encodingObj, "encoding");
-    TclNewObj(searchPathObj);
+    TclNewObj(searchPath);
     Tcl_IncrRefCount(encodingObj);
-    Tcl_IncrRefCount(searchPathObj);
-    libPathObj = TclGetLibraryPath();
-    Tcl_IncrRefCount(libPathObj);
-    Tcl_ListObjLength(NULL, libPathObj, &numDirs);
+    Tcl_IncrRefCount(searchPath);
+    libPath = TclGetLibraryPath();
+    Tcl_IncrRefCount(libPath);
+    Tcl_ListObjLength(NULL, libPath, &numDirs);
 
     for (i = 0; i < numDirs; i++) {
-	Tcl_Obj *directoryObj, *pathObj;
+	Tcl_Obj *directory, *path;
 	Tcl_StatBuf stat;
 
-	Tcl_ListObjIndex(NULL, libPathObj, i, &directoryObj);
-	pathObj = Tcl_FSJoinToPath(directoryObj, 1, &encodingObj);
-	Tcl_IncrRefCount(pathObj);
-	if ((0 == Tcl_FSStat(pathObj, &stat)) && S_ISDIR(stat.st_mode)) {
-	    Tcl_ListObjAppendElement(NULL, searchPathObj, pathObj);
+	Tcl_ListObjIndex(NULL, libPath, i, &directory);
+	path = Tcl_FSJoinToPath(directory, 1, &encodingObj);
+	Tcl_IncrRefCount(path);
+	if ((0 == Tcl_FSStat(path, &stat)) && S_ISDIR(stat.st_mode)) {
+	    Tcl_ListObjAppendElement(NULL, searchPath, path);
 	}
-	Tcl_DecrRefCount(pathObj);
+	Tcl_DecrRefCount(path);
     }
 
-    Tcl_DecrRefCount(libPathObj);
+    Tcl_DecrRefCount(libPath);
     Tcl_DecrRefCount(encodingObj);
     *encodingPtr = libraryPath.encoding;
     if (*encodingPtr) {
 	((Encoding *)(*encodingPtr))->refCount++;
     }
-    bytes = Tcl_GetStringFromObj(searchPathObj, &numBytes);
+    bytes = Tcl_GetStringFromObj(searchPath, &numBytes);
 
     *lengthPtr = numBytes;
-    *valuePtr = ckalloc(numBytes + 1);
+    *valuePtr = ckalloc((unsigned int) numBytes + 1);
     memcpy(*valuePtr, bytes, (size_t) numBytes + 1);
-    Tcl_DecrRefCount(searchPathObj);
+    Tcl_DecrRefCount(searchPath);
 }
 
 /*
@@ -3690,3 +3569,4 @@ InitializeEncodingSearchPath(
  * fill-column: 78
  * End:
  */
+

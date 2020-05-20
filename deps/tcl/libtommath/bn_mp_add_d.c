@@ -1,89 +1,109 @@
-#include "tommath_private.h"
+#include <tommath.h>
 #ifdef BN_MP_ADD_D_C
-/* LibTomMath, multiple-precision integer library -- Tom St Denis */
-/* SPDX-License-Identifier: Unlicense */
+/* LibTomMath, multiple-precision integer library -- Tom St Denis
+ *
+ * LibTomMath is a library that provides multiple-precision
+ * integer arithmetic as well as number theoretic functionality.
+ *
+ * The library was designed directly after the MPI library by
+ * Michael Fromberger but has been written from scratch with
+ * additional optimizations in place.
+ *
+ * The library is free for all purposes without any express
+ * guarantee it works.
+ *
+ * Tom St Denis, tomstdenis@gmail.com, http://math.libtomcrypt.com
+ */
 
 /* single digit addition */
-mp_err mp_add_d(const mp_int *a, mp_digit b, mp_int *c)
+int
+mp_add_d (mp_int * a, mp_digit b, mp_int * c)
 {
-   mp_err     err;
-   int ix, oldused;
-   mp_digit *tmpa, *tmpc;
+  int     res, ix, oldused;
+  mp_digit *tmpa, *tmpc, mu;
 
-   /* grow c as required */
-   if (c->alloc < (a->used + 1)) {
-      if ((err = mp_grow(c, a->used + 1)) != MP_OKAY) {
-         return err;
-      }
-   }
+  /* grow c as required */
+  if (c->alloc < a->used + 1) {
+     if ((res = mp_grow(c, a->used + 1)) != MP_OKAY) {
+        return res;
+     }
+  }
 
-   /* if a is negative and |a| >= b, call c = |a| - b */
-   if ((a->sign == MP_NEG) && ((a->used > 1) || (a->dp[0] >= b))) {
-      mp_int a_ = *a;
-      /* temporarily fix sign of a */
-      a_.sign = MP_ZPOS;
+  /* if a is negative and |a| >= b, call c = |a| - b */
+  if (a->sign == MP_NEG && (a->used > 1 || a->dp[0] >= b)) {
+     /* temporarily fix sign of a */
+     a->sign = MP_ZPOS;
 
-      /* c = |a| - b */
-      err = mp_sub_d(&a_, b, c);
+     /* c = |a| - b */
+     res = mp_sub_d(a, b, c);
 
-      /* fix sign  */
-      c->sign = MP_NEG;
+     /* fix signs  */
+     a->sign = MP_NEG;
+     c->sign = (c->used) ? MP_NEG : MP_ZPOS;
 
-      /* clamp */
-      mp_clamp(c);
+     /* clamp */
+     mp_clamp(c);
 
-      return err;
-   }
+     return res;
+  }
 
-   /* old number of used digits in c */
-   oldused = c->used;
+  /* old number of used digits in c */
+  oldused = c->used;
 
-   /* source alias */
-   tmpa    = a->dp;
+  /* sign always positive */
+  c->sign = MP_ZPOS;
 
-   /* destination alias */
-   tmpc    = c->dp;
+  /* source alias */
+  tmpa    = a->dp;
 
-   /* if a is positive */
-   if (a->sign == MP_ZPOS) {
-      /* add digits, mu is carry */
-      mp_digit mu = b;
-      for (ix = 0; ix < a->used; ix++) {
-         *tmpc   = *tmpa++ + mu;
-         mu      = *tmpc >> MP_DIGIT_BIT;
-         *tmpc++ &= MP_MASK;
-      }
-      /* set final carry */
-      ix++;
-      *tmpc++  = mu;
+  /* destination alias */
+  tmpc    = c->dp;
 
-      /* setup size */
-      c->used = a->used + 1;
-   } else {
-      /* a was negative and |a| < b */
-      c->used  = 1;
+  /* if a is positive */
+  if (a->sign == MP_ZPOS) {
+     /* add digit, after this we're propagating
+      * the carry.
+      */
+     *tmpc   = *tmpa++ + b;
+     mu      = *tmpc >> DIGIT_BIT;
+     *tmpc++ &= MP_MASK;
 
-      /* the result is a single digit */
-      if (a->used == 1) {
-         *tmpc++  =  b - a->dp[0];
-      } else {
-         *tmpc++  =  b;
-      }
+     /* now handle rest of the digits */
+     for (ix = 1; ix < a->used; ix++) {
+        *tmpc   = *tmpa++ + mu;
+        mu      = *tmpc >> DIGIT_BIT;
+        *tmpc++ &= MP_MASK;
+     }
+     /* set final carry */
+     ix++;
+     *tmpc++  = mu;
 
-      /* setup count so the clearing of oldused
-       * can fall through correctly
-       */
-      ix       = 1;
-   }
+     /* setup size */
+     c->used = a->used + 1;
+  } else {
+     /* a was negative and |a| < b */
+     c->used  = 1;
 
-   /* sign always positive */
-   c->sign = MP_ZPOS;
+     /* the result is a single digit */
+     if (a->used == 1) {
+        *tmpc++  =  b - a->dp[0];
+     } else {
+        *tmpc++  =  b;
+     }
 
-   /* now zero to oldused */
-   MP_ZERO_DIGITS(tmpc, oldused - ix);
-   mp_clamp(c);
+     /* setup count so the clearing of oldused
+      * can fall through correctly
+      */
+     ix       = 1;
+  }
 
-   return MP_OKAY;
+  /* now zero to oldused */
+  while (ix++ < oldused) {
+     *tmpc++ = 0;
+  }
+  mp_clamp(c);
+
+  return MP_OKAY;
 }
 
 #endif

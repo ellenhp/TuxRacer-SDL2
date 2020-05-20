@@ -13,24 +13,17 @@
 
 #include "tclInt.h"
 
-MODULE_SCOPE const TclStubs *tclStubsPtr;
-MODULE_SCOPE const TclPlatStubs *tclPlatStubsPtr;
-MODULE_SCOPE const TclIntStubs *tclIntStubsPtr;
-MODULE_SCOPE const TclIntPlatStubs *tclIntPlatStubsPtr;
-
-const TclStubs *tclStubsPtr = NULL;
-const TclPlatStubs *tclPlatStubsPtr = NULL;
-const TclIntStubs *tclIntStubsPtr = NULL;
-const TclIntPlatStubs *tclIntPlatStubsPtr = NULL;
+TclStubs *tclStubsPtr = NULL;
+TclPlatStubs *tclPlatStubsPtr = NULL;
+TclIntStubs *tclIntStubsPtr = NULL;
+TclIntPlatStubs *tclIntPlatStubsPtr = NULL;
+TclTomMathStubs* tclTomMathStubsPtr = NULL;
 
 /*
- * Use our own isDigit to avoid linking to libc on windows
+ * Use our own ISDIGIT to avoid linking to libc on windows
  */
 
-static int isDigit(const int c)
-{
-    return (c >= '0' && c <= '9');
-}
+#define ISDIGIT(c) (((unsigned)((c)-'0')) <= 9)
 
 /*
  *----------------------------------------------------------------------
@@ -50,16 +43,16 @@ static int isDigit(const int c)
  *----------------------------------------------------------------------
  */
 #undef Tcl_InitStubs
-MODULE_SCOPE const char *
+CONST char *
 Tcl_InitStubs(
     Tcl_Interp *interp,
-    const char *version,
+    CONST char *version,
     int exact)
 {
     Interp *iPtr = (Interp *) interp;
-    const char *actualVersion = NULL;
+    CONST char *actualVersion = NULL;
     ClientData pkgData = NULL;
-    const TclStubs *stubsPtr = iPtr->stubTable;
+    TclStubs *stubsPtr = iPtr->stubTable;
 
     /*
      * We can't optimize this check by caching tclStubsPtr because that
@@ -68,7 +61,7 @@ Tcl_InitStubs(
      */
 
     if (!stubsPtr || (stubsPtr->magic != TCL_STUB_MAGIC)) {
-	iPtr->result = (char *)"interpreter uses an incompatible stubs mechanism";
+	iPtr->result = "interpreter uses an incompatible stubs mechanism";
 	iPtr->freeProc = TCL_STATIC;
 	return NULL;
     }
@@ -78,20 +71,20 @@ Tcl_InitStubs(
 	return NULL;
     }
     if (exact) {
-	const char *p = version;
+	CONST char *p = version;
 	int count = 0;
 
 	while (*p) {
-	    count += !isDigit(*p++);
+	    count += !ISDIGIT(*p++);
 	}
 	if (count == 1) {
-	    const char *q = actualVersion;
+	    CONST char *q = actualVersion;
 
 	    p = version;
 	    while (*p && (*p == *q)) {
 		p++; q++;
 	    }
-	    if (*p || isDigit(*q)) {
+	    if (*p || ISDIGIT(*q)) {
 		/* Construct error message */
 		stubsPtr->tcl_PkgRequireEx(interp, "Tcl", version, 1, NULL);
 		return NULL;
@@ -116,6 +109,61 @@ Tcl_InitStubs(
     }
 
     return actualVersion;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TclTomMathInitStubs --
+ *
+ *	Initializes the Stubs table for Tcl's subset of libtommath
+ *
+ * Results:
+ *	Returns a standard Tcl result.
+ *
+ * This procedure should not be called directly, but rather through
+ * the TclTomMath_InitStubs macro, to insure that the Stubs table
+ * matches the header files used in compilation.
+ *
+ *----------------------------------------------------------------------
+ */
+
+#undef TclTomMathInitializeStubs
+
+CONST char*
+TclTomMathInitializeStubs(
+    Tcl_Interp* interp,		/* Tcl interpreter */
+    CONST char* version,	/* Tcl version needed */
+    int epoch,			/* Stubs table epoch from the header files */
+    int revision		/* Stubs table revision number from the
+				 * header files */
+) {
+    int exact = 0;
+    const char* packageName = "tcl::tommath";
+    const char* errMsg = NULL;
+    ClientData pkgClientData = NULL;
+    const char* actualVersion = 
+	tclStubsPtr->tcl_PkgRequireEx(interp, packageName, version, exact, &pkgClientData);
+    TclTomMathStubs* stubsPtr = (TclTomMathStubs*) pkgClientData;
+    if (actualVersion == NULL) {
+	return NULL;
+    }
+    if (pkgClientData == NULL) {
+	errMsg = "missing stub table pointer";
+    } else if ((stubsPtr->tclBN_epoch)() != epoch) {
+	errMsg = "epoch number mismatch";
+    } else if ((stubsPtr->tclBN_revision)() != revision) {
+	errMsg = "requires a later revision";
+    } else {
+	tclTomMathStubsPtr = stubsPtr;
+	return actualVersion;
+    }
+    tclStubsPtr->tcl_ResetResult(interp);
+    tclStubsPtr->tcl_AppendResult(interp, "error loading ", packageName,
+		     " (requested version ", version,
+		     ", actual version ", actualVersion,
+		     "): ", errMsg, NULL);
+    return NULL;
 }
 
 /*

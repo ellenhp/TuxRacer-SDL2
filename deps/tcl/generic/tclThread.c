@@ -5,7 +5,6 @@
  *	the real work is done in the platform dependent files.
  *
  * Copyright (c) 1998 by Sun Microsystems, Inc.
- * Copyright (c) 2008 by George Peter Staplin
  *
  * See the file "license.terms" for information on usage and redistribution of
  * this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -83,23 +82,21 @@ Tcl_GetThreadData(
     /*
      * Initialize the key for this thread.
      */
-
-    result = TclThreadStorageKeyGet(keyPtr);
+    result = TclpThreadDataKeyGet(keyPtr);
 
     if (result == NULL) {
-	result = ckalloc(size);
+	result = ckalloc((size_t) size);
 	memset(result, 0, (size_t) size);
-	TclThreadStorageKeySet(keyPtr, result);
+	TclpThreadDataKeySet(keyPtr, result);
     }
 #else /* TCL_THREADS */
     if (*keyPtr == NULL) {
-	result = ckalloc(size);
-	memset(result, 0, (size_t)size);
-	*keyPtr = result;
+	result = ckalloc((size_t) size);
+	memset(result, 0, (size_t) size);
+	*keyPtr = (Tcl_ThreadDataKey)result;
 	RememberSyncObject(keyPtr, &keyRecord);
-    } else {
-	result = *keyPtr;
     }
+    result = * (void **) keyPtr;
 #endif /* TCL_THREADS */
     return result;
 }
@@ -123,15 +120,17 @@ Tcl_GetThreadData(
 
 void *
 TclThreadDataKeyGet(
-    Tcl_ThreadDataKey *keyPtr)	/* Identifier for the data chunk. */
-
+    Tcl_ThreadDataKey *keyPtr)	/* Identifier for the data chunk, really
+				 * (pthread_key_t **) */
 {
 #ifdef TCL_THREADS
-    return TclThreadStorageKeyGet(keyPtr);
+    return TclpThreadDataKeyGet(keyPtr);
 #else /* TCL_THREADS */
-    return *keyPtr;
+    char *result = *(char **) keyPtr;
+    return result;
 #endif /* TCL_THREADS */
 }
+
 
 /*
  *----------------------------------------------------------------------
@@ -179,14 +178,14 @@ RememberSyncObject(
 
     if (recPtr->num >= recPtr->max) {
 	recPtr->max += 8;
-	newList = ckalloc(recPtr->max * sizeof(void *));
+	newList = (void **) ckalloc(recPtr->max * sizeof(char *));
 	for (i=0,j=0 ; i<recPtr->num ; i++) {
 	    if (recPtr->list[i] != NULL) {
 		newList[j++] = recPtr->list[i];
 	    }
 	}
 	if (recPtr->list != NULL) {
-	    ckfree(recPtr->list);
+	    ckfree((char *) recPtr->list);
 	}
 	recPtr->list = newList;
 	recPtr->num = j;
@@ -353,16 +352,11 @@ Tcl_ConditionFinalize(
  */
 
 void
-TclFinalizeThreadData(int quick)
+TclFinalizeThreadData(void)
 {
-    TclFinalizeThreadDataThread();
+    TclpFinalizeThreadDataThread();
 #if defined(TCL_THREADS) && defined(USE_THREAD_ALLOC)
-    if (!quick) {
-	/*
-	 * Quick exit principle makes it useless to terminate allocators
-	 */
-	TclFinalizeThreadAllocThread();
-    }
+    TclFinalizeThreadAllocThread();
 #endif
 }
 
@@ -404,15 +398,15 @@ TclFinalizeSynchronization(void)
     if (keyRecord.list != NULL) {
 	for (i=0 ; i<keyRecord.num ; i++) {
 	    keyPtr = (Tcl_ThreadDataKey *) keyRecord.list[i];
-	    blockPtr = *keyPtr;
+	    blockPtr = (void *) *keyPtr;
 	    ckfree(blockPtr);
 	}
-	ckfree(keyRecord.list);
+	ckfree((char *) keyRecord.list);
 	keyRecord.list = NULL;
     }
     keyRecord.max = 0;
     keyRecord.num = 0;
-
+    
 #ifdef TCL_THREADS
     /*
      * Call thread storage master cleanup.
@@ -427,7 +421,7 @@ TclFinalizeSynchronization(void)
 	}
     }
     if (mutexRecord.list != NULL) {
-	ckfree(mutexRecord.list);
+	ckfree((char *) mutexRecord.list);
 	mutexRecord.list = NULL;
     }
     mutexRecord.max = 0;
@@ -440,7 +434,7 @@ TclFinalizeSynchronization(void)
 	}
     }
     if (condRecord.list != NULL) {
-	ckfree(condRecord.list);
+	ckfree((char *) condRecord.list);
 	condRecord.list = NULL;
     }
     condRecord.max = 0;
@@ -503,7 +497,7 @@ void
 Tcl_ConditionWait(
     Tcl_Condition *condPtr,	/* Really (pthread_cond_t **) */
     Tcl_Mutex *mutexPtr,	/* Really (pthread_mutex_t **) */
-    const Tcl_Time *timePtr) /* Timeout on waiting period */
+    Tcl_Time *timePtr)		/* Timeout on waiting period */
 {
 }
 

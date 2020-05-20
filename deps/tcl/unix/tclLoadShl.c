@@ -13,14 +13,6 @@
 
 #include <dl.h>
 #include "tclInt.h"
-
-/*
- * Static functions defined within this file.
- */
-
-static void *		FindSymbol(Tcl_Interp *interp,
-			    Tcl_LoadHandle loadHandle, const char *symbol);
-static void		UnloadFile(Tcl_LoadHandle handle);
 
 /*
  *----------------------------------------------------------------------
@@ -48,15 +40,13 @@ TclpDlopen(
     Tcl_LoadHandle *loadHandle,	/* Filled with token for dynamically loaded
 				 * file which will be passed back to
 				 * (*unloadProcPtr)() to unload the file. */
-    Tcl_FSUnloadFileProc **unloadProcPtr,
+    Tcl_FSUnloadFileProc **unloadProcPtr)
 				/* Filled with address of Tcl_FSUnloadFileProc
 				 * function which should be used for this
 				 * file. */
-    int flags)
 {
     shl_t handle;
-    Tcl_LoadHandle newHandle;
-    const char *native;
+    CONST char *native;
     char *fileName = Tcl_GetString(pathPtr);
 
     /*
@@ -92,23 +82,19 @@ TclpDlopen(
     }
 
     if (handle == NULL) {
-	Tcl_SetObjResult(interp, Tcl_ObjPrintf(
-		"couldn't load file \"%s\": %s",
-		fileName, Tcl_PosixError(interp)));
+	Tcl_AppendResult(interp, "couldn't load file \"", fileName, "\": ",
+		Tcl_PosixError(interp), (char *) NULL);
 	return TCL_ERROR;
     }
-    newHandle = ckalloc(sizeof(*newHandle));
-    newHandle->clientData = handle;
-    newHandle->findSymbolProcPtr = &FindSymbol;
-    newHandle->unloadFileProcPtr = *unloadProcPtr = &UnloadFile;
-    *loadHandle = newHandle;
+    *loadHandle = (Tcl_LoadHandle) handle;
+    *unloadProcPtr = &TclpUnloadFile;
     return TCL_OK;
 }
 
 /*
  *----------------------------------------------------------------------
  *
- * Tcl_FindSymbol --
+ * TclpFindSymbol --
  *
  *	Looks up a symbol, by name, through a handle associated with a
  *	previously loaded piece of code (shared library).
@@ -121,15 +107,15 @@ TclpDlopen(
  *----------------------------------------------------------------------
  */
 
-static void*
-FindSymbol(
+Tcl_PackageInitProc *
+TclpFindSymbol(
     Tcl_Interp *interp,
     Tcl_LoadHandle loadHandle,
-    const char *symbol)
+    CONST char *symbol)
 {
     Tcl_DString newName;
     Tcl_PackageInitProc *proc = NULL;
-    shl_t handle = (shl_t) loadHandle->clientData;
+    shl_t handle = (shl_t)loadHandle;
 
     /*
      * Some versions of the HP system software still use "_" at the beginning
@@ -139,7 +125,7 @@ FindSymbol(
     if (shl_findsym(&handle, symbol, (short) TYPE_PROCEDURE,
 	    (void *) &proc) != 0) {
 	Tcl_DStringInit(&newName);
-	TclDStringAppendLiteral(&newName, "_");
+	Tcl_DStringAppend(&newName, "_", 1);
 	Tcl_DStringAppend(&newName, symbol, -1);
 	if (shl_findsym(&handle, Tcl_DStringValue(&newName),
 		(short) TYPE_PROCEDURE, (void *) &proc) != 0) {
@@ -147,18 +133,13 @@ FindSymbol(
 	}
 	Tcl_DStringFree(&newName);
     }
-    if (proc == NULL && interp != NULL) {
-	Tcl_SetObjResult(interp, Tcl_ObjPrintf(
-		"cannot find symbol \"%s\": %s",
-		symbol, Tcl_PosixError(interp)));
-    }
     return proc;
 }
 
 /*
  *----------------------------------------------------------------------
  *
- * UnloadFile --
+ * TclpUnloadFile --
  *
  *	Unloads a dynamically loaded binary code file from memory.  Code
  *	pointers in the formerly loaded file are no longer valid after calling
@@ -173,16 +154,16 @@ FindSymbol(
  *----------------------------------------------------------------------
  */
 
-static void
-UnloadFile(
+void
+TclpUnloadFile(
     Tcl_LoadHandle loadHandle)	/* loadHandle returned by a previous call to
 				 * TclpDlopen(). The loadHandle is a token
 				 * that represents the loaded file. */
 {
-    shl_t handle = (shl_t) loadHandle->clientData;
+    shl_t handle;
 
+    handle = (shl_t) loadHandle;
     shl_unload(handle);
-    ckfree(loadHandle);
 }
 
 /*
@@ -207,7 +188,7 @@ UnloadFile(
 
 int
 TclGuessPackageName(
-    const char *fileName,	/* Name of file containing package (already
+    CONST char *fileName,	/* Name of file containing package (already
 				 * translated to local form if needed). */
     Tcl_DString *bufPtr)	/* Initialized empty dstring. Append package
 				 * name to this if possible. */

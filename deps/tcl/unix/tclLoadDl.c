@@ -6,8 +6,8 @@
  *
  * Copyright (c) 1995-1997 Sun Microsystems, Inc.
  *
- * See the file "license.terms" for information on usage and redistribution
- * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+ * See the file "license.terms" for information on usage and redistribution of
+ * this file, and for a DISCLAIMER OF ALL WARRANTIES.
  */
 
 #include "tclInt.h"
@@ -31,14 +31,6 @@
 #ifndef RTLD_LOCAL
 #   define RTLD_LOCAL 0
 #endif
-
-/*
- * Static procedures defined within this file.
- */
-
-static void *		FindSymbol(Tcl_Interp *interp,
-			    Tcl_LoadHandle loadHandle, const char *symbol);
-static void		UnloadFile(Tcl_LoadHandle loadHandle);
 
 /*
  *---------------------------------------------------------------------------
@@ -66,16 +58,13 @@ TclpDlopen(
     Tcl_LoadHandle *loadHandle,	/* Filled with token for dynamically loaded
 				 * file which will be passed back to
 				 * (*unloadProcPtr)() to unload the file. */
-    Tcl_FSUnloadFileProc **unloadProcPtr,
+    Tcl_FSUnloadFileProc **unloadProcPtr)
 				/* Filled with address of Tcl_FSUnloadFileProc
 				 * function which should be used for this
 				 * file. */
-    int flags)
 {
     void *handle;
-    Tcl_LoadHandle newHandle;
-    const char *native;
-    int dlopenflags = 0;
+    CONST char *native;
 
     /*
      * First try the full path the user gave us. This is particularly
@@ -85,19 +74,9 @@ TclpDlopen(
 
     native = Tcl_FSGetNativePath(pathPtr);
     /*
-     * Use (RTLD_NOW|RTLD_LOCAL) as default, see [Bug #3216070]
+     * Use (RTLD_NOW|RTLD_LOCAL) always, see [Bug #3216070]
      */
-    if (flags & TCL_LOAD_GLOBAL) {
-    	dlopenflags |= RTLD_GLOBAL;
-    } else {
-    	dlopenflags |= RTLD_LOCAL;
-    }
-    if (flags & TCL_LOAD_LAZY) {
-    	dlopenflags |= RTLD_LAZY;
-    } else {
-    	dlopenflags |= RTLD_NOW;
-    }
-    handle = dlopen(native, dlopenflags);
+    handle = dlopen(native, RTLD_NOW | RTLD_LOCAL);
     if (handle == NULL) {
 	/*
 	 * Let the OS loader examine the binary search path for whatever
@@ -106,13 +85,13 @@ TclpDlopen(
 	 */
 
 	Tcl_DString ds;
-	const char *fileName = Tcl_GetString(pathPtr);
+	char *fileName = Tcl_GetString(pathPtr);
 
 	native = Tcl_UtfToExternalDString(NULL, fileName, -1, &ds);
 	/*
-	 * Use (RTLD_NOW|RTLD_LOCAL) as default, see [Bug #3216070]
+	 * Use (RTLD_NOW|RTLD_LOCAL) always, see [Bug #3216070]
 	 */
-	handle = dlopen(native, dlopenflags);
+	handle = dlopen(native, RTLD_NOW | RTLD_LOCAL);
 	Tcl_DStringFree(&ds);
     }
 
@@ -124,27 +103,20 @@ TclpDlopen(
 
 	const char *errorStr = dlerror();
 
-	if (interp) {
-	    Tcl_SetObjResult(interp, Tcl_ObjPrintf(
-		    "couldn't load file \"%s\": %s",
-		    Tcl_GetString(pathPtr), errorStr));
-	}
+	Tcl_AppendResult(interp, "couldn't load file \"",
+		Tcl_GetString(pathPtr), "\": ", errorStr, NULL);
 	return TCL_ERROR;
     }
-    newHandle = ckalloc(sizeof(*newHandle));
-    newHandle->clientData = handle;
-    newHandle->findSymbolProcPtr = &FindSymbol;
-    newHandle->unloadFileProcPtr = &UnloadFile;
-    *unloadProcPtr = &UnloadFile;
-    *loadHandle = newHandle;
 
+    *unloadProcPtr = &TclpUnloadFile;
+    *loadHandle = (Tcl_LoadHandle) handle;
     return TCL_OK;
 }
 
 /*
  *----------------------------------------------------------------------
  *
- * FindSymbol --
+ * TclpFindSymbol --
  *
  *	Looks up a symbol, by name, through a handle associated with a
  *	previously loaded piece of code (shared library).
@@ -157,21 +129,16 @@ TclpDlopen(
  *----------------------------------------------------------------------
  */
 
-static void *
-FindSymbol(
+Tcl_PackageInitProc *
+TclpFindSymbol(
     Tcl_Interp *interp,		/* Place to put error messages. */
     Tcl_LoadHandle loadHandle,	/* Value from TcpDlopen(). */
-    const char *symbol)		/* Symbol to look up. */
+    CONST char *symbol)		/* Symbol to look up. */
 {
-    const char *native;		/* Name of the library to be loaded, in
-				 * system encoding */
-    Tcl_DString newName, ds;	/* Buffers for converting the name to
-				 * system encoding and prepending an
-				 * underscore*/
-    void *handle = (void *) loadHandle->clientData;
-				/* Native handle to the loaded library */
-    void *proc;			/* Address corresponding to the resolved
-				 * symbol */
+    CONST char *native;
+    Tcl_DString newName, ds;
+    VOID *handle = (VOID*)loadHandle;
+    Tcl_PackageInitProc *proc;
 
     /*
      * Some platforms still add an underscore to the beginning of symbol
@@ -180,35 +147,25 @@ FindSymbol(
      */
 
     native = Tcl_UtfToExternalDString(NULL, symbol, -1, &ds);
-    proc = dlsym(handle, native);	/* INTL: Native. */
+    proc = (Tcl_PackageInitProc *) dlsym(handle,	/* INTL: Native. */
+	    native);
     if (proc == NULL) {
 	Tcl_DStringInit(&newName);
-	TclDStringAppendLiteral(&newName, "_");
+	Tcl_DStringAppend(&newName, "_", 1);
 	native = Tcl_DStringAppend(&newName, native, -1);
-	proc = dlsym(handle, native);	/* INTL: Native. */
+	proc = (Tcl_PackageInitProc *) dlsym(handle,	/* INTL: Native. */
+		native);
 	Tcl_DStringFree(&newName);
     }
     Tcl_DStringFree(&ds);
-    if (proc == NULL) {
-	const char *errorStr = dlerror();
 
-	if (interp) {
-	    if (!errorStr) {
-		errorStr = "unknown";
-	    }
-	    Tcl_SetObjResult(interp, Tcl_ObjPrintf(
-		    "cannot find symbol \"%s\": %s", symbol, errorStr));
-	    Tcl_SetErrorCode(interp, "TCL", "LOOKUP", "LOAD_SYMBOL", symbol,
-		    NULL);
-	}
-    }
     return proc;
 }
 
 /*
  *----------------------------------------------------------------------
  *
- * UnloadFile --
+ * TclpUnloadFile --
  *
  *	Unloads a dynamically loaded binary code file from memory. Code
  *	pointers in the formerly loaded file are no longer valid after calling
@@ -223,16 +180,16 @@ FindSymbol(
  *----------------------------------------------------------------------
  */
 
-static void
-UnloadFile(
+void
+TclpUnloadFile(
     Tcl_LoadHandle loadHandle)	/* loadHandle returned by a previous call to
 				 * TclpDlopen(). The loadHandle is a token
 				 * that represents the loaded file. */
 {
-    void *handle = loadHandle->clientData;
+    void *handle;
 
+    handle = (void *) loadHandle;
     dlclose(handle);
-    ckfree(loadHandle);
 }
 
 /*
@@ -257,7 +214,7 @@ UnloadFile(
 
 int
 TclGuessPackageName(
-    const char *fileName,	/* Name of file containing package (already
+    CONST char *fileName,	/* Name of file containing package (already
 				 * translated to local form if needed). */
     Tcl_DString *bufPtr)	/* Initialized empty dstring. Append package
 				 * name to this if possible. */

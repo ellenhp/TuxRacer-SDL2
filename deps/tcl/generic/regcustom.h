@@ -30,16 +30,16 @@
  * Headers if any.
  */
 
-#include "regex.h"
+#include "tclInt.h"
 
 /*
  * Overrides for regguts.h definitions, if any.
  */
 
 #define	FUNCPTR(name, args)	(*name)args
-#define	MALLOC(n)		VS(attemptckalloc(n))
+#define	MALLOC(n)		ckalloc(n)
 #define	FREE(p)			ckfree(VS(p))
-#define	REALLOC(p,n)		VS(attemptckrealloc(VS(p),n))
+#define	REALLOC(p,n)		ckrealloc(VS(p),n)
 
 /*
  * Do not insert extras between the "begin" and "end" lines - this chunk is
@@ -60,6 +60,12 @@
 #ifdef __REG_REGOFF_T
 #undef __REG_REGOFF_T
 #endif
+#ifdef __REG_VOID_T
+#undef __REG_VOID_T
+#endif
+#ifdef __REG_CONST
+#undef __REG_CONST
+#endif
 #ifdef __REG_NOFRONT
 #undef __REG_NOFRONT
 #endif
@@ -69,6 +75,8 @@
 /* Interface types */
 #define	__REG_WIDE_T	Tcl_UniChar
 #define	__REG_REGOFF_T	long	/* Not really right, but good enough... */
+#define	__REG_VOID_T	void
+#define	__REG_CONST	const
 /* Names and declarations */
 #define	__REG_WIDE_COMPILE	TclReComp
 #define	__REG_WIDE_EXEC		TclReExec
@@ -132,7 +140,7 @@ typedef int celt;		/* Type to hold chr, or NOCELT */
 #if 1
 #define AllocVars(vPtr) \
     static Tcl_ThreadDataKey varsKey; \
-    struct vars *vPtr = (struct vars *) \
+    register struct vars *vPtr = (struct vars *) \
 	    Tcl_GetThreadData(&varsKey, sizeof(struct vars))
 #else
 /*
@@ -141,15 +149,13 @@ typedef int celt;		/* Type to hold chr, or NOCELT */
  * faster in practice (measured!)
  */
 #define AllocVars(vPtr) \
-    struct vars *vPtr = (struct vars *) MALLOC(sizeof(struct vars))
+    register struct vars *vPtr = (struct vars *) MALLOC(sizeof(struct vars))
 #define FreeVars(vPtr) \
     FREE(vPtr)
 #endif
 
 /*
- * Local Variables:
- * mode: c
- * c-basic-offset: 4
- * fill-column: 78
- * End:
+ * And pick up the standard header.
  */
+
+#include "regex.h"

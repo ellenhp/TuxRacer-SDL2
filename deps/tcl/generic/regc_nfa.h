@@ -62,6 +62,7 @@ newnfa(
     nfa->nstates = 0;
     nfa->cm = cm;
     nfa->v = v;
+    nfa->size = 0;
     nfa->bos[0] = nfa->bos[1] = COLORLESS;
     nfa->eos[0] = nfa->eos[1] = COLORLESS;
     nfa->parent = parent;	/* Precedes newfstate so parent is valid. */
@@ -89,8 +90,63 @@ newnfa(
 }
 
 /*
+ - TooManyStates - checks if the max states exceeds the compile-time value
+ ^ static int TooManyStates(struct nfa *);
+ */
+static int
+TooManyStates(
+    struct nfa *nfa)
+{
+    struct nfa *parent = nfa->parent;
+    size_t sz = nfa->size;
+
+    while (parent != NULL) {
+	sz = parent->size;
+	parent = parent->parent;
+    }
+    if (sz > REG_MAX_STATES) {
+	return 1;
+    }
+    return 0;
+}
+
+/*
+ - IncrementSize - increases the tracked size of the NFA and its parents.
+ ^ static void IncrementSize(struct nfa *);
+ */
+static void
+IncrementSize(
+    struct nfa *nfa)
+{
+    struct nfa *parent = nfa->parent;
+
+    nfa->size++;
+    while (parent != NULL) {
+	parent->size++;
+	parent = parent->parent;
+    }
+}
+
+/*
+ - DecrementSize - increases the tracked size of the NFA and its parents.
+ ^ static void DecrementSize(struct nfa *);
+ */
+static void
+DecrementSize(
+    struct nfa *nfa)
+{
+    struct nfa *parent = nfa->parent;
+
+    nfa->size--;
+    while (parent != NULL) {
+	parent->size--;
+	parent = parent->parent;
+    }
+}
+
+/*
  - freenfa - free an entire NFA
- ^ static void freenfa(struct nfa *);
+ ^ static VOID freenfa(struct nfa *);
  */
 static void
 freenfa(
@@ -124,20 +180,20 @@ newstate(
 {
     struct state *s;
 
+    if (TooManyStates(nfa)) {
+	/* XXX: add specific error for this */
+	NERR(REG_ETOOBIG);
+	return NULL;
+    }
     if (nfa->free != NULL) {
 	s = nfa->free;
 	nfa->free = s->next;
     } else {
-	if (nfa->v->spaceused >= REG_MAX_COMPILE_SPACE) {
-	    NERR(REG_ETOOBIG);
-	    return NULL;
-	}
 	s = (struct state *) MALLOC(sizeof(struct state));
 	if (s == NULL) {
 	    NERR(REG_ESPACE);
 	    return NULL;
 	}
-	nfa->v->spaceused += sizeof(struct state);
 	s->oas.next = NULL;
 	s->free = NULL;
 	s->noas = 0;
@@ -161,6 +217,12 @@ newstate(
     }
     s->prev = nfa->slast;
     nfa->slast = s;
+
+    /*
+     * Track the current size and the parent size.
+     */
+
+    IncrementSize(nfa);
     return s;
 }
 
@@ -184,7 +246,7 @@ newfstate(
 
 /*
  - dropstate - delete a state's inarcs and outarcs and free it
- ^ static void dropstate(struct nfa *, struct state *);
+ ^ static VOID dropstate(struct nfa *, struct state *);
  */
 static void
 dropstate(
@@ -204,7 +266,7 @@ dropstate(
 
 /*
  - freestate - free a state, which has no in-arcs or out-arcs
- ^ static void freestate(struct nfa *, struct state *);
+ ^ static VOID freestate(struct nfa *, struct state *);
  */
 static void
 freestate(
@@ -231,11 +293,12 @@ freestate(
     s->prev = NULL;
     s->next = nfa->free;	/* don't delete it, put it on the free list */
     nfa->free = s;
+    DecrementSize(nfa);
 }
 
 /*
  - destroystate - really get rid of an already-freed state
- ^ static void destroystate(struct nfa *, struct state *);
+ ^ static VOID destroystate(struct nfa *, struct state *);
  */
 static void
 destroystate(
@@ -249,18 +312,16 @@ destroystate(
     for (ab=s->oas.next ; ab!=NULL ; ab=abnext) {
 	abnext = ab->next;
 	FREE(ab);
-	nfa->v->spaceused -= sizeof(struct arcbatch);
     }
     s->ins = NULL;
     s->outs = NULL;
     s->next = NULL;
     FREE(s);
-    nfa->v->spaceused -= sizeof(struct state);
 }
 
 /*
  - newarc - set up a new arc within an NFA
- ^ static void newarc(struct nfa *, int, pcolor, struct state *,
+ ^ static VOID newarc(struct nfa *, int, pcolor, struct state *,
  ^	struct state *);
  */
 /*
@@ -293,7 +354,7 @@ newarc(
 	    }
 	}
     }
-
+  
     /* no dup, so create the arc */
     createarc(nfa, t, co, from, to);
 }
@@ -378,19 +439,14 @@ allocarc(
      */
 
     if (s->free == NULL) {
-	struct arcbatch *newAb;
+	struct arcbatch *newAb = (struct arcbatch *)
+		MALLOC(sizeof(struct arcbatch));
 	int i;
 
-	if (nfa->v->spaceused >= REG_MAX_COMPILE_SPACE) {
-	    NERR(REG_ETOOBIG);
-	    return NULL;
-	}
-	newAb = (struct arcbatch *) MALLOC(sizeof(struct arcbatch));
 	if (newAb == NULL) {
 	    NERR(REG_ESPACE);
 	    return NULL;
 	}
-	nfa->v->spaceused += sizeof(struct arcbatch);
 	newAb->next = s->oas.next;
 	s->oas.next = newAb;
 
@@ -410,7 +466,7 @@ allocarc(
 
 /*
  - freearc - free an arc
- ^ static void freearc(struct nfa *, struct arc *);
+ ^ static VOID freearc(struct nfa *, struct arc *);
  */
 static void
 freearc(
@@ -569,7 +625,7 @@ findarc(
 
 /*
  - cparc - allocate a new arc within an NFA, copying details from old one
- ^ static void cparc(struct nfa *, struct arc *, struct state *,
+ ^ static VOID cparc(struct nfa *, struct arc *, struct state *,
  ^ 	struct state *);
  */
 static void
@@ -657,7 +713,7 @@ sortins_cmp(
     }
     return 0;
 }
-
+ 
 /*
  * sortouts - sort the out arcs of a state by to/color/type
  */
@@ -756,7 +812,7 @@ sortouts_cmp(
  * checks become too slow.  In that case we proceed by sorting and merging
  * the arc lists, and then we can indeed just update the arcs in-place.
  *
- ^ static void moveins(struct nfa *, struct state *, struct state *);
+ ^ static VOID moveins(struct nfa *, struct state *, struct state *);
  */
 static void
 moveins(
@@ -1016,7 +1072,7 @@ mergeins(
 
 /*
  - moveouts - move all out arcs of a state to another state
- ^ static void moveouts(struct nfa *, struct state *, struct state *);
+ ^ static VOID moveouts(struct nfa *, struct state *, struct state *);
  */
 static void
 moveouts(
@@ -1176,7 +1232,7 @@ copyouts(
 
 /*
  - cloneouts - copy out arcs of a state to another state pair, modifying type
- ^ static void cloneouts(struct nfa *, struct state *, struct state *,
+ ^ static VOID cloneouts(struct nfa *, struct state *, struct state *,
  ^ 	struct state *, int);
  */
 static void
@@ -1200,7 +1256,7 @@ cloneouts(
  - delsub - delete a sub-NFA, updating subre pointers if necessary
  * This uses a recursive traversal of the sub-NFA, marking already-seen
  * states using their tmp pointer.
- ^ static void delsub(struct nfa *, struct state *, struct state *);
+ ^ static VOID delsub(struct nfa *, struct state *, struct state *);
  */
 static void
 delsub(
@@ -1223,7 +1279,7 @@ delsub(
 /*
  - deltraverse - the recursive heart of delsub
  * This routine's basic job is to destroy all out-arcs of the state.
- ^ static void deltraverse(struct nfa *, struct state *, struct state *);
+ ^ static VOID deltraverse(struct nfa *, struct state *, struct state *);
  */
 static void
 deltraverse(
@@ -1266,7 +1322,7 @@ deltraverse(
  * Another recursive traversal, this time using tmp to point to duplicates as
  * well as mark already-seen states. (You knew there was a reason why it's a
  * state pointer, didn't you? :-))
- ^ static void dupnfa(struct nfa *, struct state *, struct state *,
+ ^ static VOID dupnfa(struct nfa *, struct state *, struct state *,
  ^ 	struct state *, struct state *);
  */
 static void
@@ -1283,7 +1339,7 @@ dupnfa(
     }
 
     stop->tmp = to;
-    duptraverse(nfa, start, from, 0);
+    duptraverse(nfa, start, from);
     /* done, except for clearing out the tmp pointers */
 
     stop->tmp = NULL;
@@ -1292,14 +1348,13 @@ dupnfa(
 
 /*
  - duptraverse - recursive heart of dupnfa
- ^ static void duptraverse(struct nfa *, struct state *, struct state *);
+ ^ static VOID duptraverse(struct nfa *, struct state *, struct state *);
  */
 static void
 duptraverse(
     struct nfa *nfa,
     struct state *s,
-    struct state *stmp,		/* s's duplicate, or NULL */
-    int depth)
+    struct state *stmp)		/* s's duplicate, or NULL */
 {
     struct arc *a;
 
@@ -1313,20 +1368,8 @@ duptraverse(
 	return;
     }
 
-    /*
-     * Arbitrary depth limit. Needs tuning, but this value is sufficient to
-     * make all normal tests (not reg-33.14) pass.
-     */
-#ifndef DUPTRAVERSE_MAX_DEPTH
-#define DUPTRAVERSE_MAX_DEPTH 15000
-#endif
-
-    if (depth++ > DUPTRAVERSE_MAX_DEPTH) {
-	NERR(REG_ESPACE);
-    }
-
     for (a=s->outs ; a!=NULL && !NISERR() ; a=a->outchain) {
-	duptraverse(nfa, a->to, NULL, depth);
+	duptraverse(nfa, a->to, NULL);
 	if (NISERR()) {
 	    break;
 	}
@@ -1337,7 +1380,7 @@ duptraverse(
 
 /*
  - cleartraverse - recursive cleanup for algorithms that leave tmp ptrs set
- ^ static void cleartraverse(struct nfa *, struct state *);
+ ^ static VOID cleartraverse(struct nfa *, struct state *);
  */
 static void
 cleartraverse(
@@ -1358,7 +1401,7 @@ cleartraverse(
 
 /*
  - specialcolors - fill in special colors for an NFA
- ^ static void specialcolors(struct nfa *);
+ ^ static VOID specialcolors(struct nfa *);
  */
 static void
 specialcolors(
@@ -1441,7 +1484,7 @@ optimize(
 
 /*
  - pullback - pull back constraints backward to eliminate them
- ^ static void pullback(struct nfa *, FILE *);
+ ^ static VOID pullback(struct nfa *, FILE *);
  */
 static void
 pullback(
@@ -1621,7 +1664,7 @@ pull(
 
 /*
  - pushfwd - push forward constraints forward to eliminate them
- ^ static void pushfwd(struct nfa *, FILE *);
+ ^ static VOID pushfwd(struct nfa *, FILE *);
  */
 static void
 pushfwd(
@@ -1860,7 +1903,7 @@ combine(
 
 /*
  - fixempties - get rid of EMPTY arcs
- ^ static void fixempties(struct nfa *, FILE *);
+ ^ static VOID fixempties(struct nfa *, FILE *);
  */
 static void
 fixempties(
@@ -2020,7 +2063,7 @@ fixempties(
 		    arcarray[arccount++] = a;
 		}
 	    }
-
+  
   	    /* Reset the tmp fields as we walk back */
   	    nexts = s2->tmp;
   	    s2->tmp = NULL;
@@ -2042,7 +2085,7 @@ fixempties(
 	}
 	inarcsorig[s->no] = a;
     }
-
+  
     FREE(arcarray);
     FREE(inarcsorig);
 
@@ -2193,7 +2236,7 @@ fixconstraintloops(
  	    dropstate(nfa, s);
 	}
     }
-
+ 
     /* Nothing to do if no remaining constraint arcs */
     if (NISERR() || !hasconstraints) {
 	return;
@@ -2683,7 +2726,7 @@ clonesuccessorstates(
 
 /*
  - cleanup - clean up NFA after optimizations
- ^ static void cleanup(struct nfa *);
+ ^ static VOID cleanup(struct nfa *);
  */
 static void
 cleanup(
@@ -2724,7 +2767,7 @@ cleanup(
 
 /*
  - markreachable - recursive marking of reachable states
- ^ static void markreachable(struct nfa *, struct state *, struct state *,
+ ^ static VOID markreachable(struct nfa *, struct state *, struct state *,
  ^ 	struct state *);
  */
 static void
@@ -2748,7 +2791,7 @@ markreachable(
 
 /*
  - markcanreach - recursive marking of states which can reach here
- ^ static void markcanreach(struct nfa *, struct state *, struct state *,
+ ^ static VOID markcanreach(struct nfa *, struct state *, struct state *,
  ^ 	struct state *);
  */
 static void
@@ -2796,7 +2839,7 @@ analyze(
 
 /*
  - compact - construct the compact representation of an NFA
- ^ static void compact(struct nfa *, struct cnfa *);
+ ^ static VOID compact(struct nfa *, struct cnfa *);
  */
 static void
 compact(
@@ -2816,16 +2859,13 @@ compact(
     narcs = 0;
     for (s = nfa->states; s != NULL; s = s->next) {
 	nstates++;
-	narcs += s->nouts + 1;	/* need one extra for endmarker */
+	narcs += 1 + s->nouts + 1;
+	/* 1 as a fake for flags, nouts for arcs, 1 as endmarker */
     }
 
-    cnfa->stflags = (char *) MALLOC(nstates * sizeof(char));
     cnfa->states = (struct carc **) MALLOC(nstates * sizeof(struct carc *));
     cnfa->arcs = (struct carc *) MALLOC(narcs * sizeof(struct carc));
-    if (cnfa->stflags == NULL || cnfa->states == NULL || cnfa->arcs == NULL) {
-	if (cnfa->stflags != NULL) {
-	    FREE(cnfa->stflags);
-	}
+    if (cnfa->states == NULL || cnfa->arcs == NULL) {
 	if (cnfa->states != NULL) {
 	    FREE(cnfa->states);
 	}
@@ -2848,8 +2888,9 @@ compact(
     ca = cnfa->arcs;
     for (s = nfa->states; s != NULL; s = s->next) {
 	assert((size_t) s->no < nstates);
-	cnfa->stflags[s->no] = 0;
 	cnfa->states[s->no] = ca;
+	ca->co = 0;		/* clear and skip flags "arc" */
+	ca++;
 	first = ca;
 	for (a = s->outs; a != NULL; a = a->outchain) {
 	    switch (a->type) {
@@ -2883,14 +2924,14 @@ compact(
      */
 
     for (a = nfa->pre->outs; a != NULL; a = a->outchain) {
-	cnfa->stflags[a->to->no] = CNFA_NOPROGRESS;
+	cnfa->states[a->to->no]->co = 1;
     }
-    cnfa->stflags[nfa->pre->no] = CNFA_NOPROGRESS;
+    cnfa->states[nfa->pre->no]->co = 1;
 }
 
 /*
  - carcsort - sort compacted-NFA arcs by color
- ^ static void carcsort(struct carc *, struct carc *);
+ ^ static VOID carcsort(struct carc *, struct carc *);
  */
 static void
 carcsort(
@@ -2909,7 +2950,7 @@ carc_cmp(
 {
     const struct carc *aa = (const struct carc *) a;
     const struct carc *bb = (const struct carc *) b;
-
+  
     if (aa->co < bb->co) {
 	return -1;
     }
@@ -2927,7 +2968,7 @@ carc_cmp(
 
 /*
  - freecnfa - free a compacted NFA
- ^ static void freecnfa(struct cnfa *);
+ ^ static VOID freecnfa(struct cnfa *);
  */
 static void
 freecnfa(
@@ -2935,14 +2976,13 @@ freecnfa(
 {
     assert(cnfa->nstates != 0);	/* not empty already */
     cnfa->nstates = 0;
-    FREE(cnfa->stflags);
     FREE(cnfa->states);
     FREE(cnfa->arcs);
 }
 
 /*
  - dumpnfa - dump an NFA in human-readable form
- ^ static void dumpnfa(struct nfa *, FILE *);
+ ^ static VOID dumpnfa(struct nfa *, FILE *);
  */
 static void
 dumpnfa(
@@ -2978,9 +3018,6 @@ dumpnfa(
 	dumpcolors(nfa->cm, f);
     }
     fflush(f);
-#else
-    (void)nfa;
-    (void)f;
 #endif
 }
 
@@ -2991,7 +3028,7 @@ dumpnfa(
 
 /*
  - dumpstate - dump an NFA state in human-readable form
- ^ static void dumpstate(struct state *, FILE *);
+ ^ static VOID dumpstate(struct state *, FILE *);
  */
 static void
 dumpstate(
@@ -3021,7 +3058,7 @@ dumpstate(
 
 /*
  - dumparcs - dump out-arcs in human-readable form
- ^ static void dumparcs(struct state *, FILE *);
+ ^ static VOID dumparcs(struct state *, FILE *);
  */
 static void
 dumparcs(
@@ -3055,7 +3092,7 @@ dumparcs(
 
 /*
  - dumparc - dump one outarc in readable form, including prefixing tab
- ^ static void dumparc(struct arc *, struct state *, FILE *);
+ ^ static VOID dumparc(struct arc *, struct state *, FILE *);
  */
 static void
 dumparc(
@@ -3129,7 +3166,7 @@ dumparc(
 
 /*
  - dumpcnfa - dump a compacted NFA in human-readable form
- ^ static void dumpcnfa(struct cnfa *, FILE *);
+ ^ static VOID dumpcnfa(struct cnfa *, FILE *);
  */
 static void
 dumpcnfa(
@@ -3157,12 +3194,9 @@ dumpcnfa(
     }
     fprintf(f, "\n");
     for (st = 0; st < cnfa->nstates; st++) {
-	dumpcstate(st, cnfa, f);
+	dumpcstate(st, cnfa->states[st], cnfa, f);
     }
     fflush(f);
-#else
-    (void)cnfa;
-    (void)f;
 #endif
 }
 
@@ -3173,24 +3207,25 @@ dumpcnfa(
 
 /*
  - dumpcstate - dump a compacted-NFA state in human-readable form
- ^ static void dumpcstate(int, struct cnfa *, FILE *);
+ ^ static VOID dumpcstate(int, struct carc *, struct cnfa *, FILE *);
  */
 static void
 dumpcstate(
     int st,
+    struct carc *ca,
     struct cnfa *cnfa,
     FILE *f)
 {
-    struct carc *ca;
+    int i;
     int pos;
 
-    fprintf(f, "%d%s", st, (cnfa->stflags[st] & CNFA_NOPROGRESS) ? ":" : ".");
+    fprintf(f, "%d%s", st, (ca[0].co) ? ":" : ".");
     pos = 1;
-    for (ca = cnfa->states[st]; ca->co != COLORLESS; ca++) {
-	if (ca->co < cnfa->ncolors) {
-	    fprintf(f, "\t[%ld]->%d", (long) ca->co, ca->to);
+    for (i = 1; ca[i].co != COLORLESS; i++) {
+	if (ca[i].co < cnfa->ncolors) {
+	    fprintf(f, "\t[%ld]->%d", (long) ca[i].co, ca[i].to);
 	} else {
-	    fprintf(f, "\t:%ld:->%d", (long) (ca->co - cnfa->ncolors), ca->to);
+	    fprintf(f, "\t:%ld:->%d", (long) ca[i].co-cnfa->ncolors,ca[i].to);
 	}
 	if (pos == 5) {
 	    fprintf(f, "\n");
@@ -3199,7 +3234,7 @@ dumpcstate(
 	    pos++;
 	}
     }
-    if (ca == cnfa->states[st] || pos != 1) {
+    if (i == 1 || pos != 1) {
 	fprintf(f, "\n");
     }
     fflush(f);

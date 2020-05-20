@@ -29,6 +29,7 @@
 #include "view.h"
 #include "tux.h"
 #include "tux_shadow.h"
+#include "shaders.h"
 #include "keyboard.h"
 #include "hud.h"
 #include "hud_training.h"
@@ -38,10 +39,11 @@
 #include "game_config.h"
 #include "joystick.h"
 
-static void abort_intro( player_data_t *plyr ) {
+static void abort_intro(player_data_t *plyr)
+{
     point2d_t start_pt = get_start_pt();
-    
-    set_game_mode( RACING );
+
+    set_game_mode(RACING);
 
     plyr->orientation_initialized = False;
     plyr->view.initialized = False;
@@ -54,29 +56,29 @@ static void abort_intro( player_data_t *plyr ) {
 
 void intro_js_func(int button)
 {
-    player_data_t *plyr = get_player_data( local_player() );
-	winsys_set_joystick_button_func(NULL);
-	abort_intro( plyr );
+    player_data_t *plyr = get_player_data(local_player());
+    winsys_set_joystick_button_func(NULL);
+    abort_intro(plyr);
 }
 
-void intro_init(void) 
+void intro_init(void)
 {
     int i, num_items;
     item_t *item_locs;
-    
-    player_data_t *plyr = get_player_data( local_player() );
+
+    player_data_t *plyr = get_player_data(local_player());
     point2d_t start_pt = get_start_pt();
 
     init_key_frame();
 
-    winsys_set_display_func( main_loop );
-    winsys_set_idle_func( main_loop );
-    winsys_set_reshape_func( reshape );
-    winsys_set_mouse_func( NULL );
-    winsys_set_motion_func( NULL );
-    winsys_set_passive_motion_func( NULL );
-	winsys_set_joystick_button_func( intro_js_func );
-    
+    winsys_set_display_func(main_loop);
+    winsys_set_idle_func(main_loop);
+    winsys_set_reshape_func(reshape);
+    winsys_set_mouse_func(NULL);
+    winsys_set_motion_func(NULL);
+    winsys_set_passive_motion_func(NULL);
+    winsys_set_joystick_button_func(intro_js_func);
+
     /* order trees */
     course_render_init();
 
@@ -87,11 +89,11 @@ void intro_init(void)
     g_game.time = 0.0;
     plyr->herring = 0;
     plyr->score = 0;
-    
+
 #ifdef TARGET_OS_IPHONE
     plyr->tricks = 0;
-    plyr->control.is_flying=False;
-    plyr->control.fly_total_time=0;
+    plyr->control.is_flying = False;
+    plyr->control.fly_total_time = 0;
 #endif
 
     plyr->pos.x = start_pt.x;
@@ -99,33 +101,36 @@ void intro_init(void)
 
     init_physical_simulation();
 
-    plyr->vel = make_vector( 0, 0, 0 );
+    plyr->vel = make_vector(0, 0, 0);
 
     clear_particles();
 
-    set_view_mode( plyr, ABOVE );
-    update_view( plyr, EPS ); 
+    set_view_mode(plyr, ABOVE);
+    update_view(plyr, EPS);
 
     /* reset all items as collectable */
     num_items = get_num_items();
     item_locs = get_item_locs();
-    for (i = 0; i < num_items; i++ ) {
-	if ( item_locs[i].collectable != -1 ) {
-	    item_locs[i].collectable = 1;
-	}
+    for (i = 0; i < num_items; i++)
+    {
+        if (item_locs[i].collectable != -1)
+        {
+            item_locs[i].collectable = 1;
+        }
     }
 
-    play_music( "intro" );
+    play_music("intro");
 }
 
-void intro_loop( scalar_t time_step )
+void intro_loop(scalar_t time_step)
 {
     int width, height;
-    player_data_t *plyr = get_player_data( local_player() );
+    player_data_t *plyr = get_player_data(local_player());
 
-    if ( getparam_do_intro_animation() == False ) {
-	set_game_mode( RACING );
-	return;
+    if (getparam_do_intro_animation() == False)
+    {
+        set_game_mode(RACING);
+        return;
     }
 
     width = getparam_x_resolution();
@@ -142,18 +147,18 @@ void intro_loop( scalar_t time_step )
 
     update_audio();
 
-    update_key_frame( plyr, time_step );
+    update_key_frame(plyr, time_step);
 
     clear_rendering_context();
-    
+
     use_generic_program();
 
-    update_view( plyr, time_step );
+    update_view(plyr, time_step);
 
     util_setup_projection(NEAR_CLIP_DIST, getparam_forward_clip_distance());
 
-    set_course_clipping( True );
-    set_course_eye_point( plyr->view.pos );
+    set_course_clipping(True);
+    set_course_eye_point(plyr->view.pos);
 
     use_terrain_program();
 
@@ -164,27 +169,29 @@ void intro_loop( scalar_t time_step )
     draw_tux();
 
     use_generic_program();
-    
+
     draw_sky(plyr->view.pos);
-    
+
     draw_trees();
-    
+
     use_hud_program();
 
-    draw_hud( plyr );
+    draw_hud(plyr);
     draw_hud_training(plyr);
-    
-    reshape( width, height );
+
+    reshape(width, height);
     winsys_swap_buffers();
 #ifdef TARGET_OS_IPHONE
     setparam_tux_sphere_divisions(saved_tux_sphere_divisions);
 #endif
-} 
+}
 
-START_KEYBOARD_CB( intro_cb )
+START_KEYBOARD_CB(intro_cb)
 {
-    if ( release ) return;
-    if (g_game.practicing) abort_intro( plyr );
+    if (release)
+        return;
+    if (g_game.practicing)
+        abort_intro(plyr);
 }
 END_KEYBOARD_CB
 
@@ -192,13 +199,12 @@ void intro_register()
 {
     int status = 0;
 
-    register_loop_funcs( INTRO, intro_init, intro_loop, NULL );
+    register_loop_funcs(INTRO, intro_init, intro_loop, NULL);
 
     status |= add_keymap_entry(
-	INTRO, DEFAULT_CALLBACK, NULL, NULL, intro_cb );
+        INTRO, DEFAULT_CALLBACK, NULL, NULL, intro_cb);
 
-    check_assertion( status == 0, "out of keymap entries" );
+    check_assertion(status == 0, "out of keymap entries");
 
     return;
 }
-

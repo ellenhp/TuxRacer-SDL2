@@ -35,14 +35,6 @@
 #include "tclInt.h"
 #include <sys/types.h>
 #include <loader.h>
-
-/*
- * Static functions defined within this file.
- */
-
-static void *		FindSymbol(Tcl_Interp *interp,
-			    Tcl_LoadHandle loadHandle, const char* symbol);
-static void		UnloadFile(Tcl_LoadHandle handle);
 
 /*
  *----------------------------------------------------------------------
@@ -70,17 +62,15 @@ TclpDlopen(
     Tcl_LoadHandle *loadHandle,	/* Filled with token for dynamically loaded
 				 * file which will be passed back to
 				 * (*unloadProcPtr)() to unload the file. */
-    Tcl_FSUnloadFileProc **unloadProcPtr,
+    Tcl_FSUnloadFileProc **unloadProcPtr)
 				/* Filled with address of Tcl_FSUnloadFileProc
 				 * function which should be used for this
 				 * file. */
-    int flags)
 {
-    Tcl_LoadHandle newHandle;
     ldr_module_t lm;
     char *pkg;
     char *fileName = Tcl_GetString(pathPtr);
-    const char *native;
+    CONST char *native;
 
     /*
      * First try the full path the user gave us.  This is particularly
@@ -106,9 +96,8 @@ TclpDlopen(
     }
 
     if (lm == LDR_NULL_MODULE) {
-	Tcl_SetObjResult(interp, Tcl_ObjPrintf(
-		"couldn't load file \"%s\": %s",
-		fileName, Tcl_PosixError(interp)));
+	Tcl_AppendResult(interp, "couldn't load file \"", fileName, "\": ",
+		Tcl_PosixError(interp), NULL);
 	return TCL_ERROR;
     }
 
@@ -128,19 +117,15 @@ TclpDlopen(
     } else {
 	pkg++;
     }
-    newHandle = ckalloc(sizeof(*newHandle));
-    newHandle->clientData = pkg;
-    newHandle->findSymbolProcPtr = &FindSymbol;
-    newHandle->unloadFileProcPtr = &UnloadFile;
-    *loadHandle = newHandle;
-    *unloadProcPtr = &UnloadFile;
+    *loadHandle = pkg;
+    *unloadProcPtr = &TclpUnloadFile;
     return TCL_OK;
 }
 
 /*
  *----------------------------------------------------------------------
  *
- * FindSymbol --
+ * TclpFindSymbol --
  *
  *	Looks up a symbol, by name, through a handle associated with a
  *	previously loaded piece of code (shared library).
@@ -153,26 +138,19 @@ TclpDlopen(
  *----------------------------------------------------------------------
  */
 
-static void *
-FindSymbol(
+Tcl_PackageInitProc *
+TclpFindSymbol(
     Tcl_Interp *interp,
     Tcl_LoadHandle loadHandle,
-    const char *symbol)
+    CONST char *symbol)
 {
-    void *retval = ldr_lookup_package((char *) loadHandle, symbol);
-
-    if (retval == NULL && interp != NULL) {
-	Tcl_SetObjResult(interp, Tcl_ObjPrintf(
-		"cannot find symbol \"%s\"", symbol));
-	Tcl_SetErrorCode(interp, "TCL", "LOOKUP", "LOAD_SYMBOL", symbol, NULL);
-    }
-    return retval;
+    return ldr_lookup_package((char *)loadHandle, symbol);
 }
 
 /*
  *----------------------------------------------------------------------
  *
- * UnloadFile --
+ * TclpUnloadFile --
  *
  *	Unloads a dynamically loaded binary code file from memory. Code
  *	pointers in the formerly loaded file are no longer valid after calling
@@ -187,13 +165,12 @@ FindSymbol(
  *----------------------------------------------------------------------
  */
 
-static void
-UnloadFile(
+void
+TclpUnloadFile(
     Tcl_LoadHandle loadHandle)	/* loadHandle returned by a previous call to
 				 * TclpDlopen(). The loadHandle is a token
 				 * that represents the loaded file. */
 {
-    ckfree(loadHandle);
 }
 
 /*
@@ -218,7 +195,7 @@ UnloadFile(
 
 int
 TclGuessPackageName(
-    const char *fileName,	/* Name of file containing package (already
+    CONST char *fileName,	/* Name of file containing package (already
 				 * translated to local form if needed). */
     Tcl_DString *bufPtr)	/* Initialized empty dstring. Append package
 				 * name to this if possible. */

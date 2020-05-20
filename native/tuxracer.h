@@ -99,7 +99,7 @@ int _isnan(double x);
 #define HAVE_SDL 1
 #define HAVE_SDL_MIXER 1
 #define HAVE_SDL_JOYSTICKOPEN 1
-#define TCL_HEADER <tcl.h>
+#define TCL_HEADER "deps/tcl/generic/tcl.h"
 #endif
 
 /* Include all (or most) system include files here.  This slows down

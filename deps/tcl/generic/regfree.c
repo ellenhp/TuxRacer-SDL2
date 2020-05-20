@@ -34,23 +34,23 @@
  * character size.
  */
 
-#include "deps/tcl/generic/regguts.h"
+#include "regguts.h"
 
 /*
  - regfree - free an RE (generic function, punts to RE-specific function)
  *
  * Ignoring invocation with NULL is a convenience.
  */
-void regfree(
+void
+regfree(
     regex_t *re)
 {
-    if (re == NULL)
-    {
-        return;
+    if (re == NULL) {
+	return;
     }
     (*((struct fns *)re->re_fns)->free)(re);
 }
-
+
 /*
  * Local Variables:
  * mode: c

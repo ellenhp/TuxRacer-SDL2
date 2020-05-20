@@ -19,7 +19,7 @@
  * above. This variable can be modified by the function below.
  */
 
-static const char *tclPreInitScript = NULL;
+static char *tclPreInitScript = NULL;
 
 /* Forward declaration */
 struct Target;
@@ -225,9 +225,6 @@ static int		AliasList(Tcl_Interp *interp, Tcl_Interp *slaveInterp);
 static int		AliasObjCmd(ClientData dummy,
 			    Tcl_Interp *currentInterp, int objc,
 			    Tcl_Obj *const objv[]);
-static int		AliasNRCmd(ClientData dummy,
-			    Tcl_Interp *currentInterp, int objc,
-			    Tcl_Obj *const objv[]);
 static void		AliasObjCmdDeleteProc(ClientData clientData);
 static Tcl_Interp *	GetInterp(Tcl_Interp *interp, Tcl_Obj *pathPtr);
 static Tcl_Interp *	GetInterp2(Tcl_Interp *interp, int objc,
@@ -279,12 +276,6 @@ static void		DeleteScriptLimitCallback(ClientData clientData);
 static void		RunLimitHandlers(LimitHandler *handlerPtr,
 			    Tcl_Interp *interp);
 static void		TimeLimitCallback(ClientData clientData);
-
-/* NRE enabling */
-static Tcl_NRPostProc	NRPostInvokeHidden;
-static Tcl_ObjCmdProc	NRInterpCmd;
-static Tcl_ObjCmdProc	NRSlaveCmd;
-
 
 /*
  *----------------------------------------------------------------------
@@ -303,11 +294,11 @@ static Tcl_ObjCmdProc	NRSlaveCmd;
  *----------------------------------------------------------------------
  */
 
-const char *
+char *
 TclSetPreInitScript(
-    const char *string)		/* Pointer to a script. */
+    char *string)		/* Pointer to a script. */
 {
-    const char *prevString = tclPreInitScript;
+    char *prevString = tclPreInitScript;
     tclPreInitScript = string;
     return(prevString);
 }
@@ -337,8 +328,8 @@ Tcl_Init(
 {
     if (tclPreInitScript != NULL) {
 	if (Tcl_Eval(interp, tclPreInitScript) == TCL_ERROR) {
-	    return TCL_ERROR;
-	}
+	    return (TCL_ERROR);
+	};
     }
 
     /*
@@ -473,7 +464,7 @@ TclInterpInit(
     Master *masterPtr;
     Slave *slavePtr;
 
-    interpInfoPtr = ckalloc(sizeof(InterpInfo));
+    interpInfoPtr = (InterpInfo *) ckalloc(sizeof(InterpInfo));
     ((Interp *) interp)->interpInfo = interpInfoPtr;
 
     masterPtr = &interpInfoPtr->master;
@@ -487,8 +478,7 @@ TclInterpInit(
     slavePtr->interpCmd		= NULL;
     Tcl_InitHashTable(&slavePtr->aliasTable, TCL_STRING_KEYS);
 
-    Tcl_NRCreateCommand(interp, "interp", Tcl_InterpObjCmd, NRInterpCmd,
-	    NULL, NULL);
+    Tcl_CreateObjCommand(interp, "interp", Tcl_InterpObjCmd, NULL, NULL);
 
     Tcl_CallWhenDeleted(interp, InterpInfoDeleteProc, NULL);
     return TCL_OK;
@@ -570,7 +560,7 @@ InterpInfoDeleteProc(
     }
     Tcl_DeleteHashTable(&slavePtr->aliasTable);
 
-    ckfree(interpInfoPtr);
+    ckfree((char *) interpInfoPtr);
 }
 
 /*
@@ -597,34 +587,21 @@ Tcl_InterpObjCmd(
     int objc,				/* Number of arguments. */
     Tcl_Obj *const objv[])		/* Argument objects. */
 {
-    return Tcl_NRCallObjProc(interp, NRInterpCmd, clientData, objc, objv);
-}
-
-static int
-NRInterpCmd(
-    ClientData clientData,		/* Unused. */
-    Tcl_Interp *interp,			/* Current interpreter. */
-    int objc,				/* Number of arguments. */
-    Tcl_Obj *const objv[])		/* Argument objects. */
-{
-    Tcl_Interp *slaveInterp;
     int index;
-    static const char *const options[] = {
-	"alias",	"aliases",	"bgerror",	"cancel",
-	"create",	"debug",	"delete",
-	"eval",		"exists",	"expose",
-	"hide",		"hidden",	"issafe",
-	"invokehidden",	"limit",	"marktrusted",	"recursionlimit",
-	"slaves",	"share",	"target",	"transfer",
+    static const char *options[] = {
+	"alias",	"aliases",	"bgerror",	"create",
+	"debug",	"delete",	"eval",		"exists",	"expose",
+	"hide",		"hidden",	"issafe",	"invokehidden",
+	"limit",	"marktrusted",	"recursionlimit","slaves",
+	"share",	"target",	"transfer",
 	NULL
     };
     enum option {
-	OPT_ALIAS,	OPT_ALIASES,	OPT_BGERROR,	OPT_CANCEL,
-	OPT_CREATE,	OPT_DEBUG,	OPT_DELETE,
-	OPT_EVAL,	OPT_EXISTS,	OPT_EXPOSE,
-	OPT_HIDE,	OPT_HIDDEN,	OPT_ISSAFE,
-	OPT_INVOKEHID,	OPT_LIMIT,	OPT_MARKTRUSTED,OPT_RECLIMIT,
-	OPT_SLAVES,	OPT_SHARE,	OPT_TARGET,	OPT_TRANSFER
+	OPT_ALIAS,	OPT_ALIASES,	OPT_BGERROR,	OPT_CREATE,
+	OPT_DEBUG,	OPT_DELETE,	OPT_EVAL,	OPT_EXISTS,	OPT_EXPOSE,
+	OPT_HIDE,	OPT_HIDDEN,	OPT_ISSAFE,	OPT_INVOKEHID,
+	OPT_LIMIT,	OPT_MARKTRUSTED,OPT_RECLIMIT,	OPT_SLAVES,
+	OPT_SHARE,	OPT_TARGET,	OPT_TRANSFER
     };
 
     if (objc < 2) {
@@ -637,12 +614,12 @@ NRInterpCmd(
     }
     switch ((enum option) index) {
     case OPT_ALIAS: {
-	Tcl_Interp *masterInterp;
+	Tcl_Interp *slaveInterp, *masterInterp;
 
 	if (objc < 4) {
 	aliasArgs:
 	    Tcl_WrongNumArgs(interp, 2, objv,
-		    "slavePath slaveCmd ?masterPath masterCmd? ?arg ...?");
+		    "slavePath slaveCmd ?masterPath masterCmd? ?args ..?");
 	    return TCL_ERROR;
 	}
 	slaveInterp = GetInterp(interp, objv[2]);
@@ -660,19 +637,29 @@ NRInterpCmd(
 	    if (masterInterp == NULL) {
 		return TCL_ERROR;
 	    }
-
-	    return AliasCreate(interp, slaveInterp, masterInterp, objv[3],
-		    objv[5], objc - 6, objv + 6);
+	    if (TclGetString(objv[5])[0] == '\0') {
+		if (objc == 6) {
+		    return AliasDelete(interp, slaveInterp, objv[3]);
+		}
+	    } else {
+		return AliasCreate(interp, slaveInterp, masterInterp, objv[3],
+			objv[5], objc - 6, objv + 6);
+	    }
 	}
 	goto aliasArgs;
     }
-    case OPT_ALIASES:
+    case OPT_ALIASES: {
+	Tcl_Interp *slaveInterp;
+
 	slaveInterp = GetInterp2(interp, objc, objv);
 	if (slaveInterp == NULL) {
 	    return TCL_ERROR;
 	}
 	return AliasList(interp, slaveInterp);
-    case OPT_BGERROR:
+    }
+    case OPT_BGERROR: {
+	Tcl_Interp *slaveInterp;
+
 	if (objc != 3 && objc != 4) {
 	    Tcl_WrongNumArgs(interp, 2, objv, "path ?cmdPrefix?");
 	    return TCL_ERROR;
@@ -682,83 +669,12 @@ NRInterpCmd(
 	    return TCL_ERROR;
 	}
 	return SlaveBgerror(interp, slaveInterp, objc - 3, objv + 3);
-    case OPT_CANCEL: {
-	int i, flags;
-	Tcl_Obj *resultObjPtr;
-	static const char *const cancelOptions[] = {
-	    "-unwind",	"--",	NULL
-	};
-	enum option {
-	    OPT_UNWIND,	OPT_LAST
-	};
-
-	flags = 0;
-
-	for (i = 2; i < objc; i++) {
-	    if (TclGetString(objv[i])[0] != '-') {
-		break;
-	    }
-	    if (Tcl_GetIndexFromObj(interp, objv[i], cancelOptions, "option",
-		    0, &index) != TCL_OK) {
-		return TCL_ERROR;
-	    }
-
-	    switch ((enum option) index) {
-	    case OPT_UNWIND:
-		/*
-		 * The evaluation stack in the target interp is to be unwound.
-		 */
-
-		flags |= TCL_CANCEL_UNWIND;
-		break;
-	    case OPT_LAST:
-		i++;
-		goto endOfForLoop;
-	    }
-	}
-
-    endOfForLoop:
-	if (i < objc - 2) {
-	    Tcl_WrongNumArgs(interp, 2, objv,
-		    "?-unwind? ?--? ?path? ?result?");
-	    return TCL_ERROR;
-	}
-
-	/*
-	 * Did they specify a slave interp to cancel the script in progress
-	 * in?  If not, use the current interp.
-	 */
-
-	if (i < objc) {
-	    slaveInterp = GetInterp(interp, objv[i]);
-	    if (slaveInterp == NULL) {
-		return TCL_ERROR;
-	    }
-	    i++;
-	} else {
-	    slaveInterp = interp;
-	}
-
-	if (i < objc) {
-	    resultObjPtr = objv[i];
-
-	    /*
-	     * Tcl_CancelEval removes this reference.
-	     */
-
-	    Tcl_IncrRefCount(resultObjPtr);
-	    i++;
-	} else {
-	    resultObjPtr = NULL;
-	}
-
-	return Tcl_CancelEval(slaveInterp, resultObjPtr, 0, flags);
     }
     case OPT_CREATE: {
 	int i, last, safe;
 	Tcl_Obj *slavePtr;
 	char buf[16 + TCL_INTEGER_SPACE];
-	static const char *const createOptions[] = {
+	static const char *options[] = {
 	    "-safe",	"--", NULL
 	};
 	enum option {
@@ -775,8 +691,8 @@ NRInterpCmd(
 	last = 0;
 	for (i = 2; i < objc; i++) {
 	    if ((last == 0) && (Tcl_GetString(objv[i])[0] == '-')) {
-		if (Tcl_GetIndexFromObj(interp, objv[i], createOptions,
-			"option", 0, &index) != TCL_OK) {
+		if (Tcl_GetIndexFromObj(interp, objv[i], options, "option", 0,
+			&index) != TCL_OK) {
 		    return TCL_ERROR;
 		}
 		if (index == OPT_SAFE) {
@@ -822,11 +738,13 @@ NRInterpCmd(
 	Tcl_SetObjResult(interp, slavePtr);
 	return TCL_OK;
     }
-    case OPT_DEBUG:		/* TIP #378 */
+    case OPT_DEBUG: {
+	/* TIP #378 */
+	Tcl_Interp *slaveInterp;
+
 	/*
 	 * Currently only -frame supported, otherwise ?-option ?value??
 	 */
-
 	if (objc < 3 || objc > 5) {
 	    Tcl_WrongNumArgs(interp, 2, objv, "path ?-frame ?bool??");
 	    return TCL_ERROR;
@@ -836,9 +754,11 @@ NRInterpCmd(
 	    return TCL_ERROR;
 	}
 	return SlaveDebugCmd(interp, slaveInterp, objc - 3, objv + 3);
+    }
     case OPT_DELETE: {
 	int i;
 	InterpInfo *iiPtr;
+	Tcl_Interp *slaveInterp;
 
 	for (i = 2; i < objc; i++) {
 	    slaveInterp = GetInterp(interp, objv[i]);
@@ -847,8 +767,6 @@ NRInterpCmd(
 	    } else if (slaveInterp == interp) {
 		Tcl_SetObjResult(interp, Tcl_NewStringObj(
 			"cannot delete the current interpreter", -1));
-		Tcl_SetErrorCode(interp, "TCL", "OPERATION", "INTERP",
-			"DELETESELF", NULL);
 		return TCL_ERROR;
 	    }
 	    iiPtr = (InterpInfo *) ((Interp *) slaveInterp)->interpInfo;
@@ -857,7 +775,9 @@ NRInterpCmd(
 	}
 	return TCL_OK;
     }
-    case OPT_EVAL:
+    case OPT_EVAL: {
+	Tcl_Interp *slaveInterp;
+
 	if (objc < 4) {
 	    Tcl_WrongNumArgs(interp, 2, objv, "path arg ?arg ...?");
 	    return TCL_ERROR;
@@ -867,9 +787,12 @@ NRInterpCmd(
 	    return TCL_ERROR;
 	}
 	return SlaveEval(interp, slaveInterp, objc - 3, objv + 3);
+    }
     case OPT_EXISTS: {
-	int exists = 1;
+	int exists;
+	Tcl_Interp *slaveInterp;
 
+	exists = 1;
 	slaveInterp = GetInterp2(interp, objc, objv);
 	if (slaveInterp == NULL) {
 	    if (objc > 3) {
@@ -881,7 +804,9 @@ NRInterpCmd(
 	Tcl_SetObjResult(interp, Tcl_NewBooleanObj(exists));
 	return TCL_OK;
     }
-    case OPT_EXPOSE:
+    case OPT_EXPOSE: {
+	Tcl_Interp *slaveInterp;
+
 	if ((objc < 4) || (objc > 5)) {
 	    Tcl_WrongNumArgs(interp, 2, objv, "path hiddenCmdName ?cmdName?");
 	    return TCL_ERROR;
@@ -891,7 +816,10 @@ NRInterpCmd(
 	    return TCL_ERROR;
 	}
 	return SlaveExpose(interp, slaveInterp, objc - 3, objv + 3);
-    case OPT_HIDE:
+    }
+    case OPT_HIDE: {
+	Tcl_Interp *slaveInterp;		/* A slave. */
+
 	if ((objc < 4) || (objc > 5)) {
 	    Tcl_WrongNumArgs(interp, 2, objv, "path cmdName ?hiddenCmdName?");
 	    return TCL_ERROR;
@@ -901,23 +829,31 @@ NRInterpCmd(
 	    return TCL_ERROR;
 	}
 	return SlaveHide(interp, slaveInterp, objc - 3, objv + 3);
-    case OPT_HIDDEN:
+    }
+    case OPT_HIDDEN: {
+	Tcl_Interp *slaveInterp;		/* A slave. */
+
 	slaveInterp = GetInterp2(interp, objc, objv);
 	if (slaveInterp == NULL) {
 	    return TCL_ERROR;
 	}
 	return SlaveHidden(interp, slaveInterp);
-    case OPT_ISSAFE:
+    }
+    case OPT_ISSAFE: {
+	Tcl_Interp *slaveInterp;
+
 	slaveInterp = GetInterp2(interp, objc, objv);
 	if (slaveInterp == NULL) {
 	    return TCL_ERROR;
 	}
 	Tcl_SetObjResult(interp, Tcl_NewBooleanObj(Tcl_IsSafe(slaveInterp)));
 	return TCL_OK;
+    }
     case OPT_INVOKEHID: {
-	int i;
+	int i, index;
 	const char *namespaceName;
-	static const char *const hiddenOptions[] = {
+	Tcl_Interp *slaveInterp;
+	static const char *hiddenOptions[] = {
 	    "-global",	"-namespace",	"--", NULL
 	};
 	enum hiddenOption {
@@ -959,7 +895,8 @@ NRInterpCmd(
 		objv + i);
     }
     case OPT_LIMIT: {
-	static const char *const limitTypes[] = {
+	Tcl_Interp *slaveInterp;
+	static const char *limitTypes[] = {
 	    "commands", "time", NULL
 	};
 	enum LimitTypes {
@@ -968,8 +905,7 @@ NRInterpCmd(
 	int limitType;
 
 	if (objc < 4) {
-	    Tcl_WrongNumArgs(interp, 2, objv,
-		    "path limitType ?-option value ...?");
+	    Tcl_WrongNumArgs(interp, 2, objv, "path limitType ?options?");
 	    return TCL_ERROR;
 	}
 	slaveInterp = GetInterp(interp, objv[2]);
@@ -987,7 +923,9 @@ NRInterpCmd(
 	    return SlaveTimeLimitCmd(interp, slaveInterp, 4, objc, objv);
 	}
     }
-    case OPT_MARKTRUSTED:
+    case OPT_MARKTRUSTED: {
+	Tcl_Interp *slaveInterp;
+
 	if (objc != 3) {
 	    Tcl_WrongNumArgs(interp, 2, objv, "path");
 	    return TCL_ERROR;
@@ -997,7 +935,10 @@ NRInterpCmd(
 	    return TCL_ERROR;
 	}
 	return SlaveMarkTrusted(interp, slaveInterp);
-    case OPT_RECLIMIT:
+    }
+    case OPT_RECLIMIT: {
+	Tcl_Interp *slaveInterp;
+
 	if (objc != 3 && objc != 4) {
 	    Tcl_WrongNumArgs(interp, 2, objv, "path ?newlimit?");
 	    return TCL_ERROR;
@@ -1007,7 +948,9 @@ NRInterpCmd(
 	    return TCL_ERROR;
 	}
 	return SlaveRecursionLimit(interp, slaveInterp, objc - 3, objv + 3);
+    }
     case OPT_SLAVES: {
+	Tcl_Interp *slaveInterp;
 	InterpInfo *iiPtr;
 	Tcl_Obj *resultPtr;
 	Tcl_HashEntry *hPtr;
@@ -1031,7 +974,8 @@ NRInterpCmd(
     }
     case OPT_TRANSFER:
     case OPT_SHARE: {
-	Tcl_Interp *masterInterp;	/* The master of the slave. */
+	Tcl_Interp *slaveInterp;		/* A slave. */
+	Tcl_Interp *masterInterp;		/* Its master. */
 	Tcl_Channel chan;
 
 	if (objc != 5) {
@@ -1044,7 +988,7 @@ NRInterpCmd(
 	}
 	chan = Tcl_GetChannel(masterInterp, TclGetString(objv[3]), NULL);
 	if (chan == NULL) {
-	    Tcl_TransferResult(masterInterp, TCL_OK, interp);
+	    TclTransferResult(masterInterp, TCL_OK, interp);
 	    return TCL_ERROR;
 	}
 	slaveInterp = GetInterp(interp, objv[4]);
@@ -1059,17 +1003,18 @@ NRInterpCmd(
 	     */
 
 	    if (Tcl_UnregisterChannel(masterInterp, chan) != TCL_OK) {
-		Tcl_TransferResult(masterInterp, TCL_OK, interp);
+		TclTransferResult(masterInterp, TCL_OK, interp);
 		return TCL_ERROR;
 	    }
 	}
 	return TCL_OK;
     }
     case OPT_TARGET: {
+	Tcl_Interp *slaveInterp;
 	InterpInfo *iiPtr;
 	Tcl_HashEntry *hPtr;
 	Alias *aliasPtr;
-	const char *aliasName;
+	char *aliasName;
 
 	if (objc != 4) {
 	    Tcl_WrongNumArgs(interp, 2, objv, "path alias");
@@ -1086,20 +1031,18 @@ NRInterpCmd(
 	iiPtr = (InterpInfo *) ((Interp *) slaveInterp)->interpInfo;
 	hPtr = Tcl_FindHashEntry(&iiPtr->slave.aliasTable, aliasName);
 	if (hPtr == NULL) {
-	    Tcl_SetObjResult(interp, Tcl_ObjPrintf(
-		    "alias \"%s\" in path \"%s\" not found",
-		    aliasName, Tcl_GetString(objv[2])));
+	    Tcl_AppendResult(interp, "alias \"", aliasName, "\" in path \"",
+		    Tcl_GetString(objv[2]), "\" not found", NULL);
 	    Tcl_SetErrorCode(interp, "TCL", "LOOKUP", "ALIAS", aliasName,
 		    NULL);
 	    return TCL_ERROR;
 	}
 	aliasPtr = Tcl_GetHashValue(hPtr);
 	if (Tcl_GetInterpPath(interp, aliasPtr->targetInterp) != TCL_OK) {
-	    Tcl_SetObjResult(interp, Tcl_ObjPrintf(
-		    "target interpreter for alias \"%s\" in path \"%s\" is "
-		    "not my descendant", aliasName, Tcl_GetString(objv[2])));
-	    Tcl_SetErrorCode(interp, "TCL", "OPERATION", "INTERP",
-		    "TARGETSHROUDED", NULL);
+	    Tcl_ResetResult(interp);
+	    Tcl_AppendResult(interp, "target interpreter for alias \"",
+		    aliasName, "\" in path \"", Tcl_GetString(objv[2]),
+		    "\" is not my descendant", NULL);
 	    return TCL_ERROR;
 	}
 	return TCL_OK;
@@ -1176,7 +1119,8 @@ Tcl_CreateAlias(
     int i;
     int result;
 
-    objv = TclStackAlloc(slaveInterp, (unsigned) sizeof(Tcl_Obj *) * argc);
+    objv = (Tcl_Obj **)
+	    TclStackAlloc(slaveInterp, (unsigned) sizeof(Tcl_Obj *) * argc);
     for (i = 0; i < argc; i++) {
 	objv[i] = Tcl_NewStringObj(argv[i], -1);
 	Tcl_IncrRefCount(objv[i]);
@@ -1277,8 +1221,7 @@ Tcl_GetAlias(
 
     hPtr = Tcl_FindHashEntry(&iiPtr->slave.aliasTable, aliasName);
     if (hPtr == NULL) {
-	Tcl_SetObjResult(interp, Tcl_ObjPrintf(
-		"alias \"%s\" not found", aliasName));
+	Tcl_AppendResult(interp, "alias \"", aliasName, "\" not found", NULL);
 	Tcl_SetErrorCode(interp, "TCL", "LOOKUP", "ALIAS", aliasName, NULL);
 	return TCL_ERROR;
     }
@@ -1297,7 +1240,7 @@ Tcl_GetAlias(
     }
     if (argvPtr != NULL) {
 	*argvPtr = (const char **)
-		ckalloc(sizeof(const char *) * (objc - 1));
+		ckalloc((unsigned) sizeof(const char *) * (objc - 1));
 	for (i = 1; i < objc; i++) {
 	    (*argvPtr)[i - 1] = TclGetString(objv[i]);
 	}
@@ -1339,8 +1282,7 @@ Tcl_GetAliasObj(
 
     hPtr = Tcl_FindHashEntry(&iiPtr->slave.aliasTable, aliasName);
     if (hPtr == NULL) {
-	Tcl_SetObjResult(interp, Tcl_ObjPrintf(
-		"alias \"%s\" not found", aliasName));
+	Tcl_AppendResult(interp, "alias \"", aliasName, "\" not found", NULL);
 	Tcl_SetErrorCode(interp, "TCL", "LOOKUP", "ALIAS", aliasName, NULL);
 	return TCL_ERROR;
     }
@@ -1412,7 +1354,7 @@ TclPreventAliasLoop(
      * chain then we have a loop.
      */
 
-    aliasPtr = cmdPtr->objClientData;
+    aliasPtr = (Alias *) cmdPtr->objClientData;
     nextAliasPtr = aliasPtr;
     while (1) {
 	Tcl_Obj *cmdNamePtr;
@@ -1428,9 +1370,9 @@ TclPreventAliasLoop(
 	     * [Bug #641195]
 	     */
 
-	    Tcl_SetObjResult(interp, Tcl_ObjPrintf(
-		    "cannot define or rename alias \"%s\": interpreter deleted",
-		    Tcl_GetCommandName(cmdInterp, cmd)));
+	    Tcl_AppendResult(interp, "cannot define or rename alias \"",
+		    Tcl_GetCommandName(cmdInterp, cmd),
+		    "\": interpreter deleted", NULL);
 	    return TCL_ERROR;
 	}
 	cmdNamePtr = nextAliasPtr->objPtr;
@@ -1443,11 +1385,9 @@ TclPreventAliasLoop(
 	}
 	aliasCmdPtr = (Command *) aliasCmd;
 	if (aliasCmdPtr == cmdPtr) {
-	    Tcl_SetObjResult(interp, Tcl_ObjPrintf(
-		    "cannot define or rename alias \"%s\": would create a loop",
-		    Tcl_GetCommandName(cmdInterp, cmd)));
-	    Tcl_SetErrorCode(interp, "TCL", "OPERATION", "INTERP",
-		    "ALIASLOOP", NULL);
+	    Tcl_AppendResult(interp, "cannot define or rename alias \"",
+		    Tcl_GetCommandName(cmdInterp, cmd),
+		    "\": would create a loop", NULL);
 	    return TCL_ERROR;
 	}
 
@@ -1460,7 +1400,7 @@ TclPreventAliasLoop(
 	if (aliasCmdPtr->objProc != AliasObjCmd) {
 	    return TCL_OK;
 	}
-	nextAliasPtr = aliasCmdPtr->objClientData;
+	nextAliasPtr = (Alias *) aliasCmdPtr->objClientData;
     }
 
     /* NOTREACHED */
@@ -1503,7 +1443,8 @@ AliasCreate(
     Tcl_Obj **prefv;
     int isNew, i;
 
-    aliasPtr = ckalloc(sizeof(Alias) + objc * sizeof(Tcl_Obj *));
+    aliasPtr = (Alias *) ckalloc((unsigned) (sizeof(Alias)
+	    + objc * sizeof(Tcl_Obj *)));
     aliasPtr->token = namePtr;
     Tcl_IncrRefCount(aliasPtr->token);
     aliasPtr->targetInterp = masterInterp;
@@ -1521,15 +1462,9 @@ AliasCreate(
     Tcl_Preserve(slaveInterp);
     Tcl_Preserve(masterInterp);
 
-    if (slaveInterp == masterInterp) {
-	aliasPtr->slaveCmd = Tcl_NRCreateCommand(slaveInterp,
-		TclGetString(namePtr), AliasObjCmd, AliasNRCmd, aliasPtr,
-		AliasObjCmdDeleteProc);
-    } else {
     aliasPtr->slaveCmd = Tcl_CreateObjCommand(slaveInterp,
 	    TclGetString(namePtr), AliasObjCmd, aliasPtr,
 	    AliasObjCmdDeleteProc);
-    }
 
     if (TclPreventAliasLoop(interp, slaveInterp,
 	    aliasPtr->slaveCmd) != TCL_OK) {
@@ -1554,7 +1489,7 @@ AliasCreate(
 	cmdPtr->deleteData = NULL;
 	Tcl_DeleteCommandFromToken(slaveInterp, aliasPtr->slaveCmd);
 
-	ckfree(aliasPtr);
+	ckfree((char *) aliasPtr);
 
 	/*
 	 * The result was already set by TclPreventAliasLoop.
@@ -1572,7 +1507,7 @@ AliasCreate(
     slavePtr = &((InterpInfo *) ((Interp *) slaveInterp)->interpInfo)->slave;
     while (1) {
 	Tcl_Obj *newToken;
-	const char *string;
+	char *string;
 
 	string = TclGetString(aliasPtr->token);
 	hPtr = Tcl_CreateHashEntry(&slavePtr->aliasTable, string, &isNew);
@@ -1611,11 +1546,11 @@ AliasCreate(
      * interp alias {} foo {} zop		# Now recreate "foo"...
      */
 
-    targetPtr = ckalloc(sizeof(Target));
+    targetPtr = (Target *) ckalloc((unsigned) sizeof(Target));
     targetPtr->slaveCmd = aliasPtr->slaveCmd;
     targetPtr->slaveInterp = slaveInterp;
 
-    masterPtr = &((InterpInfo*) ((Interp*) masterInterp)->interpInfo)->master;
+    masterPtr = &((InterpInfo *) ((Interp*) masterInterp)->interpInfo)->master;
     targetPtr->nextPtr = masterPtr->targetsPtr;
     targetPtr->prevPtr = NULL;
     if (masterPtr->targetsPtr != NULL) {
@@ -1666,8 +1601,8 @@ AliasDelete(
     slavePtr = &((InterpInfo *) ((Interp *) slaveInterp)->interpInfo)->slave;
     hPtr = Tcl_FindHashEntry(&slavePtr->aliasTable, TclGetString(namePtr));
     if (hPtr == NULL) {
-	Tcl_SetObjResult(interp, Tcl_ObjPrintf(
-		"alias \"%s\" not found", TclGetString(namePtr)));
+	Tcl_AppendResult(interp, "alias \"", TclGetString(namePtr),
+		"\" not found", NULL);
 	Tcl_SetErrorCode(interp, "TCL", "LOOKUP", "ALIAS",
 		TclGetString(namePtr), NULL);
 	return TCL_ERROR;
@@ -1784,54 +1719,6 @@ AliasList(
  */
 
 static int
-AliasNRCmd(
-    ClientData clientData,	/* Alias record. */
-    Tcl_Interp *interp,		/* Current interpreter. */
-    int objc,			/* Number of arguments. */
-    Tcl_Obj *const objv[])	/* Argument vector. */
-{
-    Alias *aliasPtr = clientData;
-    int prefc, cmdc, i;
-    Tcl_Obj **prefv, **cmdv;
-    Tcl_Obj *listPtr;
-    List *listRep;
-    int flags = TCL_EVAL_INVOKE;
-
-    /*
-     * Append the arguments to the command prefix and invoke the command in
-     * the target interp's global namespace.
-     */
-
-    prefc = aliasPtr->objc;
-    prefv = &aliasPtr->objPtr;
-    cmdc = prefc + objc - 1;
-
-    listPtr = Tcl_NewListObj(cmdc, NULL);
-    listRep = listPtr->internalRep.twoPtrValue.ptr1;
-    listRep->elemCount = cmdc;
-    cmdv = &listRep->elements;
-
-    prefv = &aliasPtr->objPtr;
-    memcpy(cmdv, prefv, (size_t) (prefc * sizeof(Tcl_Obj *)));
-    memcpy(cmdv+prefc, objv+1, (size_t) ((objc-1) * sizeof(Tcl_Obj *)));
-
-    for (i=0; i<cmdc; i++) {
-	Tcl_IncrRefCount(cmdv[i]);
-    }
-
-    /*
-     * Use the ensemble rewriting machinery to ensure correct error messages:
-     * only the source command should show, not the full target prefix.
-     */
-
-    if (TclInitRewriteEnsemble(interp, 1, prefc, objv)) {
-	TclNRAddCallback(interp, TclClearRootEnsemble, NULL, NULL, NULL, NULL);
-    }
-    TclSkipTailcall(interp);
-    return Tcl_NREvalObj(interp, listPtr, flags);
-}
-
-static int
 AliasObjCmd(
     ClientData clientData,	/* Alias record. */
     Tcl_Interp *interp,		/* Current interpreter. */
@@ -1845,7 +1732,7 @@ AliasObjCmd(
     Tcl_Obj **prefv, **cmdv;
     Tcl_Obj *cmdArr[ALIAS_CMDV_PREALLOC];
     Interp *tPtr = (Interp *) targetInterp;
-    int isRootEnsemble;
+    int isRootEnsemble = (tPtr->ensembleRewrite.sourceObjs == NULL);
 
     /*
      * Append the arguments to the command prefix and invoke the command in
@@ -1858,7 +1745,7 @@ AliasObjCmd(
     if (cmdc <= ALIAS_CMDV_PREALLOC) {
 	cmdv = cmdArr;
     } else {
-	cmdv = TclStackAlloc(interp, cmdc * sizeof(Tcl_Obj *));
+	cmdv = (Tcl_Obj **) TclStackAlloc(interp, cmdc*(int)sizeof(Tcl_Obj*));
     }
 
     memcpy(cmdv, prefv, (size_t) (prefc * sizeof(Tcl_Obj *)));
@@ -1875,7 +1762,13 @@ AliasObjCmd(
      * only the source command should show, not the full target prefix.
      */
 
-    isRootEnsemble = TclInitRewriteEnsemble((Tcl_Interp *)tPtr, 1, prefc, objv);
+    if (isRootEnsemble) {
+	tPtr->ensembleRewrite.sourceObjs = objv;
+	tPtr->ensembleRewrite.numRemovedObjs = 1;
+	tPtr->ensembleRewrite.numInsertedObjs = prefc;
+    } else {
+	tPtr->ensembleRewrite.numInsertedObjs += prefc - 1;
+    }
 
     /*
      * Protect the target interpreter if it isn't the same as the source
@@ -1898,7 +1791,9 @@ AliasObjCmd(
      */
 
     if (isRootEnsemble) {
-	TclResetRewriteEnsemble((Tcl_Interp *)tPtr, 1);
+	tPtr->ensembleRewrite.sourceObjs = NULL;
+	tPtr->ensembleRewrite.numRemovedObjs = 0;
+	tPtr->ensembleRewrite.numInsertedObjs = 0;
     }
 
     /*
@@ -1908,7 +1803,7 @@ AliasObjCmd(
      */
 
     if (targetInterp != interp) {
-	Tcl_TransferResult(targetInterp, result, interp);
+	TclTransferResult(targetInterp, result, interp);
 	Tcl_Release(targetInterp);
     }
 
@@ -1973,8 +1868,8 @@ AliasObjCmdDeleteProc(
 	targetPtr->nextPtr->prevPtr = targetPtr->prevPtr;
     }
 
-    ckfree(targetPtr);
-    ckfree(aliasPtr);
+    ckfree((char *) targetPtr);
+    ckfree((char *) aliasPtr);
 }
 
 /*
@@ -2079,72 +1974,6 @@ Tcl_GetMaster(
 /*
  *----------------------------------------------------------------------
  *
- * TclSetSlaveCancelFlags --
- *
- *	This function marks all slave interpreters belonging to a given
- *	interpreter as being canceled or not canceled, depending on the
- *	provided flags.
- *
- * Results:
- *	None.
- *
- * Side effects:
- *	None.
- *
- *----------------------------------------------------------------------
- */
-
-void
-TclSetSlaveCancelFlags(
-    Tcl_Interp *interp,		/* Set cancel flags of this interpreter. */
-    int flags,			/* Collection of OR-ed bits that control
-				 * the cancellation of the script. Only
-				 * TCL_CANCEL_UNWIND is currently
-				 * supported. */
-    int force)			/* Non-zero to ignore numLevels for the purpose
-				 * of resetting the cancellation flags. */
-{
-    Master *masterPtr;		/* Master record of given interpreter. */
-    Tcl_HashEntry *hPtr;	/* Search element. */
-    Tcl_HashSearch hashSearch;	/* Search variable. */
-    Slave *slavePtr;		/* Slave record of interpreter. */
-    Interp *iPtr;
-
-    if (interp == NULL) {
-	return;
-    }
-
-    flags &= (CANCELED | TCL_CANCEL_UNWIND);
-
-    masterPtr = &((InterpInfo *) ((Interp *) interp)->interpInfo)->master;
-
-    hPtr = Tcl_FirstHashEntry(&masterPtr->slaveTable, &hashSearch);
-    for ( ; hPtr != NULL; hPtr = Tcl_NextHashEntry(&hashSearch)) {
-	slavePtr = Tcl_GetHashValue(hPtr);
-	iPtr = (Interp *) slavePtr->slaveInterp;
-
-	if (iPtr == NULL) {
-	    continue;
-	}
-
-	if (flags == 0) {
-	    TclResetCancellation((Tcl_Interp *) iPtr, force);
-	} else {
-	    TclSetCancelFlags(iPtr, flags);
-	}
-
-	/*
-	 * Now, recursively handle this for the slaves of this slave
-	 * interpreter.
-	 */
-
-	TclSetSlaveCancelFlags((Tcl_Interp *) iPtr, flags, force);
-    }
-}
-
-/*
- *----------------------------------------------------------------------
- *
  * Tcl_GetInterpPath --
  *
  *	Sets the result of the asking interpreter to a proper Tcl list
@@ -2174,19 +2003,17 @@ Tcl_GetInterpPath(
     InterpInfo *iiPtr;
 
     if (targetInterp == askingInterp) {
-	Tcl_SetObjResult(askingInterp, Tcl_NewObj());
 	return TCL_OK;
     }
     if (targetInterp == NULL) {
 	return TCL_ERROR;
     }
     iiPtr = (InterpInfo *) ((Interp *) targetInterp)->interpInfo;
-    if (Tcl_GetInterpPath(askingInterp, iiPtr->slave.masterInterp) != TCL_OK){
+    if (Tcl_GetInterpPath(askingInterp, iiPtr->slave.masterInterp) != TCL_OK) {
 	return TCL_ERROR;
     }
-    Tcl_ListObjAppendElement(NULL, Tcl_GetObjResult(askingInterp),
-	    Tcl_NewStringObj(Tcl_GetHashKey(&iiPtr->master.slaveTable,
-		    iiPtr->slave.slaveEntryPtr), -1));
+    Tcl_AppendElement(askingInterp, Tcl_GetHashKey(&iiPtr->master.slaveTable,
+	    iiPtr->slave.slaveEntryPtr));
     return TCL_OK;
 }
 
@@ -2240,8 +2067,8 @@ GetInterp(
 	}
     }
     if (searchInterp == NULL) {
-	Tcl_SetObjResult(interp, Tcl_ObjPrintf(
-		"could not find interpreter \"%s\"", TclGetString(pathPtr)));
+	Tcl_AppendResult(interp, "could not find interpreter \"",
+		TclGetString(pathPtr), "\"", NULL);
 	Tcl_SetErrorCode(interp, "TCL", "LOOKUP", "INTERP",
 		TclGetString(pathPtr), NULL);
     }
@@ -2278,10 +2105,8 @@ SlaveBgerror(
 
 	if (TCL_ERROR == TclListObjLength(NULL, objv[0], &length)
 		|| (length < 1)) {
-	    Tcl_SetObjResult(interp, Tcl_NewStringObj(
-		    "cmdPrefix must be list of length >= 1", -1));
-	    Tcl_SetErrorCode(interp, "TCL", "OPERATION", "INTERP",
-		    "BGERRORFORMAT", NULL);
+	    Tcl_AppendResult(interp, "cmdPrefix must be list of length >= 1",
+		    NULL);
 	    return TCL_ERROR;
 	}
 	TclSetBgErrorHandler(slaveInterp, objv[0]);
@@ -2319,7 +2144,7 @@ SlaveCreate(
     Slave *slavePtr;
     InterpInfo *masterInfoPtr;
     Tcl_HashEntry *hPtr;
-    const char *path;
+    char *path;
     int isNew, objc;
     Tcl_Obj **objv;
 
@@ -2348,9 +2173,8 @@ SlaveCreate(
     hPtr = Tcl_CreateHashEntry(&masterInfoPtr->master.slaveTable, path,
 	    &isNew);
     if (isNew == 0) {
-	Tcl_SetObjResult(interp, Tcl_ObjPrintf(
-		"interpreter named \"%s\" already exists, cannot create",
-		path));
+	Tcl_AppendResult(interp, "interpreter named \"", path,
+		"\" already exists, cannot create", NULL);
 	return NULL;
     }
 
@@ -2359,8 +2183,8 @@ SlaveCreate(
     slavePtr->masterInterp = masterInterp;
     slavePtr->slaveEntryPtr = hPtr;
     slavePtr->slaveInterp = slaveInterp;
-    slavePtr->interpCmd = Tcl_NRCreateCommand(masterInterp, path,
-	    SlaveObjCmd, NRSlaveCmd, slaveInterp, SlaveObjCmdDeleteProc);
+    slavePtr->interpCmd = Tcl_CreateObjCommand(masterInterp, path,
+	    SlaveObjCmd, slaveInterp, SlaveObjCmdDeleteProc);
     Tcl_InitHashTable(&slavePtr->aliasTable, TCL_STRING_KEYS);
     Tcl_SetHashValue(hPtr, slavePtr);
     Tcl_SetVar(slaveInterp, "tcl_interactive", "0", TCL_GLOBAL_ONLY);
@@ -2418,7 +2242,7 @@ SlaveCreate(
     return slaveInterp;
 
   error:
-    Tcl_TransferResult(slaveInterp, TCL_ERROR, interp);
+    TclTransferResult(slaveInterp, TCL_ERROR, interp);
   error2:
     Tcl_DeleteInterp(slaveInterp);
 
@@ -2449,29 +2273,17 @@ SlaveObjCmd(
     int objc,			/* Number of arguments. */
     Tcl_Obj *const objv[])	/* Argument objects. */
 {
-    return Tcl_NRCallObjProc(interp, NRSlaveCmd, clientData, objc, objv);
-}
-
-static int
-NRSlaveCmd(
-    ClientData clientData,	/* Slave interpreter. */
-    Tcl_Interp *interp,		/* Current interpreter. */
-    int objc,			/* Number of arguments. */
-    Tcl_Obj *const objv[])	/* Argument objects. */
-{
     Tcl_Interp *slaveInterp = clientData;
     int index;
-    static const char *const options[] = {
-	"alias",	"aliases",	"bgerror",	"debug",
-	"eval",		"expose",	"hide",		"hidden",
-	"issafe",	"invokehidden",	"limit",	"marktrusted",
-	"recursionlimit", NULL
+    static const char *options[] = {
+	"alias",	"aliases",	"bgerror",	"debug",	"eval",
+	"expose",	"hide",		"hidden",	"issafe",
+	"invokehidden",	"limit",	"marktrusted",	"recursionlimit", NULL
     };
     enum options {
-	OPT_ALIAS,	OPT_ALIASES,	OPT_BGERROR,	OPT_DEBUG,
-	OPT_EVAL,	OPT_EXPOSE,	OPT_HIDE,	OPT_HIDDEN,
-	OPT_ISSAFE,	OPT_INVOKEHIDDEN, OPT_LIMIT,	OPT_MARKTRUSTED,
-	OPT_RECLIMIT
+	OPT_ALIAS,	OPT_ALIASES,	OPT_BGERROR,	OPT_DEBUG,	OPT_EVAL,
+	OPT_EXPOSE,	OPT_HIDE,	OPT_HIDDEN,	OPT_ISSAFE,
+	OPT_INVOKEHIDDEN, OPT_LIMIT,	OPT_MARKTRUSTED, OPT_RECLIMIT
     };
 
     if (slaveInterp == NULL) {
@@ -2502,7 +2314,7 @@ NRSlaveCmd(
 			objv[3], objc - 4, objv + 4);
 	    }
 	}
-	Tcl_WrongNumArgs(interp, 2, objv, "aliasName ?targetName? ?arg ...?");
+	Tcl_WrongNumArgs(interp, 2, objv, "aliasName ?targetName? ?args..?");
 	return TCL_ERROR;
     case OPT_ALIASES:
 	if (objc != 2) {
@@ -2518,7 +2330,7 @@ NRSlaveCmd(
 	return SlaveBgerror(interp, slaveInterp, objc - 2, objv + 2);
     case OPT_DEBUG:
 	/*
-	 * TIP #378
+	 * TIP #378 *
 	 * Currently only -frame supported, otherwise ?-option ?value? ...?
 	 */
 	if (objc > 4) {
@@ -2558,9 +2370,9 @@ NRSlaveCmd(
 	Tcl_SetObjResult(interp, Tcl_NewBooleanObj(Tcl_IsSafe(slaveInterp)));
 	return TCL_OK;
     case OPT_INVOKEHIDDEN: {
-	int i;
+	int i, index;
 	const char *namespaceName;
-	static const char *const hiddenOptions[] = {
+	static const char *hiddenOptions[] = {
 	    "-global",	"-namespace",	"--", NULL
 	};
 	enum hiddenOption {
@@ -2598,7 +2410,7 @@ NRSlaveCmd(
 		objc - i, objv + i);
     }
     case OPT_LIMIT: {
-	static const char *const limitTypes[] = {
+	static const char *limitTypes[] = {
 	    "commands", "time", NULL
 	};
 	enum LimitTypes {
@@ -2607,7 +2419,7 @@ NRSlaveCmd(
 	int limitType;
 
 	if (objc < 3) {
-	    Tcl_WrongNumArgs(interp, 2, objv, "limitType ?-option value ...?");
+	    Tcl_WrongNumArgs(interp, 2, objv, "limitType ?options?");
 	    return TCL_ERROR;
 	}
 	if (Tcl_GetIndexFromObj(interp, objv[2], limitTypes, "limit type", 0,
@@ -2697,7 +2509,7 @@ SlaveObjCmdDeleteProc(
  *	A standard Tcl result.
  *
  * Side effects:
- *	May modify INTERP_DEBUG_FRAME flag in the slave.
+ *	May modify INTERP_DEBUG flag in the slave.
  *
  *----------------------------------------------------------------------
  */
@@ -2710,7 +2522,7 @@ SlaveDebugCmd(
     int objc,			/* Number of arguments. */
     Tcl_Obj *const objv[])	/* Argument objects. */
 {
-    static const char *const debugTypes[] = {
+    static const char *debugTypes[] = {
 	"-frame", NULL
     };
     enum DebugTypes {
@@ -2729,8 +2541,8 @@ SlaveDebugCmd(
 		Tcl_NewBooleanObj(iPtr->flags & INTERP_DEBUG_FRAME));
 	Tcl_SetObjResult(interp, resultPtr);
     } else {
-	if (Tcl_GetIndexFromObj(interp, objv[0], debugTypes, "debug option",
-		0, &debugType) != TCL_OK) {
+	if (Tcl_GetIndexFromObj(interp, objv[0], debugTypes,
+			"debug option", 0, &debugType) != TCL_OK) {
 	    return TCL_ERROR;
 	}
 	if (debugType == DEBUG_TYPE_FRAME) {
@@ -2739,13 +2551,11 @@ SlaveDebugCmd(
 			!= TCL_OK) {
 		    return TCL_ERROR;
 		}
-
 		/*
-		 * Quietly ignore attempts to disable interp debugging.  This
-		 * is a one-way switch as frame debug info is maintained in a
-		 * stack that must be consistent once turned on.
+		 * Quietly ignore attempts to disable interp debugging.
+		 * This is a one-way switch as frame debug info is maintained
+		 * in a stack that must be consistent once turned on.
 		 */
-
 		if (debugType) {
 		    iPtr->flags |= INTERP_DEBUG_FRAME;
 		}
@@ -2782,16 +2592,7 @@ SlaveEval(
     Tcl_Obj *const objv[])	/* Argument objects. */
 {
     int result;
-
-    /*
-     * TIP #285: If necessary, reset the cancellation flags for the slave
-     * interpreter now; otherwise, canceling a script in a master interpreter
-     * can result in a situation where a slave interpreter can no longer
-     * evaluate any scripts unless somebody calls the TclResetCancellation
-     * function for that particular Tcl_Interp.
-     */
-
-    TclSetSlaveCancelFlags(slaveInterp, 0, 0);
+    Tcl_Obj *objPtr;
 
     Tcl_Preserve(slaveInterp);
     Tcl_AllowExceptions(slaveInterp);
@@ -2801,20 +2602,19 @@ SlaveEval(
 	 * TIP #280: Make actual argument location available to eval'd script.
 	 */
 
-	Interp *iPtr = (Interp *) interp;
-	CmdFrame *invoker = iPtr->cmdFramePtr;
-	int word = 0;
+        Interp *iPtr = (Interp *) interp;
+	CmdFrame* invoker = iPtr->cmdFramePtr;
+	int word          = 0;
 
-	TclArgumentGet(interp, objv[0], &invoker, &word);
-
+	TclArgumentGet (interp, objv[0], &invoker, &word);
 	result = TclEvalObjEx(slaveInterp, objv[0], 0, invoker, word);
     } else {
-	Tcl_Obj *objPtr = Tcl_ConcatObj(objc, objv);
+	objPtr = Tcl_ConcatObj(objc, objv);
 	Tcl_IncrRefCount(objPtr);
 	result = Tcl_EvalObjEx(slaveInterp, objPtr, 0);
 	Tcl_DecrRefCount(objPtr);
     }
-    Tcl_TransferResult(slaveInterp, result, interp);
+    TclTransferResult(slaveInterp, result, interp);
 
     Tcl_Release(slaveInterp);
     return result;
@@ -2844,21 +2644,19 @@ SlaveExpose(
     int objc,			/* Number of arguments. */
     Tcl_Obj *const objv[])	/* Argument strings. */
 {
-    const char *name;
+    char *name;
 
     if (Tcl_IsSafe(interp)) {
 	Tcl_SetObjResult(interp, Tcl_NewStringObj(
 		"permission denied: safe interpreter cannot expose commands",
 		-1));
-	Tcl_SetErrorCode(interp, "TCL", "OPERATION", "INTERP", "UNSAFE",
-		NULL);
 	return TCL_ERROR;
     }
 
     name = TclGetString(objv[(objc == 1) ? 0 : 1]);
     if (Tcl_ExposeCommand(slaveInterp, TclGetString(objv[0]),
 	    name) != TCL_OK) {
-	Tcl_TransferResult(slaveInterp, TCL_ERROR, interp);
+	TclTransferResult(slaveInterp, TCL_ERROR, interp);
 	return TCL_ERROR;
     }
     return TCL_OK;
@@ -2893,10 +2691,8 @@ SlaveRecursionLimit(
 
     if (objc) {
 	if (Tcl_IsSafe(interp)) {
-	    Tcl_SetObjResult(interp, Tcl_NewStringObj("permission denied: "
-		    "safe interpreters cannot change recursion limit", -1));
-	    Tcl_SetErrorCode(interp, "TCL", "OPERATION", "INTERP", "UNSAFE",
-		    NULL);
+	    Tcl_AppendResult(interp, "permission denied: "
+		    "safe interpreters cannot change recursion limit", NULL);
 	    return TCL_ERROR;
 	}
 	if (TclGetIntFromObj(interp, objv[0], &limit) == TCL_ERROR) {
@@ -2905,8 +2701,6 @@ SlaveRecursionLimit(
 	if (limit <= 0) {
 	    Tcl_SetObjResult(interp, Tcl_NewStringObj(
 		    "recursion limit must be > 0", -1));
-	    Tcl_SetErrorCode(interp, "TCL", "OPERATION", "INTERP", "BADLIMIT",
-		    NULL);
 	    return TCL_ERROR;
 	}
 	Tcl_SetRecursionLimit(slaveInterp, limit);
@@ -2914,7 +2708,6 @@ SlaveRecursionLimit(
 	if (interp == slaveInterp && iPtr->numLevels > limit) {
 	    Tcl_SetObjResult(interp, Tcl_NewStringObj(
 		    "falling back due to new recursion limit", -1));
-	    Tcl_SetErrorCode(interp, "TCL", "RECURSION", NULL);
 	    return TCL_ERROR;
 	}
 	Tcl_SetObjResult(interp, objv[0]);
@@ -2950,20 +2743,18 @@ SlaveHide(
     int objc,			/* Number of arguments. */
     Tcl_Obj *const objv[])	/* Argument strings. */
 {
-    const char *name;
+    char *name;
 
     if (Tcl_IsSafe(interp)) {
 	Tcl_SetObjResult(interp, Tcl_NewStringObj(
 		"permission denied: safe interpreter cannot hide commands",
 		-1));
-	Tcl_SetErrorCode(interp, "TCL", "OPERATION", "INTERP", "UNSAFE",
-		NULL);
 	return TCL_ERROR;
     }
 
     name = TclGetString(objv[(objc == 1) ? 0 : 1]);
     if (Tcl_HideCommand(slaveInterp, TclGetString(objv[0]), name) != TCL_OK) {
-	Tcl_TransferResult(slaveInterp, TCL_ERROR, interp);
+	TclTransferResult(slaveInterp, TCL_ERROR, interp);
 	return TCL_ERROR;
     }
     return TCL_OK;
@@ -3040,8 +2831,6 @@ SlaveInvokeHidden(
 	Tcl_SetObjResult(interp, Tcl_NewStringObj(
 		"not allowed to invoke hidden commands from safe interpreter",
 		-1));
-	Tcl_SetErrorCode(interp, "TCL", "OPERATION", "INTERP", "UNSAFE",
-		NULL);
 	return TCL_ERROR;
     }
 
@@ -3049,11 +2838,7 @@ SlaveInvokeHidden(
     Tcl_AllowExceptions(slaveInterp);
 
     if (namespaceName == NULL) {
-	NRE_callback *rootPtr = TOP_CB(slaveInterp);
-
-	Tcl_NRAddCallback(interp, NRPostInvokeHidden, slaveInterp,
-		rootPtr, NULL, NULL);
-	return TclNRInvoke(NULL, slaveInterp, objc, objv);
+	result = TclObjInvoke(slaveInterp, objc, objv, TCL_INVOKE_HIDDEN);
     } else {
 	Namespace *nsPtr, *dummy1, *dummy2;
 	const char *tail;
@@ -3063,29 +2848,12 @@ SlaveInvokeHidden(
 		| TCL_CREATE_NS_IF_UNKNOWN, &nsPtr, &dummy1, &dummy2, &tail);
 	if (result == TCL_OK) {
 	    result = TclObjInvokeNamespace(slaveInterp, objc, objv,
-		    (Tcl_Namespace *) nsPtr, TCL_INVOKE_HIDDEN);
+		    (Tcl_Namespace *)nsPtr, TCL_INVOKE_HIDDEN);
 	}
     }
 
-    Tcl_TransferResult(slaveInterp, result, interp);
+    TclTransferResult(slaveInterp, result, interp);
 
-    Tcl_Release(slaveInterp);
-    return result;
-}
-
-static int
-NRPostInvokeHidden(
-    ClientData data[],
-    Tcl_Interp *interp,
-    int result)
-{
-    Tcl_Interp *slaveInterp = (Tcl_Interp *)data[0];
-    NRE_callback *rootPtr = (NRE_callback *)data[1];
-
-    if (interp != slaveInterp) {
-	result = TclNRRunCallbacks(slaveInterp, result, rootPtr);
-	Tcl_TransferResult(slaveInterp, result, interp);
-    }
     Tcl_Release(slaveInterp);
     return result;
 }
@@ -3117,8 +2885,6 @@ SlaveMarkTrusted(
 	Tcl_SetObjResult(interp, Tcl_NewStringObj(
 		"permission denied: safe interpreter cannot mark trusted",
 		-1));
-	Tcl_SetErrorCode(interp, "TCL", "OPERATION", "INTERP", "UNSAFE",
-		NULL);
 	return TCL_ERROR;
     }
     ((Interp *) slaveInterp)->flags &= ~SAFE_INTERP;
@@ -3374,9 +3140,8 @@ Tcl_LimitCheck(
 	if (iPtr->limit.cmdCount >= iPtr->cmdCount) {
 	    iPtr->limit.exceeded &= ~TCL_LIMIT_COMMANDS;
 	} else if (iPtr->limit.exceeded & TCL_LIMIT_COMMANDS) {
-	    Tcl_SetObjResult(interp, Tcl_NewStringObj(
-		    "command count limit exceeded", -1));
-	    Tcl_SetErrorCode(interp, "TCL", "LIMIT", "COMMANDS", NULL);
+	    Tcl_ResetResult(interp);
+	    Tcl_AppendResult(interp, "command count limit exceeded", NULL);
 	    Tcl_Release(interp);
 	    return TCL_ERROR;
 	}
@@ -3400,9 +3165,8 @@ Tcl_LimitCheck(
 		    iPtr->limit.time.usec >= now.usec)) {
 		iPtr->limit.exceeded &= ~TCL_LIMIT_TIME;
 	    } else if (iPtr->limit.exceeded & TCL_LIMIT_TIME) {
-		Tcl_SetObjResult(interp, Tcl_NewStringObj(
-			"time limit exceeded", -1));
-		Tcl_SetErrorCode(interp, "TCL", "LIMIT", "TIME", NULL);
+		Tcl_ResetResult(interp);
+		Tcl_AppendResult(interp, "time limit exceeded", NULL);
 		Tcl_Release(interp);
 		return TCL_ERROR;
 	    }
@@ -3455,7 +3219,7 @@ RunLimitHandlers(
 	 */
 
 	handlerPtr->flags |= LIMIT_HANDLER_ACTIVE;
-	handlerPtr->handlerProc(handlerPtr->clientData, interp);
+	(handlerPtr->handlerProc)(handlerPtr->clientData, interp);
 	handlerPtr->flags &= ~LIMIT_HANDLER_ACTIVE;
 
 	/*
@@ -3476,9 +3240,9 @@ RunLimitHandlers(
 
 	if (handlerPtr->flags & LIMIT_HANDLER_DELETED) {
 	    if (handlerPtr->deleteProc != NULL) {
-		handlerPtr->deleteProc(handlerPtr->clientData);
+		(handlerPtr->deleteProc)(handlerPtr->clientData);
 	    }
-	    ckfree(handlerPtr);
+	    ckfree((char *) handlerPtr);
 	}
     }
 }
@@ -3525,7 +3289,7 @@ Tcl_LimitAddHandler(
      * Allocate a handler record.
      */
 
-    handlerPtr = ckalloc(sizeof(LimitHandler));
+    handlerPtr = (LimitHandler *) ckalloc(sizeof(LimitHandler));
     handlerPtr->flags = 0;
     handlerPtr->handlerProc = handlerProc;
     handlerPtr->clientData = clientData;
@@ -3642,9 +3406,9 @@ Tcl_LimitRemoveHandler(
 
 	if (!(handlerPtr->flags & LIMIT_HANDLER_ACTIVE)) {
 	    if (handlerPtr->deleteProc != NULL) {
-		handlerPtr->deleteProc(handlerPtr->clientData);
+		(handlerPtr->deleteProc)(handlerPtr->clientData);
 	    }
-	    ckfree(handlerPtr);
+	    ckfree((char *) handlerPtr);
 	}
 	return;
     }
@@ -3702,9 +3466,9 @@ TclLimitRemoveAllHandlers(
 
 	if (!(handlerPtr->flags & LIMIT_HANDLER_ACTIVE)) {
 	    if (handlerPtr->deleteProc != NULL) {
-		handlerPtr->deleteProc(handlerPtr->clientData);
+		(handlerPtr->deleteProc)(handlerPtr->clientData);
 	    }
-	    ckfree(handlerPtr);
+	    ckfree((char *) handlerPtr);
 	}
     }
 
@@ -3735,9 +3499,9 @@ TclLimitRemoveAllHandlers(
 
 	if (!(handlerPtr->flags & LIMIT_HANDLER_ACTIVE)) {
 	    if (handlerPtr->deleteProc != NULL) {
-		handlerPtr->deleteProc(handlerPtr->clientData);
+		(handlerPtr->deleteProc)(handlerPtr->clientData);
 	    }
-	    ckfree(handlerPtr);
+	    ckfree((char *) handlerPtr);
 	}
     }
 
@@ -4000,7 +3764,7 @@ TimeLimitCallback(
     code = Tcl_LimitCheck(interp);
     if (code != TCL_OK) {
 	Tcl_AddErrorInfo(interp, "\n    (while waiting for event)");
-	Tcl_BackgroundException(interp, code);
+	TclBackgroundException(interp, code);
     }
     Tcl_Release(interp);
 }
@@ -4132,7 +3896,7 @@ DeleteScriptLimitCallback(
     if (limitCBPtr->entryPtr != NULL) {
 	Tcl_DeleteHashEntry(limitCBPtr->entryPtr);
     }
-    ckfree(limitCBPtr);
+    ckfree((char *) limitCBPtr);
 }
 
 /*
@@ -4168,7 +3932,7 @@ CallScriptLimitCallback(
     code = Tcl_EvalObjEx(limitCBPtr->interp, limitCBPtr->scriptObj,
 	    TCL_EVAL_GLOBAL);
     if (code != TCL_OK && !Tcl_InterpDeleted(limitCBPtr->interp)) {
-	Tcl_BackgroundException(limitCBPtr->interp, code);
+	TclBackgroundException(limitCBPtr->interp, code);
     }
     Tcl_Release(limitCBPtr->interp);
 }
@@ -4223,7 +3987,7 @@ SetScriptLimitCallback(
 	return;
     }
 
-    hashPtr = Tcl_CreateHashEntry(&iPtr->limit.callbacks, &key,
+    hashPtr = Tcl_CreateHashEntry(&iPtr->limit.callbacks, (char *) &key,
 	    &isNew);
     if (!isNew) {
 	limitCBPtr = Tcl_GetHashValue(hashPtr);
@@ -4232,7 +3996,7 @@ SetScriptLimitCallback(
 		limitCBPtr);
     }
 
-    limitCBPtr = ckalloc(sizeof(ScriptLimitCallback));
+    limitCBPtr = (ScriptLimitCallback *) ckalloc(sizeof(ScriptLimitCallback));
     limitCBPtr->interp = interp;
     limitCBPtr->scriptObj = scriptObj;
     limitCBPtr->entryPtr = hashPtr;
@@ -4387,7 +4151,7 @@ SlaveCommandLimitCmd(
     int objc,			/* Total number of arguments. */
     Tcl_Obj *const objv[])	/* Argument objects. */
 {
-    static const char *const options[] = {
+    static const char *options[] = {
 	"-command", "-granularity", "-value", NULL
     };
     enum Options {
@@ -4407,9 +4171,8 @@ SlaveCommandLimitCmd(
      */
 
     if (interp == slaveInterp) {
-	Tcl_SetObjResult(interp, Tcl_NewStringObj(
-		"limits on current interpreter inaccessible", -1));
-	Tcl_SetErrorCode(interp, "TCL", "OPERATION", "INTERP", "SELF", NULL);
+	Tcl_AppendResult(interp,
+		"limits on current interpreter inaccessible", NULL);
 	return TCL_ERROR;
     }
 
@@ -4482,7 +4245,8 @@ SlaveCommandLimitCmd(
 	}
 	return TCL_OK;
     } else if ((objc-consumedObjc) & 1 /* isOdd(objc-consumedObjc) */) {
-	Tcl_WrongNumArgs(interp, consumedObjc, objv, "?-option value ...?");
+	Tcl_WrongNumArgs(interp, consumedObjc, objv,
+		"?-option? ?value? ?-option value ...?");
 	return TCL_ERROR;
     } else {
 	int i, scriptLen = 0, limitLen = 0;
@@ -4505,10 +4269,8 @@ SlaveCommandLimitCmd(
 		    return TCL_ERROR;
 		}
 		if (gran < 1) {
-		    Tcl_SetObjResult(interp, Tcl_NewStringObj(
-			    "granularity must be at least 1", -1));
-		    Tcl_SetErrorCode(interp, "TCL", "OPERATION", "INTERP",
-			    "BADVALUE", NULL);
+		    Tcl_AppendResult(interp, "granularity must be at "
+			    "least 1", NULL);
 		    return TCL_ERROR;
 		}
 		break;
@@ -4522,10 +4284,8 @@ SlaveCommandLimitCmd(
 		    return TCL_ERROR;
 		}
 		if (limit < 0) {
-		    Tcl_SetObjResult(interp, Tcl_NewStringObj(
-			    "command limit value must be at least 0", -1));
-		    Tcl_SetErrorCode(interp, "TCL", "OPERATION", "INTERP",
-			    "BADVALUE", NULL);
+		    Tcl_AppendResult(interp, "command limit value must be at "
+			    "least 0", NULL);
 		    return TCL_ERROR;
 		}
 		break;
@@ -4575,7 +4335,7 @@ SlaveTimeLimitCmd(
     int objc,				/* Total number of arguments. */
     Tcl_Obj *const objv[])		/* Argument objects. */
 {
-    static const char *const options[] = {
+    static const char *options[] = {
 	"-command", "-granularity", "-milliseconds", "-seconds", NULL
     };
     enum Options {
@@ -4595,9 +4355,8 @@ SlaveTimeLimitCmd(
      */
 
     if (interp == slaveInterp) {
-	Tcl_SetObjResult(interp, Tcl_NewStringObj(
-		"limits on current interpreter inaccessible", -1));
-	Tcl_SetErrorCode(interp, "TCL", "OPERATION", "INTERP", "SELF", NULL);
+	Tcl_AppendResult(interp,
+		"limits on current interpreter inaccessible", NULL);
 	return TCL_ERROR;
     }
 
@@ -4687,7 +4446,8 @@ SlaveTimeLimitCmd(
 	}
 	return TCL_OK;
     } else if ((objc-consumedObjc) & 1 /* isOdd(objc-consumedObjc) */) {
-	Tcl_WrongNumArgs(interp, consumedObjc, objv, "?-option value ...?");
+	Tcl_WrongNumArgs(interp, consumedObjc, objv,
+		"?-option? ?value? ?-option value ...?");
 	return TCL_ERROR;
     } else {
 	int i, scriptLen = 0, milliLen = 0, secLen = 0;
@@ -4714,10 +4474,8 @@ SlaveTimeLimitCmd(
 		    return TCL_ERROR;
 		}
 		if (gran < 1) {
-		    Tcl_SetObjResult(interp, Tcl_NewStringObj(
-			    "granularity must be at least 1", -1));
-		    Tcl_SetErrorCode(interp, "TCL", "OPERATION", "INTERP",
-			    "BADVALUE", NULL);
+		    Tcl_AppendResult(interp, "granularity must be at "
+			    "least 1", NULL);
 		    return TCL_ERROR;
 		}
 		break;
@@ -4731,13 +4489,11 @@ SlaveTimeLimitCmd(
 		    return TCL_ERROR;
 		}
 		if (tmp < 0) {
-		    Tcl_SetObjResult(interp, Tcl_NewStringObj(
-			    "milliseconds must be at least 0", -1));
-		    Tcl_SetErrorCode(interp, "TCL", "OPERATION", "INTERP",
-			    "BADVALUE", NULL);
+		    Tcl_AppendResult(interp, "milliseconds must be at least 0",
+			    NULL);
 		    return TCL_ERROR;
 		}
-		limitMoment.usec = ((long) tmp)*1000;
+		limitMoment.usec = ((long)tmp)*1000;
 		break;
 	    case OPT_SEC:
 		secObj = objv[i+1];
@@ -4749,10 +4505,8 @@ SlaveTimeLimitCmd(
 		    return TCL_ERROR;
 		}
 		if (tmp < 0) {
-		    Tcl_SetObjResult(interp, Tcl_NewStringObj(
-			    "seconds must be at least 0", -1));
-		    Tcl_SetErrorCode(interp, "TCL", "OPERATION", "INTERP",
-			    "BADVALUE", NULL);
+		    Tcl_AppendResult(interp, "seconds must be at least 0",
+			    NULL);
 		    return TCL_ERROR;
 		}
 		limitMoment.sec = tmp;
@@ -4767,19 +4521,13 @@ SlaveTimeLimitCmd(
 		 */
 
 		if (secObj != NULL && secLen == 0 && milliLen > 0) {
-		    Tcl_SetObjResult(interp, Tcl_NewStringObj(
-			    "may only set -milliseconds if -seconds is not "
-			    "also being reset", -1));
-		    Tcl_SetErrorCode(interp, "TCL", "OPERATION", "INTERP",
-			    "BADUSAGE", NULL);
+		    Tcl_AppendResult(interp, "may only set -milliseconds "
+			    "if -seconds is not also being reset", NULL);
 		    return TCL_ERROR;
 		}
 		if (milliLen == 0 && (secObj == NULL || secLen > 0)) {
-		    Tcl_SetObjResult(interp, Tcl_NewStringObj(
-			    "may only reset -milliseconds if -seconds is "
-			    "also being reset", -1));
-		    Tcl_SetErrorCode(interp, "TCL", "OPERATION", "INTERP",
-			    "BADUSAGE", NULL);
+		    Tcl_AppendResult(interp, "may only reset -milliseconds "
+			    "if -seconds is also being reset", NULL);
 		    return TCL_ERROR;
 		}
 	    }

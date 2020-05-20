@@ -44,13 +44,13 @@ typedef struct ChannelBuffer {
     int bufLength;		/* How big is the buffer? */
     struct ChannelBuffer *nextPtr;
     				/* Next buffer in chain. */
-    char buf[1];		/* Placeholder for real buffer. The real
-				 * buffer occuppies this space + bufSize-1
+    char buf[4];		/* Placeholder for real buffer. The real
+				 * buffer occuppies this space + bufSize-4
 				 * bytes. This must be the last field in the
 				 * structure. */
 } ChannelBuffer;
 
-#define CHANNELBUFFER_HEADER_SIZE	TclOffset(ChannelBuffer, buf)
+#define CHANNELBUFFER_HEADER_SIZE	(sizeof(ChannelBuffer) - 4)
 
 /*
  * How much extra space to allocate in buffer to hold bytes from previous
@@ -98,7 +98,7 @@ typedef struct Channel {
     struct ChannelState *state; /* Split out state information */
     ClientData instanceData;	/* Instance-specific data provided by creator
 				 * of channel. */
-    const Tcl_ChannelType *typePtr; /* Pointer to channel type structure. */
+    Tcl_ChannelType *typePtr;	/* Pointer to channel type structure. */
     struct Channel *downChanPtr;/* Refers to channel this one was stacked
 				 * upon. This reference is NULL for normal
 				 * channels. See Tcl_StackChannel. */
@@ -214,8 +214,6 @@ typedef struct ChannelState {
 				 * because it happened in the background. The
 				 * value is the chanMg, if any. #219's
 				 * companion to 'unreportedError'. */
-    int epoch;			/* Used to test validity of stored channelname
-				 * lookup results. */
 } ChannelState;
 
 /*
@@ -277,16 +275,10 @@ typedef struct ChannelState {
 					 * usable, but it may not be closed
 					 * again from within the close
 					 * handler. */
-#define CHANNEL_CLOSEDWRITE	(1<<21)	/* Channel write side has been closed.
-					 * No further Tcl-level write IO on
-					 * the channel is allowed. */
-
-/*
- * The length of time to wait between synthetic timer events. Must be zero or
- * bad things tend to happen.
- */
-
-#define SYNTHETIC_EVENT_TIME	0
+#define CHANNEL_TAINTED		(1<<20)	/* Channel stack structure has changed.
+					 * Used by Channel Tcl_Obj type to
+					 * determine if we have to revalidate
+					 * the channel. */
 
 /*
  * Local Variables:

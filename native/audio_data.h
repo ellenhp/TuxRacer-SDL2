@@ -28,38 +28,38 @@ extern "C"
 #include "tuxracer.h"
 
 #if defined(HAVE_SDL) && defined(HAVE_SDL_MIXER)
-   
+
 #include "SDL.h"
 #include "SDL_mixer.h"
 
 #else
 
-typedef int Mix_Chunk;
-typedef int Mix_Music;
+    typedef int Mix_Chunk;
+    typedef int Mix_Music;
 
 #endif /* defined(HAVE_SDL) && defined(HAVE_SDL_MIXER) */
 
-void init_audio_data();
+    void init_audio_data();
 
-/* SOUND */
-bool_t load_sound( char *name, char *filename ) ;
-bool_t get_sound_data( char *name, Mix_Chunk **data );
-void incr_sound_data_ref_ctr( char *name ) ;
-void decr_sound_data_ref_ctr( char *name ) ;
-void delete_unused_audio_data();
-bool_t is_sound_data_dirty();
-void mark_sound_data_clean();
-void register_sound_data_tcl_callbacks( Tcl_Interp *ip );
+    /* SOUND */
+    bool_t load_sound(char *name, char *filename);
+    bool_t get_sound_data(char *name, Mix_Chunk **data);
+    void incr_sound_data_ref_ctr(char *name);
+    void decr_sound_data_ref_ctr(char *name);
+    void delete_unused_audio_data();
+    bool_t is_sound_data_dirty();
+    void mark_sound_data_clean();
+    void register_sound_data_tcl_callbacks(Tcl_Interp *ip);
 
-/* MUSIC */
-bool_t load_music( char *name, char *filename ) ;
-bool_t get_music_data( char *name, Mix_Music **data );
-void set_music_playing_status( char *name, bool_t playing );
-bool_t get_music_playing_status( char *name );
-void incr_music_data_ref_ctr( char *name ) ;
-void decr_music_data_ref_ctr( char *name ) ;
-bool_t is_music_data_dirty();
-void mark_music_data_clean();
+    /* MUSIC */
+    bool_t load_music(char *name, char *filename);
+    bool_t get_music_data(char *name, Mix_Music **data);
+    void set_music_playing_status(char *name, bool_t playing);
+    bool_t get_music_playing_status(char *name);
+    void incr_music_data_ref_ctr(char *name);
+    void decr_music_data_ref_ctr(char *name);
+    bool_t is_music_data_dirty();
+    void mark_music_data_clean();
 
 #endif /* AUDIO_DATA_H */
 

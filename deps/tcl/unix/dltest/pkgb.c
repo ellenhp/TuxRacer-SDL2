@@ -11,7 +11,6 @@
  * this file, and for a DISCLAIMER OF ALL WARRANTIES.
  */
 
-#undef STATIC_BUILD
 #include "tcl.h"
 
 /*
@@ -19,11 +18,9 @@
  */
 
 static int    Pkgb_SubObjCmd(ClientData clientData,
-		Tcl_Interp *interp, int objc, Tcl_Obj *const objv[]);
+		Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]);
 static int    Pkgb_UnsafeObjCmd(ClientData clientData,
-		Tcl_Interp *interp, int objc, Tcl_Obj *const objv[]);
-static int    Pkgb_DemoObjCmd(ClientData clientData,
-		Tcl_Interp *interp, int objc, Tcl_Obj *const objv[]);
+		Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]);
 
 /*
  *----------------------------------------------------------------------
@@ -51,7 +48,7 @@ Pkgb_SubObjCmd(
     ClientData dummy,		/* Not used. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int objc,			/* Number of arguments. */
-    Tcl_Obj *const objv[])	/* Argument objects. */
+    Tcl_Obj *CONST objv[])	/* Argument objects. */
 {
     int first, second;
 
@@ -92,29 +89,9 @@ Pkgb_UnsafeObjCmd(
     ClientData dummy,		/* Not used. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int objc,			/* Number of arguments. */
-    Tcl_Obj *const objv[])	/* Argument objects. */
+    Tcl_Obj *CONST objv[])	/* Argument objects. */
 {
     return Tcl_EvalEx(interp, "list unsafe command invoked", -1, TCL_EVAL_GLOBAL);
-}
-
-static int
-Pkgb_DemoObjCmd(
-    ClientData dummy,		/* Not used. */
-    Tcl_Interp *interp,		/* Current interpreter. */
-    int objc,			/* Number of arguments. */
-    Tcl_Obj *const objv[])	/* Argument objects. */
-{
-#if (TCL_MAJOR_VERSION > 8) || (TCL_MINOR_VERSION > 4)
-    Tcl_Obj *first;
-
-    if (Tcl_ListObjIndex(NULL, Tcl_GetEncodingSearchPath(), 0, &first)
-	    == TCL_OK) {
-	Tcl_SetObjResult(interp, first);
-    }
-#else
-    Tcl_SetObjResult(interp, Tcl_NewStringObj(Tcl_GetDefaultEncodingDir(), -1));
-#endif
-    return TCL_OK;
 }
 
 /*
@@ -141,16 +118,20 @@ Pkgb_Init(
 {
     int code;
 
-    if (Tcl_InitStubs(interp, "8.5-", 0) == NULL) {
-	return TCL_ERROR;
+    if (Tcl_InitStubs(interp, "8.4", 0) == NULL) {
+	if (Tcl_InitStubs(interp, "8.4-", 0) == NULL) {
+	    return TCL_ERROR;
+	}
+	Tcl_ResetResult(interp);
     }
     code = Tcl_PkgProvide(interp, "Pkgb", "2.3");
     if (code != TCL_OK) {
 	return code;
     }
-    Tcl_CreateObjCommand(interp, "pkgb_sub", Pkgb_SubObjCmd, NULL, NULL);
-    Tcl_CreateObjCommand(interp, "pkgb_unsafe", Pkgb_UnsafeObjCmd, NULL, NULL);
-    Tcl_CreateObjCommand(interp, "pkgb_demo", Pkgb_DemoObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand(interp, "pkgb_sub", Pkgb_SubObjCmd,
+	    (ClientData) 0, (Tcl_CmdDeleteProc *) NULL);
+    Tcl_CreateObjCommand(interp, "pkgb_unsafe", Pkgb_UnsafeObjCmd,
+	    (ClientData) 0, (Tcl_CmdDeleteProc *) NULL);
     return TCL_OK;
 }
 
@@ -178,13 +159,17 @@ Pkgb_SafeInit(
 {
     int code;
 
-    if (Tcl_InitStubs(interp, "8.5-", 0) == NULL) {
-	return TCL_ERROR;
+    if (Tcl_InitStubs(interp, "8.4", 0) == NULL) {
+	if (Tcl_InitStubs(interp, "8.4-", 0) == NULL) {
+	    return TCL_ERROR;
+	}
+	Tcl_ResetResult(interp);
     }
     code = Tcl_PkgProvide(interp, "Pkgb", "2.3");
     if (code != TCL_OK) {
 	return code;
     }
-    Tcl_CreateObjCommand(interp, "pkgb_sub", Pkgb_SubObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand(interp, "pkgb_sub", Pkgb_SubObjCmd, (ClientData) 0,
+	    (Tcl_CmdDeleteProc *) NULL);
     return TCL_OK;
 }

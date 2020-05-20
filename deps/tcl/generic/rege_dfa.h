@@ -36,16 +36,17 @@
  */
 static chr *			/* endpoint, or NULL */
 longest(
-    struct vars *const v,	/* used only for debug and exec flags */
-    struct dfa *const d,
-    chr *const start,		/* where the match should start */
-    chr *const stop,		/* match must end at or before here */
-    int *const hitstopp)	/* record whether hit v->stop, if non-NULL */
+    struct vars *v,		/* used only for debug and exec flags */
+    struct dfa *d,
+    chr *start,			/* where the match should start */
+    chr *stop,			/* match must end at or before here */
+    int *hitstopp)		/* record whether hit v->stop, if non-NULL */
 {
     chr *cp;
     chr *realstop = (stop == v->stop) ? stop : stop + 1;
     color co;
-    struct sset *css, *ss;
+    struct sset *css;
+    struct sset *ss;
     chr *post;
     int i;
     struct colormap *cm = d->cm;
@@ -84,7 +85,7 @@ longest(
 
     if (v->eflags&REG_FTRACE) {
 	while (cp < realstop) {
-	    FDEBUG(("+++ at c%d +++\n", (int) (css - d->ssets)));
+	    FDEBUG(("+++ at c%d +++\n", css - d->ssets));
 	    co = GETCOLOR(cm, *cp);
 	    FDEBUG(("char %c, color %ld\n", (char)*cp, (long)co));
 	    ss = css->outs[co];
@@ -118,7 +119,7 @@ longest(
      * Shutdown.
      */
 
-    FDEBUG(("+++ shutdown at c%d +++\n", (int) (css - d->ssets)));
+    FDEBUG(("+++ shutdown at c%d +++\n", css - d->ssets));
     if (cp == v->stop && stop == v->stop) {
 	if (hitstopp != NULL) {
 	    *hitstopp = 1;
@@ -163,19 +164,20 @@ longest(
  */
 static chr *			/* endpoint, or NULL */
 shortest(
-    struct vars *const v,
-    struct dfa *const d,
-    chr *const start,		/* where the match should start */
-    chr *const min,		/* match must end at or after here */
-    chr *const max,		/* match must end at or before here */
-    chr **const coldp,		/* store coldstart pointer here, if nonNULL */
-    int *const hitstopp)	/* record whether hit v->stop, if non-NULL */
+    struct vars *v,
+    struct dfa *d,
+    chr *start,			/* where the match should start */
+    chr *min,			/* match must end at or after here */
+    chr *max,			/* match must end at or before here */
+    chr **coldp,		/* store coldstart pointer here, if nonNULL */
+    int *hitstopp)		/* record whether hit v->stop, if non-NULL */
 {
     chr *cp;
     chr *realmin = (min == v->stop) ? min : min + 1;
     chr *realmax = (max == v->stop) ? max : max + 1;
     color co;
-    struct sset *css, *ss;
+    struct sset *css;
+    struct sset *ss;
     struct colormap *cm = d->cm;
 
     /*
@@ -213,7 +215,7 @@ shortest(
 
     if (v->eflags&REG_FTRACE) {
 	while (cp < realmax) {
-	    FDEBUG(("--- at c%d ---\n", (int) (css - d->ssets)));
+	    FDEBUG(("--- at c%d ---\n", css - d->ssets));
 	    co = GETCOLOR(cm, *cp);
 	    FDEBUG(("char %c, color %ld\n", (char)*cp, (long)co));
 	    ss = css->outs[co];
@@ -254,7 +256,7 @@ shortest(
     }
 
     if (coldp != NULL) {	/* report last no-progress state set, if any */
-	*coldp = lastCold(v, d);
+	*coldp = lastcold(v, d);
     }
 
     if ((ss->flags&POSTSTATE) && cp > min) {
@@ -282,18 +284,19 @@ shortest(
 }
 
 /*
- - lastCold - determine last point at which no progress had been made
- ^ static chr *lastCold(struct vars *, struct dfa *);
+ - lastcold - determine last point at which no progress had been made
+ ^ static chr *lastcold(struct vars *, struct dfa *);
  */
 static chr *			/* endpoint, or NULL */
-lastCold(
-    struct vars *const v,
-    struct dfa *const d)
+lastcold(
+    struct vars *v,
+    struct dfa *d)
 {
     struct sset *ss;
-    chr *nopr = d->lastnopr;
+    chr *nopr;
     int i;
 
+    nopr = d->lastnopr;
     if (nopr == NULL) {
 	nopr = v->start;
     }
@@ -306,15 +309,15 @@ lastCold(
 }
 
 /*
- - newDFA - set up a fresh DFA
- ^ static struct dfa *newDFA(struct vars *, struct cnfa *,
+ - newdfa - set up a fresh DFA
+ ^ static struct dfa *newdfa(struct vars *, struct cnfa *,
  ^ 	struct colormap *, struct smalldfa *);
  */
 static struct dfa *
-newDFA(
-    struct vars *const v,
-    struct cnfa *const cnfa,
-    struct colormap *const cm,
+newdfa(
+    struct vars *v,
+    struct cnfa *cnfa,
+    struct colormap *cm,
     struct smalldfa *sml)	/* preallocated space, may be NULL */
 {
     struct dfa *d;
@@ -342,12 +345,12 @@ newDFA(
 	d->cptsmalloced = 0;
 	d->mallocarea = (smallwas == NULL) ? (char *)sml : NULL;
     } else {
-	d = (struct dfa *) MALLOC(sizeof(struct dfa));
+	d = (struct dfa *)MALLOC(sizeof(struct dfa));
 	if (d == NULL) {
 	    ERR(REG_ESPACE);
 	    return NULL;
 	}
-	d->ssets = (struct sset *) MALLOC(nss * sizeof(struct sset));
+	d->ssets = (struct sset *)MALLOC(nss * sizeof(struct sset));
 	d->statesarea = (unsigned *)
 		MALLOC((nss+WORK) * wordsper * sizeof(unsigned));
 	d->work = &d->statesarea[nss * wordsper];
@@ -359,7 +362,7 @@ newDFA(
 	d->mallocarea = (char *)d;
 	if (d->ssets == NULL || d->statesarea == NULL ||
 		d->outsarea == NULL || d->incarea == NULL) {
-	    freeDFA(d);
+	    freedfa(d);
 	    ERR(REG_ESPACE);
 	    return NULL;
 	}
@@ -384,12 +387,12 @@ newDFA(
 }
 
 /*
- - freeDFA - free a DFA
- ^ static void freeDFA(struct dfa *);
+ - freedfa - free a DFA
+ ^ static void freedfa(struct dfa *);
  */
 static void
-freeDFA(
-    struct dfa *const d)
+freedfa(
+    struct dfa *d)
 {
     if (d->cptsmalloced) {
 	if (d->ssets != NULL) {
@@ -418,8 +421,8 @@ freeDFA(
  */
 static unsigned
 hash(
-    unsigned *const uv,
-    const int n)
+    unsigned *uv,
+    int n)
 {
     int i;
     unsigned h;
@@ -437,9 +440,9 @@ hash(
  */
 static struct sset *
 initialize(
-    struct vars *const v,	/* used only for debug flags */
-    struct dfa *const d,
-    chr *const start)
+    struct vars *v,		/* used only for debug flags */
+    struct dfa *d,
+    chr *start)
 {
     struct sset *ss;
     int i;
@@ -451,7 +454,7 @@ initialize(
     if (d->nssused > 0 && (d->ssets[0].flags&STARTER)) {
 	ss = &d->ssets[0];
     } else {			/* no, must (re)build it */
-	ss = getVacantSS(v, d, start, start);
+	ss = getvacant(v, d, start, start);
 	for (i = 0; i < d->wordsper; i++) {
 	    ss->states[i] = 0;
 	}
@@ -481,18 +484,23 @@ initialize(
  */
 static struct sset *		/* NULL if goes to empty set */
 miss(
-    struct vars *const v,	/* used only for debug flags */
-    struct dfa *const d,
-    struct sset *const css,
-    const pcolor co,
-    chr *const cp,		/* next chr */
-    chr *const start)		/* where the attempt got started */
+    struct vars *v,		/* used only for debug flags */
+    struct dfa *d,
+    struct sset *css,
+    pcolor co,
+    chr *cp,			/* next chr */
+    chr *start)			/* where the attempt got started */
 {
     struct cnfa *cnfa = d->cnfa;
+    int i;
     unsigned h;
     struct carc *ca;
     struct sset *p;
-    int i, isPost, noProgress, gotState, doLAConstraints, sawLAConstraints;
+    int ispost;
+    int noprogress;
+    int gotstate;
+    int dolacons;
+    int sawlacons;
 
     /*
      * For convenience, we can be called even if it might not be a miss.
@@ -511,57 +519,57 @@ miss(
     for (i = 0; i < d->wordsper; i++) {
 	d->work[i] = 0;
     }
-    isPost = 0;
-    noProgress = 1;
-    gotState = 0;
+    ispost = 0;
+    noprogress = 1;
+    gotstate = 0;
     for (i = 0; i < d->nstates; i++) {
 	if (ISBSET(css->states, i)) {
-	    for (ca = cnfa->states[i]; ca->co != COLORLESS; ca++) {
+	    for (ca = cnfa->states[i]+1; ca->co != COLORLESS; ca++) {
 		if (ca->co == co) {
 		    BSET(d->work, ca->to);
-		    gotState = 1;
+		    gotstate = 1;
 		    if (ca->to == cnfa->post) {
-			isPost = 1;
+			ispost = 1;
 		    }
-		    if (!(cnfa->stflags[ca->to] & CNFA_NOPROGRESS)) {
-			noProgress = 0;
+		    if (!cnfa->states[ca->to]->co) {
+			noprogress = 0;
 		    }
 		    FDEBUG(("%d -> %d\n", i, ca->to));
 		}
 	    }
 	}
     }
-    doLAConstraints = (gotState ? (cnfa->flags&HASLACONS) : 0);
-    sawLAConstraints = 0;
-    while (doLAConstraints) {		/* transitive closure */
-	doLAConstraints = 0;
+    dolacons = (gotstate) ? (cnfa->flags&HASLACONS) : 0;
+    sawlacons = 0;
+    while (dolacons) {		/* transitive closure */
+	dolacons = 0;
 	for (i = 0; i < d->nstates; i++) {
 	    if (ISBSET(d->work, i)) {
-		for (ca = cnfa->states[i]; ca->co != COLORLESS; ca++) {
-		    if (ca->co < cnfa->ncolors) {
-			continue;	/* NOTE CONTINUE */
+		for (ca = cnfa->states[i]+1; ca->co != COLORLESS; ca++) {
+		    if (ca->co <= cnfa->ncolors) {
+			continue; /* NOTE CONTINUE */
 		    }
-		    sawLAConstraints = 1;
+		    sawlacons = 1;
 		    if (ISBSET(d->work, ca->to)) {
-			continue;	/* NOTE CONTINUE */
+			continue; /* NOTE CONTINUE */
 		    }
-		    if (!checkLAConstraint(v, cnfa, cp, ca->co)) {
-			continue;	/* NOTE CONTINUE */
+		    if (!lacon(v, cnfa, cp, ca->co)) {
+			continue; /* NOTE CONTINUE */
 		    }
 		    BSET(d->work, ca->to);
-		    doLAConstraints = 1;
+		    dolacons = 1;
 		    if (ca->to == cnfa->post) {
-			isPost = 1;
+			ispost = 1;
 		    }
-		    if (!(cnfa->stflags[ca->to] & CNFA_NOPROGRESS)) {
-			noProgress = 0;
+		    if (!cnfa->states[ca->to]->co) {
+			noprogress = 0;
 		    }
 		    FDEBUG(("%d :> %d\n", i, ca->to));
 		}
 	    }
 	}
     }
-    if (!gotState) {
+    if (!gotstate) {
 	return NULL;
     }
     h = HASH(d->work, d->wordsper);
@@ -572,19 +580,19 @@ miss(
 
     for (p = d->ssets, i = d->nssused; i > 0; p++, i--) {
 	 if (HIT(h, d->work, p, d->wordsper)) {
-	     FDEBUG(("cached c%d\n", (int) (p - d->ssets)));
+	     FDEBUG(("cached c%d\n", p - d->ssets));
 	     break;			/* NOTE BREAK OUT */
 	 }
     }
     if (i == 0) {		/* nope, need a new cache entry */
-	p = getVacantSS(v, d, cp, start);
+	p = getvacant(v, d, cp, start);
 	assert(p != css);
 	for (i = 0; i < d->wordsper; i++) {
 	    p->states[i] = d->work[i];
 	}
 	p->hash = h;
-	p->flags = (isPost ? POSTSTATE : 0);
-	if (noProgress) {
+	p->flags = (ispost) ? POSTSTATE : 0;
+	if (noprogress) {
 	    p->flags |= NOPROGRESS;
 	}
 
@@ -593,27 +601,26 @@ miss(
 	 */
     }
 
-    if (!sawLAConstraints) {	/* lookahead conds. always cache miss */
-	FDEBUG(("c%d[%d]->c%d\n",
-		(int) (css - d->ssets), co, (int) (p - d->ssets)));
+    if (!sawlacons) {		/* lookahead conds. always cache miss */
+	FDEBUG(("c%d[%d]->c%d\n", css - d->ssets, co, p - d->ssets));
 	css->outs[co] = p;
 	css->inchain[co] = p->ins;
 	p->ins.ss = css;
-	p->ins.co = (color) co;
+	p->ins.co = (color)co;
     }
     return p;
 }
 
 /*
- - checkLAConstraint - lookahead-constraint checker for miss()
- ^ static int checkLAConstraint(struct vars *, struct cnfa *, chr *, pcolor);
+ - lacon - lookahead-constraint checker for miss()
+ ^ static int lacon(struct vars *, struct cnfa *, chr *, pcolor);
  */
 static int			/* predicate:  constraint satisfied? */
-checkLAConstraint(
-    struct vars *const v,
-    struct cnfa *const pcnfa,	/* parent cnfa */
-    chr *const cp,
-    const pcolor co)		/* "color" of the lookahead constraint */
+lacon(
+    struct vars *v,
+    struct cnfa *pcnfa,		/* parent cnfa */
+    chr *cp,
+    pcolor co)			/* "color" of the lookahead constraint */
 {
     int n;
     struct subre *sub;
@@ -625,36 +632,38 @@ checkLAConstraint(
     assert(n < v->g->nlacons && v->g->lacons != NULL);
     FDEBUG(("=== testing lacon %d\n", n));
     sub = &v->g->lacons[n];
-    d = newDFA(v, &sub->cnfa, &v->g->cmap, &sd);
+    d = newdfa(v, &sub->cnfa, &v->g->cmap, &sd);
     if (d == NULL) {
 	ERR(REG_ESPACE);
 	return 0;
     }
-    end = longest(v, d, cp, v->stop, NULL);
-    freeDFA(d);
+    end = longest(v, d, cp, v->stop, (int *)NULL);
+    freedfa(d);
     FDEBUG(("=== lacon %d match %d\n", n, (end != NULL)));
     return (sub->subno) ? (end != NULL) : (end == NULL);
 }
 
 /*
- - getVacantSS - get a vacant state set
+ - getvacant - get a vacant state set
  * This routine clears out the inarcs and outarcs, but does not otherwise
  * clear the innards of the state set -- that's up to the caller.
- ^ static struct sset *getVacantSS(struct vars *, struct dfa *, chr *, chr *);
+ ^ static struct sset *getvacant(struct vars *, struct dfa *, chr *, chr *);
  */
 static struct sset *
-getVacantSS(
-    struct vars *const v,	/* used only for debug flags */
-    struct dfa *const d,
-    chr *const cp,
-    chr *const start)
+getvacant(
+    struct vars *v,		/* used only for debug flags */
+    struct dfa *d,
+    chr *cp,
+    chr *start)
 {
     int i;
-    struct sset *ss, *p;
-    struct arcp ap, lastap = {NULL, 0}; /* silence gcc 4 warning */
+    struct sset *ss;
+    struct sset *p;
+    struct arcp ap;
+    struct arcp lastap = {NULL, 0}; /* silence gcc 4 warning */
     color co;
 
-    ss = pickNextSS(v, d, cp, start);
+    ss = pickss(v, d, cp, start);
     assert(!(ss->flags&LOCKED));
 
     /*
@@ -664,7 +673,7 @@ getVacantSS(
     ap = ss->ins;
     while ((p = ap.ss) != NULL) {
 	co = ap.co;
-	FDEBUG(("zapping c%d's %ld outarc\n", (int) (p - d->ssets), (long)co));
+	FDEBUG(("zapping c%d's %ld outarc\n", p - d->ssets, (long)co));
 	p->outs[co] = NULL;
 	ap = p->inchain[co];
 	p->inchain[co].ss = NULL; /* paranoia */
@@ -681,12 +690,13 @@ getVacantSS(
 	if (p == NULL) {
 	    continue;		/* NOTE CONTINUE */
 	}
-	FDEBUG(("del outarc %d from c%d's in chn\n", i, (int) (p - d->ssets)));
+	FDEBUG(("del outarc %d from c%d's in chn\n", i, p - d->ssets));
 	if (p->ins.ss == ss && p->ins.co == i) {
 	    p->ins = ss->inchain[i];
 	} else {
 	    assert(p->ins.ss != NULL);
-	    for (ap = p->ins; ap.ss != NULL && !(ap.ss == ss && ap.co == i);
+	    for (ap = p->ins; ap.ss != NULL &&
+		    !(ap.ss == ss && ap.co == i);
 		    ap = ap.ss->inchain[ap.co]) {
 		lastap = ap;
 	    }
@@ -719,18 +729,19 @@ getVacantSS(
 }
 
 /*
- - pickNextSS - pick the next stateset to be used
- ^ static struct sset *pickNextSS(struct vars *, struct dfa *, chr *, chr *);
+ - pickss - pick the next stateset to be used
+ ^ static struct sset *pickss(struct vars *, struct dfa *, chr *, chr *);
  */
 static struct sset *
-pickNextSS(
-    struct vars *const v,	/* used only for debug flags */
-    struct dfa *const d,
-    chr *const cp,
-    chr *const start)
+pickss(
+    struct vars *v,		/* used only for debug flags */
+    struct dfa *d,
+    chr *cp,
+    chr *start)
 {
     int i;
-    struct sset *ss, *end;
+    struct sset *ss;
+    struct sset *end;
     chr *ancient;
 
     /*
@@ -773,7 +784,7 @@ pickNextSS(
 	if ((ss->lastseen == NULL || ss->lastseen < ancient)
 		&& !(ss->flags&LOCKED)) {
 	    d->search = ss + 1;
-	    FDEBUG(("replacing c%d\n", (int) (ss - d->ssets)));
+	    FDEBUG(("replacing c%d\n", ss - d->ssets));
 	    return ss;
 	}
     }
@@ -781,7 +792,7 @@ pickNextSS(
 	if ((ss->lastseen == NULL || ss->lastseen < ancient)
 		&& !(ss->flags&LOCKED)) {
 	    d->search = ss + 1;
-	    FDEBUG(("replacing c%d\n", (int) (ss - d->ssets)));
+	    FDEBUG(("replacing c%d\n", ss - d->ssets));
 	    return ss;
 	}
     }

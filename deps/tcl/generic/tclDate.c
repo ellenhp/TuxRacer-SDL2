@@ -359,8 +359,14 @@ typedef short int yytype_int16;
 #ifndef YYSIZE_T
 # ifdef __SIZE_TYPE__
 #  define YYSIZE_T __SIZE_TYPE__
-# else
+# elif defined size_t
 #  define YYSIZE_T size_t
+# elif ! defined YYSIZE_T && (defined __STDC__ || defined __C99__FUNC__ \
+     || defined __cplusplus || defined _MSC_VER)
+#  include <stddef.h> /* INFRINGES ON USER NAME SPACE */
+#  define YYSIZE_T size_t
+# else
+#  define YYSIZE_T unsigned int
 # endif
 #endif
 
@@ -1348,7 +1354,7 @@ yyparse (info)
 int yychar;
 
 /* The semantic value of the look-ahead symbol.  */
-YYSTYPE yylval = {0};
+YYSTYPE yylval;
 
 /* Number of syntax errors so far.  */
 int yynerrs;
@@ -2285,6 +2291,10 @@ yyreturn:
 
 
 
+MODULE_SCOPE int yychar;
+MODULE_SCOPE YYSTYPE yylval;
+MODULE_SCOPE int yynerrs;
+
 /*
  * Month and day table.
  */
@@ -2314,7 +2324,7 @@ static const TABLE MonthDayTable[] = {
     { "thurs",		tDAY, 4 },
     { "friday",		tDAY, 5 },
     { "saturday",	tDAY, 6 },
-    { NULL, 0, 0 }
+    { NULL }
 };
 
 /*
@@ -2332,7 +2342,7 @@ static const TABLE UnitsTable[] = {
     { "min",		tSEC_UNIT,	60 },
     { "second",		tSEC_UNIT,	 1 },
     { "sec",		tSEC_UNIT,	 1 },
-    { NULL, 0, 0 }
+    { NULL }
 };
 
 /*
@@ -2364,7 +2374,7 @@ static const TABLE OtherTable[] = {
     { "ago",		tAGO,		1 },
     { "epoch",		tEPOCH,		0 },
     { "stardate",	tSTARDATE,	0 },
-    { NULL, 0, 0 }
+    { NULL }
 };
 
 /*
@@ -2450,7 +2460,7 @@ static const TABLE TimezoneTable[] = {
     /* ADDED BY Marco Nijdam */
     { "dst",	tDST,	  HOUR( 0) },	    /* DST on (hour is ignored) */
     /* End ADDED */
-    { NULL, 0, 0 }
+    {  NULL  }
 };
 
 /*
@@ -2483,7 +2493,7 @@ static const TABLE MilitaryTable[] = {
     { "x",	tZONE,	HOUR( 11) },
     { "y",	tZONE,	HOUR( 12) },
     { "z",	tZONE,	HOUR( 0) },
-    { NULL, 0, 0 }
+    { NULL }
 };
 
 /*
@@ -2746,7 +2756,7 @@ TclClockOldscanObjCmd(
     ClientData clientData,	/* Unused */
     Tcl_Interp *interp,		/* Tcl interpreter */
     int objc,			/* Count of paraneters */
-    Tcl_Obj *const *objv)	/* Parameters */
+    Tcl_Obj *CONST *objv)	/* Parameters */
 {
     Tcl_Obj *result, *resultElement;
     int yr, mo, da;
@@ -2794,12 +2804,10 @@ TclClockOldscanObjCmd(
     if (status == 1) {
 	Tcl_SetObjResult(interp, dateInfo.messages);
 	Tcl_DecrRefCount(dateInfo.messages);
-	Tcl_SetErrorCode(interp, "TCL", "VALUE", "DATE", "PARSE", NULL);
 	return TCL_ERROR;
     } else if (status == 2) {
 	Tcl_SetObjResult(interp, Tcl_NewStringObj("memory exhausted", -1));
 	Tcl_DecrRefCount(dateInfo.messages);
-	Tcl_SetErrorCode(interp, "TCL", "MEMORY", NULL);
 	return TCL_ERROR;
     } else if (status != 0) {
 	Tcl_SetObjResult(interp, Tcl_NewStringObj("Unknown status returned "
@@ -2807,7 +2815,6 @@ TclClockOldscanObjCmd(
 						  "report this error as a "
 						  "bug in Tcl.", -1));
 	Tcl_DecrRefCount(dateInfo.messages);
-	Tcl_SetErrorCode(interp, "TCL", "BUG", NULL);
 	return TCL_ERROR;
     }
     Tcl_DecrRefCount(dateInfo.messages);
@@ -2815,31 +2822,26 @@ TclClockOldscanObjCmd(
     if (yyHaveDate > 1) {
 	Tcl_SetObjResult(interp,
 		Tcl_NewStringObj("more than one date in string", -1));
-	Tcl_SetErrorCode(interp, "TCL", "VALUE", "DATE", "MULTIPLE", NULL);
 	return TCL_ERROR;
     }
     if (yyHaveTime > 1) {
 	Tcl_SetObjResult(interp,
 		Tcl_NewStringObj("more than one time of day in string", -1));
-	Tcl_SetErrorCode(interp, "TCL", "VALUE", "DATE", "MULTIPLE", NULL);
 	return TCL_ERROR;
     }
     if (yyHaveZone > 1) {
 	Tcl_SetObjResult(interp,
 		Tcl_NewStringObj("more than one time zone in string", -1));
-	Tcl_SetErrorCode(interp, "TCL", "VALUE", "DATE", "MULTIPLE", NULL);
 	return TCL_ERROR;
     }
     if (yyHaveDay > 1) {
 	Tcl_SetObjResult(interp,
 		Tcl_NewStringObj("more than one weekday in string", -1));
-	Tcl_SetErrorCode(interp, "TCL", "VALUE", "DATE", "MULTIPLE", NULL);
 	return TCL_ERROR;
     }
     if (yyHaveOrdinalMonth > 1) {
 	Tcl_SetObjResult(interp,
 		Tcl_NewStringObj("more than one ordinal month in string", -1));
-	Tcl_SetErrorCode(interp, "TCL", "VALUE", "DATE", "MULTIPLE", NULL);
 	return TCL_ERROR;
     }
 

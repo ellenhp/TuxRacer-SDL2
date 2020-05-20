@@ -1,139 +1,142 @@
-#include "tommath_private.h"
+#include <tommath.h>
+
 #ifdef BN_MP_SQRT_C
-/* LibTomMath, multiple-precision integer library -- Tom St Denis */
-/* SPDX-License-Identifier: Unlicense */
+/* LibTomMath, multiple-precision integer library -- Tom St Denis
+ *
+ * LibTomMath is a library that provides multiple-precision
+ * integer arithmetic as well as number theoretic functionality.
+ *
+ * The library was designed directly after the MPI library by
+ * Michael Fromberger but has been written from scratch with
+ * additional optimizations in place.
+ *
+ * The library is free for all purposes without any express
+ * guarantee it works.
+ *
+ * Tom St Denis, tomstdenis@gmail.com, http://math.libtomcrypt.com
+ */
 
 #ifndef NO_FLOATING_POINT
 #include <math.h>
-#if (MP_DIGIT_BIT != 28) || (FLT_RADIX != 2) || (DBL_MANT_DIG != 53) || (DBL_MAX_EXP != 1024)
-#define NO_FLOATING_POINT
-#endif
 #endif
 
 /* this function is less generic than mp_n_root, simpler and faster */
-mp_err mp_sqrt(const mp_int *arg, mp_int *ret)
+int mp_sqrt(mp_int *arg, mp_int *ret) 
 {
-   mp_err err;
-   mp_int t1, t2;
+  int res;
+  mp_int t1,t2;
+  int i, j, k;
 #ifndef NO_FLOATING_POINT
-   int i, j, k;
-   volatile double d;
-   mp_digit dig;
+  volatile double d;
+  mp_digit dig;
 #endif
 
-   /* must be positive */
-   if (arg->sign == MP_NEG) {
-      return MP_VAL;
-   }
+  /* must be positive */
+  if (arg->sign == MP_NEG) {
+    return MP_VAL;
+  }
 
-   /* easy out */
-   if (MP_IS_ZERO(arg)) {
-      mp_zero(ret);
-      return MP_OKAY;
-   }
+  /* easy out */
+  if (mp_iszero(arg) == MP_YES) {
+    mp_zero(ret);
+    return MP_OKAY;
+  }
+  
+  i = (arg->used / 2) - 1;
+  j = 2 * i;
+  if ((res = mp_init_size(&t1, i+2)) != MP_OKAY) {
+      return res;
+  }
+  
+  if ((res = mp_init(&t2)) != MP_OKAY) {
+    goto E2;
+  }
 
+  for (k = 0; k < i; ++k) {
+      t1.dp[k] = (mp_digit) 0;
+  }
+      
 #ifndef NO_FLOATING_POINT
 
-   i = (arg->used / 2) - 1;
-   j = 2 * i;
-   if ((err = mp_init_size(&t1, i+2)) != MP_OKAY) {
-      return err;
-   }
+  /* Estimate the square root using the hardware floating point unit. */
 
-   if ((err = mp_init(&t2)) != MP_OKAY) {
-      goto E2;
-   }
+  d = 0.0;
+  for (k = arg->used-1; k >= j; --k) {
+      d = ldexp(d, DIGIT_BIT) + (double) (arg->dp[k]);
+  }
 
-   for (k = 0; k < i; ++k) {
-      t1.dp[k] = (mp_digit) 0;
-   }
+  /* 
+   * At this point, d is the nearest floating point number to the most
+   * significant 1 or 2 mp_digits of arg. Extract its square root.
+   */
+     
+  d = sqrt(d);
 
-   /* Estimate the square root using the hardware floating point unit. */
+  /* dig is the most significant mp_digit of the square root */
 
-   d = 0.0;
-   for (k = arg->used-1; k >= j; --k) {
-      d = ldexp(d, MP_DIGIT_BIT) + (double)(arg->dp[k]);
-   }
+  dig = (mp_digit) ldexp(d, -DIGIT_BIT);
 
-   /*
-    * At this point, d is the nearest floating point number to the most
-    * significant 1 or 2 mp_digits of arg. Extract its square root.
-    */
+  /* 
+   * If the most significant digit is nonzero, find the next digit down
+   * by subtracting DIGIT_BIT times thie most significant digit. 
+   * Subtract one from the result so that our initial estimate is always
+   * low.
+   */
 
-   d = sqrt(d);
-
-   /* dig is the most significant mp_digit of the square root */
-
-   dig = (mp_digit) ldexp(d, -MP_DIGIT_BIT);
-
-   /*
-    * If the most significant digit is nonzero, find the next digit down
-    * by subtracting MP_DIGIT_BIT times thie most significant digit.
-    * Subtract one from the result so that our initial estimate is always
-    * low.
-    */
-
-   if (dig) {
+  if (dig) {
       t1.used = i+2;
-      d -= ldexp((double) dig, MP_DIGIT_BIT);
+      d -= ldexp((double) dig, DIGIT_BIT);
       if (d >= 1.0) {
-         t1.dp[i+1] = dig;
-         t1.dp[i] = ((mp_digit) d) - 1;
+	  t1.dp[i+1] = dig;
+	  t1.dp[i] = ((mp_digit) d) - 1;
       } else {
-         t1.dp[i+1] = dig-1;
-         t1.dp[i] = MP_DIGIT_MAX;
+	  t1.dp[i+1] = dig-1;
+	  t1.dp[i] = MP_DIGIT_MAX;
       }
-   } else {
+  } else {
       t1.used = i+1;
       t1.dp[i] = ((mp_digit) d) - 1;
-   }
+  }
 
 #else
 
-   if ((err = mp_init_copy(&t1, arg)) != MP_OKAY) {
-      return err;
-   }
+  /* Estimate the square root as having 1 in the most significant place. */
 
-   if ((err = mp_init(&t2)) != MP_OKAY) {
-      goto E2;
-   }
-
-   /* First approx. (not very bad for large arg) */
-   mp_rshd(&t1, t1.used/2);
+  t1.used = i + 2;
+  t1.dp[i+1] = (mp_digit) 1;
+  t1.dp[i] = (mp_digit) 0;
 
 #endif
 
-   /* t1 > 0  */
-   if ((err = mp_div(arg, &t1, &t2, NULL)) != MP_OKAY) {
+  /* t1 > 0  */ 
+  if ((res = mp_div(arg,&t1,&t2,NULL)) != MP_OKAY) {
+    goto E1;
+  }
+  if ((res = mp_add(&t1,&t2,&t1)) != MP_OKAY) {
+    goto E1;
+  }
+  if ((res = mp_div_2(&t1,&t1)) != MP_OKAY) {
+    goto E1;
+  }
+  /* And now t1 > sqrt(arg) */
+  do { 
+    if ((res = mp_div(arg,&t1,&t2,NULL)) != MP_OKAY) {
       goto E1;
-   }
-   if ((err = mp_add(&t1, &t2, &t1)) != MP_OKAY) {
+    }
+    if ((res = mp_add(&t1,&t2,&t1)) != MP_OKAY) {
       goto E1;
-   }
-   if ((err = mp_div_2(&t1, &t1)) != MP_OKAY) {
+    }
+    if ((res = mp_div_2(&t1,&t1)) != MP_OKAY) {
       goto E1;
-   }
-   /* And now t1 > sqrt(arg) */
-   do {
-      if ((err = mp_div(arg, &t1, &t2, NULL)) != MP_OKAY) {
-         goto E1;
-      }
-      if ((err = mp_add(&t1, &t2, &t1)) != MP_OKAY) {
-         goto E1;
-      }
-      if ((err = mp_div_2(&t1, &t1)) != MP_OKAY) {
-         goto E1;
-      }
-      /* t1 >= sqrt(arg) >= t2 at this point */
-   } while (mp_cmp_mag(&t1, &t2) == MP_GT);
+    }
+    /* t1 >= sqrt(arg) >= t2 at this point */
+  } while (mp_cmp_mag(&t1,&t2) == MP_GT);
 
-   mp_exch(&t1, ret);
+  mp_exch(&t1,ret);
 
-E1:
-   mp_clear(&t2);
-E2:
-   mp_clear(&t1);
-   return err;
+E1: mp_clear(&t2);
+E2: mp_clear(&t1);
+  return res;
 }
 
 #endif

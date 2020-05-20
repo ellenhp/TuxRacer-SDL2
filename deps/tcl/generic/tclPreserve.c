@@ -89,10 +89,10 @@ TclFinalizePreserve(void)
 {
     Tcl_MutexLock(&preserveMutex);
     if (spaceAvl != 0) {
-	ckfree(refArray);
-	refArray = NULL;
-	inUse = 0;
-	spaceAvl = 0;
+        ckfree((char *) refArray);
+        refArray = NULL;
+        inUse = 0;
+        spaceAvl = 0;
     }
     Tcl_MutexUnlock(&preserveMutex);
 }
@@ -144,7 +144,8 @@ Tcl_Preserve(
 
     if (inUse == spaceAvl) {
 	spaceAvl = spaceAvl ? 2*spaceAvl : INITIAL_SIZE;
-	refArray = ckrealloc(refArray, spaceAvl * sizeof(Reference));
+	refArray = (Reference *) ckrealloc((char *) refArray,
+		spaceAvl * sizeof(Reference));
     }
 
     /*
@@ -224,9 +225,9 @@ Tcl_Release(
 	Tcl_MutexUnlock(&preserveMutex);
 	if (mustFree) {
 	    if (freeProc == TCL_DYNAMIC) {
-		ckfree(clientData);
+		ckfree((char *) clientData);
 	    } else {
-		freeProc(clientData);
+		(*freeProc)((char *) clientData);
 	    }
 	}
 	return;
@@ -237,7 +238,7 @@ Tcl_Release(
      * Reference not found. This is a bug in the caller.
      */
 
-    Tcl_Panic("Tcl_Release couldn't find reference for %p", clientData);
+    Tcl_Panic("Tcl_Release couldn't find reference for 0x%x", PTR2UINT(clientData));
 }
 
 /*
@@ -277,12 +278,13 @@ Tcl_EventuallyFree(
 	    continue;
 	}
 	if (refPtr->mustFree) {
-	    Tcl_Panic("Tcl_EventuallyFree called twice for %p", clientData);
-	}
-	refPtr->mustFree = 1;
+	    Tcl_Panic("Tcl_EventuallyFree called twice for 0x%x",
+		    PTR2UINT(clientData));
+        }
+        refPtr->mustFree = 1;
 	refPtr->freeProc = freeProc;
 	Tcl_MutexUnlock(&preserveMutex);
-	return;
+        return;
     }
     Tcl_MutexUnlock(&preserveMutex);
 
@@ -291,9 +293,9 @@ Tcl_EventuallyFree(
      */
 
     if (freeProc == TCL_DYNAMIC) {
-	ckfree(clientData);
+	ckfree((char *) clientData);
     } else {
-	freeProc(clientData);
+	(*freeProc)((char *)clientData);
     }
 }
 
@@ -327,8 +329,9 @@ TclHandleCreate(
 				 * be tracked for deletion. Must not be
 				 * NULL. */
 {
-    HandleStruct *handlePtr = ckalloc(sizeof(HandleStruct));
+    HandleStruct *handlePtr;
 
+    handlePtr = (HandleStruct *) ckalloc(sizeof(HandleStruct));
     handlePtr->ptr = ptr;
 #ifdef TCL_MEM_DEBUG
     handlePtr->ptr2 = ptr;
@@ -368,16 +371,16 @@ TclHandleFree(
     handlePtr = (HandleStruct *) handle;
 #ifdef TCL_MEM_DEBUG
     if (handlePtr->refCount == 0x61616161) {
-	Tcl_Panic("using previously disposed TclHandle %p", handlePtr);
+	Tcl_Panic("using previously disposed TclHandle %x", handlePtr);
     }
     if (handlePtr->ptr2 != handlePtr->ptr) {
-	Tcl_Panic("someone has changed the block referenced by the handle %p\nfrom %p to %p",
+	Tcl_Panic("someone has changed the block referenced by the handle %x\nfrom %x to %x",
 		handlePtr, handlePtr->ptr2, handlePtr->ptr);
     }
 #endif
     handlePtr->ptr = NULL;
     if (handlePtr->refCount == 0) {
-	ckfree(handlePtr);
+	ckfree((char *) handlePtr);
     }
 }
 
@@ -411,10 +414,10 @@ TclHandlePreserve(
     handlePtr = (HandleStruct *) handle;
 #ifdef TCL_MEM_DEBUG
     if (handlePtr->refCount == 0x61616161) {
-	Tcl_Panic("using previously disposed TclHandle %p", handlePtr);
+	Tcl_Panic("using previously disposed TclHandle %x", handlePtr);
     }
     if ((handlePtr->ptr != NULL) && (handlePtr->ptr != handlePtr->ptr2)) {
-	Tcl_Panic("someone has changed the block referenced by the handle %p\nfrom %p to %p",
+	Tcl_Panic("someone has changed the block referenced by the handle %x\nfrom %x to %x",
 		handlePtr, handlePtr->ptr2, handlePtr->ptr);
     }
 #endif
@@ -452,15 +455,16 @@ TclHandleRelease(
     handlePtr = (HandleStruct *) handle;
 #ifdef TCL_MEM_DEBUG
     if (handlePtr->refCount == 0x61616161) {
-	Tcl_Panic("using previously disposed TclHandle %p", handlePtr);
+	Tcl_Panic("using previously disposed TclHandle %x", handlePtr);
     }
     if ((handlePtr->ptr != NULL) && (handlePtr->ptr != handlePtr->ptr2)) {
-	Tcl_Panic("someone has changed the block referenced by the handle %p\nfrom %p to %p",
+	Tcl_Panic("someone has changed the block referenced by the handle %x\nfrom %x to %x",
 		handlePtr, handlePtr->ptr2, handlePtr->ptr);
     }
 #endif
-    if ((--handlePtr->refCount == 0) && (handlePtr->ptr == NULL)) {
-	ckfree(handlePtr);
+    handlePtr->refCount--;
+    if ((handlePtr->refCount == 0) && (handlePtr->ptr == NULL)) {
+	ckfree((char *) handlePtr);
     }
 }
 

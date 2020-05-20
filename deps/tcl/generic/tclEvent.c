@@ -49,8 +49,8 @@ typedef struct ErrAssocData {
 } ErrAssocData;
 
 /*
- * For each exit handler created with a call to Tcl_Create(Late)ExitHandler
- * there is a structure of the following type:
+ * For each exit handler created with a call to Tcl_Create(Late)ExitHandler there is
+ * a structure of the following type:
  */
 
 typedef struct ExitHandler {
@@ -74,22 +74,22 @@ static ExitHandler *firstLateExitPtr = NULL;
 TCL_DECLARE_MUTEX(exitMutex)
 
 /*
- * This variable is set to 1 when Tcl_Exit is called. The variable is checked
- * by TclInExit() to allow different behavior for exit-time processing, e.g.,
- * in closing of files and pipes.
+ * This variable is set to 1 when Tcl_Finalize is called, and at the end of
+ * its work, it is reset to 0. The variable is checked by TclInExit() to allow
+ * different behavior for exit-time processing, e.g. in closing of files and
+ * pipes.
  */
 
-static int inExit = 0;
-
+static int inFinalize = 0;
 static int subsystemsInitialized = 0;
 
 /*
- * This variable contains the application wide exit handler. It will be called
- * by Tcl_Exit instead of the C-runtime exit if this variable is set to a
- * non-NULL value.
+ * This variable contains the application wide exit handler. It will be
+ * called by Tcl_Exit instead of the C-runtime exit if this variable is set
+ * to a non-NULL value.
  */
 
-static TCL_NORETURN1 Tcl_ExitProc *appExitPtr = NULL;
+static Tcl_ExitProc *appExitPtr = NULL;
 
 typedef struct ThreadSpecificData {
     ExitHandler *firstExitPtr;	/* First in list of all exit handlers for this
@@ -115,11 +115,8 @@ static Tcl_ThreadCreateType NewThreadProc(ClientData clientData);
 static void		BgErrorDeleteProc(ClientData clientData,
 			    Tcl_Interp *interp);
 static void		HandleBgErrors(ClientData clientData);
-static char *		VwaitVarProc(ClientData clientData,
-			    Tcl_Interp *interp, const char *name1,
-			    const char *name2, int flags);
-static void		InvokeExitHandlers(void);
-static void		FinalizeThread(int quick);
+static char *		VwaitVarProc(ClientData clientData, Tcl_Interp *interp,
+			    CONST char *name1, CONST char *name2, int flags);
 
 /*
  *----------------------------------------------------------------------
@@ -144,11 +141,10 @@ Tcl_BackgroundError(
     Tcl_Interp *interp)		/* Interpreter in which an error has
 				 * occurred. */
 {
-    Tcl_BackgroundException(interp, TCL_ERROR);
+    TclBackgroundException(interp, TCL_ERROR);
 }
-
 void
-Tcl_BackgroundException(
+TclBackgroundException(
     Tcl_Interp *interp,		/* Interpreter in which an exception has
 				 * occurred. */
     int code)			/* The exception code value */
@@ -160,7 +156,7 @@ Tcl_BackgroundException(
 	return;
     }
 
-    errPtr = ckalloc(sizeof(BgError));
+    errPtr = (BgError *) ckalloc(sizeof(BgError));
     errPtr->errorMsg = Tcl_GetObjResult(interp);
     Tcl_IncrRefCount(errPtr->errorMsg);
     errPtr->returnOpts = Tcl_GetReturnOptions(interp, code);
@@ -168,10 +164,10 @@ Tcl_BackgroundException(
     errPtr->nextPtr = NULL;
 
     (void) TclGetBgErrorHandler(interp);
-    assocPtr = Tcl_GetAssocData(interp, "tclBgError", NULL);
+    assocPtr = (ErrAssocData *) Tcl_GetAssocData(interp, "tclBgError", NULL);
     if (assocPtr->firstBgPtr == NULL) {
 	assocPtr->firstBgPtr = errPtr;
-	Tcl_DoWhenIdle(HandleBgErrors, assocPtr);
+	Tcl_DoWhenIdle(HandleBgErrors, (ClientData) assocPtr);
     } else {
 	assocPtr->lastBgPtr->nextPtr = errPtr;
     }
@@ -200,7 +196,7 @@ static void
 HandleBgErrors(
     ClientData clientData)	/* Pointer to ErrAssocData structure. */
 {
-    ErrAssocData *assocPtr = clientData;
+    ErrAssocData *assocPtr = (ErrAssocData *) clientData;
     Tcl_Interp *interp = assocPtr->interp;
     BgError *errPtr;
 
@@ -211,15 +207,15 @@ HandleBgErrors(
      * that could lead us here.
      */
 
-    Tcl_Preserve(assocPtr);
-    Tcl_Preserve(interp);
+    Tcl_Preserve((ClientData) assocPtr);
+    Tcl_Preserve((ClientData) interp);
     while (assocPtr->firstBgPtr != NULL) {
 	int code, prefixObjc;
 	Tcl_Obj **prefixObjv, **tempObjv;
 
 	/*
-	 * Note we copy the handler command prefix each pass through, so we do
-	 * support one handler setting another handler.
+	 * Note we copy the handler command prefix each pass through, so
+	 * we do support one handler setting another handler.
 	 */
 
 	Tcl_Obj *copyObj = TclListObjCopy(NULL, assocPtr->cmdPrefix);
@@ -227,7 +223,7 @@ HandleBgErrors(
 	errPtr = assocPtr->firstBgPtr;
 
 	Tcl_ListObjGetElements(NULL, copyObj, &prefixObjc, &prefixObjv);
-	tempObjv = ckalloc((prefixObjc+2) * sizeof(Tcl_Obj *));
+	tempObjv = (Tcl_Obj **) ckalloc((prefixObjc+2)*sizeof(Tcl_Obj *));
 	memcpy(tempObjv, prefixObjv, prefixObjc*sizeof(Tcl_Obj *));
 	tempObjv[prefixObjc] = errPtr->errorMsg;
 	tempObjv[prefixObjc+1] = errPtr->returnOpts;
@@ -242,8 +238,8 @@ HandleBgErrors(
 	Tcl_DecrRefCount(errPtr->errorMsg);
 	Tcl_DecrRefCount(errPtr->returnOpts);
 	assocPtr->firstBgPtr = errPtr->nextPtr;
-	ckfree(errPtr);
-	ckfree(tempObjv);
+	ckfree((char *) errPtr);
+	ckfree((char *) tempObjv);
 
 	if (code == TCL_BREAK) {
 	    /*
@@ -256,12 +252,12 @@ HandleBgErrors(
 		assocPtr->firstBgPtr = errPtr->nextPtr;
 		Tcl_DecrRefCount(errPtr->errorMsg);
 		Tcl_DecrRefCount(errPtr->returnOpts);
-		ckfree(errPtr);
+		ckfree((char *) errPtr);
 	    }
 	} else if ((code == TCL_ERROR) && !Tcl_IsSafe(interp)) {
 	    Tcl_Channel errChannel = Tcl_GetStdChannel(TCL_STDERR);
 
-	    if (errChannel != NULL) {
+	    if (errChannel != (Tcl_Channel) NULL) {
 		Tcl_Obj *options = Tcl_GetReturnOptions(interp, code);
 		Tcl_Obj *keyPtr, *valuePtr = NULL;
 
@@ -284,8 +280,8 @@ HandleBgErrors(
 	}
     }
     assocPtr->lastBgPtr = NULL;
-    Tcl_Release(interp);
-    Tcl_Release(assocPtr);
+    Tcl_Release((ClientData) interp);
+    Tcl_Release((ClientData) assocPtr);
 }
 
 /*
@@ -311,7 +307,7 @@ TclDefaultBgErrorHandlerObjCmd(
     ClientData dummy,		/* Not used. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int objc,			/* Number of arguments. */
-    Tcl_Obj *const objv[])	/* Argument objects. */
+    Tcl_Obj *CONST objv[])	/* Argument objects. */
 {
     Tcl_Obj *keyPtr, *valuePtr;
     Tcl_Obj *tempObjv[2];
@@ -334,7 +330,6 @@ TclDefaultBgErrorHandlerObjCmd(
     if (result != TCL_OK || valuePtr == NULL) {
 	Tcl_SetObjResult(interp, Tcl_NewStringObj(
 		"missing return option \"-level\"", -1));
-	Tcl_SetErrorCode(interp, "TCL", "ARGUMENT", "MISSING", NULL);
 	return TCL_ERROR;
     }
     if (Tcl_GetIntFromObj(interp, valuePtr, &level) == TCL_ERROR) {
@@ -347,7 +342,6 @@ TclDefaultBgErrorHandlerObjCmd(
     if (result != TCL_OK || valuePtr == NULL) {
 	Tcl_SetObjResult(interp, Tcl_NewStringObj(
 		"missing return option \"-code\"", -1));
-	Tcl_SetErrorCode(interp, "TCL", "ARGUMENT", "MISSING", NULL);
 	return TCL_ERROR;
     }
     if (Tcl_GetIntFromObj(interp, valuePtr, &code) == TCL_ERROR) {
@@ -355,26 +349,19 @@ TclDefaultBgErrorHandlerObjCmd(
     }
 
     if (level != 0) {
-	/*
-	 * We're handling a TCL_RETURN exception.
-	 */
-
+	/* We're handling a TCL_RETURN exception */
 	code = TCL_RETURN;
     }
     if (code == TCL_OK) {
 	/*
-	 * Somehow we got to exception handling with no exception. (Pass
-	 * TCL_OK to Tcl_BackgroundException()?) Just return without doing
-	 * anything.
+	 * Somehow we got to exception handling with no exception.
+	 * (Pass TCL_OK to TclBackgroundException()?)
+	 * Just return without doing anything.
 	 */
-
 	return TCL_OK;
     }
 
-    /*
-     * Construct the bgerror command.
-     */
-
+    /* Construct the bgerror command */
     TclNewLiteralStringObj(tempObjv[0], "bgerror");
     Tcl_IncrRefCount(tempObjv[0]);
 
@@ -432,10 +419,7 @@ TclDefaultBgErrorHandlerObjCmd(
 
     saved = Tcl_SaveInterpState(interp, code);
 
-    /*
-     * Invoke the bgerror command.
-     */
-
+    /* Invoke the bgerror command. */
     Tcl_AllowExceptions(interp);
     code = Tcl_EvalObjv(interp, 2, tempObjv, TCL_EVAL_GLOBAL);
     if (code == TCL_ERROR) {
@@ -454,8 +438,7 @@ TclDefaultBgErrorHandlerObjCmd(
 	    TclObjInvoke(interp, 2, tempObjv, TCL_INVOKE_HIDDEN);
 	} else {
 	    Tcl_Channel errChannel = Tcl_GetStdChannel(TCL_STDERR);
-
-	    if (errChannel != NULL) {
+	    if (errChannel != (Tcl_Channel) NULL) {
 		Tcl_Obj *resultPtr = Tcl_GetObjResult(interp);
 
 		Tcl_IncrRefCount(resultPtr);
@@ -515,7 +498,8 @@ TclSetBgErrorHandler(
     Tcl_Interp *interp,
     Tcl_Obj *cmdPrefix)
 {
-    ErrAssocData *assocPtr = Tcl_GetAssocData(interp, "tclBgError", NULL);
+    ErrAssocData *assocPtr = (ErrAssocData *)
+	    Tcl_GetAssocData(interp, "tclBgError", NULL);
 
     if (cmdPrefix == NULL) {
 	Tcl_Panic("TclSetBgErrorHandler: NULL cmdPrefix argument");
@@ -525,12 +509,13 @@ TclSetBgErrorHandler(
 	 * First access: initialize.
 	 */
 
-	assocPtr = ckalloc(sizeof(ErrAssocData));
+	assocPtr = (ErrAssocData *) ckalloc(sizeof(ErrAssocData));
 	assocPtr->interp = interp;
 	assocPtr->cmdPrefix = NULL;
 	assocPtr->firstBgPtr = NULL;
 	assocPtr->lastBgPtr = NULL;
-	Tcl_SetAssocData(interp, "tclBgError", BgErrorDeleteProc, assocPtr);
+	Tcl_SetAssocData(interp, "tclBgError", BgErrorDeleteProc,
+		(ClientData) assocPtr);
     }
     if (assocPtr->cmdPrefix) {
 	Tcl_DecrRefCount(assocPtr->cmdPrefix);
@@ -560,14 +545,16 @@ Tcl_Obj *
 TclGetBgErrorHandler(
     Tcl_Interp *interp)
 {
-    ErrAssocData *assocPtr = Tcl_GetAssocData(interp, "tclBgError", NULL);
+    ErrAssocData *assocPtr = (ErrAssocData *)
+	    Tcl_GetAssocData(interp, "tclBgError", NULL);
 
     if (assocPtr == NULL) {
 	Tcl_Obj *bgerrorObj;
 
 	TclNewLiteralStringObj(bgerrorObj, "::tcl::Bgerror");
 	TclSetBgErrorHandler(interp, bgerrorObj);
-	assocPtr = Tcl_GetAssocData(interp, "tclBgError", NULL);
+	assocPtr = (ErrAssocData *)
+		Tcl_GetAssocData(interp, "tclBgError", NULL);
     }
     return assocPtr->cmdPrefix;
 }
@@ -586,7 +573,7 @@ TclGetBgErrorHandler(
  *
  * Side effects:
  *	Background error information is freed: if there were any pending error
- *	reports, they are canceled.
+ *	reports, they are cancelled.
  *
  *----------------------------------------------------------------------
  */
@@ -596,7 +583,7 @@ BgErrorDeleteProc(
     ClientData clientData,	/* Pointer to ErrAssocData structure. */
     Tcl_Interp *interp)		/* Interpreter being deleted. */
 {
-    ErrAssocData *assocPtr = clientData;
+    ErrAssocData *assocPtr = (ErrAssocData *) clientData;
     BgError *errPtr;
 
     while (assocPtr->firstBgPtr != NULL) {
@@ -604,11 +591,11 @@ BgErrorDeleteProc(
 	assocPtr->firstBgPtr = errPtr->nextPtr;
 	Tcl_DecrRefCount(errPtr->errorMsg);
 	Tcl_DecrRefCount(errPtr->returnOpts);
-	ckfree(errPtr);
+	ckfree((char *) errPtr);
     }
-    Tcl_CancelIdleCall(HandleBgErrors, assocPtr);
+    Tcl_CancelIdleCall(HandleBgErrors, (ClientData) assocPtr);
     Tcl_DecrRefCount(assocPtr->cmdPrefix);
-    Tcl_EventuallyFree(assocPtr, TCL_DYNAMIC);
+    Tcl_EventuallyFree((ClientData) assocPtr, TCL_DYNAMIC);
 }
 
 /*
@@ -634,8 +621,9 @@ Tcl_CreateExitHandler(
     Tcl_ExitProc *proc,		/* Function to invoke. */
     ClientData clientData)	/* Arbitrary value to pass to proc. */
 {
-    ExitHandler *exitPtr = ckalloc(sizeof(ExitHandler));
+    ExitHandler *exitPtr;
 
+    exitPtr = (ExitHandler *) ckalloc(sizeof(ExitHandler));
     exitPtr->proc = proc;
     exitPtr->clientData = clientData;
     Tcl_MutexLock(&exitMutex);
@@ -649,8 +637,7 @@ Tcl_CreateExitHandler(
  *
  * TclCreateLateExitHandler --
  *
- *	Arrange for a given function to be invoked after all pre-thread
- *	cleanups.
+ *	Arrange for a given function to be invoked after all pre-thread cleanups
  *
  * Results:
  *	None.
@@ -667,8 +654,9 @@ TclCreateLateExitHandler(
     Tcl_ExitProc *proc,		/* Function to invoke. */
     ClientData clientData)	/* Arbitrary value to pass to proc. */
 {
-    ExitHandler *exitPtr = ckalloc(sizeof(ExitHandler));
+    ExitHandler *exitPtr;
 
+    exitPtr = (ExitHandler *) ckalloc(sizeof(ExitHandler));
     exitPtr->proc = proc;
     exitPtr->clientData = clientData;
     Tcl_MutexLock(&exitMutex);
@@ -690,7 +678,7 @@ TclCreateLateExitHandler(
  *
  * Side effects:
  *	If there is an exit handler corresponding to proc and clientData then
- *	it is canceled; if no such handler exists then nothing happens.
+ *	it is cancelled; if no such handler exists then nothing happens.
  *
  *----------------------------------------------------------------------
  */
@@ -712,7 +700,7 @@ Tcl_DeleteExitHandler(
 	    } else {
 		prevPtr->nextPtr = exitPtr->nextPtr;
 	    }
-	    ckfree(exitPtr);
+	    ckfree((char *) exitPtr);
 	    break;
 	}
     }
@@ -732,8 +720,8 @@ Tcl_DeleteExitHandler(
  *	None.
  *
  * Side effects:
- *	If there is a late exit handler corresponding to proc and clientData
- *	then it is canceled; if no such handler exists then nothing happens.
+ *	If there is a late exit handler corresponding to proc and clientData then
+ *	it is canceled; if no such handler exists then nothing happens.
  *
  *----------------------------------------------------------------------
  */
@@ -755,7 +743,7 @@ TclDeleteLateExitHandler(
 	    } else {
 		prevPtr->nextPtr = exitPtr->nextPtr;
 	    }
-	    ckfree(exitPtr);
+	    ckfree((char *) exitPtr);
 	    break;
 	}
     }
@@ -789,7 +777,7 @@ Tcl_CreateThreadExitHandler(
     ExitHandler *exitPtr;
     ThreadSpecificData *tsdPtr = TCL_TSD_INIT(&dataKey);
 
-    exitPtr = ckalloc(sizeof(ExitHandler));
+    exitPtr = (ExitHandler *) ckalloc(sizeof(ExitHandler));
     exitPtr->proc = proc;
     exitPtr->clientData = clientData;
     exitPtr->nextPtr = tsdPtr->firstExitPtr;
@@ -809,7 +797,7 @@ Tcl_CreateThreadExitHandler(
  *
  * Side effects:
  *	If there is an exit handler corresponding to proc and clientData then
- *	it is canceled; if no such handler exists then nothing happens.
+ *	it is cancelled; if no such handler exists then nothing happens.
  *
  *----------------------------------------------------------------------
  */
@@ -831,7 +819,7 @@ Tcl_DeleteThreadExitHandler(
 	    } else {
 		prevPtr->nextPtr = exitPtr->nextPtr;
 	    }
-	    ckfree(exitPtr);
+	    ckfree((char *) exitPtr);
 	    return;
 	}
     }
@@ -857,7 +845,7 @@ Tcl_DeleteThreadExitHandler(
 
 Tcl_ExitProc *
 Tcl_SetExitProc(
-    TCL_NORETURN1 Tcl_ExitProc *proc)		/* New exit handler for app or NULL */
+    Tcl_ExitProc *proc)		/* New exit handler for app or NULL */
 {
     Tcl_ExitProc *prevExitProc;
 
@@ -873,49 +861,6 @@ Tcl_SetExitProc(
 
     return prevExitProc;
 }
-
-
-/*
- *----------------------------------------------------------------------
- *
- * InvokeExitHandlers --
- *
- *      Call the registered exit handlers.
- *
- * Results:
- *	None.
- *
- * Side effects:
- *	The exit handlers are invoked, and the ExitHandler struct is
- *      freed.
- *
- *----------------------------------------------------------------------
- */
-static void
-InvokeExitHandlers(void)
-{
-    ExitHandler *exitPtr;
-
-    Tcl_MutexLock(&exitMutex);
-    inExit = 1;
-
-    for (exitPtr = firstExitPtr; exitPtr != NULL; exitPtr = firstExitPtr) {
-	/*
-	 * Be careful to remove the handler from the list before invoking its
-	 * callback. This protects us against double-freeing if the callback
-	 * should call Tcl_DeleteExitHandler on itself.
-	 */
-
-	firstExitPtr = exitPtr->nextPtr;
-	Tcl_MutexUnlock(&exitMutex);
-	exitPtr->proc(exitPtr->clientData);
-	ckfree(exitPtr);
-	Tcl_MutexLock(&exitMutex);
-    }
-    firstExitPtr = NULL;
-    Tcl_MutexUnlock(&exitMutex);
-}
-
 
 /*
  *----------------------------------------------------------------------
@@ -933,67 +878,35 @@ InvokeExitHandlers(void)
  *----------------------------------------------------------------------
  */
 
-TCL_NORETURN void
+void
 Tcl_Exit(
     int status)			/* Exit status for application; typically 0
 				 * for normal return, 1 for error return. */
 {
-    TCL_NORETURN1 Tcl_ExitProc *currentAppExitPtr;
+    Tcl_ExitProc *currentAppExitPtr;
 
     Tcl_MutexLock(&exitMutex);
     currentAppExitPtr = appExitPtr;
     Tcl_MutexUnlock(&exitMutex);
 
-    /*
-     * Warning: this function SHOULD NOT return, as there is code that depends
-     * on Tcl_Exit never returning. In fact, we will Tcl_Panic if anyone
-     * returns, so critical is this dependcy.
-     *
-     * If subsystems are not (yet) initialized, proper Tcl-finalization is
-     * impossible, so fallback to system exit, see bug-[f8a33ce3db5d8cc2].
-     */
-
     if (currentAppExitPtr) {
+	/*
+	 * Warning: this code SHOULD NOT return, as there is code that depends
+	 * on Tcl_Exit never returning. In fact, we will Tcl_Panic if anyone
+	 * returns, so critical is this dependcy.
+	 */
 
-	currentAppExitPtr(INT2PTR(status));
+	currentAppExitPtr((ClientData) INT2PTR(status));
+	Tcl_Panic("AppExitProc returned unexpectedly");
+    } else {
+	/*
+	 * Use default handling.
+	 */
 
-    } else if (subsystemsInitialized) {
-
-	if (TclFullFinalizationRequested()) {
-
-	    /*
-	     * Thorough finalization for Valgrind et al.
-	     */
-
-	    Tcl_Finalize();
-
-	} else {
-
-	    /*
-	     * Fast and deterministic exit (default behavior)
-	     */
-
-	    InvokeExitHandlers();
-
-	    /*
-	     * Ensure the thread-specific data is initialised as it is used in
-	     * Tcl_FinalizeThread()
-	     */
-
-	    (void) TCL_TSD_INIT(&dataKey);
-
-	    /*
-	     * Now finalize the calling thread only (others are not safely
-	     * reachable).  Among other things, this triggers a flush of the
-	     * Tcl_Channels that may have data enqueued.
-	     */
-
-	    FinalizeThread(/* quick */ 1);
-	}
+	Tcl_Finalize();
+	TclpExit(status);
+	Tcl_Panic("OS exit failed!");
     }
-
-    TclpExit(status);
-    Tcl_Panic("OS exit failed!");
 }
 
 /*
@@ -1024,8 +937,8 @@ Tcl_Exit(
 void
 TclInitSubsystems(void)
 {
-    if (inExit != 0) {
-	Tcl_Panic("TclInitSubsystems called while exiting");
+    if (inFinalize != 0) {
+	Tcl_Panic("TclInitSubsystems called while finalizing");
     }
 
     if (subsystemsInitialized == 0) {
@@ -1074,8 +987,8 @@ TclInitSubsystems(void)
  * Tcl_Finalize --
  *
  *	Shut down Tcl. First calls registered exit handlers, then carefully
- *	shuts down various subsystems.  Should be invoked by user before the
- *	Tcl shared library is being unloaded in an embedded context.
+ *	shuts down various subsystems. Called by Tcl_Exit or when the Tcl
+ *	shared library is being unloaded.
  *
  * Results:
  *	None.
@@ -1095,7 +1008,23 @@ Tcl_Finalize(void)
      * Invoke exit handlers first.
      */
 
-    InvokeExitHandlers();
+    Tcl_MutexLock(&exitMutex);
+    inFinalize = 1;
+    for (exitPtr = firstExitPtr; exitPtr != NULL; exitPtr = firstExitPtr) {
+	/*
+	 * Be careful to remove the handler from the list before invoking its
+	 * callback. This protects us against double-freeing if the callback
+	 * should call Tcl_DeleteExitHandler on itself.
+	 */
+
+	firstExitPtr = exitPtr->nextPtr;
+	Tcl_MutexUnlock(&exitMutex);
+	(*exitPtr->proc)(exitPtr->clientData);
+	ckfree((char *) exitPtr);
+	Tcl_MutexLock(&exitMutex);
+    }
+    firstExitPtr = NULL;
+    Tcl_MutexUnlock(&exitMutex);
 
     TclpInitLock();
     if (subsystemsInitialized == 0) {
@@ -1124,8 +1053,7 @@ Tcl_Finalize(void)
      */
 
     Tcl_MutexLock(&exitMutex);
-    for (exitPtr = firstLateExitPtr; exitPtr != NULL;
-	    exitPtr = firstLateExitPtr) {
+    for (exitPtr = firstLateExitPtr; exitPtr != NULL; exitPtr = firstLateExitPtr) {
 	/*
 	 * Be careful to remove the handler from the list before invoking its
 	 * callback. This protects us against double-freeing if the callback
@@ -1135,7 +1063,7 @@ Tcl_Finalize(void)
 	firstLateExitPtr = exitPtr->nextPtr;
 	Tcl_MutexUnlock(&exitMutex);
 	exitPtr->proc(exitPtr->clientData);
-	ckfree(exitPtr);
+	ckfree((char *) exitPtr);
 	Tcl_MutexLock(&exitMutex);
     }
     firstLateExitPtr = NULL;
@@ -1146,7 +1074,6 @@ Tcl_Finalize(void)
      * after the exit handlers, because there are order dependencies.
      */
 
-    TclFinalizeEvaluation();
     TclFinalizeExecution();
     TclFinalizeEnvironment();
 
@@ -1177,6 +1104,8 @@ Tcl_Finalize(void)
 
     TclFinalizeEncodingSubsystem();
 
+    Tcl_SetPanicProc(NULL);
+
     /*
      * Repeat finalization of the thread local storage once more. Although
      * this step is already done by the Tcl_FinalizeThread call above, series
@@ -1189,7 +1118,7 @@ Tcl_Finalize(void)
      * This fixes the Tcl Bug #990552.
      */
 
-    TclFinalizeThreadData(/* quick */ 0);
+    TclFinalizeThreadData();
 
     /*
      * Now we can free constants for conversions to/from double.
@@ -1200,10 +1129,10 @@ Tcl_Finalize(void)
     /*
      * There have been several bugs in the past that cause exit handlers to be
      * established during Tcl_Finalize processing. Such exit handlers leave
-     * malloc'ed memory, and Tcl_FinalizeMemorySubsystem or
-     * Tcl_FinalizeThreadAlloc will result in a corrupted heap. The result can
-     * be a mysterious crash on process exit. Check here that nobody's done
-     * this.
+     * malloc'ed memory, and Tcl_FinalizeThreadAlloc or
+     * Tcl_FinalizeMemorySubsystem will result in a corrupted heap. The result
+     * can be a mysterious crash on process exit. Check here that nobody's
+     * done this.
      */
 
     if (firstExitPtr != NULL) {
@@ -1250,6 +1179,7 @@ Tcl_Finalize(void)
      */
 
     TclFinalizeMemorySubsystem();
+    inFinalize = 0;
 
   alreadyFinalized:
     TclFinalizeLock();
@@ -1275,13 +1205,6 @@ Tcl_Finalize(void)
 void
 Tcl_FinalizeThread(void)
 {
-    FinalizeThread(/* quick */ 0);
-}
-
-void
-FinalizeThread(
-    int quick)
-{
     ExitHandler *exitPtr;
     ThreadSpecificData *tsdPtr;
 
@@ -1291,7 +1214,7 @@ FinalizeThread(
      * initialized already.
      */
 
-    tsdPtr = TclThreadDataKeyGet(&dataKey);
+    tsdPtr = (ThreadSpecificData *)TclThreadDataKeyGet(&dataKey);
     if (tsdPtr != NULL) {
 	tsdPtr->inExit = 1;
 
@@ -1304,8 +1227,8 @@ FinalizeThread(
 	     */
 
 	    tsdPtr->firstExitPtr = exitPtr->nextPtr;
-	    exitPtr->proc(exitPtr->clientData);
-	    ckfree(exitPtr);
+	    (*exitPtr->proc)(exitPtr->clientData);
+	    ckfree((char *) exitPtr);
 	}
 	TclFinalizeIOSubsystem();
 	TclFinalizeNotifier();
@@ -1322,7 +1245,8 @@ FinalizeThread(
      *
      * Fix [Bug #571002]
      */
-    TclFinalizeThreadData(quick);
+
+    TclFinalizeThreadData();
 }
 
 /*
@@ -1344,7 +1268,7 @@ FinalizeThread(
 int
 TclInExit(void)
 {
-    return inExit;
+    return inFinalize;
 }
 
 /*
@@ -1366,12 +1290,13 @@ TclInExit(void)
 int
 TclInThreadExit(void)
 {
-    ThreadSpecificData *tsdPtr = TclThreadDataKeyGet(&dataKey);
-
+    ThreadSpecificData *tsdPtr = (ThreadSpecificData *)
+	    TclThreadDataKeyGet(&dataKey);
     if (tsdPtr == NULL) {
 	return 0;
+    } else {
+	return tsdPtr->inExit;
     }
-    return tsdPtr->inExit;
 }
 
 /*
@@ -1397,54 +1322,32 @@ Tcl_VwaitObjCmd(
     ClientData clientData,	/* Not used. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int objc,			/* Number of arguments. */
-    Tcl_Obj *const objv[])	/* Argument objects. */
+    Tcl_Obj *CONST objv[])	/* Argument objects. */
 {
     int done, foundEvent;
-    const char *nameString;
+    char *nameString;
 
     if (objc != 2) {
 	Tcl_WrongNumArgs(interp, 1, objv, "name");
 	return TCL_ERROR;
     }
     nameString = Tcl_GetString(objv[1]);
-    if (Tcl_TraceVar2(interp, nameString, NULL,
+    if (Tcl_TraceVar(interp, nameString,
 	    TCL_GLOBAL_ONLY|TCL_TRACE_WRITES|TCL_TRACE_UNSETS,
-	    VwaitVarProc, &done) != TCL_OK) {
+	    VwaitVarProc, (ClientData) &done) != TCL_OK) {
 	return TCL_ERROR;
     };
     done = 0;
     foundEvent = 1;
     while (!done && foundEvent) {
 	foundEvent = Tcl_DoOneEvent(TCL_ALL_EVENTS);
-	if (Tcl_Canceled(interp, TCL_LEAVE_ERR_MSG) == TCL_ERROR) {
-	    break;
-	}
 	if (Tcl_LimitExceeded(interp)) {
-	    Tcl_ResetResult(interp);
-	    Tcl_SetObjResult(interp, Tcl_NewStringObj("limit exceeded", -1));
 	    break;
 	}
     }
-    Tcl_UntraceVar2(interp, nameString, NULL,
+    Tcl_UntraceVar(interp, nameString,
 	    TCL_GLOBAL_ONLY|TCL_TRACE_WRITES|TCL_TRACE_UNSETS,
-	    VwaitVarProc, &done);
-
-    if (!foundEvent) {
-	Tcl_ResetResult(interp);
-	Tcl_SetObjResult(interp, Tcl_ObjPrintf(
-		"can't wait for variable \"%s\": would wait forever",
-		nameString));
-	Tcl_SetErrorCode(interp, "TCL", "EVENT", "NO_SOURCES", NULL);
-	return TCL_ERROR;
-    }
-    if (!done) {
-	/*
-	 * The interpreter's result was already set to the right error message
-	 * prior to exiting the loop above.
-	 */
-
-	return TCL_ERROR;
-    }
+	    VwaitVarProc, (ClientData) &done);
 
     /*
      * Clear out the interpreter's result, since it may have been set by event
@@ -1452,6 +1355,15 @@ Tcl_VwaitObjCmd(
      */
 
     Tcl_ResetResult(interp);
+    if (!foundEvent) {
+	Tcl_AppendResult(interp, "can't wait for variable \"", nameString,
+		"\": would wait forever", NULL);
+	return TCL_ERROR;
+    }
+    if (!done) {
+	Tcl_AppendResult(interp, "limit exceeded", NULL);
+	return TCL_ERROR;
+    }
     return TCL_OK;
 }
 
@@ -1460,15 +1372,13 @@ static char *
 VwaitVarProc(
     ClientData clientData,	/* Pointer to integer to set to 1. */
     Tcl_Interp *interp,		/* Interpreter containing variable. */
-    const char *name1,		/* Name of variable. */
-    const char *name2,		/* Second part of variable name. */
+    CONST char *name1,		/* Name of variable. */
+    CONST char *name2,		/* Second part of variable name. */
     int flags)			/* Information about what happened. */
 {
-    int *donePtr = clientData;
+    int *donePtr = (int *) clientData;
 
     *donePtr = 1;
-    Tcl_UntraceVar(interp, name1, TCL_TRACE_WRITES|TCL_TRACE_UNSETS,
-	    VwaitVarProc, clientData);
     return NULL;
 }
 
@@ -1495,12 +1405,12 @@ Tcl_UpdateObjCmd(
     ClientData clientData,	/* Not used. */
     Tcl_Interp *interp,		/* Current interpreter. */
     int objc,			/* Number of arguments. */
-    Tcl_Obj *const objv[])	/* Argument objects. */
+    Tcl_Obj *CONST objv[])	/* Argument objects. */
 {
     int optionIndex;
     int flags = 0;		/* Initialized to avoid compiler warning. */
-    static const char *const updateOptions[] = {"idletasks", NULL};
-    enum updateOptions {OPT_IDLETASKS};
+    static CONST char *updateOptions[] = {"idletasks", NULL};
+    enum updateOptions {REGEXP_IDLETASKS};
 
     if (objc == 1) {
 	flags = TCL_ALL_EVENTS|TCL_DONT_WAIT;
@@ -1510,7 +1420,7 @@ Tcl_UpdateObjCmd(
 	    return TCL_ERROR;
 	}
 	switch ((enum updateOptions) optionIndex) {
-	case OPT_IDLETASKS:
+	case REGEXP_IDLETASKS:
 	    flags = TCL_WINDOW_EVENTS|TCL_IDLE_EVENTS|TCL_DONT_WAIT;
 	    break;
 	default:
@@ -1522,12 +1432,9 @@ Tcl_UpdateObjCmd(
     }
 
     while (Tcl_DoOneEvent(flags) != 0) {
-	if (Tcl_Canceled(interp, TCL_LEAVE_ERR_MSG) == TCL_ERROR) {
-	    return TCL_ERROR;
-	}
 	if (Tcl_LimitExceeded(interp)) {
 	    Tcl_ResetResult(interp);
-	    Tcl_SetObjResult(interp, Tcl_NewStringObj("limit exceeded", -1));
+	    Tcl_AppendResult(interp, "limit exceeded", NULL);
 	    return TCL_ERROR;
 	}
     }
@@ -1543,11 +1450,11 @@ Tcl_UpdateObjCmd(
 
 #ifdef TCL_THREADS
 /*
- *----------------------------------------------------------------------
+ *-----------------------------------------------------------------------------
  *
  * NewThreadProc --
  *
- *	Bootstrap function of a new Tcl thread.
+ * 	Bootstrap function of a new Tcl thread.
  *
  * Results:
  *	None.
@@ -1555,22 +1462,23 @@ Tcl_UpdateObjCmd(
  * Side Effects:
  *	Initializes Tcl notifier for the current thread.
  *
- *----------------------------------------------------------------------
+ *-----------------------------------------------------------------------------
  */
 
 static Tcl_ThreadCreateType
 NewThreadProc(
     ClientData clientData)
 {
-    ThreadClientData *cdPtr = clientData;
+    ThreadClientData *cdPtr;
     ClientData threadClientData;
     Tcl_ThreadCreateProc *threadProc;
 
+    cdPtr = (ThreadClientData *) clientData;
     threadProc = cdPtr->proc;
     threadClientData = cdPtr->clientData;
-    ckfree(clientData);		/* Allocated in Tcl_CreateThread() */
+    ckfree((char *) clientData);	/* Allocated in Tcl_CreateThread() */
 
-    threadProc(threadClientData);
+    (*threadProc)(threadClientData);
 
     TCL_THREAD_CREATE_RETURN;
 }
@@ -1598,23 +1506,21 @@ NewThreadProc(
 int
 Tcl_CreateThread(
     Tcl_ThreadId *idPtr,	/* Return, the ID of the thread */
-    Tcl_ThreadCreateProc *proc,	/* Main() function of the thread */
+    Tcl_ThreadCreateProc proc,	/* Main() function of the thread */
     ClientData clientData,	/* The one argument to Main() */
     int stackSize,		/* Size of stack for the new thread */
     int flags)			/* Flags controlling behaviour of the new
 				 * thread. */
 {
 #ifdef TCL_THREADS
-    ThreadClientData *cdPtr = ckalloc(sizeof(ThreadClientData));
-    int result;
+    ThreadClientData *cdPtr;
 
+    cdPtr = (ThreadClientData *) ckalloc(sizeof(ThreadClientData));
     cdPtr->proc = proc;
     cdPtr->clientData = clientData;
-    result = TclpThreadCreate(idPtr, NewThreadProc, cdPtr, stackSize, flags);
-    if (result != TCL_OK) {
-	ckfree(cdPtr);
-    }
-    return result;
+
+    return TclpThreadCreate(idPtr, NewThreadProc, (ClientData) cdPtr,
+	    stackSize, flags);
 #else
     return TCL_ERROR;
 #endif /* TCL_THREADS */
