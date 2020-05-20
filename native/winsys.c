@@ -637,7 +637,7 @@ void winsys_process_events()
 				if (!winsys_game_controller && event.jaxis.axis == getparam_joystick_x_axis())
 				{
 					//accelerometer
-					x_joystick = 2 * event.jaxis.value / 32767.0;
+					x_joystick = -2 * event.jaxis.value / 32767.0;
 					if (x_joystick > 1)
 						x_joystick = 1;
 					if (x_joystick < -1)
