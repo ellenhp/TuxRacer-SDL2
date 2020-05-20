@@ -90,6 +90,7 @@ static widget_t *back_button = NULL;
 
 /* Forward declaration */
 static void race_select_loop(scalar_t time_step);
+void update_text();
 
 const char *get_current_course_name()
 {
@@ -581,6 +582,8 @@ static void race_select_init(void)
     gui_add_widget(play_button = create_button(get_race_text(), play_cb), &button_coord);
 
     play_music("start_screen");
+
+    update_text();
 }
 
 /*---------------------------------------------------------------------------*/

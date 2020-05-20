@@ -186,7 +186,7 @@ void winsys_set_passive_motion_func(winsys_motion_func_t func)
 /*---------------------------------------------------------------------------*/
 /*! 
   Sets the joystick callback
-  \author  nopoe
+  \author  ellenhp
   \date    Created:  2013-10-06
   \date    Modfiied: 2013-10-06
 */
@@ -198,7 +198,7 @@ void winsys_set_joystick_func(winsys_joystick_func_t func)
 /*---------------------------------------------------------------------------*/
 /*! 
   Sets the joystick button callback
-  \author  nopoe
+  \author  ellenhp
   \date    Created:  2013-10-06
   \date    Modfiied: 2013-10-06
 */
@@ -335,7 +335,7 @@ static void setup_sdl_video_mode()
 /*---------------------------------------------------------------------------*/
 /*! 
   Handles time-critical events on mobile devices.
-  \author  nopoe
+  \author  ellenhp
   \date    Created:  2013-10-08
   \date    Modified: 2013-10-08 */
 int winsys_event_filter(void *userdata, SDL_Event *event)
@@ -814,7 +814,7 @@ void winsys_process_events()
 /*---------------------------------------------------------------------------*/
 /*! 
   Adds an assocation between a joystick button and an SDL Key.
-  \author  nopoe
+  \author  ellenhp
   \date    Created:  2013-10-08
   \date    Modified: 2013-10-08 */
 void winsys_add_js_button_binding(int js_button, int sdl_key)
@@ -830,7 +830,7 @@ void winsys_add_js_button_binding(int js_button, int sdl_key)
 /*---------------------------------------------------------------------------*/
 /*! 
   Binds the joystick axes to the arrow keys
-  \author  nopoe
+  \author  ellenhp
   \date    Created:  2013-10-08
   \date    Modified: 2013-10-08 */
 void winsys_add_js_axis_bindings()
@@ -841,7 +841,7 @@ void winsys_add_js_axis_bindings()
 /*---------------------------------------------------------------------------*/
 /*! 
   Resets all bindings of joystick axes or buttons to keys.
-  \author  nopoe
+  \author  ellenhp
   \date    Created:  2013-10-08
   \date    Modified: 2013-10-08 */
 void winsys_reset_js_bindings()
@@ -854,7 +854,7 @@ void winsys_reset_js_bindings()
 /*! 
   Updates the joysticks for the purposes of sending keyboard events bound
   to the axes.
-  \author  nopoe
+  \author  ellenhp
   \date    Created:  2013-10-08
   \date    Modified: 2013-10-08 */
 void winsys_update_joysticks()

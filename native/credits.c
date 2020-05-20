@@ -43,7 +43,7 @@
 #define CREDITS_MAX_Y -140
 #define CREDITS_MIN_Y 64
 
-#define CREDITS_SPEED 40
+#define CREDITS_SPEED 60
 #define CREDITS_JOYSTICK_SPEED 150
 
 double joystick_y;
@@ -70,8 +70,8 @@ static credit_line_t credit_lines[] =
         {"credits_text", ""},
         {"credits_h2", "Development Team:"},
         {"credits_text_small", "(Alphabetical Order)"},
+        {"credits_text", "Ellen Poe"},
         {"credits_text", "Lennie Araki"},
-        {"credits_text", "Nolan Poe"},
         {"credits_text", ""},
         {"credits_h2", "Original Tux Racer"},
         {"credits_h2", "Core Development Team:"},
@@ -90,7 +90,7 @@ static credit_line_t credit_lines[] =
         {"credits_text", "Felix Jankowski"},
         {"credits_text", ""},
         {"credits_h2", "Source available at:"},
-        {"credits_text", "https://github.com/nopoe/TuxRacer-SDL2"},
+        {"credits_text", "https://github.com/ellenhp/TuxRacer-SDL2"},
 };
 
 static scalar_t y_offset = 0;
@@ -127,7 +127,7 @@ void mouse_cb(int button, int state, int finger_index, int x, int y)
 /*---------------------------------------------------------------------------*/
 /*! 
  Joystick axis event callback
- \author  nopoe
+ \author  ellenhp
  \date    Created:  2013-10-08
  \date    Modified: 2013-10-08
  */
@@ -139,7 +139,7 @@ void credits_joystick_func(double x, double y)
 /*---------------------------------------------------------------------------*/
 /*! 
  Joystick button event callback
- \author  nopoe
+ \author  ellenhp
  \date    Created:  2013-10-08
  \date    Modified: 2013-10-08
  */

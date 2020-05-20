@@ -34,7 +34,7 @@
 #include <vector>
 
 std::deque<glm::mat4> matrix_stack;
-glm::mat4 current_mat;
+glm::mat4 current_mat(1.0f);
 
 std::vector<GLfloat> tux_verts;
 std::vector<GLfloat> tux_normals;

@@ -470,7 +470,7 @@ void draw_sky(point_t pos)
             // that makes the plane and texture non contiguous.
             // this removes an artifacts visible in the sky
 
-            // nopoe 10/13/2013: necessary even on windows when using OpenGL ES rendering code
+            // ellenhp 10/13/2013: necessary even on windows when using OpenGL ES rendering code
 
             ZERO,
             ZERO,
