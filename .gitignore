@@ -179,3 +179,5 @@ android/libs/obj
 android/local.properties
 
 bazel-*
+
+*.bin
