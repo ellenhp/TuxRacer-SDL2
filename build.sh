@@ -10,4 +10,4 @@ if [[ -z "${ANDROID_NDK_HOME}" ]]; then
     exit 1;
 fi
 
-bazel build --verbose_failures --subcommands --verbose_failures //android/java:app
+bazel build --verbose_failures --subcommands --verbose_failures //android/java:app --compilation_mode=opt
