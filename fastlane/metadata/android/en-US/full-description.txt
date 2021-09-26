@@ -1,0 +1,3 @@
+Slide down snowy slopes with Tux, the Linux mascot. Collect herring along the way to earn points, but hurry, the clock is ticking!
+
+Tux Racer is released under the terms of the GNU General Public License, verion 2.
