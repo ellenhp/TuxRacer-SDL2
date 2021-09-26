@@ -1,8 +1,9 @@
 on: [pull_request]
 jobs:
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v1
-    - uses: ashutoshgngwr/validate-fastlane-supply-metadata@v1
-      with:
-        fastlaneDir: ./fastlane
+  validate-fastlane:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: ashutoshgngwr/validate-fastlane-supply-metadata@v1
+        with:
+          fastlaneDir: ./fastlane
